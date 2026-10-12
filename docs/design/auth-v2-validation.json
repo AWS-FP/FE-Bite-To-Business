@@ -1,0 +1,361 @@
+{
+  "fileKey": "slN9sK1TVVTINvDzn1sA81",
+  "runId": "mdfoods-auth-v2-20261011",
+  "validatedScreens": 10,
+  "fonts": [
+    "Inter"
+  ],
+  "editability": "Native text, component instances and vectors; raster food photography only",
+  "layoutFix": {
+    "mutatedNodeIds": [
+      "31:2100",
+      "31:2115",
+      "31:2126",
+      "31:2127",
+      "31:2135",
+      "31:2181",
+      "31:2189",
+      "31:2203",
+      "31:2250",
+      "31:2272",
+      "31:2284",
+      "31:2292",
+      "31:2302",
+      "31:2310",
+      "31:2318",
+      "31:2337",
+      "31:2364",
+      "31:2382",
+      "31:2394",
+      "31:2408",
+      "31:2420",
+      "31:2484",
+      "31:2510",
+      "31:2522",
+      "31:2529",
+      "31:2539",
+      "31:2547",
+      "31:2555",
+      "31:2592",
+      "31:2625",
+      "31:2632",
+      "31:2651",
+      "31:2665",
+      "31:2677",
+      "31:2746",
+      "31:2753",
+      "31:2786",
+      "31:2798",
+      "31:2805",
+      "31:2815",
+      "31:2823",
+      "31:2831",
+      "31:2864",
+      "31:2885",
+      "31:2893",
+      "31:2912",
+      "31:2926",
+      "31:2938",
+      "31:2991",
+      "31:2999",
+      "31:3032",
+      "31:3052",
+      "31:3070",
+      "31:3084",
+      "31:3103",
+      "15:360",
+      "15:524",
+      "31:2261",
+      "31:2397",
+      "31:2499",
+      "31:2654",
+      "31:2775",
+      "31:2915",
+      "31:3021",
+      "31:3073"
+    ],
+    "views": [
+      {
+        "id": "15:360",
+        "name": "MD Foods / Login / Desktop / VI",
+        "width": 1440,
+        "height": 1000,
+        "children": [
+          {
+            "id": "31:2090",
+            "name": "Header",
+            "width": 1344,
+            "height": 44
+          },
+          {
+            "id": "31:2113",
+            "name": "Login content",
+            "width": 1344,
+            "height": 744
+          },
+          {
+            "id": "31:2189",
+            "name": "Footer",
+            "width": 1344,
+            "height": 17
+          }
+        ]
+      },
+      {
+        "id": "15:524",
+        "name": "MD Foods / Login / Mobile / VI",
+        "width": 390,
+        "height": 844,
+        "children": [
+          {
+            "id": "31:2193",
+            "name": "Header",
+            "width": 342,
+            "height": 44
+          },
+          {
+            "id": "31:2214",
+            "name": "Login form",
+            "width": 342,
+            "height": 590
+          },
+          {
+            "id": "31:2258",
+            "name": "Footer",
+            "width": 342,
+            "height": 34
+          }
+        ]
+      },
+      {
+        "id": "31:2261",
+        "name": "MD Foods / Register / 01 Contact / Desktop / VI",
+        "width": 1440,
+        "height": 1080,
+        "children": [
+          {
+            "id": "31:2262",
+            "name": "Header",
+            "width": 1344,
+            "height": 44
+          },
+          {
+            "id": "31:2284",
+            "name": "Registration content",
+            "width": 1184,
+            "height": 813
+          },
+          {
+            "id": "31:2394",
+            "name": "Footer",
+            "width": 1344,
+            "height": 17
+          }
+        ]
+      },
+      {
+        "id": "31:2397",
+        "name": "MD Foods / Register / 01 Contact / Mobile / VI",
+        "width": 390,
+        "height": 1130,
+        "children": [
+          {
+            "id": "31:2398",
+            "name": "Header",
+            "width": 342,
+            "height": 44
+          },
+          {
+            "id": "31:2419",
+            "name": "Registration form",
+            "width": 342,
+            "height": 941
+          },
+          {
+            "id": "31:2496",
+            "name": "Footer",
+            "width": 342,
+            "height": 34
+          }
+        ]
+      },
+      {
+        "id": "31:2499",
+        "name": "MD Foods / Register / 02 Delivery / Desktop / VI",
+        "width": 1440,
+        "height": 1080,
+        "children": [
+          {
+            "id": "31:2500",
+            "name": "Header",
+            "width": 1344,
+            "height": 44
+          },
+          {
+            "id": "31:2522",
+            "name": "Registration content",
+            "width": 1184,
+            "height": 805
+          },
+          {
+            "id": "31:2651",
+            "name": "Footer",
+            "width": 1344,
+            "height": 17
+          }
+        ]
+      },
+      {
+        "id": "31:2654",
+        "name": "MD Foods / Register / 02 Delivery / Mobile / VI",
+        "width": 390,
+        "height": 1120,
+        "children": [
+          {
+            "id": "31:2655",
+            "name": "Header",
+            "width": 342,
+            "height": 44
+          },
+          {
+            "id": "31:2676",
+            "name": "Registration form",
+            "width": 342,
+            "height": 835
+          },
+          {
+            "id": "31:2772",
+            "name": "Footer",
+            "width": 342,
+            "height": 34
+          }
+        ]
+      },
+      {
+        "id": "31:2775",
+        "name": "MD Foods / Register / 03 Invoice / Desktop / VI",
+        "width": 1440,
+        "height": 1080,
+        "children": [
+          {
+            "id": "31:2776",
+            "name": "Header",
+            "width": 1344,
+            "height": 44
+          },
+          {
+            "id": "31:2798",
+            "name": "Registration content",
+            "width": 1184,
+            "height": 821
+          },
+          {
+            "id": "31:2912",
+            "name": "Footer",
+            "width": 1344,
+            "height": 17
+          }
+        ]
+      },
+      {
+        "id": "31:2915",
+        "name": "MD Foods / Register / 03 Invoice / Mobile / VI",
+        "width": 390,
+        "height": 1200,
+        "children": [
+          {
+            "id": "31:2916",
+            "name": "Header",
+            "width": 342,
+            "height": 44
+          },
+          {
+            "id": "31:2937",
+            "name": "Registration form",
+            "width": 342,
+            "height": 887
+          },
+          {
+            "id": "31:3018",
+            "name": "Footer",
+            "width": 342,
+            "height": 34
+          }
+        ]
+      },
+      {
+        "id": "31:3021",
+        "name": "MD Foods / Register / Pending approval / Desktop / VI",
+        "width": 1440,
+        "height": 1000,
+        "children": [
+          {
+            "id": "31:3022",
+            "name": "Header",
+            "width": 1344,
+            "height": 44
+          },
+          {
+            "id": "31:3044",
+            "name": "Request received",
+            "width": 560,
+            "height": 411
+          },
+          {
+            "id": "31:3070",
+            "name": "Footer",
+            "width": 1344,
+            "height": 17
+          }
+        ]
+      },
+      {
+        "id": "31:3073",
+        "name": "MD Foods / Register / Pending approval / Mobile / VI",
+        "width": 390,
+        "height": 844,
+        "children": [
+          {
+            "id": "31:3074",
+            "name": "Header",
+            "width": 342,
+            "height": 44
+          },
+          {
+            "id": "31:3095",
+            "name": "Request received",
+            "width": 342,
+            "height": 420
+          },
+          {
+            "id": "31:3121",
+            "name": "Footer",
+            "width": 342,
+            "height": 34
+          }
+        ]
+      }
+    ]
+  },
+  "prototypeFix": {
+    "mutatedNodeIds": [
+      "31:2170",
+      "31:2240",
+      "31:2384",
+      "31:2486",
+      "31:2634",
+      "31:2641",
+      "31:2755",
+      "31:2762",
+      "31:2895",
+      "31:2902",
+      "31:3001",
+      "31:3008",
+      "31:3061",
+      "31:3112",
+      "31:2101"
+    ],
+    "checkedViews": 10,
+    "validPrototypeActions": 25
+  }
+}
