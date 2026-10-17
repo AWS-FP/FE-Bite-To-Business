@@ -1,4 +1,4 @@
-﻿# Cấu trúc Frontend MD Foods
+﻿# Cấu trúc Frontend Bite to Business
 
 **Stack:** React + TypeScript + Vite; i18next/react-i18next cho VI/EN.  
 **Trạng thái:** Cập nhật theo folder hiện có trong `src/`; giữ nguyên các feature đã có và bổ sung folder cho nghiệp vụ còn thiếu. A2UI là giao thức UI động đã chọn; system prompt và khóa model nằm ở Backend.

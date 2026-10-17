@@ -9,7 +9,7 @@ import LanguageSwitcher from '../../../components/navigation/LanguageSwitcher'
 export default function AuthInformationPage({ kind }: { kind: 'register' | 'forgot' }) {
   const { t } = useTranslation()
   const title = t(`information.${kind}Title`)
-  useEffect(() => { document.title = `${title} | MD Foods` }, [title])
+  useEffect(() => { document.title = `${title} | Bite to Business` }, [title])
   return (
     <main className="auth-information">
       <header><Brand compact /><LanguageSwitcher /></header>

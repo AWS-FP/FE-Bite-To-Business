@@ -3,7 +3,7 @@ import { initReactI18next } from 'react-i18next'
 import vi from './locales/vi/auth.json'
 import en from './locales/en/auth.json'
 
-const storageKey = 'mdfoods.language'
+const storageKey = 'bitetobusiness.language'
 let language = 'vi'
 try {
   if (localStorage.getItem(storageKey) === 'en') language = 'en'
