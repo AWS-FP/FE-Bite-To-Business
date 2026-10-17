@@ -1,7 +1,7 @@
 ﻿# Cấu trúc Frontend Bite to Business
 
 **Stack:** React + TypeScript + Vite; i18next/react-i18next cho VI/EN.  
-**Trạng thái:** Cập nhật theo folder hiện có trong `src/`; giữ nguyên các feature đã có và bổ sung folder cho nghiệp vụ còn thiếu. A2UI là giao thức UI động đã chọn; system prompt và khóa model nằm ở Backend.
+**Trạng thái:** FE hiện chỉ giữ cấu hình và cây thư mục để triển khai sau. Đã gỡ code UI đăng nhập, form, component, CSS và route hiển thị; `App` trả về `null` nên trang chạy trắng. Các file page/component chưa triển khai là placeholder trống. Giữ setup React/Vite/TypeScript, thư viện đã cài và i18next/react-i18next với dữ liệu dịch trống. A2UI là giao thức UI động đã chọn; system prompt và khóa model nằm ở Backend.
 
 ```text
 Generate-UI-FE/src/

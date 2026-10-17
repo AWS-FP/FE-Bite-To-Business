@@ -6,7 +6,8 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // docs chứa tài liệu và script chạy trong Figma, không thuộc source của ứng dụng.
+  globalIgnores(['dist', 'docs']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

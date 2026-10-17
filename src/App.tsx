@@ -1,5 +1,4 @@
-import AppRouter from './app/router/AppRouter'
-
 export default function App() {
-  return <AppRouter />
+  // Chưa triển khai UI; giữ React entry point để bắt đầu làm từng page sau.
+  return null
 }
