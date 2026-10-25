@@ -19,10 +19,18 @@ try {
 
 void i18n.use(initReactI18next).init({
   resources: {
-    vi: { translation: vi, common: viCommon, storefront: viStorefront },
-    en: { translation: en, common: enCommon, storefront: enStorefront },
-    vi: { translation: vi, common: viCommon, admin: { ...viAdmin, ...viRegistrations } },
-    en: { translation: en, common: enCommon, admin: { ...enAdmin, ...enRegistrations } },
+    vi: {
+      translation: vi,
+      common: viCommon,
+      storefront: viStorefront,
+      admin: { ...viAdmin, ...viRegistrations },
+    },
+    en: {
+      translation: en,
+      common: enCommon,
+      storefront: enStorefront,
+      admin: { ...enAdmin, ...enRegistrations },
+    },
   },
   lng: language,
   fallbackLng: 'vi',
