@@ -1,0 +1,34 @@
+/* Màu của từng loại nút được khai báo trực tiếp, không ghép chuỗi class trong React. */
+.admin-button[data-tone='plain'] {
+  background: white;
+}
+
+.admin-button[data-tone='plain']:hover {
+  background: #fff8e8;
+}
+
+.admin-button[data-tone='primary'] {
+  background: #ffe14d;
+  box-shadow: 3px 3px 0 #000;
+}
+
+.admin-button[data-tone='primary']:hover {
+  background: #ffda24;
+}
+
+.admin-button[data-tone='danger'] {
+  background: #ffb4ba;
+  box-shadow: 3px 3px 0 #000;
+}
+
+.admin-button[data-tone='danger']:hover {
+  background: #ffa0a8;
+}
+
+.admin-button[data-tone='subtleDanger'] {
+  background: #fbeeed;
+}
+
+.admin-button[data-tone='subtleDanger']:hover {
+  background: #f7deda;
+}

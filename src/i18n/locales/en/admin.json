@@ -1,0 +1,27 @@
+{
+  "workspace": "ADMIN WORKSPACE",
+  "skipToContent": "Skip to main content",
+  "navigation": {
+    "registrations": "Customer registrations",
+    "staff": "Staff accounts"
+  },
+  "header": {
+    "title": "Operations desk.",
+    "breadcrumb": "Current location",
+    "language": "LANGUAGE",
+    "role": "Administrator",
+    "accountMenu": "Admin account menu: {{name}}",
+    "accountDetails": "Account details",
+    "closeAccount": "Close account details",
+    "logout": "Sign out"
+  },
+  "sidebar": {
+    "label": "Admin navigation",
+    "accountManagement": "ACCOUNT MANAGEMENT",
+    "pendingRegistrations": "Customer registrations, {{count}} applications awaiting approval",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar",
+    "open": "Open admin navigation",
+    "close": "Close admin navigation"
+  }
+}
