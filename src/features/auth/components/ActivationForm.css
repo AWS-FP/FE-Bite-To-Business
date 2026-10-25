@@ -1,0 +1,121 @@
+.activation-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 24px;
+  text-align: left;
+}
+
+.activation-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  padding: 0 15px;
+  border: 1px solid #17133a20;
+  border-radius: 12px;
+  background: white;
+  color: #17133a;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.activation-input::placeholder {
+  color: #a8a3b4;
+  opacity: 1;
+}
+.activation-input:focus {
+  border-color: #123b2e;
+  box-shadow: 0 0 0 3px #123b2e18;
+}
+.activation-input[aria-invalid='true'] {
+  border-color: #e8453c;
+}
+.activation-input:disabled {
+  cursor: not-allowed;
+  background: #f1eff8;
+}
+.activation-otp {
+  font-family: monospace;
+  font-size: 22px;
+  letter-spacing: 0.2em;
+}
+
+.activation-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 18px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: #17133a;
+  color: white;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+}
+.activation-button:hover {
+  background: #123b2e;
+}
+.activation-button:disabled {
+  opacity: 0.65;
+}
+
+.activation-error,
+.activation-notice {
+  padding: 14px 16px;
+  border: 1px solid #f5c2bc;
+  border-radius: 12px;
+  background: #ffedeb;
+  color: #9b2018;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.activation-notice {
+  border-color: #123b2e26;
+  background: #e8eaff;
+  color: #343282;
+}
+.activation-error-code {
+  display: block;
+  margin-top: 4px;
+  font-family: monospace;
+  font-size: 12px;
+}
+.activation-link {
+  color: #123b2e;
+  font-size: 13px;
+  font-weight: 600;
+  text-underline-offset: 4px;
+}
+.activation-link:hover {
+  text-decoration: underline;
+}
+.activation-password {
+  position: relative;
+}
+.activation-password .activation-input {
+  padding-right: 50px;
+}
+.activation-password button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #123b2e;
+}
+.activation-password button:hover {
+  background: #123b2e0d;
+}
