@@ -3,6 +3,7 @@ import { AUTH_ROLES } from "../../features/auth/constants/roles";
 import LoginPage from "../../features/auth/pages/LoginPage";
 import RegisterPage from "../../features/auth/pages/RegisterPage";
 import ActivationPage from "../../features/auth/pages/ActivationPage";
+import HomePage from "../../features/customer/pages/HomePage";
 import PendingPage from "../../components/feedback/PendingPage";
 import ProtectedRoute from "./ProtectedRoute";
 import { ROUTES } from "./routes";
@@ -16,7 +17,7 @@ export const router = createBrowserRouter([
   { path: ROUTES.FORGOT_PASSWORD, Component: PendingPage },
   // Guest được xem sản phẩm và mở giỏ hàng; checkout vẫn yêu cầu đăng nhập.
   // Mỗi trang tự chọn bố cục và dùng Header/Footer chung khi cần.
-  { path: ROUTES.HOME, Component: PendingPage },
+  { path: ROUTES.HOME, Component: HomePage },
   { path: ROUTES.CATALOG, Component: PendingPage },
   { path: ROUTES.PRODUCT_DETAIL, Component: PendingPage },
   { path: ROUTES.QUOTES, Component: PendingPage },
