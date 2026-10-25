@@ -117,14 +117,15 @@
     "recipient": "Gmail nhận OTP",
     "activationNote": "Customer sẽ tự xác minh OTP, tạo và xác nhận mật khẩu. Admin không nhập mật khẩu hoặc OTP cho Customer. Đã duyệt không đồng nghĩa với Đã kích hoạt.",
     "rejectTitle": "Từ chối hồ sơ đăng ký?",
-    "rejectDescription": "Vui lòng cho biết lý do từ chối hồ sơ của {{name}}.",
+    "rejectDescription": "Vui lòng cho biết lý do từ chối hồ sơ của {{name}}. Lý do này sẽ được gửi đến Gmail đăng ký.",
     "reason": "Lý do từ chối",
     "reasonPlaceholder": "Nhập lý do cụ thể để Customer có thể bổ sung thông tin...",
     "characterCount": "{{count}} / 2.000 ký tự"
   },
   "notices": {
     "approved": "Đã duyệt hồ sơ và gửi OTP đến Gmail đăng ký. Customer cần xác minh OTP và tạo mật khẩu để kích hoạt tài khoản.",
-    "rejected": "Đã từ chối hồ sơ và lưu lý do xử lý.",
+    "rejected": "Đã từ chối hồ sơ và gửi email thông báo kèm lý do đến Gmail đăng ký.",
+    "rejectionEmailFailed": "Đã từ chối hồ sơ và lưu lý do, nhưng chưa gửi được email thông báo. Vui lòng kiểm tra dịch vụ email của hệ thống.",
     "otpSent": "Đã gửi lại OTP đến Gmail đăng ký.",
     "otpFailedTitle": "Đã duyệt · Gửi OTP chưa thành công",
     "otpFailedDescription": "Hồ sơ vẫn được giữ trạng thái Đã duyệt. Hãy gửi lại OTP để Customer có thể tự kích hoạt tài khoản."

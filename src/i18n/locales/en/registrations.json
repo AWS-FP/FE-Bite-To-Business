@@ -118,14 +118,15 @@
     "recipient": "OTP recipient",
     "activationNote": "The Customer verifies the OTP and creates and confirms their own password. Admins do not enter passwords or OTPs for Customers. Approval does not activate the account.",
     "rejectTitle": "Reject this application?",
-    "rejectDescription": "Please explain why you are rejecting the application from {{name}}.",
+    "rejectDescription": "Please explain why you are rejecting the application from {{name}}. This reason will be emailed to the registered Gmail address.",
     "reason": "Rejection reason",
     "reasonPlaceholder": "Enter a specific reason so the Customer can provide the required information...",
     "characterCount": "{{count}} / 2,000 characters"
   },
   "notices": {
     "approved": "Application approved and OTP sent to the registered Gmail. The Customer must verify the code and create a password to activate their account.",
-    "rejected": "Application rejected and the reason saved.",
+    "rejected": "Application rejected and a notification email with the reason sent to the registered Gmail address.",
+    "rejectionEmailFailed": "Application rejected and the reason saved, but the notification email could not be sent. Please check the system email service.",
     "otpSent": "OTP resent to the registered Gmail.",
     "otpFailedTitle": "Approved · OTP delivery failed",
     "otpFailedDescription": "This application remains approved. Resend the OTP so the Customer can activate their account."
