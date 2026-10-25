@@ -1,151 +1,152 @@
 {
-  "stats": {
-    "total": {
-      "title": "Tổng hồ sơ đăng ký",
-      "description": "Tất cả hồ sơ trong hệ thống"
+    "stats": {
+        "total": {
+            "title": "Tổng hồ sơ đăng ký",
+            "description": "Tất cả hồ sơ trong hệ thống"
+        },
+        "pending": {
+            "title": "Chờ duyệt",
+            "description": "Hồ sơ đang chờ bạn xem xét"
+        },
+        "approved": {
+            "title": "Đã duyệt",
+            "description": "Đã đủ điều kiện tạo tài khoản"
+        },
+        "rejected": {
+            "title": "Từ chối",
+            "description": "Hồ sơ không đáp ứng yêu cầu"
+        }
     },
-    "pending": {
-      "title": "Chờ duyệt",
-      "description": "Hồ sơ đang chờ bạn xem xét"
+    "status": {
+        "ALL": "Tất cả",
+        "PENDING": "Chờ duyệt",
+        "APPROVED": "Đã duyệt",
+        "REJECTED": "Từ chối"
     },
-    "approved": {
-      "title": "Đã duyệt",
-      "description": "Đã đủ điều kiện tạo tài khoản"
+    "activation": {
+        "active": "Đã kích hoạt",
+        "inactive": "Chưa kích hoạt",
+        "waiting": "Chờ kích hoạt",
+        "otpFailed": "Gửi OTP lỗi"
     },
-    "rejected": {
-      "title": "Từ chối",
-      "description": "Hồ sơ không đáp ứng yêu cầu"
+    "customerType": {
+        "HOUSEHOLD_INDIVIDUAL_BUSINESS": "Cá nhân / Hộ gia đình",
+        "BUSINESS_COOPERATIVE": "Doanh nghiệp / HTX"
+    },
+    "list": {
+        "stamp": "HỒ SƠ & KẾT NỐI",
+        "title": "Danh sách đăng ký",
+        "count": "{{count}} hồ sơ",
+        "description": "Theo dõi và xử lý các yêu cầu đăng ký Customer.",
+        "filterStatus": "Lọc theo trạng thái",
+        "filterType": "Loại Customer",
+        "search": "Tìm tên, Gmail, số điện thoại...",
+        "loading": "Đang tải hồ sơ...",
+        "empty": "Chưa có hồ sơ đăng ký",
+        "emptyDescription": "Hồ sơ Customer gửi sẽ xuất hiện tại đây để bạn xét duyệt.",
+        "emptyFiltered": "Không có hồ sơ phù hợp. Hãy thử từ khóa hoặc bộ lọc khác.",
+        "results": "Hiển thị {{from}}–{{to}} trong {{total}} kết quả",
+        "pagination": "Phân trang hồ sơ",
+        "tableLabel": "Danh sách hồ sơ đăng ký Customer"
+    },
+    "fields": {
+        "name": "Họ tên",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "phone": "Số điện thoại",
+        "customerType": "Loại Customer",
+        "businessShort": "Doanh nghiệp / Đại diện",
+        "businessName": "Tên doanh nghiệp / Người đại diện",
+        "submittedShort": "Ngày gửi",
+        "submittedAt": "Ngày gửi yêu cầu",
+        "reviewedAt": "Ngày xét duyệt",
+        "reviewStatus": "Xét duyệt",
+        "activation": "Kích hoạt tài khoản",
+        "actions": "Thao tác",
+        "province": "Tỉnh / Thành phố",
+        "district": "Quận / Huyện",
+        "ward": "Phường / Xã",
+        "deliveryAddress": "Địa chỉ giao hàng chi tiết",
+        "invoiceSameAsDelivery": "Trùng địa chỉ giao hàng",
+        "invoicePurchaser": "Người mua hàng",
+        "invoiceTaxCode": "Mã số thuế",
+        "invoiceEmail": "Email nhận hóa đơn",
+        "invoiceAddress": "Địa chỉ hóa đơn",
+        "reviewNote": "Ghi chú / Lý do từ chối",
+        "otpSentAt": "Lần gửi OTP gần nhất",
+        "activatedAt": "Thời điểm kích hoạt",
+        "fullDeliveryAddress": "Địa chỉ nhận hàng đầy đủ",
+        "deliveryNote": "Ghi chú giao hàng"
+    },
+    "actions": {
+        "view": "Xem hồ sơ",
+        "viewNamed": "Xem hồ sơ {{name}}",
+        "refresh": "Làm mới danh sách",
+        "retry": "Thử lại",
+        "previous": "Trang trước",
+        "next": "Trang sau",
+        "page": "Trang {{page}}",
+        "sortNewest": "Ngày gửi: mới nhất trước",
+        "sortOldest": "Ngày gửi: cũ nhất trước",
+        "close": "Đóng",
+        "closeProfile": "Đóng hồ sơ",
+        "cancel": "Hủy",
+        "approve": "Duyệt và gửi OTP",
+        "reject": "Từ chối",
+        "confirmReject": "Xác nhận từ chối",
+        "processing": "Đang xử lý...",
+        "resend": "Gửi lại OTP",
+        "resendCooldown": "Gửi lại sau {{seconds}}s"
+    },
+    "detail": {
+        "eyebrow": "HỒ SƠ ĐĂNG KÝ / {{id}}",
+        "title": "Thông tin Customer",
+        "description": "Xem lại thông tin trước khi xử lý hồ sơ.",
+        "contact": "Thông tin liên hệ",
+        "customer": "Thông tin Customer",
+        "invoice": "Thông tin hóa đơn",
+        "processing": "Thông tin xử lý",
+        "notProvided": "Chưa cung cấp",
+        "yes": "Có",
+        "no": "Không",
+        "onceOnly": "Chỉ xử lý một lần"
+    },
+    "review": {
+        "approveTitle": "Duyệt hồ sơ và gửi OTP?",
+        "approveDescription": "Hồ sơ sẽ chuyển sang Đã duyệt. Mã OTP sẽ được gửi đến Gmail đăng ký dưới đây.",
+        "recipient": "Gmail nhận OTP",
+        "activationNote": "Customer sẽ tự xác minh OTP, tạo và xác nhận mật khẩu. Admin không nhập mật khẩu hoặc OTP cho Customer. Đã duyệt không đồng nghĩa với Đã kích hoạt.",
+        "rejectTitle": "Từ chối hồ sơ đăng ký?",
+        "rejectDescription": "Vui lòng cho biết lý do từ chối hồ sơ của {{name}}. Lý do này sẽ được gửi đến Gmail đăng ký.",
+        "reason": "Lý do từ chối",
+        "reasonPlaceholder": "Nhập lý do cụ thể để Customer có thể bổ sung thông tin...",
+        "characterCount": "{{count}} / 2.000 ký tự",
+        "reasonTooLong": "Lý do từ chối không được vượt quá 2.000 ký tự."
+    },
+    "notices": {
+        "approved": "Đã duyệt hồ sơ và gửi OTP đến Gmail đăng ký. Customer cần xác minh OTP và tạo mật khẩu để kích hoạt tài khoản.",
+        "rejected": "Đã từ chối hồ sơ và gửi email thông báo kèm lý do đến Gmail đăng ký.",
+        "rejectionEmailFailed": "Đã từ chối hồ sơ và lưu lý do, nhưng chưa gửi được email thông báo. Vui lòng kiểm tra dịch vụ email của hệ thống.",
+        "otpSent": "Đã gửi lại OTP đến Gmail đăng ký.",
+        "otpFailedTitle": "Đã duyệt · Gửi OTP chưa thành công",
+        "otpFailedDescription": "Hồ sơ vẫn được giữ trạng thái Đã duyệt. Hãy gửi lại OTP để Customer có thể tự kích hoạt tài khoản."
+    },
+    "errors": {
+        "unknown": "Không thể xử lý yêu cầu. Vui lòng thử lại.",
+        "network": "Không kết nối được máy chủ. Kiểm tra kết nối rồi thử lại.",
+        "unavailable": "Dịch vụ tạm thời không khả dụng. Vui lòng thử lại sau.",
+        "unauthorized": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+        "forbidden": "Bạn không có quyền xử lý hồ sơ này.",
+        "notFound": "Không tìm thấy hồ sơ đăng ký.",
+        "alreadyReviewed": "Hồ sơ đã được xử lý trước đó. Thông tin đang được cập nhật lại.",
+        "alreadyActivated": "Customer đã kích hoạt tài khoản, không cần gửi lại OTP.",
+        "reasonRequired": "Vui lòng nhập lý do từ chối.",
+        "cooldown": "Bạn vừa gửi yêu cầu quá nhanh. Vui lòng chờ rồi thử lại.",
+        "mail": "Chưa gửi được OTP. Hồ sơ đã duyệt vẫn được giữ nguyên; bạn có thể gửi lại mã.",
+        "validation": "Thông tin chưa hợp lệ. Vui lòng kiểm tra và thử lại."
+    },
+    "footer": {
+        "copyright": "© {{year}} Bite to Business. Kết nối nguồn thực phẩm tốt.",
+        "adminOnly": "Chỉ dành cho quản trị viên"
     }
-  },
-  "status": {
-    "ALL": "Tất cả",
-    "PENDING": "Chờ duyệt",
-    "APPROVED": "Đã duyệt",
-    "REJECTED": "Từ chối"
-  },
-  "activation": {
-    "active": "Đã kích hoạt",
-    "inactive": "Chưa kích hoạt",
-    "waiting": "Chờ kích hoạt",
-    "otpFailed": "Gửi OTP lỗi"
-  },
-  "customerType": {
-    "HOUSEHOLD_INDIVIDUAL_BUSINESS": "Cá nhân / Hộ gia đình",
-    "BUSINESS_COOPERATIVE": "Doanh nghiệp / HTX"
-  },
-  "list": {
-    "stamp": "HỒ SƠ & KẾT NỐI",
-    "title": "Danh sách đăng ký",
-    "count": "{{count}} hồ sơ",
-    "description": "Theo dõi và xử lý các yêu cầu đăng ký Customer.",
-    "filterStatus": "Lọc theo trạng thái",
-    "filterType": "Loại Customer",
-    "search": "Tìm tên, Gmail, số điện thoại...",
-    "loading": "Đang tải hồ sơ...",
-    "empty": "Chưa có hồ sơ đăng ký",
-    "emptyDescription": "Hồ sơ Customer gửi sẽ xuất hiện tại đây để bạn xét duyệt.",
-    "emptyFiltered": "Không có hồ sơ phù hợp. Hãy thử từ khóa hoặc bộ lọc khác.",
-    "results": "Hiển thị {{from}}–{{to}} trong {{total}} kết quả",
-    "pagination": "Phân trang hồ sơ",
-    "tableLabel": "Danh sách hồ sơ đăng ký Customer"
-  },
-  "fields": {
-    "name": "Họ tên",
-    "firstName": "First name",
-    "lastName": "Last name",
-    "phone": "Số điện thoại",
-    "customerType": "Loại Customer",
-    "businessShort": "Doanh nghiệp / Đại diện",
-    "businessName": "Tên doanh nghiệp / Người đại diện",
-    "submittedShort": "Ngày gửi",
-    "submittedAt": "Ngày gửi yêu cầu",
-    "reviewedAt": "Ngày xét duyệt",
-    "reviewStatus": "Xét duyệt",
-    "activation": "Kích hoạt tài khoản",
-    "actions": "Thao tác",
-    "province": "Tỉnh / Thành phố",
-    "district": "Quận / Huyện",
-    "ward": "Phường / Xã",
-    "deliveryAddress": "Địa chỉ giao hàng chi tiết",
-    "invoiceSameAsDelivery": "Trùng địa chỉ giao hàng",
-    "invoicePurchaser": "Người mua hàng",
-    "invoiceTaxCode": "Mã số thuế",
-    "invoiceEmail": "Email nhận hóa đơn",
-    "invoiceAddress": "Địa chỉ hóa đơn",
-    "reviewNote": "Ghi chú / Lý do từ chối",
-    "otpSentAt": "Lần gửi OTP gần nhất",
-    "activatedAt": "Thời điểm kích hoạt",
-    "fullDeliveryAddress": "Địa chỉ nhận hàng đầy đủ",
-    "deliveryNote": "Ghi chú giao hàng"
-  },
-  "actions": {
-    "view": "Xem hồ sơ",
-    "viewNamed": "Xem hồ sơ {{name}}",
-    "refresh": "Làm mới danh sách",
-    "retry": "Thử lại",
-    "previous": "Trang trước",
-    "next": "Trang sau",
-    "page": "Trang {{page}}",
-    "sortNewest": "Ngày gửi: mới nhất trước",
-    "sortOldest": "Ngày gửi: cũ nhất trước",
-    "close": "Đóng",
-    "closeProfile": "Đóng hồ sơ",
-    "cancel": "Hủy",
-    "approve": "Duyệt và gửi OTP",
-    "reject": "Từ chối",
-    "confirmReject": "Xác nhận từ chối",
-    "processing": "Đang xử lý...",
-    "resend": "Gửi lại OTP",
-    "resendCooldown": "Gửi lại sau {{seconds}}s"
-  },
-  "detail": {
-    "eyebrow": "HỒ SƠ ĐĂNG KÝ / {{id}}",
-    "title": "Thông tin Customer",
-    "description": "Xem lại thông tin trước khi xử lý hồ sơ.",
-    "contact": "Thông tin liên hệ",
-    "customer": "Thông tin Customer",
-    "invoice": "Thông tin hóa đơn",
-    "processing": "Thông tin xử lý",
-    "notProvided": "Chưa cung cấp",
-    "yes": "Có",
-    "no": "Không",
-    "onceOnly": "Chỉ xử lý một lần"
-  },
-  "review": {
-    "approveTitle": "Duyệt hồ sơ và gửi OTP?",
-    "approveDescription": "Hồ sơ sẽ chuyển sang Đã duyệt. Mã OTP sẽ được gửi đến Gmail đăng ký dưới đây.",
-    "recipient": "Gmail nhận OTP",
-    "activationNote": "Customer sẽ tự xác minh OTP, tạo và xác nhận mật khẩu. Admin không nhập mật khẩu hoặc OTP cho Customer. Đã duyệt không đồng nghĩa với Đã kích hoạt.",
-    "rejectTitle": "Từ chối hồ sơ đăng ký?",
-    "rejectDescription": "Vui lòng cho biết lý do từ chối hồ sơ của {{name}}. Lý do này sẽ được gửi đến Gmail đăng ký.",
-    "reason": "Lý do từ chối",
-    "reasonPlaceholder": "Nhập lý do cụ thể để Customer có thể bổ sung thông tin...",
-    "characterCount": "{{count}} / 2.000 ký tự"
-  },
-  "notices": {
-    "approved": "Đã duyệt hồ sơ và gửi OTP đến Gmail đăng ký. Customer cần xác minh OTP và tạo mật khẩu để kích hoạt tài khoản.",
-    "rejected": "Đã từ chối hồ sơ và gửi email thông báo kèm lý do đến Gmail đăng ký.",
-    "rejectionEmailFailed": "Đã từ chối hồ sơ và lưu lý do, nhưng chưa gửi được email thông báo. Vui lòng kiểm tra dịch vụ email của hệ thống.",
-    "otpSent": "Đã gửi lại OTP đến Gmail đăng ký.",
-    "otpFailedTitle": "Đã duyệt · Gửi OTP chưa thành công",
-    "otpFailedDescription": "Hồ sơ vẫn được giữ trạng thái Đã duyệt. Hãy gửi lại OTP để Customer có thể tự kích hoạt tài khoản."
-  },
-  "errors": {
-    "unknown": "Không thể xử lý yêu cầu. Vui lòng thử lại.",
-    "network": "Không kết nối được máy chủ. Kiểm tra kết nối rồi thử lại.",
-    "unavailable": "Dịch vụ tạm thời không khả dụng. Vui lòng thử lại sau.",
-    "unauthorized": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
-    "forbidden": "Bạn không có quyền xử lý hồ sơ này.",
-    "notFound": "Không tìm thấy hồ sơ đăng ký.",
-    "alreadyReviewed": "Hồ sơ đã được xử lý trước đó. Thông tin đang được cập nhật lại.",
-    "alreadyActivated": "Customer đã kích hoạt tài khoản, không cần gửi lại OTP.",
-    "reasonRequired": "Vui lòng nhập lý do từ chối.",
-    "cooldown": "Bạn vừa gửi yêu cầu quá nhanh. Vui lòng chờ rồi thử lại.",
-    "mail": "Chưa gửi được OTP. Hồ sơ đã duyệt vẫn được giữ nguyên; bạn có thể gửi lại mã.",
-    "validation": "Thông tin chưa hợp lệ. Vui lòng kiểm tra và thử lại."
-  },
-  "footer": {
-    "copyright": "© {{year}} Bite to Business. Kết nối nguồn thực phẩm tốt.",
-    "adminOnly": "Chỉ dành cho quản trị viên"
-  }
 }

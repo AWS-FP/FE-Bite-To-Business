@@ -22,7 +22,7 @@ src/
 ├── i18n/                   # Cấu hình ngôn ngữ và bản dịch vi/en
 ├── layouts/                # Header, Footer, MainLayout và layout theo role
 ├── lib/                    # env, storage, Supabase, a2ui và pwa
-├── pages/                  # Trang guest ở ngoài; bên trong chia đúng 5 role
+├── pages/                  # Trang public ở ngoài; đăng nhập/đăng ký gộp vào admin
 ├── router/                 # router.tsx, routes.ts, ProtectedRoute.tsx
 ├── services/               # API chung ở ngoài, API riêng chia theo 5 role
 ├── store/                  # Store Zustand chung và store theo role
@@ -37,7 +37,7 @@ src/
 - `pages/` ghép các component để tạo màn hình; logic form nằm trong `hooks/`.
 - `services/axiosClient.ts` cung cấp `http` có Bearer token/refresh và `publicHttp` cho API công khai.
 - `services/locationService.ts` lấy danh sách thành phố/phường xã ở bước đăng ký nhận hàng.
-- `store/authStore.ts` lưu phiên đăng nhập trong `sessionStorage`; phiên tạo mật khẩu được quản lý riêng trong `utils/activationSession.ts`.
+- `store/admin/authStore.ts` lưu phiên đăng nhập trong `sessionStorage`; phiên tạo mật khẩu được quản lý riêng trong `utils/admin/activationSession.ts`.
 - Mỗi ngôn ngữ trong `i18n/index.ts` khai báo một lần và chứa đủ các nhóm `translation`, `common`, `admin`, `storefront`.
 - File CSS riêng của component đặt cạnh component. Asset dùng bằng URL nằm trong `public/`.
 
@@ -50,20 +50,20 @@ src/
 services/                  # Áp dụng tương tự cho các lớp code trên
 ├── customer/
 ├── admin/
+│   ├── authService.ts
 │   └── registrationService.ts
 ├── e-commerce/
 ├── logistic/
 ├── shipper/
 ├── axiosClient.ts
-├── authService.ts
 ├── locationService.ts
 └── searchHistoryService.ts
 ```
 
-File dùng chung đặt trực tiếp trong thư mục của lớp code. Ví dụ `hooks/useAuth.ts`,
-`hooks/useSearchHistory.ts`, `components/LanguageSwitcher.tsx`, `types/auth.ts` và
-`utils/deliveryAddress.ts` phục vụ nhiều role hoặc luồng guest. Mẫu đăng nhập/đăng ký
-và hook của các form này cũng đặt ở ngoài các folder role.
+File dùng chung đặt trực tiếp trong thư mục của lớp code. Ví dụ `hooks/useSearchHistory.ts`,
+`components/LanguageSwitcher.tsx` và `utils/deliveryAddress.ts` phục vụ nhiều role hoặc luồng guest.
+Riêng code xác thực được gộp vào `admin` của từng lớp: component, page, hook, service, store,
+type, constant, utility và validation. Không tạo folder `auth` riêng.
 
 File riêng của admin nằm ở `components/admin`, `hooks/admin`, `layouts/admin`,
 `services/admin`, `types/admin` và `utils/admin`. Các lớp có thể chỉ có `.gitkeep`
@@ -77,22 +77,25 @@ ngôn ngữ; `lib` giữ các thư viện và cấu hình hạ tầng dùng chun
 ```text
 pages/
 ├── HomePage.tsx
-├── LoginPage.tsx
-├── RegisterPage.tsx
-├── ActivationPage.tsx
-├── ForgotPasswordPage.tsx
-├── AuthInformationPage.tsx
 ├── CatalogPage.tsx
 ├── ProductDetailPage.tsx
 ├── QuotesPage.tsx
 ├── customer/               # Đơn hàng, chi tiết giỏ hàng, hồ sơ, AI và nhập tài liệu
-├── admin/                  # Danh sách và chi tiết hồ sơ đăng ký
+├── admin/                  # Đăng nhập/đăng ký/kích hoạt và quản trị hồ sơ đăng ký
+│   ├── LoginPage.tsx
+│   ├── RegisterPage.tsx
+│   ├── ActivationPage.tsx
+│   ├── ForgotPasswordPage.tsx
+│   ├── AuthInformationPage.tsx
+│   ├── RegistrationsPage.tsx
+│   └── RegistrationDetailPage.tsx
 ├── e-commerce/             # Quản lý sản phẩm, khuyến mãi và coupon
 ├── logistic/               # Kho và yêu cầu sản phẩm
 └── shipper/                # Chuyến giao hàng
 ```
 
-Các trang guest có thể truy cập nằm trực tiếp trong `pages/`. `QuotesPage` là giỏ hàng guest;
+Các trang public khác nằm trực tiếp trong `pages/`. Các trang xác thực đặt trong `pages/admin`
+vẫn cho guest truy cập theo URL và phân quyền trong router. `QuotesPage` là giỏ hàng guest;
 `customer/QuoteDetailPage` là chi tiết báo giá cần đăng nhập. Các trang chưa triển khai UI
 vẫn dùng `PendingPage` trong router.
 
@@ -102,16 +105,37 @@ và `shipper` tương ứng `DELIVERY_STAFF`. Phân quyền của từng route n
 Dùng alias `@/` cho import giữa các thư mục, ví dụ:
 
 ```ts
-import useAuth from '@/hooks/useAuth'
-import { login } from '@/services/authService'
-import type { AuthResponse } from '@/types/auth'
+import useAuth from '@/hooks/admin/useAuth'
+import { login } from '@/services/admin/authService'
+import type { AuthResponse } from '@/types/admin/auth'
 ```
 
 Alias được khai báo đồng bộ trong `tsconfig.app.json` và `vite.config.ts`.
+
+## Validation bằng Zod
+
+- `validations/admin/authSchema.ts`: Gmail, đăng nhập, OTP và xác nhận mật khẩu.
+- `validations/admin/registrationSchema.ts`: các bước đăng ký, thông tin hóa đơn và địa chỉ theo danh mục API.
+- `validations/admin/registrationReviewSchema.ts`: quyết định duyệt/từ chối và lý do của admin.
+
+Form đăng ký dùng `zodResolver` với React Hook Form; các form ngắn dùng `schema.safeParse()`.
+Schema chuẩn hóa Gmail, số điện thoại và các ô tùy chọn trước khi gửi API. Mật khẩu và số 0 đầu
+của OTP/mã số thuế được giữ nguyên. Thông báo lỗi dùng key i18n để đổi VI/EN cùng giao diện.
+`strictNullChecks` được bật để kiểu dữ liệu Zod và form xử lý đúng các trường có thể trống.
 
 ## Kiểm tra
 
 ```sh
 npm run build
 npm run lint
+```
+
+## Format code
+
+Dùng 4 dấu cách, dấu `{` cùng dòng khai báo và dấu `;` cuối câu lệnh JS/TS.
+Cấu hình nằm trong `.prettierrc.json` và `.editorconfig`.
+
+```sh
+npm run format
+npm run format:check
 ```

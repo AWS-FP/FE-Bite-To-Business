@@ -7,79 +7,89 @@
 
 /* Màu và font xài cho cả trang web */
 @theme static {
-  --font-body: 'Be Vietnam Pro', sans-serif;
-  --font-subtext: 'Manrope', sans-serif;
-  --font-heading: 'Prata', Georgia, serif;
-  --font-subheading: 'Space Grotesk', sans-serif;
-  --font-brand: 'Kavoon', Georgia, serif;
-  --font-price: 'Inter', sans-serif;
-  --font-label: 'Oswald', sans-serif;
-  --font-display: 'Bricolage Grotesque', sans-serif;
-  --color-store-green: #12372a;
-  --color-store-dark: #0b241b;
-  --color-store-yellow: #fce043;
-  --color-store-cream: #fbf3e4;
-  --color-store-ink: #14132b;
-  --color-auth-green: #123b2e;
-  --color-auth-ink: #17133a;
-  --color-auth-cream: #fff1e0;
-  --color-auth-muted: #787386;
+    --font-body: 'Be Vietnam Pro', sans-serif;
+    --font-subtext: 'Manrope', sans-serif;
+    --font-heading: 'Prata', Georgia, serif;
+    --font-subheading: 'Space Grotesk', sans-serif;
+    --font-brand: 'Kavoon', Georgia, serif;
+    --font-price: 'Inter', sans-serif;
+    --font-label: 'Oswald', sans-serif;
+    --font-display: 'Bricolage Grotesque', sans-serif;
+    --color-store-green: #12372a;
+    --color-store-dark: #0b241b;
+    --color-store-yellow: #fce043;
+    --color-store-cream: #fbf3e4;
+    --color-store-ink: #14132b;
+    --color-auth-green: #123b2e;
+    --color-auth-ink: #17133a;
+    --color-auth-cream: #fff1e0;
+    --color-auth-muted: #787386;
 }
 
 @utility brand-name {
-  font-family: var(--font-brand);
-  font-weight: 400;
-  font-style: normal;
-  font-synthesis: none;
+    font-family: var(--font-brand);
+    font-weight: 400;
+    font-style: normal;
+    font-synthesis: none;
 }
 
 @utility font-heading {
-  font-family: var(--font-heading);
-  font-weight: 400;
-  font-style: normal;
-  font-synthesis: none;
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-style: normal;
+    font-synthesis: none;
 }
 
 /* Giá tiền dùng chữ số có cùng độ rộng để dễ nhìn */
 @utility font-price {
-  font-family: var(--font-price);
-  font-variant-numeric: lining-nums tabular-nums;
+    font-family: var(--font-price);
+    font-variant-numeric: lining-nums tabular-nums;
 }
 
 @layer base {
-  * {
-    box-sizing: border-box;
-  }
+    * {
+        box-sizing: border-box;
+    }
 
-  body {
-    margin: 0;
-    font-family: var(--font-body);
-    -webkit-font-smoothing: antialiased;
-  }
+    body {
+        margin: 0;
+        font-family: var(--font-body);
+        -webkit-font-smoothing: antialiased;
+    }
 
-  h1 {
-    font-family: var(--font-heading);
-    font-weight: 400;
-    font-synthesis: none;
-  }
+    h1 {
+        font-family: var(--font-heading);
+        font-weight: 400;
+        font-synthesis: none;
+    }
 
-  h2, h3, h4 {
-    font-family: var(--font-subheading);
-  }
+    h2,
+    h3,
+    h4 {
+        font-family: var(--font-subheading);
+    }
 
-  label, legend {
-    font-family: var(--font-label);
-  }
+    label,
+    legend {
+        font-family: var(--font-label);
+    }
 
-  small {
-    font-family: var(--font-subtext);
-  }
+    small {
+        font-family: var(--font-subtext);
+    }
 
-  button, input, textarea, select {
-    font: inherit;
-  }
+    button,
+    input,
+    textarea,
+    select {
+        font: inherit;
+    }
 
-  button, a, input, textarea, select {
-    -webkit-tap-highlight-color: transparent;
-  }
+    button,
+    a,
+    input,
+    textarea,
+    select {
+        -webkit-tap-highlight-color: transparent;
+    }
 }
