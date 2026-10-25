@@ -1,0 +1,25 @@
+/* Hộp xác nhận nằm giữa màn hình. */
+.admin-modal[data-drawer='false'] {
+  inset: 0;
+  margin: auto;
+  width: 490px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 44px);
+  border-radius: 4px;
+  box-shadow: 7px 7px 0 #000;
+}
+
+/* Khung hồ sơ nằm sát bên phải màn hình. */
+.admin-modal[data-drawer='true'] {
+  inset: 0 0 0 auto;
+  margin: 0;
+  width: 660px;
+  height: 100dvh;
+  max-width: 100%;
+  max-height: 100dvh;
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-radius: 0;
+  box-shadow: -15px 0 35px #12332917;
+}
