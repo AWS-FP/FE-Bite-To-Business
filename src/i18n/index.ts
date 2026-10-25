@@ -4,6 +4,8 @@ import vi from './locales/vi/auth.json'
 import en from './locales/en/auth.json'
 import viCommon from './locales/vi/common.json'
 import enCommon from './locales/en/common.json'
+import viStorefront from './locales/vi/storefront.json'
+import enStorefront from './locales/en/storefront.json'
 import viAdmin from './locales/vi/admin.json'
 import enAdmin from './locales/en/admin.json'
 import viRegistrations from './locales/vi/registrations.json'
@@ -17,6 +19,8 @@ try {
 
 void i18n.use(initReactI18next).init({
   resources: {
+    vi: { translation: vi, common: viCommon, storefront: viStorefront },
+    en: { translation: en, common: enCommon, storefront: enStorefront },
     vi: { translation: vi, common: viCommon, admin: { ...viAdmin, ...viRegistrations } },
     en: { translation: en, common: enCommon, admin: { ...enAdmin, ...enRegistrations } },
   },

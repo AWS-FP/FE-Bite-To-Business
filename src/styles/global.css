@@ -15,6 +15,11 @@
   --font-price: 'Inter', sans-serif;
   --font-label: 'Oswald', sans-serif;
   --font-display: 'Bricolage Grotesque', sans-serif;
+  --color-store-green: #12372a;
+  --color-store-dark: #0b241b;
+  --color-store-yellow: #fce043;
+  --color-store-cream: #fbf3e4;
+  --color-store-ink: #14132b;
   --color-auth-green: #123b2e;
   --color-auth-ink: #17133a;
   --color-auth-cream: #fff1e0;
