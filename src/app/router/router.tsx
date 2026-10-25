@@ -3,6 +3,9 @@ import { AUTH_ROLES } from "../../features/auth/constants/roles";
 import LoginPage from "../../features/auth/pages/LoginPage";
 import RegisterPage from "../../features/auth/pages/RegisterPage";
 import ActivationPage from "../../features/auth/pages/ActivationPage";
+import RegistrationsPage from "../../features/admin/pages/RegistrationsPage";
+import RegistrationDetailPage from "../../features/admin/pages/RegistrationDetailPage";
+import AdminLayout from "../../layout/admin/AdminLayout";
 import PendingPage from "../../components/feedback/PendingPage";
 import ProtectedRoute from "./ProtectedRoute";
 import { ROUTES } from "./routes";
@@ -37,6 +40,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: ROUTES.ADMIN,
+        element: <AdminLayout />,
         children: [
           {
             index: true,
@@ -44,8 +48,8 @@ export const router = createBrowserRouter([
           },
           {
             path: ROUTES.ADMIN_REGISTRATIONS,
-            Component: PendingPage,
-            children: [{ path: ':requestId', Component: PendingPage }],
+            Component: RegistrationsPage,
+            children: [{ path: ':requestId', Component: RegistrationDetailPage }],
           },
           { path: ROUTES.ADMIN_STAFF, Component: PendingPage },
         ],

@@ -4,6 +4,10 @@ import vi from './locales/vi/auth.json'
 import en from './locales/en/auth.json'
 import viCommon from './locales/vi/common.json'
 import enCommon from './locales/en/common.json'
+import viAdmin from './locales/vi/admin.json'
+import enAdmin from './locales/en/admin.json'
+import viRegistrations from './locales/vi/registrations.json'
+import enRegistrations from './locales/en/registrations.json'
 
 const storageKey = 'bitetobusiness.language'
 let language = 'vi'
@@ -13,8 +17,8 @@ try {
 
 void i18n.use(initReactI18next).init({
   resources: {
-    vi: { translation: vi, common: viCommon },
-    en: { translation: en, common: enCommon },
+    vi: { translation: vi, common: viCommon, admin: { ...viAdmin, ...viRegistrations } },
+    en: { translation: en, common: enCommon, admin: { ...enAdmin, ...enRegistrations } },
   },
   lng: language,
   fallbackLng: 'vi',

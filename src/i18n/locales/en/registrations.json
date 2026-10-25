@@ -1,0 +1,151 @@
+{
+  "stats": {
+    "total": {
+      "title": "Total registrations",
+      "description": "All applications in the system"
+    },
+    "pending": {
+      "title": "Pending",
+      "description": "Applications awaiting your review"
+    },
+    "approved": {
+      "title": "Approved",
+      "description": "Eligible to set up an account"
+    },
+    "rejected": {
+      "title": "Rejected",
+      "description": "Applications that did not meet requirements"
+    }
+  },
+  "status": {
+    "ALL": "All",
+    "PENDING": "Pending",
+    "APPROVED": "Approved",
+    "REJECTED": "Rejected"
+  },
+  "activation": {
+    "active": "Activated",
+    "inactive": "Not activated",
+    "waiting": "Awaiting activation",
+    "otpFailed": "OTP delivery failed"
+  },
+  "customerType": {
+    "HOUSEHOLD_INDIVIDUAL_BUSINESS": "Individual / Household",
+    "BUSINESS_COOPERATIVE": "Business / Cooperative"
+  },
+  "list": {
+    "stamp": "PEOPLE & CONNECTIONS",
+    "title": "Registration list",
+    "count_one": "{{count}} application",
+    "count_other": "{{count}} applications",
+    "description": "Track and review Customer registration requests.",
+    "filterStatus": "Filter by review status",
+    "filterType": "Customer type",
+    "search": "Search name, Gmail, phone...",
+    "loading": "Loading applications...",
+    "empty": "No applications yet",
+    "emptyDescription": "Customer applications will appear here for review.",
+    "emptyFiltered": "No applications match. Try a different search or filter.",
+    "results": "Showing {{from}}–{{to}} of {{total}} results",
+    "pagination": "Application pagination",
+    "tableLabel": "Customer registration applications"
+  },
+  "fields": {
+    "name": "Full name",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Phone number",
+    "customerType": "Customer type",
+    "businessShort": "Business / Representative",
+    "businessName": "Business name / Representative",
+    "submittedShort": "Submitted",
+    "submittedAt": "Submitted at",
+    "reviewedAt": "Reviewed at",
+    "reviewStatus": "Review status",
+    "activation": "Account activation",
+    "actions": "Actions",
+    "province": "Province / City",
+    "district": "District",
+    "ward": "Ward",
+    "deliveryAddress": "Delivery address",
+    "invoiceSameAsDelivery": "Same as delivery address",
+    "invoicePurchaser": "Purchaser",
+    "invoiceTaxCode": "Tax code",
+    "invoiceEmail": "Invoice email",
+    "invoiceAddress": "Invoice address",
+    "reviewNote": "Note / Rejection reason",
+    "otpSentAt": "Last OTP sent",
+    "activatedAt": "Activated at",
+    "fullDeliveryAddress": "Full delivery address",
+    "deliveryNote": "Note for delivery"
+  },
+  "actions": {
+    "view": "View profile",
+    "viewNamed": "View profile for {{name}}",
+    "refresh": "Refresh applications",
+    "retry": "Try again",
+    "previous": "Previous page",
+    "next": "Next page",
+    "page": "Page {{page}}",
+    "sortNewest": "Submission date: newest first",
+    "sortOldest": "Submission date: oldest first",
+    "close": "Close",
+    "closeProfile": "Close profile",
+    "cancel": "Cancel",
+    "approve": "Approve and send OTP",
+    "reject": "Reject",
+    "confirmReject": "Confirm rejection",
+    "processing": "Processing...",
+    "resend": "Resend OTP",
+    "resendCooldown": "Resend in {{seconds}}s"
+  },
+  "detail": {
+    "eyebrow": "REGISTRATION / {{id}}",
+    "title": "Customer profile",
+    "description": "Review the information before processing this application.",
+    "contact": "Contact information",
+    "customer": "Customer information",
+    "invoice": "Invoice information",
+    "processing": "Processing information",
+    "notProvided": "Not provided",
+    "yes": "Yes",
+    "no": "No",
+    "onceOnly": "One-time decision"
+  },
+  "review": {
+    "approveTitle": "Approve and send OTP?",
+    "approveDescription": "This application will be approved. A verification code will be sent to the registered Gmail below.",
+    "recipient": "OTP recipient",
+    "activationNote": "The Customer verifies the OTP and creates and confirms their own password. Admins do not enter passwords or OTPs for Customers. Approval does not activate the account.",
+    "rejectTitle": "Reject this application?",
+    "rejectDescription": "Please explain why you are rejecting the application from {{name}}.",
+    "reason": "Rejection reason",
+    "reasonPlaceholder": "Enter a specific reason so the Customer can provide the required information...",
+    "characterCount": "{{count}} / 2,000 characters"
+  },
+  "notices": {
+    "approved": "Application approved and OTP sent to the registered Gmail. The Customer must verify the code and create a password to activate their account.",
+    "rejected": "Application rejected and the reason saved.",
+    "otpSent": "OTP resent to the registered Gmail.",
+    "otpFailedTitle": "Approved · OTP delivery failed",
+    "otpFailedDescription": "This application remains approved. Resend the OTP so the Customer can activate their account."
+  },
+  "errors": {
+    "unknown": "We could not process this request. Please try again.",
+    "network": "Cannot connect to the server. Check your connection and try again.",
+    "unavailable": "The service is temporarily unavailable. Please try again later.",
+    "unauthorized": "Your session has expired. Please sign in again.",
+    "forbidden": "You do not have permission to process this application.",
+    "notFound": "Registration application not found.",
+    "alreadyReviewed": "This application has already been reviewed. Refreshing the information.",
+    "alreadyActivated": "The Customer has already activated their account. An OTP is no longer needed.",
+    "reasonRequired": "Please enter a rejection reason.",
+    "cooldown": "Requests were sent too quickly. Please wait and try again.",
+    "mail": "OTP delivery failed. The application remains approved; you can resend the code.",
+    "validation": "Some information is invalid. Please check and try again."
+  },
+  "footer": {
+    "copyright": "© {{year}} Bite to Business. Connecting you to good food.",
+    "adminOnly": "For administrators only"
+  }
+}
