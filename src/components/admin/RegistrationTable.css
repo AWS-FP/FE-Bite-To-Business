@@ -1,0 +1,15 @@
+.admin-customer-avatar {
+    background: #eaf0e8;
+}
+
+tr:nth-child(4n + 2) .admin-customer-avatar {
+    background: #f4ebe3;
+}
+
+tr:nth-child(4n + 3) .admin-customer-avatar {
+    background: #eeeaf5;
+}
+
+tr:nth-child(4n + 4) .admin-customer-avatar {
+    background: #e5edf1;
+}
