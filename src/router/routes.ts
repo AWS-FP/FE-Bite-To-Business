@@ -4,6 +4,7 @@ import type { UserRole } from '@/types/admin/auth';
 // mấy routes ở đây là demo th, khi code đặt sao thì sửa lại sau
 export const ROUTES = {
     HOME: '/',
+    LANDING: '/landing',
     CATALOG: '/products',
     PRODUCT_DETAIL: '/products/:productId',
 
