@@ -22,7 +22,10 @@
         "deals": "Chợ Sớm Giá Sốc",
         "standardFood": "Nguồn Thực Phẩm Tiêu Chuẩn B2B",
         "combos": "Combo Gói Nguyên Liệu F&B",
-        "invoice": "Xuất hóa đơn VAT tự động"
+        "invoice": "Xuất hóa đơn VAT tự động",
+        "aboutBusiness": "Về Bite to Business",
+        "landingPage": "Trang giới thiệu",
+        "shopHomepage": "Trang mua hàng"
     },
     "search": {
         "label": "Tìm kiếm sản phẩm",
@@ -102,5 +105,10 @@
         "newsletterDesc": "Báo giá cập nhật tự động mỗi tuần kèm chính sách chiết khấu theo sản lượng.",
         "newsletterPlaceholder": "Nhập Số điện thoại Zalo hoặc Email doanh nghiệp...",
         "newsletterBtn": "Nhận báo giá ngay"
+    },
+    "landingPending": {
+        "title": "Trang giới thiệu đang được hoàn thiện",
+        "description": "Landing Page được phát triển ở nhánh riêng của nhóm. Khi tích hợp vào dự án, đường dẫn này sẽ hiển thị trang giới thiệu Bite to Business đầy đủ.",
+        "backToShop": "Quay về trang mua hàng"
     }
 }

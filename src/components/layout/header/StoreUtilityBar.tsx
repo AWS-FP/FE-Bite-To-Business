@@ -2,6 +2,7 @@ import { Check, ChevronDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../LanguageSwitcher';
+import AboutBusinessDropdown from './AboutBusinessDropdown';
 
 export default function StoreUtilityBar() {
     const { t } = useTranslation('storefront');
@@ -124,6 +125,7 @@ export default function StoreUtilityBar() {
                         />
                         {t('header.certifications')}
                     </a>
+                    <AboutBusinessDropdown />
                     <LanguageSwitcher />
                 </div>
             </div>

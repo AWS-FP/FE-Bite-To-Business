@@ -22,7 +22,10 @@
         "deals": "Early Market Deals",
         "standardFood": "Quality B2B Food Supply",
         "combos": "F&B Ingredient Combos",
-        "invoice": "Automatic VAT invoices"
+        "invoice": "Automatic VAT invoices",
+        "aboutBusiness": "About Bite to Business",
+        "landingPage": "Our Landing Page",
+        "shopHomepage": "Browse products"
     },
     "search": {
         "label": "Search products",
@@ -102,5 +105,10 @@
         "newsletterDesc": "Automatically updated weekly price books with volume discount tiers sent straight to your inbox.",
         "newsletterPlaceholder": "Enter your business email or Zalo phone number...",
         "newsletterBtn": "Get Price List Now"
+    },
+    "landingPending": {
+        "title": "Our story is on the way",
+        "description": "The Landing Page is being developed on a separate feature branch. Once it is integrated, this link will open the full introduction to Bite to Business.",
+        "backToShop": "Back to shopping"
     }
 }
