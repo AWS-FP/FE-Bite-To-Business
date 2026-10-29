@@ -1,9 +1,15 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import type { RouteObject } from 'react-router-dom';
 import { AUTH_ROLES } from '@/constants/roles';
 import LoginPage from '@/pages/admin/LoginPage';
 import RegisterPage from '@/pages/admin/RegisterPage';
 import ActivationPage from '@/pages/admin/ActivationPage';
 import HomePage from '@/pages/HomePage';
+import LogisticsLayout from '@/layouts/logistic/LogisticsLayout';
+import InventoryPage from '@/pages/logistic/InventoryPage';
+import ReceivePage from '@/pages/logistic/ReceivePage';
+import PackingPage from '@/pages/logistic/PackingPage';
+import ProductRequestsPage from '@/pages/logistic/ProductRequestsPage';
 import RegistrationsPage from '@/pages/admin/RegistrationsPage';
 import RegistrationDetailPage from '@/pages/admin/RegistrationDetailPage';
 import AdminLayout from '@/layouts/admin/AdminLayout';
@@ -11,16 +17,40 @@ import PendingPage from '@/components/PendingPage';
 import ProtectedRoute from './ProtectedRoute';
 import { ROUTES } from './routes';
 
+// Local-only preview. Add VITE_LOGISTICS_PREVIEW=true to .env.local
+// to make / open the Logistics dashboard during npm run dev.
+// .env.local is not committed, so this won't change the site's Home after merge.
+const logisticsPreview = import.meta.env.DEV;
+
+const logisticsWorkspaceRoute: RouteObject = {
+    path: ROUTES.LOGISTICS,
+    element: <LogisticsLayout />,
+    children: [
+        { index: true, element: <Navigate to={ROUTES.LOGISTICS_INVENTORY} replace /> },
+        { path: ROUTES.LOGISTICS_INVENTORY, Component: InventoryPage },
+        { path: ROUTES.LOGISTICS_RECEIVE, Component: ReceivePage },
+        { path: ROUTES.LOGISTICS_PACKING, Component: PackingPage },
+        { path: ROUTES.LOGISTICS_PRODUCT_REQUESTS, Component: ProductRequestsPage },
+    ],
+};
+
 export const router = createBrowserRouter([
     { path: ROUTES.LOGIN, Component: LoginPage },
     { path: ROUTES.REGISTER, Component: RegisterPage },
     { path: ROUTES.VERIFY_OTP, Component: ActivationPage },
     { path: ROUTES.SET_PASSWORD, Component: ActivationPage },
     { path: ROUTES.FORGOT_PASSWORD, Component: PendingPage },
-    { path: ROUTES.HOME, Component: HomePage },
+    {
+        path: ROUTES.HOME,
+        element: logisticsPreview
+            ? <Navigate to={ROUTES.LOGISTICS_INVENTORY} replace />
+            : <HomePage />,
+    },
     { path: ROUTES.CATALOG, Component: PendingPage },
     { path: ROUTES.PRODUCT_DETAIL, Component: PendingPage },
     { path: ROUTES.QUOTES, Component: PendingPage },
+    // Logistics is accessible without login only in an explicitly enabled local preview.
+    ...(logisticsPreview ? [logisticsWorkspaceRoute] : []),
     {
         // Chỉ kiểm tra quyền truy cập
         element: <ProtectedRoute allowedRoles={[AUTH_ROLES.CUSTOMER]} />,
@@ -71,22 +101,13 @@ export const router = createBrowserRouter([
             },
         ],
     },
-    {
-        element: <ProtectedRoute allowedRoles={[AUTH_ROLES.LOGISTICS_STAFF]} />,
-        children: [
-            {
-                path: ROUTES.LOGISTICS,
-                children: [
-                    {
-                        index: true,
-                        element: <Navigate to={ROUTES.LOGISTICS_INVENTORY} replace />,
-                    },
-                    { path: ROUTES.LOGISTICS_INVENTORY, Component: PendingPage },
-                    { path: ROUTES.LOGISTICS_PRODUCT_REQUESTS, Component: PendingPage },
-                ],
-            },
-        ],
-    },
+    // In production (or normal dev mode), keep the Logistics role guard.
+    ...(!logisticsPreview
+        ? [{
+            element: <ProtectedRoute allowedRoles={[AUTH_ROLES.LOGISTICS_STAFF]} />,
+            children: [logisticsWorkspaceRoute],
+        }]
+        : []),
     {
         element: <ProtectedRoute allowedRoles={[AUTH_ROLES.DELIVERY_STAFF]} />,
         children: [

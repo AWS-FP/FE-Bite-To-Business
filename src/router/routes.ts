@@ -33,6 +33,8 @@ export const ROUTES = {
 
     LOGISTICS: '/logistics',
     LOGISTICS_INVENTORY: '/logistics/inventory',
+    LOGISTICS_RECEIVE: '/logistics/receive',
+    LOGISTICS_PACKING: '/logistics/packing',
     LOGISTICS_PRODUCT_REQUESTS: '/logistics/product-requests',
 
     DELIVERY: '/delivery',
