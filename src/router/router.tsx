@@ -9,6 +9,7 @@ import RegistrationDetailPage from '@/pages/admin/RegistrationDetailPage';
 import AdminLayout from '@/layouts/admin/AdminLayout';
 import PendingPage from '@/components/PendingPage';
 import ProtectedRoute from './ProtectedRoute';
+import ProductDetailPage from '@/pages/ProductDetailPage';
 import { ROUTES } from './routes';
 
 export const router = createBrowserRouter([
@@ -19,7 +20,8 @@ export const router = createBrowserRouter([
     { path: ROUTES.FORGOT_PASSWORD, Component: PendingPage },
     { path: ROUTES.HOME, Component: HomePage },
     { path: ROUTES.CATALOG, Component: PendingPage },
-    { path: ROUTES.PRODUCT_DETAIL, Component: PendingPage },
+    { path: ROUTES.PRODUCT_DETAIL, Component: ProductDetailPage,
+    },
     { path: ROUTES.QUOTES, Component: PendingPage },
     {
         // Chỉ kiểm tra quyền truy cập

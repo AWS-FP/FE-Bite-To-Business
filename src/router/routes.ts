@@ -5,7 +5,7 @@ import type { UserRole } from '@/types/admin/auth';
 export const ROUTES = {
     HOME: '/',
     CATALOG: '/products',
-    PRODUCT_DETAIL: '/products/:productId',
+    PRODUCT_DETAIL: '/products/:id',
 
     LOGIN: '/login',
     REGISTER: '/register',
