@@ -8,6 +8,10 @@ export const ROUTES = {
     CATALOG: '/products',
     PRODUCT_DETAIL: '/products/:productId',
 
+    BRANDS: '/brands',
+    BRAND_DETAIL: '/brands/:brandSlug',
+
+
     LOGIN: '/login',
     REGISTER: '/register',
     VERIFY_OTP: '/verify-otp',
