@@ -1,19 +1,28 @@
-import { ROUTES } from '@/router/routes';
-//khi code nhớ đổi
+export const freshCategoryKeys = [
+    'meatPoultry',
+    'fishSeafood',
+    'eggs',
+    'vegetablesMushrooms',
+    'fruits',
+    'tofuVegetarian',
+] as const
 
-export const freshCategoryKeys = ['meat', 'seafood', 'eggs', 'vegetables', 'fruit', 'vegetarian'];
 export const dryCategoryKeys = [
-    'grains',
-    'noodles',
-    'nuts',
-    'dairy',
-    'seasoning',
-    'prepared',
-    'bakery',
-];
+    'riceGrainsFlour',
+    'noodlesPasta',
+    'beansNuts',
+    'dairyProducts',
+    'oilSpicesSauces',
+    'processedCanned',
+    'bakeryDesserts',
+    'beveragesBarista',
+] as const
 
-export function getCatalogSearchPath(keyword: string) {
-    const searchParams = new URLSearchParams();
-    searchParams.set('q', keyword);
-    return `${ROUTES.CATALOG}?${searchParams.toString()}`;
+export function getCatalogSearchPath(searchText: string): string {
+    const encoded = encodeURIComponent(searchText.trim())
+    return `/catalog?q=${encoded}`
+}
+
+export function getCategoryPagePath(categorySlug: string): string {
+    return `/catalog?category=${encodeURIComponent(categorySlug)}`
 }

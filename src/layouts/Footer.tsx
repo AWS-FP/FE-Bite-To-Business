@@ -1,134 +1,131 @@
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-import { ROUTES } from '@/router/routes';
+import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import {
     dryCategoryKeys,
     freshCategoryKeys,
     getCatalogSearchPath,
-} from '@/constants/catalogNavigation';
+} from '../constants/catalogNavigation'
+import { ROUTES } from '../router/routes'
 
-const SUPPORT_URL = 'https://github.com/AWS-FP';
-
-// Chỉ chứa các thành phần dùng chung, không chứa nội dung riêng của homepage.
 export default function Footer() {
-    const { t } = useTranslation('storefront');
+    const { t } = useTranslation('storefront')
 
     return (
-        <footer className="border-0 border-t-2 border-solid border-store-cream/15 bg-store-dark font-body text-store-cream">
-            <div className="mx-auto max-w-[1440px] px-12 pt-16 pb-10 max-[640px]:px-5 max-[640px]:pt-10 max-[640px]:pb-7">
-                <div className="grid grid-cols-[1.4fr_1fr_1.4fr_1fr] gap-8 max-[1024px]:grid-cols-2 max-[640px]:gap-x-5 max-[640px]:gap-y-9 max-[400px]:grid-cols-1">
-                    <div className="min-w-0 max-[640px]:col-span-full">
+        <footer className="border-0 border-t border-solid border-white/10 bg-[#0B2418] font-body text-[#D1DDD6]">
+            <div className="mx-auto max-w-[1440px] px-5 pt-14 pb-10">
+                <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-12">
+                    {/* Column 1: Logo & Certifications */}
+                    <div className="lg:col-span-4">
                         <Link
-                            className="flex w-fit shrink-0 items-center gap-3 text-white no-underline"
                             to={ROUTES.HOME}
-                            aria-label={t('home')}
+                            className="flex w-fit items-center gap-3 text-white no-underline"
                         >
                             <img
-                                className="block h-auto w-[133px] shrink-0 object-contain max-[640px]:w-[84px]"
                                 src="/images/storefront/brand-logo.png"
-                                alt=""
-                                width={133}
-                                height={89}
+                                alt="Bite to Business"
+                                width={92}
+                                height={62}
+                                className="block h-auto w-[92px] object-contain"
                             />
-                            <span className="brand-name flex flex-col text-[24px] leading-[1.1] tracking-[-0.5px] max-[640px]:text-[20px]">
-                                <span>Bite to</span>
-                                <span>Business</span>
-                            </span>
+                            <span className="brand-name flex flex-col text-[20px] leading-[1.1]">
+                <span>Bite to</span>
+                <span>Business</span>
+              </span>
                         </Link>
-                        <p className="mt-4 mb-0 max-w-[310px] font-subtext text-[13.5px] leading-[1.6] text-store-cream/75">
+
+                        <p className="mt-4 max-w-[320px] text-xs leading-relaxed text-[#9FB3A8]">
                             {t('footer.description')}
                         </p>
-                        <div
-                            className="mt-4 flex flex-wrap gap-2"
-                            id="store-certifications"
-                            aria-label={t('header.certifications')}
-                        >
-                            <a
-                                className="rounded-md border border-solid border-white/25 bg-white/10 px-2.5 py-1 font-label text-[11px] leading-[1.5] font-medium text-store-cream no-underline hover:text-store-yellow hover:underline"
-                                href="/documents/TCVN11892-1_2017_916963.pdf"
-                                download="TCVN11892-1_2017_916963.pdf"
-                            >
-                                VietGAP
-                            </a>
-                            <span className="rounded-md border border-solid border-white/25 bg-white/10 px-2.5 py-1 font-label text-[11px] leading-[1.5] font-medium">
-                                GlobalGAP
-                            </span>
-                            <span className="rounded-md border border-solid border-white/25 bg-white/10 px-2.5 py-1 font-label text-[11px] leading-[1.5] font-medium">
-                                ISO 22000 / HACCP
-                            </span>
+
+                        <div className="mt-5 flex flex-wrap items-center gap-2">
+              <span className="rounded-md border border-solid border-white/20 bg-white/5 px-2.5 py-1 text-[10px] font-bold text-white">
+                VietGAP
+              </span>
+                            <span className="rounded-md border border-solid border-white/20 bg-white/5 px-2.5 py-1 text-[10px] font-bold text-white">
+                GlobalGAP
+              </span>
+                            <span className="rounded-md border border-solid border-white/20 bg-white/5 px-2.5 py-1 text-[10px] font-bold text-white">
+                ISO 22000 / HACCP
+              </span>
                         </div>
                     </div>
 
-                    <nav aria-labelledby="footer-fresh-title">
-                        <h2
-                            className="m-0 font-subheading text-[17px] leading-[1.5] font-semibold text-store-yellow"
-                            id="footer-fresh-title"
-                        >
-                            {t('footer.fresh')}
-                        </h2>
-                        <ul className="mt-5 mb-0 flex list-none flex-col gap-3 p-0">
-                            {freshCategoryKeys.map((key) => (
-                                <li key={key}>
-                                    <Link
-                                        className="text-[13.5px] leading-[1.5] text-store-cream/80 no-underline hover:text-store-yellow hover:underline"
-                                        to={getCatalogSearchPath(t(`categories.${key}`))}
-                                    >
-                                        {t(`categories.${key}`)}
-                                    </Link>
-                                </li>
-                            ))}
+                    {/* Column 2: Fresh Produce */}
+                    <div className="lg:col-span-3">
+                        <h3 className="m-0 font-serif text-sm font-bold text-[#FACC15]">
+                            {t('footer.freshHeading')}
+                        </h3>
+                        <ul className="mt-4 list-none space-y-2.5 p-0 text-xs">
+                            {freshCategoryKeys.map((key) => {
+                                const label = t(`categories.${key}`)
+                                return (
+                                    <li key={key}>
+                                        <Link
+                                            to={getCatalogSearchPath(label)}
+                                            className="text-[#B8C9C0] no-underline hover:text-[#FACC15]"
+                                        >
+                                            {label}
+                                        </Link>
+                                    </li>
+                                )
+                            })}
                         </ul>
-                    </nav>
+                    </div>
 
-                    <nav aria-labelledby="footer-dry-title">
-                        <h2
-                            className="m-0 font-subheading text-[17px] leading-[1.5] font-semibold text-store-yellow"
-                            id="footer-dry-title"
-                        >
-                            {t('footer.dry')}
-                        </h2>
-                        <ul className="mt-5 mb-0 flex list-none flex-col gap-3 p-0">
-                            {dryCategoryKeys.map((key) => (
-                                <li key={key}>
-                                    <Link
-                                        className="text-[13.5px] leading-[1.5] text-store-cream/80 no-underline hover:text-store-yellow hover:underline"
-                                        to={getCatalogSearchPath(t(`categories.${key}`))}
-                                    >
-                                        {t(`categories.${key}`)}
-                                    </Link>
-                                </li>
-                            ))}
+                    {/* Column 3: Dry Goods, Dairy & Barista */}
+                    <div className="lg:col-span-3">
+                        <h3 className="m-0 font-serif text-sm font-bold text-[#FACC15]">
+                            {t('footer.dryHeading')}
+                        </h3>
+                        <ul className="mt-4 list-none space-y-2.5 p-0 text-xs">
+                            {dryCategoryKeys.map((key) => {
+                                const label = t(`categories.${key}`)
+                                return (
+                                    <li key={key}>
+                                        <Link
+                                            to={getCatalogSearchPath(label)}
+                                            className="text-[#B8C9C0] no-underline hover:text-[#FACC15]"
+                                        >
+                                            {label}
+                                        </Link>
+                                    </li>
+                                )
+                            })}
                         </ul>
-                    </nav>
+                    </div>
 
-                    <div className="max-[640px]:col-span-full">
-                        <h2 className="m-0 font-subheading text-[17px] leading-[1.5] font-semibold text-store-yellow">
-                            {t('footer.support')}
-                        </h2>
+                    {/* Column 4: Contact Support at GitHub */}
+                    <div className="lg:col-span-2">
+                        <h3 className="m-0 font-serif text-sm font-bold text-[#FACC15]">
+                            {t('footer.supportHeading')}
+                        </h3>
                         <a
-                            className="relative mt-6 ml-8 block size-[99px] overflow-hidden rounded-sm outline-offset-4 hover:opacity-80 max-[640px]:ml-0"
-                            href={SUPPORT_URL}
+                            href="https://github.com/AWS-FP"
                             target="_blank"
                             rel="noreferrer"
-                            aria-label={t('footer.github')}
+                            aria-label="GitHub Repository"
+                            className="mt-4 inline-flex h-20 w-20 items-center justify-center rounded-xl bg-white p-2 text-[#0B2418] shadow-md transition-transform hover:scale-105"
                         >
-                            {/* Giữ kích thước SVG gốc; wrapper cắt phần lề giống frame trong Figma. */}
-                            <img
-                                className="absolute -top-[24.47px] -left-[19.97px] block"
-                                src="/images/storefront/github.svg"
-                                alt="GitHub"
-                            />
+                            <svg
+                                viewBox="0 0 24 24"
+                                className="h-14 w-14 fill-current"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    fillRule="evenodd"
+                                    clipRule="evenodd"
+                                    d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                                />
+                            </svg>
                         </a>
                     </div>
                 </div>
 
-                <div className="mt-14 grid grid-cols-[1.6fr_1fr] gap-5 border-0 border-t border-solid border-store-cream/12 pt-6 font-subtext text-[13px] leading-[1.5] text-store-cream/60 max-[640px]:mt-10 max-[640px]:grid-cols-1 max-[640px]:gap-2 max-[640px]:text-[11px]">
-                    <p className="m-0">
-                        {t('footer.copyright', { year: new Date().getFullYear() })}
-                    </p>
-                    <p className="m-0">{t('footer.education')}</p>
+                <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-0 border-t border-solid border-white/10 pt-6 text-[11px] text-[#7D9488]">
+                    <span>{t('footer.copyright')}</span>
+                    <span>{t('footer.educationalNote')}</span>
                 </div>
             </div>
         </footer>
-    );
+    )
 }

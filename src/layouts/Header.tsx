@@ -1,16 +1,12 @@
 import { ChevronDown } from 'lucide-react';
 import type { FormEvent, MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
-import { getRoleHome, ROUTES } from '@/router/routes';
-import useSearchHistory from '@/hooks/useSearchHistory';
-import {
-    dryCategoryKeys,
-    freshCategoryKeys,
-    getCatalogSearchPath,
-} from '@/constants/catalogNavigation';
-import { useAuthStore } from '@/store/admin/authStore';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { Link } from 'react-router-dom';
+import { ROUTES } from '../router/routes';
+import StoreUtilityBar from '../components/layout/header/StoreUtilityBar';
+import StoreSearch from '../components/layout/header/StoreSearch';
+import StoreAccountActions from '../components/layout/header/StoreAccountActions';
+import StoreNavigation from '../components/layout/header/StoreNavigation';
 
 
 import {
@@ -459,9 +455,9 @@ export default function Header() {
     const { t } = useTranslation('storefront');
 
     return (
-        <header className="relative z-20 border-0 border-b-2 border-solid border-[#00b9c9] bg-store-green font-body text-store-cream">
+        <header className="relative z-30 border-0 border-b-2 border-solid border-[#00b9c9] bg-store-green font-body text-store-cream">
             <a
-                className="sr-only rounded bg-store-yellow p-3 text-store-ink focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-30"
+                className="sr-only rounded bg-store-yellow p-3 text-store-ink focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
                 href="#main-content"
             >
                 {t('skipToContent')}
