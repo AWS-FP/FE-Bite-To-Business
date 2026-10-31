@@ -60,7 +60,9 @@ export default function RegistrationDetailPage() {
     }
 
     async function handleConfirmReview(note: string) {
-        if (!reviewDecision) return;
+        if (!reviewDecision) {
+            return;
+        }
 
         const result = await reviewMutation.mutateAsync({
             decision: reviewDecision,
