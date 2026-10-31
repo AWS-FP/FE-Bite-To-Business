@@ -1,5 +1,6 @@
 ﻿import { useTranslation } from 'react-i18next';
 import AdminIcon from './AdminIcon';
+import type { ReactNode } from 'react';
 
 interface RegistrationPaginationProps {
     page: number;
@@ -7,6 +8,10 @@ interface RegistrationPaginationProps {
     total: number;
     totalPages: number;
     onPage: (page: number) => void;
+    ariaLabel?: string;
+    resultsLabel?: string;
+    previousIcon?: ReactNode;
+    nextIcon?: ReactNode;
 }
 
 export default function RegistrationPagination({
@@ -15,6 +20,10 @@ export default function RegistrationPagination({
     total,
     totalPages,
     onPage,
+    ariaLabel,
+    resultsLabel,
+    previousIcon,
+    nextIcon,
 }: RegistrationPaginationProps) {
     const { t } = useTranslation('admin');
     const pageNumbers: number[] = [];
@@ -39,14 +48,17 @@ export default function RegistrationPagination({
     return (
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-black px-[22px] py-[17px] text-[12px]">
             <p>
-                {t('list.results', {
+                {t(resultsLabel || 'list.results', {
                     from: total > 0 ? page * size + 1 : 0,
                     to: Math.min((page + 1) * size, total),
                     total,
                 })}
             </p>
 
-            <nav aria-label={t('list.pagination')} className="flex items-center gap-[5px]">
+            <nav
+                aria-label={ariaLabel || t('list.pagination')}
+                className="flex items-center gap-[5px]"
+            >
                 <button
                     type="button"
                     className="grid size-[33px] place-items-center rounded-[2px] border border-black bg-white p-0 text-[12px] disabled:cursor-not-allowed disabled:opacity-40"
@@ -54,7 +66,7 @@ export default function RegistrationPagination({
                     disabled={page <= 0}
                     aria-label={t('actions.previous')}
                 >
-                    <AdminIcon name="previous" />
+                    {previousIcon || <AdminIcon name="previous" />}
                 </button>
 
                 {pageNumbers.map((pageNumber, index) => (
@@ -81,7 +93,7 @@ export default function RegistrationPagination({
                     disabled={page + 1 >= totalPages}
                     aria-label={t('actions.next')}
                 >
-                    <AdminIcon name="next" />
+                    {nextIcon || <AdminIcon name="next" />}
                 </button>
             </nav>
         </div>

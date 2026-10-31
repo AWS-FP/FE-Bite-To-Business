@@ -10,6 +10,8 @@ import viAdmin from './locales/vi/admin.json';
 import enAdmin from './locales/en/admin.json';
 import viRegistrations from './locales/vi/registrations.json';
 import enRegistrations from './locales/en/registrations.json';
+import viStaff from './locales/vi/staff.json';
+import enStaff from './locales/en/staff.json';
 
 const storageKey = 'bitetobusiness.language';
 let language = 'vi';
@@ -25,13 +27,13 @@ void i18n.use(initReactI18next).init({
             translation: vi,
             common: viCommon,
             storefront: viStorefront,
-            admin: { ...viAdmin, ...viRegistrations },
+            admin: { ...viAdmin, ...viRegistrations, ...viStaff },
         },
         en: {
             translation: en,
             common: enCommon,
             storefront: enStorefront,
-            admin: { ...enAdmin, ...enRegistrations },
+            admin: { ...enAdmin, ...enRegistrations, ...enStaff },
         },
     },
     lng: language,

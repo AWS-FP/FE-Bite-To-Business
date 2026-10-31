@@ -6,7 +6,8 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 interface AdminHeaderProps {
     user: AuthUser | null;
-    isStaffPage: boolean;
+    sectionNumber: string;
+    pageLabel: string;
     isSidebarOpen: boolean;
     onOpenSidebar: () => void;
     onLogout: () => void;
@@ -14,7 +15,8 @@ interface AdminHeaderProps {
 
 export default function AdminHeader({
     user,
-    isStaffPage,
+    sectionNumber,
+    pageLabel,
     isSidebarOpen,
     onOpenSidebar,
     onLogout,
@@ -81,7 +83,7 @@ export default function AdminHeader({
                         BTB
                     </span>
                     <strong className="font-display text-[33px] leading-[39.6px] font-extrabold max-[600px]:text-[28px] max-[600px]:leading-8">
-                        {isStaffPage ? '02' : '01'}
+                        {sectionNumber}
                     </strong>
                 </div>
 
@@ -104,9 +106,7 @@ export default function AdminHeader({
                             width={11}
                             height={11}
                         />
-                        <span aria-current="page">
-                            {isStaffPage ? t('navigation.staff') : t('navigation.registrations')}
-                        </span>
+                        <span aria-current="page">{pageLabel}</span>
                     </nav>
                 </div>
             </div>

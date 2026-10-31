@@ -1,0 +1,73 @@
+{
+    "staff": {
+        "eyebrow": "QUẢN LÝ TÀI KHOẢN",
+        "description": "Tạo và quản lý tài khoản nhân viên theo từng bộ phận.",
+        "accountCount": "{{count}} tài khoản",
+        "departmentCount": "3 bộ phận",
+        "searchLabel": "Tìm kiếm nhân viên",
+        "employeeSection": "THÔNG TIN NHÂN VIÊN",
+        "loginSection": "THÔNG TIN ĐĂNG NHẬP",
+        "createSubmit": "Tạo tài khoản",
+        "hidePassword": "Ẩn mật khẩu ban đầu",
+        "showConfirmation": "Hiện mật khẩu xác nhận",
+        "hideConfirmation": "Ẩn mật khẩu xác nhận",
+        "results": "Hiển thị {{from}}–{{to}} trong tổng số {{total}} nhân viên",
+        "footer": "Vận hành gọn gàng. Kinh doanh vững vàng.",
+        "placeholders": {
+            "lastName": "Nhập họ và tên đệm",
+            "firstName": "Nhập tên",
+            "email": "Nhập địa chỉ Gmail",
+            "phone": "Nhập số điện thoại",
+            "password": "Nhập mật khẩu",
+            "confirmPassword": "Nhập lại mật khẩu"
+        },
+        "departments": {
+            "ECOMMERCE_EXECUTIVE": "E-commerce",
+            "LOGISTICS_STAFF": "Logistic",
+            "DELIVERY_STAFF": "Shipper"
+        },
+        "listTitle": "Danh sách nhân viên",
+        "tableLabel": "Danh sách tài khoản Staff",
+        "create": "Tạo tài khoản Staff",
+        "createTitle": "Tạo tài khoản Staff",
+        "createHint": "Nhân viên có thể đăng nhập ngay bằng Gmail và mật khẩu được cấp.",
+        "selectRole": "Chọn bộ phận",
+        "allRoles": "Tất cả",
+        "filterRole": "Lọc theo bộ phận",
+        "search": "Tìm theo tên, Gmail hoặc số điện thoại...",
+        "searchSubmit": "Tìm nhân viên",
+        "refresh": "Làm mới",
+        "refreshLabel": "Làm mới danh sách nhân viên",
+        "pagination": "Phân trang nhân viên",
+        "showPassword": "Hiện mật khẩu ban đầu",
+        "passwordHint": "Mật khẩu từ 8 đến 72 ký tự.",
+        "creating": "Đang tạo tài khoản...",
+        "created": "Đã tạo tài khoản {{email}}. Nhân viên có thể đăng nhập ngay bằng mật khẩu vừa đặt.",
+        "cancel": "Hủy",
+        "close": "Đóng form tạo tài khoản",
+        "loading": "Đang tải danh sách nhân viên...",
+        "empty": "Chưa có tài khoản Staff. Tạo tài khoản đầu tiên cho nhân viên.",
+        "emptyFiltered": "Không có nhân viên phù hợp với từ khóa hoặc bộ phận đã chọn.",
+        "active": "Đang hoạt động",
+        "banned": "Đã bị khóa",
+        "forbidden": "Chỉ Admin mới được quản lý tài khoản Staff.",
+        "errorCode": "Mã lỗi",
+        "fields": {
+            "lastName": "Họ và tên đệm",
+            "firstName": "Tên",
+            "name": "Họ tên",
+            "phone": "Số điện thoại",
+            "contact": "Liên hệ",
+            "role": "Bộ phận",
+            "password": "Mật khẩu ban đầu",
+            "confirmPassword": "Xác nhận mật khẩu",
+            "status": "Trạng thái",
+            "createdAt": "Ngày tạo"
+        },
+        "roles": {
+            "ECOMMERCE_EXECUTIVE": "Nhân viên E-commerce",
+            "LOGISTICS_STAFF": "Nhân viên Logistic",
+            "DELIVERY_STAFF": "Nhân viên giao hàng (Shipper)"
+        }
+    }
+}

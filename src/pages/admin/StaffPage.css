@@ -1,0 +1,707 @@
+.staff-workspace {
+    background: #fff8e8;
+}
+
+.staff-workspace .admin-main-content {
+    padding-top: 36px;
+}
+
+.staff-workspace .admin-header-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-weight: 500;
+}
+
+.staff-workspace .admin-eyebrow {
+    font-family: var(--font-body);
+    font-weight: 800;
+}
+
+.staff-workspace .admin-section-stamp strong {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 800;
+}
+
+.staff-page {
+    display: grid;
+    min-width: 0;
+    gap: 30px;
+}
+
+.staff-icon {
+    display: block;
+    flex-shrink: 0;
+}
+
+.staff-page-intro {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.staff-section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.5;
+    letter-spacing: 1.2px;
+}
+
+.staff-section-label > span {
+    display: grid;
+    width: 25px;
+    height: 25px;
+    place-items: center;
+    border: 1px solid black;
+    border-radius: 4px;
+    background: white;
+    letter-spacing: 0;
+}
+
+.staff-page-intro h1 {
+    padding-top: 8px;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1.5;
+}
+
+.staff-page-description {
+    padding-top: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.staff-page .staff-open-create {
+    flex-shrink: 0;
+    min-width: 200px;
+    height: 46px;
+    font-size: 14px;
+}
+
+.staff-panel {
+    min-width: 0;
+    overflow: hidden;
+    border: 2px solid black;
+    border-radius: 4px;
+    background: white;
+    box-shadow: 4px 4px 0 black;
+}
+
+.staff-panel-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 24px 24px 0;
+}
+
+.staff-panel-heading > div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.staff-panel-heading h2 {
+    font-family: var(--font-body);
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.staff-count,
+.staff-role-badge,
+.staff-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid black;
+    border-radius: 2px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: nowrap;
+}
+
+.staff-count,
+.staff-role-badge {
+    background: #fff8e8;
+}
+
+.staff-role-badge[data-role='ECOMMERCE_EXECUTIVE'] {
+    background: #d9eea3;
+}
+
+.staff-role-badge[data-role='DELIVERY_STAFF'] {
+    background: #fff6df;
+}
+
+.staff-status-badge {
+    background: #eaf4ed;
+    color: #163d32;
+}
+
+.staff-status-badge[data-banned='true'] {
+    background: #fbeeed;
+    color: #a52c2c;
+}
+
+.staff-department-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 116px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.staff-filters {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    padding: 24px;
+}
+
+.staff-search {
+    flex: 1;
+    min-width: 0;
+}
+
+.staff-search label,
+.staff-role-filter > label {
+    display: block;
+    padding-bottom: 8px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.staff-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 46px;
+    border: 1px solid black;
+    border-radius: 4px;
+    background: white;
+    padding-inline: 12px;
+}
+
+.staff-control:focus-within {
+    outline: 2px solid #376e55;
+    outline-offset: 2px;
+}
+
+.staff-control input,
+.staff-control select {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: black;
+    font-size: 13px;
+}
+
+.staff-control input::placeholder {
+    color: #686868;
+    opacity: 1;
+}
+
+.staff-search-submit {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    border: 0;
+    background: transparent;
+    padding: 0;
+}
+
+.staff-role-filter {
+    flex-shrink: 0;
+    width: 200px;
+}
+
+.staff-select-control {
+    position: relative;
+}
+
+.staff-select-control select {
+    appearance: none;
+    padding-right: 20px;
+    cursor: pointer;
+}
+
+.staff-select-control > img:last-child {
+    position: absolute;
+    right: 12px;
+    pointer-events: none;
+}
+
+.staff-page .staff-refresh {
+    flex-shrink: 0;
+    min-width: 120px;
+    height: 46px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.staff-table-scroll {
+    overflow-x: auto;
+}
+
+.staff-table-scroll:focus-visible {
+    outline: 2px solid #376e55;
+    outline-offset: -2px;
+}
+
+.staff-table {
+    width: 100%;
+    min-width: 1080px;
+    table-layout: fixed;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.staff-table col:nth-child(1) {
+    width: 24%;
+}
+.staff-table col:nth-child(2) {
+    width: 22.7%;
+}
+.staff-table col:nth-child(3),
+.staff-table col:nth-child(4),
+.staff-table col:nth-child(5) {
+    width: 12.8%;
+}
+.staff-table col:nth-child(6) {
+    width: 14.9%;
+}
+
+.staff-table th {
+    background: #fff8e8;
+    padding: 16px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.staff-table td {
+    height: 84px;
+    border-bottom: 1px solid #deded8;
+    padding: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.staff-table th:first-child,
+.staff-table td:first-child {
+    padding-left: 24px;
+}
+
+.staff-table th:last-child,
+.staff-table td:last-child {
+    padding-right: 24px;
+}
+
+.staff-table td:last-child {
+    font-size: 12px;
+}
+
+.staff-identity {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.staff-avatar {
+    display: grid;
+    flex-shrink: 0;
+    width: 37px;
+    height: 37px;
+    place-items: center;
+    border: 1px solid black;
+    border-radius: 50%;
+    background: #eaf0e8;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.staff-identity strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.staff-account-id {
+    display: block;
+    margin-top: 4px;
+    color: #686868;
+    font-size: 11px;
+}
+
+.staff-panel > div:last-child:has(> nav) {
+    border-top: 0;
+    padding: 19px 24px;
+}
+
+.staff-panel > div:last-child nav {
+    gap: 6px;
+}
+
+.staff-panel > div:last-child nav button {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+}
+
+.staff-list-message {
+    padding: 32px 24px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.staff-success {
+    border: 1px solid #376e55;
+    border-radius: 3px;
+    background: #eaf4ed;
+    padding: 16px;
+    font-size: 13px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+}
+
+.staff-page-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: #686868;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.staff-create-modal.admin-modal[data-drawer='false'] {
+    width: 760px;
+}
+
+.staff-create-modal::backdrop {
+    background: #0006;
+}
+
+.staff-modal-header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: flex-start;
+    gap: 16px;
+    background: #fff8e8;
+    padding: 24px;
+}
+
+.staff-modal-symbol {
+    display: grid;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border: 2px solid black;
+    border-radius: 4px;
+    background: #ffe14d;
+    box-shadow: 2px 2px 0 black;
+}
+
+.staff-modal-titles {
+    min-width: 0;
+    width: 540px;
+}
+
+.staff-modal-titles h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 27px;
+    font-weight: 800;
+    line-height: 41px;
+}
+
+.staff-modal-titles p {
+    padding-top: 8px;
+    font-size: 13px;
+    line-height: 20px;
+}
+
+.staff-close-button {
+    display: grid;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    border: 1px solid black;
+    border-radius: 4px;
+    background: white;
+    padding: 0;
+}
+
+.staff-create-form {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.staff-form-body {
+    display: grid;
+    min-height: 0;
+    gap: 20px;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.staff-form-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 16px;
+    min-width: 0;
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.staff-form-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 0;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.5;
+    letter-spacing: 0.6px;
+}
+
+.staff-password-fields legend {
+    border-top: 1px solid #deded8;
+    padding-top: 21px;
+}
+
+.staff-create-modal .auth-field > label {
+    margin-bottom: 8px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 20px;
+}
+
+.staff-create-modal .auth-required {
+    color: black;
+}
+
+.staff-form-fields input,
+.staff-form-fields select {
+    width: 100%;
+    min-width: 0;
+    height: 46px;
+    border: 1px solid black;
+    border-radius: 4px;
+    background: white;
+    padding: 12px;
+    color: black;
+    font-family: var(--font-body);
+    font-size: 13px;
+}
+
+.staff-form-fields input::placeholder {
+    color: #686868;
+    opacity: 1;
+}
+
+.staff-form-fields input:focus-visible,
+.staff-form-fields select:focus-visible {
+    outline: 2px solid #376e55;
+    outline-offset: 2px;
+}
+
+.staff-form-fields [aria-invalid='true'] {
+    border-color: #a52c2c;
+}
+
+.staff-form-full {
+    grid-column: 1 / -1;
+}
+
+.staff-form-select,
+.staff-password-control {
+    position: relative;
+}
+
+.staff-form-select select {
+    appearance: none;
+    padding-right: 44px;
+}
+
+.staff-form-select select:has(option[value='']:checked) {
+    color: #686868;
+}
+
+.staff-form-select > img {
+    position: absolute;
+    top: 14px;
+    right: 12px;
+    pointer-events: none;
+}
+
+.staff-password-control input {
+    padding-right: 44px;
+}
+
+.staff-password-control button {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    display: grid;
+    width: 42px;
+    height: 44px;
+    place-items: center;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    padding: 0;
+}
+
+.staff-create-modal .auth-field-hint {
+    padding-top: 8px;
+    color: #686868;
+    font-family: var(--font-body);
+    font-size: 11px;
+    line-height: 17px;
+}
+
+.staff-create-modal .auth-field-error {
+    padding-top: 6px;
+    font-family: var(--font-body);
+}
+
+.staff-form-actions {
+    display: flex;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 2px solid black;
+    background: white;
+    padding: 18px 24px;
+}
+
+.staff-form-actions .admin-button {
+    min-width: 68px;
+    height: 46px;
+    font-size: 14px;
+}
+
+.staff-form-actions .staff-submit-create {
+    min-width: 160px;
+}
+
+@media (max-width: 1050px) {
+    .staff-filters {
+        flex-wrap: wrap;
+    }
+    .staff-search {
+        flex-basis: 100%;
+    }
+    .staff-role-filter {
+        flex: 1;
+    }
+}
+
+@media (max-width: 600px) {
+    .staff-page {
+        gap: 24px;
+    }
+    .staff-workspace .admin-main-content {
+        padding-top: 24px;
+    }
+    .staff-page-intro {
+        flex-wrap: wrap;
+        gap: 18px;
+    }
+    .staff-page-intro h1 {
+        font-size: 30px;
+    }
+    .staff-page-description {
+        font-size: 13px;
+    }
+    .staff-panel-heading {
+        padding: 20px 16px 0;
+    }
+    .staff-panel-heading h2 {
+        font-size: 17px;
+    }
+    .staff-filters {
+        gap: 14px;
+        padding: 20px 16px;
+    }
+    .staff-role-filter {
+        min-width: 145px;
+    }
+    .staff-control input,
+    .staff-control select {
+        font-size: 16px;
+    }
+    .staff-page .staff-refresh {
+        min-width: 105px;
+        padding-inline: 10px;
+        font-size: 12px;
+    }
+    .staff-panel > div:last-child:has(> nav) {
+        padding: 18px 16px;
+    }
+    .staff-modal-header {
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 20px 16px;
+    }
+    .staff-modal-titles {
+        flex: 1;
+        width: auto;
+    }
+    .staff-modal-titles h2 {
+        font-size: 22px;
+    }
+    .staff-modal-titles p {
+        font-size: 12px;
+    }
+    .staff-modal-symbol {
+        width: 40px;
+        height: 40px;
+    }
+    .staff-form-body {
+        padding: 20px 16px;
+    }
+    .staff-form-fields {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .staff-form-fields input,
+    .staff-form-fields select {
+        font-size: 16px;
+    }
+    .staff-form-actions {
+        padding: 16px;
+    }
+    .staff-form-actions .admin-button {
+        flex: 1;
+        min-width: 0;
+    }
+}

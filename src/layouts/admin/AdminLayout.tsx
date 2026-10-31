@@ -47,6 +47,12 @@ function AdminWorkspace() {
     const statsQuery = useRegistrationStats();
     const queryClient = useQueryClient();
     const loggingOut = useRef(false);
+    let pageLabel = t('navigation.registrations');
+    let sectionNumber = '01';
+    if (location.pathname.startsWith(ROUTES.ADMIN_STAFF)) {
+        pageLabel = t('navigation.staff');
+        sectionNumber = '02';
+    }
 
     // Giữ hàm đóng menu ổn định để effect khóa cuộn của sidebar không chạy lại khi đổi ngôn ngữ.
     const closeMobileSidebar = useCallback(() => {
@@ -83,6 +89,7 @@ function AdminWorkspace() {
         [&_button]:cursor-pointer [&_a]:text-inherit [&_p]:m-0 [&_h1]:m-0 [&_h2]:m-0
         [&_button:focus-visible]:outline-[3px_solid_#376e55] [&_button:focus-visible]:outline-offset-4
         [&_a:focus-visible]:outline-[3px_solid_#376e55] [&_a:focus-visible]:outline-offset-4
+        ${sectionNumber === '02' ? 'staff-workspace' : ''}
         ${isCollapsed ? 'is-collapsed min-[901px]:grid-cols-[84px_minmax(0,1fr)]' : ''}
         ${isMobileOpen ? 'is-mobile-open' : ''}`}
             data-layout="admin"
@@ -116,7 +123,8 @@ function AdminWorkspace() {
             <div className="admin-workspace min-w-0">
                 <AdminHeader
                     user={user}
-                    isStaffPage={location.pathname.startsWith(ROUTES.ADMIN_STAFF)}
+                    sectionNumber={sectionNumber}
+                    pageLabel={pageLabel}
                     isSidebarOpen={isMobileOpen}
                     onOpenSidebar={() => setIsMobileOpen(true)}
                     onLogout={handleLogout}

@@ -6,6 +6,7 @@ import ActivationPage from '@/pages/admin/ActivationPage';
 import HomePage from '@/pages/HomePage';
 import RegistrationsPage from '@/pages/admin/RegistrationsPage';
 import RegistrationDetailPage from '@/pages/admin/RegistrationDetailPage';
+import StaffPage from '@/pages/admin/StaffPage';
 import AdminLayout from '@/layouts/admin/AdminLayout';
 import PendingPage from '@/components/PendingPage';
 import ProtectedRoute from './ProtectedRoute';
@@ -49,7 +50,7 @@ export const router = createBrowserRouter([
                         Component: RegistrationsPage,
                         children: [{ path: ':requestId', Component: RegistrationDetailPage }],
                     },
-                    { path: ROUTES.ADMIN_STAFF, Component: PendingPage },
+                    { path: ROUTES.ADMIN_STAFF, Component: StaffPage },
                 ],
             },
         ],
