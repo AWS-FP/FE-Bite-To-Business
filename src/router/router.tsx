@@ -10,6 +10,7 @@ import AdminLayout from '@/layouts/admin/AdminLayout';
 import PendingPage from '@/components/PendingPage';
 import ProtectedRoute from './ProtectedRoute';
 import { ROUTES } from './routes';
+import LandingPage from '@/pages/LandingPage';
 
 export const router = createBrowserRouter([
     { path: ROUTES.LOGIN, Component: LoginPage },
@@ -17,6 +18,7 @@ export const router = createBrowserRouter([
     { path: ROUTES.VERIFY_OTP, Component: ActivationPage },
     { path: ROUTES.SET_PASSWORD, Component: ActivationPage },
     { path: ROUTES.FORGOT_PASSWORD, Component: PendingPage },
+    { path: ROUTES.LANDING, Component: LandingPage },
     { path: ROUTES.HOME, Component: HomePage },
     { path: ROUTES.CATALOG, Component: PendingPage },
     { path: ROUTES.PRODUCT_DETAIL, Component: PendingPage },
