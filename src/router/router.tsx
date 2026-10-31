@@ -11,6 +11,10 @@ import PendingPage from '@/components/PendingPage';
 import ProtectedRoute from './ProtectedRoute';
 import { ROUTES } from './routes';
 
+import BrandsPage from '@/pages/BrandsPage';
+import BrandDetailPage from '@/pages/BrandDetailPage';
+
+
 export const router = createBrowserRouter([
     { path: ROUTES.LOGIN, Component: LoginPage },
     { path: ROUTES.REGISTER, Component: RegisterPage },
@@ -20,6 +24,10 @@ export const router = createBrowserRouter([
     { path: ROUTES.HOME, Component: HomePage },
     { path: ROUTES.CATALOG, Component: PendingPage },
     { path: ROUTES.PRODUCT_DETAIL, Component: PendingPage },
+
+    { path: ROUTES.BRANDS, Component: BrandsPage },
+    { path: ROUTES.BRAND_DETAIL, Component: BrandDetailPage },
+
     { path: ROUTES.QUOTES, Component: PendingPage },
     {
         // Chỉ kiểm tra quyền truy cập
