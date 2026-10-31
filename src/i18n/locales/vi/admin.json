@@ -3,7 +3,8 @@
     "skipToContent": "Chuyển đến nội dung chính",
     "navigation": {
         "registrations": "Đăng ký Customer",
-        "staff": "Tài khoản Staff"
+        "staff": "Tài khoản Staff",
+        "system": "Hệ thống & Báo cáo"
     },
     "header": {
         "title": "Góc điều hành.",
@@ -18,6 +19,7 @@
     "sidebar": {
         "label": "Menu quản trị",
         "accountManagement": "QUẢN LÝ TÀI KHOẢN",
+        "systemManagement": "VẬN HÀNH HỆ THỐNG",
         "pendingRegistrations": "Đăng ký Customer, {{count}} hồ sơ chờ duyệt",
         "collapse": "Thu gọn sidebar",
         "expand": "Mở rộng sidebar",

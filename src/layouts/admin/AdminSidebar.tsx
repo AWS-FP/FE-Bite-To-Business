@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { Activity, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
@@ -6,6 +6,7 @@ import { NavLink } from 'react-router-dom';
 interface AdminSidebarProps {
     registrationsPath: string;
     staffPath: string;
+    systemPath: string;
     pendingCount?: number;
     isCollapsed: boolean;
     isMobileOpen: boolean;
@@ -16,6 +17,7 @@ interface AdminSidebarProps {
 export default function AdminSidebar({
     registrationsPath,
     staffPath,
+    systemPath,
     pendingCount,
     isCollapsed,
     isMobileOpen,
@@ -177,6 +179,26 @@ export default function AdminSidebar({
                     />
                     <span className="admin-sidebar-text min-w-0 flex-1 min-[901px]:[.is-collapsed_&]:hidden">
                         {t('navigation.staff')}
+                    </span>
+                </NavLink>
+            </nav>
+
+            <p className="admin-sidebar-group admin-sidebar-text pt-8 pb-[13px] pl-[5px] text-[10px] leading-[15px] font-bold tracking-[1px] min-[901px]:[.is-collapsed_&]:hidden">
+                {t('sidebar.systemManagement')}
+            </p>
+            <nav
+                className="min-[901px]:[.is-collapsed_&]:pt-5"
+                aria-label={t('sidebar.systemManagement')}
+            >
+                <NavLink
+                    className="admin-navigation-link relative flex min-h-[51px] items-center gap-[9px] rounded-[3px] border border-black bg-white px-[11px] py-[9px] text-[13px] leading-[18.2px] font-normal no-underline hover:bg-[#fff3b1] aria-[current=page]:bg-[#ffe14d] aria-[current=page]:font-bold aria-[current=page]:shadow-[3px_3px_0_#000] min-[901px]:[.is-collapsed_&]:justify-center min-[901px]:[.is-collapsed_&]:px-2"
+                    to={systemPath}
+                    title={t('navigation.system')}
+                    onClick={onCloseMobile}
+                >
+                    <Activity size={18} className="shrink-0" aria-hidden="true" />
+                    <span className="admin-sidebar-text min-w-0 flex-1 min-[901px]:[.is-collapsed_&]:hidden">
+                        {t('navigation.system')}
                     </span>
                 </NavLink>
             </nav>

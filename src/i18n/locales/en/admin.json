@@ -3,7 +3,8 @@
     "skipToContent": "Skip to main content",
     "navigation": {
         "registrations": "Customer registrations",
-        "staff": "Staff accounts"
+        "staff": "Staff accounts",
+        "system": "System & Reports"
     },
     "header": {
         "title": "Operations desk.",
@@ -18,6 +19,7 @@
     "sidebar": {
         "label": "Admin navigation",
         "accountManagement": "ACCOUNT MANAGEMENT",
+        "systemManagement": "SYSTEM OPERATIONS",
         "pendingRegistrations": "Customer registrations, {{count}} applications awaiting approval",
         "collapse": "Collapse sidebar",
         "expand": "Expand sidebar",

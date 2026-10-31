@@ -7,6 +7,7 @@ import HomePage from '@/pages/HomePage';
 import RegistrationsPage from '@/pages/admin/RegistrationsPage';
 import RegistrationDetailPage from '@/pages/admin/RegistrationDetailPage';
 import StaffPage from '@/pages/admin/StaffPage';
+import SystemMetricsPage from '@/pages/admin/SystemMetricsPage';
 import AdminLayout from '@/layouts/admin/AdminLayout';
 import PendingPage from '@/components/PendingPage';
 import ProtectedRoute from './ProtectedRoute';
@@ -51,6 +52,7 @@ export const router = createBrowserRouter([
                         children: [{ path: ':requestId', Component: RegistrationDetailPage }],
                     },
                     { path: ROUTES.ADMIN_STAFF, Component: StaffPage },
+                    { path: ROUTES.ADMIN_SYSTEM, Component: SystemMetricsPage },
                 ],
             },
         ],

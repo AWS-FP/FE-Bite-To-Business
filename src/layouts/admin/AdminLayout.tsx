@@ -53,6 +53,10 @@ function AdminWorkspace() {
         pageLabel = t('navigation.staff');
         sectionNumber = '02';
     }
+    if (location.pathname.startsWith(ROUTES.ADMIN_SYSTEM)) {
+        pageLabel = t('navigation.system');
+        sectionNumber = '03';
+    }
 
     // Giữ hàm đóng menu ổn định để effect khóa cuộn của sidebar không chạy lại khi đổi ngôn ngữ.
     const closeMobileSidebar = useCallback(() => {
@@ -114,6 +118,7 @@ function AdminWorkspace() {
                 pendingCount={statsQuery.data?.pending}
                 registrationsPath={ROUTES.ADMIN_REGISTRATIONS}
                 staffPath={ROUTES.ADMIN_STAFF}
+                systemPath={ROUTES.ADMIN_SYSTEM}
                 isCollapsed={isCollapsed}
                 isMobileOpen={isMobileOpen}
                 onToggleCollapse={() => setIsCollapsed(!isCollapsed)}

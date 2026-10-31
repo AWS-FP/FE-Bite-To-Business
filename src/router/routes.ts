@@ -25,6 +25,7 @@ export const ROUTES = {
     ADMIN_REGISTRATIONS: '/admin/registration-requests',
     ADMIN_REGISTRATION_DETAIL: '/admin/registration-requests/:requestId',
     ADMIN_STAFF: '/admin/staff',
+    ADMIN_SYSTEM: '/admin/system',
 
     ECOMMERCE: '/e-commerce',
     ECOMMERCE_PRODUCTS: '/e-commerce/products',
