@@ -27,3 +27,4 @@ dist-ssr
 
 # Tài liệu dự án chỉ lưu ở local.
 /docs/
+*.md

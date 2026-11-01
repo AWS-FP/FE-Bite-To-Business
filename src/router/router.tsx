@@ -1,8 +1,8 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AUTH_ROLES } from '@/constants/roles';
-import LoginPage from '@/pages/admin/LoginPage';
-import RegisterPage from '@/pages/admin/RegisterPage';
-import ActivationPage from '@/pages/admin/ActivationPage';
+import LoginPage from '@/pages/auth/LoginPage';
+import RegisterPage from '@/pages/auth/RegisterPage';
+import ActivationPage from '@/pages/auth/ActivationPage';
 import HomePage from '@/pages/HomePage';
 import RegistrationsPage from '@/pages/admin/RegistrationsPage';
 import RegistrationDetailPage from '@/pages/admin/RegistrationDetailPage';
