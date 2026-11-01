@@ -26,6 +26,11 @@ import PendingPage from '@/components/PendingPage';
 // Router
 import ProtectedRoute from './ProtectedRoute';
 import { ROUTES } from './routes';
+import LandingPage from '@/pages/LandingPage';
+
+import BrandsPage from '@/pages/BrandsPage';
+import BrandDetailPage from '@/pages/BrandDetailPage';
+
 
 export const router = createBrowserRouter([
     // ==========================================
