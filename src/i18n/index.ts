@@ -16,9 +16,10 @@ import viSystem from './locales/vi/system.json';
 import enSystem from './locales/en/system.json';
 
 const storageKey = 'bitetobusiness.language';
-let language = 'vi';
+let language = 'en';
 try {
-    if (localStorage.getItem(storageKey) === 'en') language = 'en';
+    const saved = localStorage.getItem(storageKey);
+    if (saved === 'vi' || saved === 'en') language = saved;
 } catch {
     /* Language selection works even when browser storage is unavailable. */
 }
@@ -39,7 +40,7 @@ void i18n.use(initReactI18next).init({
         },
     },
     lng: language,
-    fallbackLng: 'vi',
+    fallbackLng: 'en',
     supportedLngs: ['vi', 'en'],
     interpolation: { escapeValue: false },
 });
