@@ -34,11 +34,9 @@ export default function RegistrationDetailPage() {
         : 0;
 
     useEffect(() => {
-        if (!registration?.otpResendAvailableAt) return;
-
         const timer = window.setInterval(() => setCurrentTime(Date.now()), 1000);
         return () => window.clearInterval(timer);
-    }, [registration?.otpResendAvailableAt]);
+    }, []);
 
     function handleClose() {
         if (isProcessing) return;
@@ -68,6 +66,7 @@ export default function RegistrationDetailPage() {
             decision: reviewDecision,
             note: note || null,
         });
+        setCurrentTime(Date.now());
 
         if (result.registration.status === 'REJECTED') {
             setSuccessMessage(
