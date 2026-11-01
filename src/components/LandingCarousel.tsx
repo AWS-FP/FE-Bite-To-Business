@@ -1,4 +1,4 @@
-
+import BtbImagePlaceholder from './BtbImagePlaceholder';
 /* Generated from the supplied HTML layout. Edit this section independently. */
 import { useEffect, useRef, useState } from 'react';
 export default function LandingCarousel() {
@@ -8,16 +8,16 @@ export default function LandingCarousel() {
   const progressRef = useRef(0);
   const changeSlide = (next: number) => { setSlide((next + 5) % 5); progressRef.current = 0; setProgress(0); };
   useEffect(() => {
-      if (!playing) return;
-      const tick = window.setInterval(() => {
-          progressRef.current += 100 / 90;
-          if (progressRef.current >= 100) {
-              progressRef.current = 0;
-              setSlide((current) => (current + 1) % 5);
-          }
-          setProgress(progressRef.current);
-      }, 50);
-      return () => window.clearInterval(tick);
+    if (!playing) return;
+    const tick = window.setInterval(() => {
+      progressRef.current += 100 / 90;
+      if (progressRef.current >= 100) {
+        progressRef.current = 0;
+        setSlide((current) => (current + 1) % 5);
+      }
+      setProgress(progressRef.current);
+    }, 50);
+    return () => window.clearInterval(tick);
   }, [playing]);
   return (
     <div className="video-carousel-wrapper">
@@ -40,14 +40,14 @@ export default function LandingCarousel() {
           </div>
         </div>
         <div className="carousel-top-status"><div className="live-video-pill">
-            <span className="pulse-dot"></span>
-            <span id="carouselStatusText">{`VIDEO GIỚI THIỆU DOANH NGHIỆP • SLIDE 0${slide + 1} / 05`}</span>
-          </div></div>
-        <button type="button" className="carousel-nav-btn carousel-nav-prev" id="btnPrevSlide" aria-label="Slide trước" onClick={() => changeSlide(slide - 1)}>‹</button>
-        <button type="button" className="carousel-nav-btn carousel-nav-next" id="btnNextSlide" aria-label="Slide kế tiếp" onClick={() => changeSlide(slide + 1)}>›</button>
+          <span className="pulse-dot"></span>
+          <span id="carouselStatusText">{`VIDEO GIỚI THIỆU DOANH NGHIỆP • SLIDE 0${slide + 1} / 05`}</span>
+        </div></div>
+        <button type="button" className="carousel-nav-btn carousel-nav-prev" id="btnPrevSlide" aria-label="Slide trước" onClick={() => changeSlide(slide - 1)}><img src="/images/ui/chevron-left.svg" alt="" aria-hidden="true" className="btb-ui-icon" /></button>
+        <button type="button" className="carousel-nav-btn carousel-nav-next" id="btnNextSlide" aria-label="Slide kế tiếp" onClick={() => changeSlide(slide + 1)}><img src="/images/ui/chevron-right.svg" alt="" aria-hidden="true" className="btb-ui-icon" /></button>
         <div className="carousel-track" id="heroCarouselTrack" style={{ transform: `translateX(-${slide * 20}%)` }}>
           <div className={"carousel-slide" + (slide === 0 ? " active" : "")}>
-            <img src="/images/landing/landing-02.jpg" alt="Kho trung tâm B2B Bite to Business" className="slide-bg-img" />
+            <BtbImagePlaceholder className="slide-bg-img" label="Ảnh kho vận" />
             <div className="slide-gradient-overlay"></div>
             <div className="slide-content-box">
               <div className="slide-text-col">
@@ -64,7 +64,7 @@ export default function LandingCarousel() {
             </div>
           </div>
           <div className={"carousel-slide" + (slide === 1 ? " active" : "")}>
-            <img src="/images/landing/landing-03.jpg" alt="Kiểm định kho lạnh và đóng gói" className="slide-bg-img" />
+            <BtbImagePlaceholder className="slide-bg-img" label="Ảnh kho lạnh" />
             <div className="slide-gradient-overlay"></div>
             <div className="slide-content-box">
               <div className="slide-text-col">
@@ -81,12 +81,12 @@ export default function LandingCarousel() {
             </div>
           </div>
           <div className={"carousel-slide" + (slide === 2 ? " active" : "")}>
-            <img src="/images/landing/landing-04.jpg" alt="Nguyên liệu tươi và đồ ăn chế biến sẵn" className="slide-bg-img" />
+            <BtbImagePlaceholder className="slide-bg-img" label="Ảnh nguyên liệu" />
             <div className="slide-gradient-overlay"></div>
             <div className="slide-content-box">
               <div className="slide-text-col">
                 <span className="slide-scene-tag">CẢNH 03 • NGUYÊN LIỆU TƯƠI &amp; ĐỒ CHẾ BIẾN SẴN</span>
-                <h2 className="slide-headline">Giải phóng 50% thời gian sơ chế cho bếp nhà hàng, quán ăn &amp; gia đình</h2>
+                <h2 className="slide-headline">Lựa chọn thực phẩm thuận tiện cho công việc và gia đình</h2>
                 <p className="slide-caption">Cung ứng đầy đủ 14 danh mục: từ cá hồi phi lê, ba chỉ heo mát đến các món chế biến sẵn tiện lợi như chả giò, bò viên, xúc xích và bánh croissant cấp đông.</p>
               </div>
               <div className="slide-floating-card">
@@ -94,17 +94,17 @@ export default function LandingCarousel() {
                 <div style={{ "fontSize": "11px", "fontWeight": "700", "color": "var(--coral)", "marginBottom": "4px" }}>ƯU ĐÃI CỘNG DỒN 3 TẦNG</div>
                 <div style={{ "fontFamily": "var(--font-serif)", "fontWeight": "800", "fontSize": "17px", "marginBottom": "6px" }}>Volume Pricing + Sale + Coupon</div>
                 <div style={{ "fontSize": "12.5px", "color": "var(--text-body)" }}>
-                  
-                    Mua số lượng càng lớn đơn giá càng giảm, cộng dồn thêm mã 
+
+                  Mua số lượng càng lớn đơn giá càng giảm, cộng dồn thêm mã
                   <code>MDFOOD10</code>
                   .
-                  
+
                 </div>
               </div>
             </div>
           </div>
           <div className={"carousel-slide" + (slide === 3 ? " active" : "")}>
-            <img src="/images/landing/landing-05.jpg" alt="Mạng lưới giao hàng TP.HCM" className="slide-bg-img" />
+            <BtbImagePlaceholder className="slide-bg-img" label="Ảnh giao nhận" />
             <div className="slide-gradient-overlay"></div>
             <div className="slide-content-box">
               <div className="slide-text-col">
@@ -121,22 +121,22 @@ export default function LandingCarousel() {
             </div>
           </div>
           <div className={"carousel-slide" + (slide === 4 ? " active" : "")}><div className="slide-haccp-center">
-              <span className="hero-eyebrow" style={{ "background": "var(--green-soft-bg)", "color": "var(--forest)", "marginBottom": "14px" }}>TIÊU CHUẨN AN TOÀN &amp; MINH BẠCH CHUỖI CUNG ỨNG</span>
-              <div className="haccp-logo-emblem">
-                <img src="/images/landing/landing-01.png" alt="Logo BTB Bite to Business" className="haccp-logo-img" />
-                <div className="haccp-brand-huge">BITE TO BUSINESS</div>
-              </div>
-              <div className="haccp-codex-sub">HACCP CODEX &amp; AI A2UI PLATFORM 2026</div>
-              <p style={{ "maxWidth": "620px", "fontSize": "15px", "color": "var(--text-body)", "marginBottom": "22px" }}>Nền tảng bán sỉ trực tiếp duy nhất kết hợp kiểm soát tồn kho 100%, giá bậc thang Volume Pricing công khai và giao diện thích ứng thông minh cho từng doanh nghiệp F&amp;B.</p>
-              <div style={{ "display": "flex", "gap": "12px", "flexWrap": "wrap", "justifyContent": "center" }}>
-                <a href="#onboarding-cta" className="btn btn-primary">Mở tài khoản Doanh nghiệp / Hộ gia đình →</a>
-                <button type="button" className="btn btn-outline" id="btnReplayCarousel" onClick={() => { setPlaying(true); changeSlide(0); }}>↻ Xem lại từ đầu</button>
-              </div>
-            </div></div>
+            <span className="hero-eyebrow" style={{ "background": "var(--green-soft-bg)", "color": "var(--forest)", "marginBottom": "14px" }}>TIÊU CHUẨN AN TOÀN &amp; MINH BẠCH CHUỖI CUNG ỨNG</span>
+            <div className="haccp-logo-emblem">
+              <img src="/images/storefront/brand-logo.png" alt="Logo BTB Bite to Business" className="haccp-logo-img" />
+              <div className="haccp-brand-huge">BITE TO BUSINESS</div>
+            </div>
+            <div className="haccp-codex-sub">HACCP CODEX &amp; AI A2UI PLATFORM 2026</div>
+            <p style={{ "maxWidth": "620px", "fontSize": "15px", "color": "var(--text-body)", "marginBottom": "22px" }}>Nền tảng hướng tới tập trung danh mục, hiển thị giá theo số lượng từng sản phẩm và hỗ trợ quy trình mua sắm cho doanh nghiệp lẫn người dùng cá nhân.</p>
+            <div style={{ "display": "flex", "gap": "12px", "flexWrap": "wrap", "justifyContent": "center" }}>
+              <a href="#onboarding-cta" className="btn btn-primary">Mở tài khoản Doanh nghiệp / Hộ gia đình <img className="btb-ui-icon" src="/images/ui/arrow-right.svg" alt="" aria-hidden="true" /></a>
+              <button type="button" className="btn btn-outline" id="btnReplayCarousel" onClick={() => { setPlaying(true); changeSlide(0); }}><img className="btb-ui-icon" src="/images/ui/rotate-ccw.svg" alt="" aria-hidden="true" /> Xem lại từ đầu</button>
+            </div>
+          </div></div>
         </div>
         <div className="carousel-bottom-controls">
-          <button type="button" className="video-ctrl-circle" id="btnPlayPauseCarousel" title="Tạm dừng / Phát tiếp slider" onClick={() => setPlaying((v) => !v)}>{playing ? "⏸" : "▶"}</button>
-          <button type="button" className="video-ctrl-circle" id="btnMuteCarousel" title="Không có âm thanh trong bản HTML gốc">🔇</button>
+          <button type="button" className="video-ctrl-circle" id="btnPlayPauseCarousel" title="Tạm dừng / Phát tiếp slider" onClick={() => setPlaying((v) => !v)}><img className="btb-ui-icon" src={playing ? "/images/ui/pause.svg" : "/images/ui/play.svg"} alt="" aria-hidden="true" /></button>
+          <button type="button" className="video-ctrl-circle" id="btnMuteCarousel" disabled title="Không có âm thanh trong bản demo"><img src="/images/ui/volume-off.svg" alt="" aria-hidden="true" className="btb-ui-icon" /></button>
         </div>
       </div>
       <div className="carousel-chapter-bar">
@@ -164,4 +164,3 @@ export default function LandingCarousel() {
     </div>
   );
 }
-

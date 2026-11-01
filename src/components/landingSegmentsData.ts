@@ -1,43 +1,8 @@
-
+/** UI content only; not a source of customer-account permissions. */
 export const landingSegments = [
-  {
-    title: "Nhà hàng & Chuỗi ẩm thực",
-    desc: "Tối ưu nguồn nguyên liệu tươi sống và thực phẩm sơ chế đồng đều chất lượng cho các bếp nhà hàng Á - Âu.",
-    b1: "Giúp tối ưu hóa quy trình mua sắm, quản lý đơn hàng tập trung.",
-    b2: "Đảm bảo hàng hóa được giữ đủ 100% và giao đúng giờ.",
-    b3: "Mọi báo giá, Order Snapshot và chứng từ VAT đều rõ ràng, số hóa.",
-    img: "/images/landing/landing-04.jpg",
-  },
-  {
-    title: "Cà phê, Tiệm bánh & Trà sữa",
-    desc: "Cung ứng bơ lạt Anchor, sữa tươi tiệt trùng, kem whipping, bánh croissant cấp đông và nguyên liệu pha chế chính hãng.",
-    b1: "Giá bậc thang Volume Pricing tiết kiệm chi phí nguyên liệu pha chế.",
-    b2: "Kiểm soát nghiêm ngặt nhiệt độ kho mát và kho đông lạnh.",
-    b3: "Đặt lại đơn hàng định kỳ mỗi tuần chỉ với 1 chạm.",
-    img: "/images/landing/landing-03.jpg",
-  },
-  {
-    title: "Quán ăn nhanh & Bếp Online",
-    desc: "Tiết kiệm 50% thời gian sơ chế với danh mục đồ ăn chế biến sẵn: bò viên, xúc xích, chả giò, cá viên định lượng chuẩn.",
-    b1: "Đóng gói sẵn theo quy cách chuẩn, dễ dàng tính giá vốn từng suất ăn.",
-    b2: "Cộng dồn trực tiếp giá Volume với chương trình Sale và Coupon.",
-    b3: "Giao nhanh trong ngày từ kho trung tâm TP.HCM.",
-    img: "/images/landing/landing-02.jpg",
-  },
-  {
-    title: "Khách sạn, Trường học & Căn tin",
-    desc: "Đáp ứng đơn hàng số lượng lớn với chiết khấu bậc thang Volume Pricing, giữ đủ 100% kho và đầy đủ chứng từ VAT.",
-    b1: "Chia một Báo giá thành nhiều nhóm giao hàng tới từng bếp/cơ sở.",
-    b2: "Quy trình Staff MD Foods duyệt báo giá và đối chiếu tồn kho minh bạch.",
-    b3: "Theo dõi lộ trình giao hàng đa điểm trực quan trên Vietmap.",
-    img: "/images/landing/landing-05.jpg",
-  },
-  {
-    title: "Siêu thị mini & Hộ gia đình hiện đại",
-    desc: "Mua thực phẩm sạch và đồ ăn chế biến sẵn tiện lợi với giá sỉ công khai, miễn phí giao hàng cho đơn trên 10kg trong 10km.",
-    b1: "Xem giá Volume Pricing công khai ngay cả khi chưa đăng nhập.",
-    b2: "Đặt lại đơn hàng cũ hoặc tạo Báo giá mới nhanh chóng chỉ với 1 chạm.",
-    b3: "Trợ lý AI gợi ý thực đơn và mặt hàng phù hợp ngân sách.",
-    img: "/images/landing/landing-04.jpg",
-  },
+  { title: 'Doanh nghiệp & Hợp tác xã', desc: 'Nhu cầu mua hàng có kế hoạch, số lượng lớn hoặc lặp lại định kỳ.', b1: 'So sánh quy cách và mức giá theo từng sản phẩm.', b2: 'Tập hợp mặt hàng để chuẩn bị báo giá, đơn hàng.', b3: 'Quản lý địa chỉ và thông tin mua sắm khi có tài khoản.', audience: 'Hồ sơ tổ chức • danh sách mua • chứng từ', img: null },
+  { title: 'Cửa hàng & Hộ kinh doanh', desc: 'Tìm nguồn thực phẩm, nguyên liệu cho cửa hàng hoặc điểm bán nhỏ.', b1: 'Tìm nhanh mặt hàng dùng thường xuyên.', b2: 'Tham khảo quy cách đóng gói và giá số lượng.', b3: 'Tiết kiệm thao tác khi mua lại danh sách quen thuộc.', audience: 'Mua định kỳ • nhiều nhóm hàng • chi phí rõ ràng', img: null },
+  { title: 'Nhà hàng & Bếp ăn', desc: 'Cần nguyên liệu đúng quy cách cho chế biến và phục vụ.', b1: 'Khám phá thực phẩm tươi và hàng chế biến.', b2: 'Phân nhóm theo nhu cầu sử dụng.', b3: 'Chuẩn bị danh sách nguyên liệu có thể đối soát.', audience: 'Quản lý nguyên liệu • lịch mua • nguồn cung', img: null },
+  { title: 'Phân phối nhỏ & Bán lẻ', desc: 'Mua theo nhu cầu kinh doanh và phân phối thực phẩm ở quy mô phù hợp.', b1: 'Xem theo thương hiệu hoặc danh mục.', b2: 'So sánh giá theo bậc số lượng của từng mã.', b3: 'Theo dõi mặt hàng thường nhập trong tài khoản.', audience: 'Danh mục hàng • quy cách • đối chiếu', img: null },
+  { title: 'Cá nhân & Hộ gia đình', desc: 'Mua thực phẩm cho bữa ăn và sinh hoạt thường ngày với thông tin dễ hiểu.', b1: 'Tìm mặt hàng theo nhu cầu và ngân sách.', b2: 'Xem quy cách trước khi chọn mua.', b3: 'Giao diện hướng tới tìm lại và mua lại nhanh.', audience: 'Hồ sơ cá nhân • thực phẩm quen thuộc • tiện lợi', img: null },
 ] as const;

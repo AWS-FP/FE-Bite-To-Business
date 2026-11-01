@@ -5,6 +5,8 @@ import type { UserRole } from '@/types/admin/auth';
 export const ROUTES = {
     HOME: '/',
     LANDING: '/landing',
+    WHY_BTB: '/landing/why-btb',
+    BTB_MODEL: '/landing/model',
     CATALOG: '/products',
     PRODUCT_DETAIL: '/products/:productId',
 
