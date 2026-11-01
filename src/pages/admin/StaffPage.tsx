@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import AdminButton from '@/components/admin/AdminButton';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import StaffCreateForm from '@/components/admin/StaffCreateForm';
 import StaffError from '@/components/admin/StaffError';
 import StaffIcon from '@/components/admin/StaffIcon';
@@ -78,15 +79,12 @@ export default function StaffPage() {
 
     return (
         <div className="staff-page">
-            <header className="staff-page-intro">
-                <div>
-                    <p className="staff-section-label">
-                        <span>02</span>
-                        {t('staff.eyebrow')}
-                    </p>
-                    <h1>{t('navigation.staff')}</h1>
-                    <p className="staff-page-description">{t('staff.description')}</p>
-                </div>
+            <AdminPageHeader
+                sectionNumber="02"
+                eyebrow={t('staff.eyebrow')}
+                title={t('navigation.staff')}
+                description={t('staff.description')}
+            >
                 <AdminButton
                     tone="primary"
                     className="staff-open-create"
@@ -95,7 +93,7 @@ export default function StaffPage() {
                     <StaffIcon name="plus" />
                     {t('staff.create')}
                 </AdminButton>
-            </header>
+            </AdminPageHeader>
             {createdEmail && (
                 <div role="status" className="staff-success">
                     {t('staff.created', { email: createdEmail })}
@@ -305,10 +303,6 @@ export default function StaffPage() {
                     </>
                 )}
             </section>
-            <footer className="staff-page-footer">
-                <p>© {new Date().getFullYear()} Bite to Business</p>
-                <p>{t('staff.footer')}</p>
-            </footer>
             {creating && (
                 <StaffCreateForm onClose={() => setCreating(false)} onCreated={handleCreated} />
             )}

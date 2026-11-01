@@ -107,14 +107,14 @@ export default function RegistrationDetailPage() {
                 onDismiss={handleClose}
                 busy={isProcessing}
             >
-                <header className="flex shrink-0 items-start justify-between gap-3 border-b border-black px-[27px] py-[23px] max-[600px]:px-5">
+                <header className="flex shrink-0 items-start justify-between gap-3 border-b border-black px-[27px] py-[23px]">
                     <div className="min-w-0">
                         <p className="text-[11px] leading-[16.5px] font-bold tracking-[1px] uppercase">
                             {t('detail.eyebrow', { id: registrationCode(requestId) })}
                         </p>
                         <h2
                             id="registration-detail-title"
-                            className="pt-[5px] font-body text-[25px] leading-[37.5px] font-bold tracking-[-0.5px]"
+                            className="pt-[5px] font-body text-[24px] leading-9 font-bold tracking-[-0.5px]"
                         >
                             {t('detail.title')}
                         </h2>
@@ -133,7 +133,7 @@ export default function RegistrationDetailPage() {
                     </button>
                 </header>
 
-                <div className="min-h-0 flex-1 overflow-y-auto px-[27px] pt-[25px] pb-[30px] max-[600px]:px-5">
+                <div className="min-h-0 flex-1 overflow-y-auto px-[27px] pt-[25px] pb-[30px]">
                     {registrationQuery.isPending && <RegistrationLoading />}
 
                     {!registrationQuery.isPending && !registration && (
@@ -200,11 +200,11 @@ export default function RegistrationDetailPage() {
                     )}
                 </div>
 
-                <footer className="flex shrink-0 flex-wrap items-center justify-end gap-[10px] border-t border-black bg-white px-[27px] py-[17px] max-[600px]:px-5">
+                <footer className="flex shrink-0 flex-wrap items-center justify-end gap-[10px] border-t border-black bg-white px-[27px] py-[17px]">
                     {/* Hồ sơ chờ duyệt */}
                     {registration?.status === 'PENDING' && (
                         <>
-                            <span className="mr-auto flex items-center gap-[5px] text-[11px] leading-[16.5px] max-[600px]:w-full">
+                            <span className="mr-auto flex items-center gap-[5px] text-[11px] leading-[16.5px]">
                                 <AdminIcon name="once" />
                                 {t('detail.onceOnly')}
                             </span>

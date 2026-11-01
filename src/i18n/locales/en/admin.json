@@ -2,7 +2,7 @@
     "workspace": "ADMIN WORKSPACE",
     "skipToContent": "Skip to main content",
     "navigation": {
-        "registrations": "Customer registrations",
+        "registrations": "Customer management",
         "staff": "Staff accounts",
         "system": "System & Reports"
     },
@@ -11,7 +11,7 @@
         "breadcrumb": "Current location",
         "language": "LANGUAGE",
         "role": "Administrator",
-        "accountMenu": "Admin account menu: {{name}}",
+        "accountMenu": "Account menu: {{name}}",
         "accountDetails": "Account details",
         "closeAccount": "Close account details",
         "logout": "Sign out"
@@ -22,8 +22,6 @@
         "systemManagement": "SYSTEM OPERATIONS",
         "pendingRegistrations": "Customer registrations, {{count}} applications awaiting approval",
         "collapse": "Collapse sidebar",
-        "expand": "Expand sidebar",
-        "open": "Open admin navigation",
-        "close": "Close admin navigation"
+        "expand": "Expand sidebar"
     }
 }

@@ -24,6 +24,7 @@ import {
     WifiOff,
 } from 'lucide-react';
 import AdminButton from '@/components/admin/AdminButton';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import SystemSettingsForm from '@/components/admin/SystemSettingsForm';
 import { useSystemMetrics } from '@/hooks/admin/useSystemMetrics';
 import { useRegistrationStats } from '@/hooks/admin/useRegistrations';
@@ -79,23 +80,24 @@ export default function SystemMetricsPage() {
 
     return (
         <div className="system-page">
-            <header className="system-intro">
-                <div>
-                    <p className="system-eyebrow">
-                        <span>03</span>
-                        {t('system.eyebrow')}
-                    </p>
-                    <h1>{t('system.title')}</h1>
-                    <p className="system-intro-description">{t('system.description')}</p>
-                </div>
-                <div className="system-intro-note">
-                    <ShieldCheck size={23} strokeWidth={1.5} aria-hidden="true" />
+            <AdminPageHeader
+                sectionNumber="03"
+                eyebrow={t('system.eyebrow')}
+                title={t('system.title')}
+                description={t('system.description')}
+            >
+                <div className="flex items-center gap-3 rounded-[3px] border border-black bg-[#fff8e8] px-4 py-3">
+                    <ShieldCheck size={20} strokeWidth={1.5} aria-hidden="true" />
                     <div>
-                        <strong>{t('system.adminOnly')}</strong>
-                        <span>{t('system.timezone')}</span>
+                        <strong className="block text-[12px] leading-[18px] font-semibold">
+                            {t('system.adminOnly')}
+                        </strong>
+                        <span className="block pt-1 text-[11px] leading-[16.5px] text-[#65655e]">
+                            {t('system.timezone')}
+                        </span>
                     </div>
                 </div>
-            </header>
+            </AdminPageHeader>
 
             <nav className="system-tabs" aria-label={t('system.tabsLabel')}>
                 <Link to="?tab=overview" aria-current={tab === 'overview' ? 'page' : undefined}>

@@ -1,31 +1,7 @@
-.staff-workspace {
-    background: #fff8e8;
-}
-
-.staff-workspace .admin-main-content {
-    padding-top: 36px;
-}
-
-.staff-workspace .admin-header-title {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-style: italic;
-    font-weight: 500;
-}
-
-.staff-workspace .admin-eyebrow {
-    font-family: var(--font-body);
-    font-weight: 800;
-}
-
-.staff-workspace .admin-section-stamp strong {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-weight: 800;
-}
-
 .staff-page {
     display: grid;
     min-width: 0;
-    gap: 30px;
+    gap: 24px;
 }
 
 .staff-icon {
@@ -33,62 +9,19 @@
     flex-shrink: 0;
 }
 
-.staff-page-intro {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-}
-
-.staff-section-label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 1.5;
-    letter-spacing: 1.2px;
-}
-
-.staff-section-label > span {
-    display: grid;
-    width: 25px;
-    height: 25px;
-    place-items: center;
-    border: 1px solid black;
-    border-radius: 4px;
-    background: white;
-    letter-spacing: 0;
-}
-
-.staff-page-intro h1 {
-    padding-top: 8px;
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: 38px;
-    font-weight: 800;
-    line-height: 1.5;
-}
-
-.staff-page-description {
-    padding-top: 8px;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
 .staff-page .staff-open-create {
     flex-shrink: 0;
     min-width: 200px;
-    height: 46px;
-    font-size: 14px;
+    height: 44px;
+    font-size: 13px;
 }
 
 .staff-panel {
     min-width: 0;
     overflow: hidden;
-    border: 2px solid black;
-    border-radius: 4px;
+    border: 1px solid black;
+    border-radius: 3px;
     background: white;
-    box-shadow: 4px 4px 0 black;
 }
 
 .staff-panel-heading {
@@ -109,7 +42,7 @@
 
 .staff-panel-heading h2 {
     font-family: var(--font-body);
-    font-size: 19px;
+    font-size: 18px;
     font-weight: 700;
     line-height: 1.5;
 }
@@ -129,27 +62,33 @@
     white-space: nowrap;
 }
 
-.staff-count,
-.staff-role-badge {
+.staff-count {
     background: #fff8e8;
 }
 
+.staff-role-badge {
+    color: white;
+}
+
 .staff-role-badge[data-role='ECOMMERCE_EXECUTIVE'] {
-    background: #d9eea3;
+    background: #9333ea;
+}
+
+.staff-role-badge[data-role='LOGISTICS_STAFF'] {
+    background: #0f766e;
 }
 
 .staff-role-badge[data-role='DELIVERY_STAFF'] {
-    background: #fff6df;
+    background: #2563eb;
 }
 
 .staff-status-badge {
-    background: #eaf4ed;
-    color: #163d32;
+    background: #22c55e;
+    color: black;
 }
 
 .staff-status-badge[data-banned='true'] {
     background: #fbeeed;
-    color: #a52c2c;
 }
 
 .staff-department-summary {
@@ -187,16 +126,11 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    height: 46px;
+    height: 44px;
     border: 1px solid black;
-    border-radius: 4px;
+    border-radius: 3px;
     background: white;
     padding-inline: 12px;
-}
-
-.staff-control:focus-within {
-    outline: 2px solid #376e55;
-    outline-offset: 2px;
 }
 
 .staff-control input,
@@ -250,8 +184,8 @@
 .staff-page .staff-refresh {
     flex-shrink: 0;
     min-width: 120px;
-    height: 46px;
-    border-radius: 4px;
+    height: 44px;
+    border-radius: 3px;
     font-size: 13px;
     font-weight: 600;
 }
@@ -289,15 +223,16 @@
 }
 
 .staff-table th {
+    border-block: 1px solid black;
     background: #fff8e8;
-    padding: 16px 12px;
+    padding: 14px 12px;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.5;
 }
 
 .staff-table td {
-    height: 84px;
+    height: 78px;
     border-bottom: 1px solid #deded8;
     padding: 12px;
     font-size: 13px;
@@ -340,7 +275,7 @@
 
 .staff-identity strong {
     display: block;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
 }
 
@@ -383,17 +318,6 @@
     overflow-wrap: anywhere;
 }
 
-.staff-page-footer {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    color: #686868;
-    font-size: 12px;
-    line-height: 1.5;
-}
-
 .staff-create-modal.admin-modal[data-drawer='false'] {
     width: 760px;
 }
@@ -429,10 +353,10 @@
 }
 
 .staff-modal-titles h2 {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: 27px;
-    font-weight: 800;
-    line-height: 41px;
+    font-family: var(--font-body);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 36px;
 }
 
 .staff-modal-titles p {
@@ -512,25 +436,20 @@
 .staff-form-fields select {
     width: 100%;
     min-width: 0;
-    height: 46px;
+    height: 44px;
     border: 1px solid black;
-    border-radius: 4px;
+    border-radius: 3px;
     background: white;
-    padding: 12px;
+    padding: 10px 12px;
     color: black;
     font-family: var(--font-body);
     font-size: 13px;
+    line-height: 20px;
 }
 
 .staff-form-fields input::placeholder {
     color: #686868;
     opacity: 1;
-}
-
-.staff-form-fields input:focus-visible,
-.staff-form-fields select:focus-visible {
-    outline: 2px solid #376e55;
-    outline-offset: 2px;
 }
 
 .staff-form-fields [aria-invalid='true'] {
@@ -606,8 +525,8 @@
 
 .staff-form-actions .admin-button {
     min-width: 68px;
-    height: 46px;
-    font-size: 14px;
+    height: 44px;
+    font-size: 13px;
 }
 
 .staff-form-actions .staff-submit-create {
@@ -623,85 +542,5 @@
     }
     .staff-role-filter {
         flex: 1;
-    }
-}
-
-@media (max-width: 600px) {
-    .staff-page {
-        gap: 24px;
-    }
-    .staff-workspace .admin-main-content {
-        padding-top: 24px;
-    }
-    .staff-page-intro {
-        flex-wrap: wrap;
-        gap: 18px;
-    }
-    .staff-page-intro h1 {
-        font-size: 30px;
-    }
-    .staff-page-description {
-        font-size: 13px;
-    }
-    .staff-panel-heading {
-        padding: 20px 16px 0;
-    }
-    .staff-panel-heading h2 {
-        font-size: 17px;
-    }
-    .staff-filters {
-        gap: 14px;
-        padding: 20px 16px;
-    }
-    .staff-role-filter {
-        min-width: 145px;
-    }
-    .staff-control input,
-    .staff-control select {
-        font-size: 16px;
-    }
-    .staff-page .staff-refresh {
-        min-width: 105px;
-        padding-inline: 10px;
-        font-size: 12px;
-    }
-    .staff-panel > div:last-child:has(> nav) {
-        padding: 18px 16px;
-    }
-    .staff-modal-header {
-        flex-wrap: wrap;
-        gap: 12px;
-        padding: 20px 16px;
-    }
-    .staff-modal-titles {
-        flex: 1;
-        width: auto;
-    }
-    .staff-modal-titles h2 {
-        font-size: 22px;
-    }
-    .staff-modal-titles p {
-        font-size: 12px;
-    }
-    .staff-modal-symbol {
-        width: 40px;
-        height: 40px;
-    }
-    .staff-form-body {
-        padding: 20px 16px;
-    }
-    .staff-form-fields {
-        grid-template-columns: minmax(0, 1fr);
-    }
-    .staff-form-fields input,
-    .staff-form-fields select {
-        font-size: 16px;
-    }
-    .staff-form-actions {
-        padding: 16px;
-    }
-    .staff-form-actions .admin-button {
-        flex: 1;
-        min-width: 0;
     }
 }

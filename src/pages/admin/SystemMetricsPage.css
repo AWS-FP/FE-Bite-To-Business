@@ -2,76 +2,6 @@
     display: grid;
     gap: 24px;
     min-width: 0;
-    max-width: 1520px;
-    margin-inline: auto;
-}
-
-.system-intro {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 28px;
-    border: 2px solid black;
-    border-radius: 4px;
-    background: #163d32;
-    color: #fff8e8;
-    padding: 30px;
-    box-shadow: 4px 4px 0 black;
-}
-
-.system-eyebrow {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #ffe14d;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-}
-
-.system-eyebrow > span {
-    display: grid;
-    width: 25px;
-    height: 25px;
-    place-items: center;
-    border: 1px solid #ffe14d;
-    letter-spacing: 0;
-}
-
-.system-intro h1 {
-    padding-top: 16px;
-    font-family: var(--font-heading);
-    font-size: clamp(25px, 2.5vw, 37px);
-    line-height: 1.4;
-}
-
-.system-intro-description {
-    max-width: 650px;
-    padding-top: 12px;
-    color: #e0e8d8;
-    font-size: 13px;
-    line-height: 1.9;
-}
-
-.system-intro-note {
-    display: flex;
-    flex-shrink: 0;
-    align-items: center;
-    gap: 12px;
-    border-left: 1px solid #ffffff40;
-    padding-left: 24px;
-}
-
-.system-intro-note strong,
-.system-intro-note span {
-    display: block;
-    font-size: 12px;
-}
-
-.system-intro-note span {
-    margin-top: 6px;
-    color: #cfdbce;
-    font-size: 10px;
 }
 
 .system-tabs {
@@ -103,7 +33,6 @@
 .system-tabs a[aria-current='page'] {
     border-color: black;
     background: #ffe14d;
-    box-shadow: 3px 3px 0 black;
     font-weight: 700;
 }
 
@@ -122,7 +51,7 @@
 .system-panel h2 {
     font-size: 18px;
     font-weight: 700;
-    line-height: 1.6;
+    line-height: 1.5;
 }
 
 .system-section-toolbar p,
@@ -146,15 +75,15 @@
 
 .system-metric-card {
     min-width: 0;
+    min-height: 154px;
     border: 1px solid black;
-    border-radius: 4px;
+    border-radius: 3px;
     background: white;
-    padding: 22px;
+    padding: 20px;
 }
 
 .system-metric-featured {
     background: #e9f1df;
-    box-shadow: 3px 3px 0 black;
 }
 
 .system-metric-label {
@@ -162,9 +91,9 @@
     align-items: start;
     justify-content: space-between;
     gap: 12px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
-    line-height: 1.7;
+    line-height: 20px;
 }
 
 .system-metric-label svg {
@@ -176,9 +105,10 @@
     min-height: 53px;
     padding-block: 14px 4px;
     font-family: var(--font-display);
-    font-size: 38px;
+    font-size: 40px;
     font-weight: 700;
     line-height: 1.2;
+    letter-spacing: -1px;
     overflow-wrap: anywhere;
 }
 
@@ -193,6 +123,7 @@
     font-family: var(--font-body);
     font-size: 20px;
     line-height: 1.4;
+    letter-spacing: 0;
 }
 
 .system-metric-card > p {
@@ -213,7 +144,7 @@
     min-width: 0;
     overflow: hidden;
     border: 1px solid black;
-    border-radius: 4px;
+    border-radius: 3px;
     background: white;
 }
 
@@ -232,7 +163,7 @@
     background: #f4f4ef;
     padding: 5px 8px;
     color: #5d6158;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     line-height: 1.6;
 }
@@ -334,11 +265,6 @@
     font-size: 12px;
     text-decoration: underline;
     text-underline-offset: 3px;
-}
-
-.system-page .admin-button {
-    min-height: 41px;
-    font-size: 12px;
 }
 
 .system-page button:disabled,
@@ -475,7 +401,8 @@
 .system-form-body select {
     width: 100%;
     min-width: 0;
-    min-height: 45px;
+    min-height: 44px;
+    height: 44px;
     border: 1px solid black;
     border-radius: 3px;
     background: white;
@@ -483,12 +410,7 @@
     color: black;
     font-size: 13px;
     font-weight: 400;
-}
-
-.system-form-body input:focus-visible,
-.system-form-body select:focus-visible {
-    outline: 2px solid #376e55;
-    outline-offset: 2px;
+    line-height: 20px;
 }
 
 .system-form-body input[aria-invalid='true'] {
@@ -644,13 +566,12 @@
 .system-log-table th {
     background: #fff8e8;
     padding: 15px 24px;
-    font-size: 11px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 18px;
 }
 
 @media (max-width: 1200px) {
-    .system-intro-note {
-        display: none;
-    }
     .system-metric-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -665,99 +586,6 @@
     }
     .system-report-filters {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 600px) {
-    .system-page {
-        gap: 20px;
-    }
-    .system-intro {
-        padding: 22px 18px;
-    }
-    .system-intro h1 {
-        font-size: 26px;
-    }
-    .system-intro-description {
-        font-size: 12px;
-    }
-    .system-tabs {
-        gap: 6px;
-    }
-    .system-tabs a {
-        flex: 1 1 auto;
-        gap: 6px;
-        padding: 9px 10px;
-        font-size: 11px;
-    }
-    .system-metric-grid {
-        gap: 12px;
-    }
-    .system-metric-card {
-        padding: 16px;
-    }
-    .system-metric-label {
-        font-size: 11px;
-    }
-    .system-metric-label svg {
-        width: 17px;
-        height: 17px;
-    }
-    .system-metric-card > strong {
-        font-size: 32px;
-    }
-    .system-metric-featured > strong {
-        font-size: 17px;
-    }
-    .system-panel-heading,
-    .system-panel-footer,
-    .system-form-footer {
-        padding: 17px;
-    }
-    .system-panel h2,
-    .system-section-toolbar h2 {
-        font-size: 16px;
-    }
-    .system-registration-chart {
-        justify-content: center;
-        padding: 24px 18px;
-    }
-    .system-bar-list {
-        flex-basis: 100%;
-    }
-    .system-source-list {
-        padding: 20px 17px;
-    }
-    .system-source-list li,
-    .system-source-list li > span:first-child {
-        gap: 8px;
-        font-size: 11px;
-    }
-    .system-source-note {
-        padding: 15px 17px;
-    }
-    .system-chart-empty {
-        margin: 17px;
-        padding: 26px 17px;
-    }
-    .system-form-body {
-        padding: 18px;
-    }
-    .system-form-body input:not([type='checkbox']),
-    .system-form-body select {
-        font-size: 16px;
-    }
-    .system-form-grid,
-    .system-form-grid-three,
-    .system-settings-aside,
-    .system-report-filters {
-        grid-template-columns: minmax(0, 1fr);
-    }
-    .system-form-footer .admin-button {
-        flex: 1;
-    }
-    .system-log-filters {
-        grid-template-columns: minmax(0, 1fr);
     }
 }
 

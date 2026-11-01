@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/router/routes';
@@ -9,6 +9,7 @@ import { useRegistrationStats } from '@/hooks/admin/useRegistrations';
 import { logout } from '@/services/admin/authService';
 import AdminHeader from './AdminHeader';
 import AdminSidebar from './AdminSidebar';
+import AdminIcon from '@/components/admin/AdminIcon';
 
 function shouldRetryAdminRequest(failureCount: number, error: unknown) {
     if (failureCount >= 1) return false;
@@ -43,7 +44,6 @@ function AdminWorkspace() {
     const clearSession = useAuthStore((state) => state.clearSession);
     const user = useAuthStore((state) => state.session?.user ?? null);
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [isMobileOpen, setIsMobileOpen] = useState(false);
     const statsQuery = useRegistrationStats();
     const queryClient = useQueryClient();
     const loggingOut = useRef(false);
@@ -57,20 +57,6 @@ function AdminWorkspace() {
         pageLabel = t('navigation.system');
         sectionNumber = '03';
     }
-
-    // Giữ hàm đóng menu ổn định để effect khóa cuộn của sidebar không chạy lại khi đổi ngôn ngữ.
-    const closeMobileSidebar = useCallback(() => {
-        setIsMobileOpen(false);
-    }, []);
-
-    useEffect(() => {
-        const desktopScreen = window.matchMedia('(min-width: 901px)');
-        function handleScreenChange() {
-            if (desktopScreen.matches) setIsMobileOpen(false);
-        }
-        desktopScreen.addEventListener('change', handleScreenChange);
-        return () => desktopScreen.removeEventListener('change', handleScreenChange);
-    }, []);
 
     async function handleLogout() {
         if (loggingOut.current) return;
@@ -88,14 +74,9 @@ function AdminWorkspace() {
 
     return (
         <div
-            className={`admin-layout grid min-h-dvh grid-cols-[248px_minmax(0,1fr)] bg-[#f8f7f3] font-body text-black
-        max-[901px]:grid-cols-[minmax(0,1fr)]
-        [&_button]:cursor-pointer [&_a]:text-inherit [&_p]:m-0 [&_h1]:m-0 [&_h2]:m-0
-        [&_button:focus-visible]:outline-[3px_solid_#376e55] [&_button:focus-visible]:outline-offset-4
-        [&_a:focus-visible]:outline-[3px_solid_#376e55] [&_a:focus-visible]:outline-offset-4
-        ${sectionNumber === '02' ? 'staff-workspace' : ''}
-        ${isCollapsed ? 'is-collapsed min-[901px]:grid-cols-[84px_minmax(0,1fr)]' : ''}
-        ${isMobileOpen ? 'is-mobile-open' : ''}`}
+            className={`admin-layout grid min-h-dvh bg-[#f8f7f3] font-body text-black [&_button]:cursor-pointer [&_a]:text-inherit [&_p]:m-0 [&_h1]:m-0 [&_h2]:m-0 [&_h1]:font-body [&_h2]:font-body [&_h3]:font-body [&_h4]:font-body [&_label]:font-body [&_small]:font-body
+        ${isCollapsed ? 'is-collapsed grid-cols-[84px_minmax(0,1fr)]' : 'grid-cols-[272px_minmax(0,1fr)]'}
+        `}
             data-layout="admin"
         >
             <a
@@ -104,25 +85,13 @@ function AdminWorkspace() {
             >
                 {t('skipToContent')}
             </a>
-            {isMobileOpen && (
-                <button
-                    className="admin-sidebar-overlay fixed inset-0 z-30 hidden border-0 bg-[#00000066] max-[901px]:block"
-                    type="button"
-                    aria-label={t('sidebar.close')}
-                    onClick={closeMobileSidebar}
-                    tabIndex={-1}
-                />
-            )}
-
             <AdminSidebar
                 pendingCount={statsQuery.data?.pending}
                 registrationsPath={ROUTES.ADMIN_REGISTRATIONS}
                 staffPath={ROUTES.ADMIN_STAFF}
                 systemPath={ROUTES.ADMIN_SYSTEM}
                 isCollapsed={isCollapsed}
-                isMobileOpen={isMobileOpen}
                 onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
-                onCloseMobile={closeMobileSidebar}
             />
 
             <div className="admin-workspace min-w-0">
@@ -130,16 +99,21 @@ function AdminWorkspace() {
                     user={user}
                     sectionNumber={sectionNumber}
                     pageLabel={pageLabel}
-                    isSidebarOpen={isMobileOpen}
-                    onOpenSidebar={() => setIsMobileOpen(true)}
                     onLogout={handleLogout}
                 />
                 <main
-                    className="admin-main-content min-w-0 p-8 focus:outline-none max-[901px]:p-6 max-[600px]:px-4"
+                    className="admin-main-content min-w-0 p-8 focus:outline-none"
                     id="admin-main-content"
                     tabIndex={-1}
                 >
                     <Outlet />
+                    <footer className="mt-6 flex flex-wrap items-center justify-between gap-3 text-[11px] leading-[16.5px] text-[#65655e]">
+                        <p>{t('footer.copyright', { year: new Date().getFullYear() })}</p>
+                        <p className="flex items-center gap-1.5">
+                            <AdminIcon name="lock" />
+                            {t('footer.adminOnly')}
+                        </p>
+                    </footer>
                 </main>
             </div>
         </div>
