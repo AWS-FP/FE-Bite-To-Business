@@ -6,11 +6,17 @@ import { formatCurrencyVnd } from '../../../constants/customer/homeData';
 import type { HomeProductCardItem } from '../../../constants/customer/homeData';
 import { useCartStore } from '../../../store/customer/cartStore';
 
-export default function ProductShowcaseCard({ product }: { product: HomeProductCardItem }) {
+export default function ProductShowcaseCard({ product, section = 'flash' }: { product: HomeProductCardItem; section?: 'flash' | 'standard' }) {
     const { t } = useTranslation('storefront');
     const [quantity, setQuantity] = useState(4);
     const addItemToCart = useCartStore((state) => state.addItem);
 
+    const productKey = `homeProducts.${section}.${product.id}`;
+    const categoryKey = product.categoryLabel.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+    const localizedName = t(`${productKey}.name`, product.name);
+    const localizedSpec = t(`${productKey}.spec`, product.spec);
+    const localizedUnit = t(`homePage.units.${product.unit}`, product.unit);
+    const localizedCategory = t(`homePage.productCategories.${categoryKey}`, product.categoryLabel);
     const activeUnitPrice = product.salePrice ?? product.listPrice;
     const totalPrice = activeUnitPrice * quantity;
 
@@ -18,8 +24,8 @@ export default function ProductShowcaseCard({ product }: { product: HomeProductC
         addItemToCart(
             {
                 id: product.id,
-                name: product.name,
-                spec: product.spec,
+                name: localizedName,
+                spec: localizedSpec,
                 unitPrice: activeUnitPrice,
                 imageUrl: product.imageUrl,
             },
@@ -36,49 +42,49 @@ export default function ProductShowcaseCard({ product }: { product: HomeProductC
                 {product.imageUrl ? (
                     <img
                         src={product.imageUrl}
-                        alt={product.name}
+                        alt={localizedName}
                         className="block h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                 ) : (
                     <div className="flex h-full w-full flex-col items-center justify-center px-4 text-center">
                         <span className="text-xs font-extrabold uppercase tracking-wider text-[#133425]">
-                            [ Food Image — {product.sku} ]
+                            {t('homePage.foodImage', { sku: product.sku })}
                         </span>
                         <span className="mt-1 text-[11px] text-[#6B7280]">
-                            Click to view Product Details
+                            {t('homePage.viewProductDetails')}
                         </span>
                     </div>
                 )}
 
                 {product.topLeftBadge && (
                     <span className="absolute top-3 left-3 rounded-full border border-solid border-[#14132b] bg-[#FACC15] px-3 py-1 text-[11px] font-extrabold text-[#14132b] shadow-[1px_1px_0_#14132b]">
-                        {product.topLeftBadge}
+                        {t(`homePage.productBadges.${product.topLeftBadge}`, product.topLeftBadge)}
                     </span>
                 )}
 
                 {product.discountBadge && (
                     <span className="absolute top-3 right-3 rounded-full border border-solid border-[#14132b] bg-[#F9C6D3] px-3 py-1 text-[11px] font-extrabold text-[#14132b]">
-                        {product.discountBadge}
+                        {t('homePage.discountBadge', { percent: product.discountBadge.match(/\d+/)?.[0] ?? '0' })}
                     </span>
                 )}
 
                 <span className="absolute right-3 bottom-3 rounded-md bg-[#133425] px-2.5 py-1 text-[10px] font-bold text-white">
-                    {product.certBadge}
+                    {t(`homePage.productBadges.${product.certBadge}`, product.certBadge)}
                 </span>
             </Link>
 
-            <div className="flex flex-1 flex-col justify-between p-4">
-                <div>
+            <div className="flex flex-1 flex-col p-4">
+                <div className="flex flex-1 flex-col">
                     <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-[#5C6B62]">
-                        <span>{product.categoryLabel}</span>
+                        <span>{localizedCategory}</span>
                         <span>SKU: {product.sku}</span>
                     </div>
 
                     <Link
                         to={`/products/${product.id}`}
-                        className="mt-1.5 block font-serif text-lg font-bold leading-snug text-[#14132b] no-underline hover:text-[#133425]"
+                        className="mt-1.5 block font-['Times_New_Roman',Georgia,serif] lining-nums text-lg font-bold leading-snug text-[#14132b] no-underline hover:text-[#133425]"
                     >
-                        {product.name}
+                        {localizedName}
                     </Link>
 
                     <div className="mt-2 flex items-center gap-1.5">
@@ -96,27 +102,30 @@ export default function ProductShowcaseCard({ product }: { product: HomeProductC
                             ))}
                         </div>
                         <span className="text-[11px] text-[#7A7D85]">
-                            {product.rating} ({product.reviewCount} reviews)
+                            {product.rating} ({t('homePage.reviewCount', { count: product.reviewCount })})
                         </span>
                     </div>
 
-                    <div className="mt-3">
-                        {product.salePrice ? (
-                            <>
-                                <div className="text-sm font-medium text-[#2F5242] line-through">
-                                    {formatCurrencyVnd(product.listPrice)} / {product.unit}
-                                </div>
-                                <div className="mt-0.5 text-right text-2xl font-black text-[#DC2626]">
-                                    {formatCurrencyVnd(product.salePrice)}{' '}
-                                    <span className="text-base font-bold">/ {product.unit}</span>
-                                </div>
-                            </>
-                        ) : (
-                            <div className="mt-2 text-2xl font-black text-[#133425]">
-                                {formatCurrencyVnd(product.listPrice)}{' '}
-                                <span className="text-base font-bold">/ {product.unit}</span>
-                            </div>
-                        )}
+                    {/* Both discounted and regular products reserve exactly the same price space.
+                        The current price sits on one baseline and starts at the same left edge. */}
+                    <div className="mt-auto flex min-h-[82px] flex-col justify-end pt-3">
+                        <div className="flex h-5 items-end">
+                            {product.salePrice != null ? (
+                                <span className="font-price text-sm leading-5 text-[#2F5242] line-through tabular-nums">
+                                    {formatCurrencyVnd(product.listPrice)} / {localizedUnit}
+                                </span>
+                            ) : (
+                                <span aria-hidden="true" className="invisible text-sm">–</span>
+                            )}
+                        </div>
+                        <div className="flex h-9 items-end gap-1 whitespace-nowrap">
+                            <span className={`font-price text-[24px] font-black leading-none lining-nums tabular-nums ${product.salePrice != null ? 'text-[#DC2626]' : 'text-[#133425]'}`}>
+                                {formatCurrencyVnd(activeUnitPrice)}
+                            </span>
+                            <span className={`font-price pb-0.5 text-sm font-bold leading-none ${product.salePrice != null ? 'text-[#DC2626]' : 'text-[#133425]'}`}>
+                                / {localizedUnit}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
@@ -133,18 +142,18 @@ export default function ProductShowcaseCard({ product }: { product: HomeProductC
                             <button
                                 type="button"
                                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                                aria-label="Decrease quantity"
+                                aria-label={t('homePage.decreaseQuantity')}
                                 className="flex h-6 w-6 cursor-pointer items-center justify-center border-0 bg-transparent text-[#14132b] hover:text-[#DC2626]"
                             >
                                 <Minus size={13} strokeWidth={2.5} />
                             </button>
-                            <span className="min-w-[26px] text-center text-xs font-extrabold text-[#14132b]">
+                            <span className="font-price min-w-[26px] text-center text-xs font-extrabold text-[#14132b]">
                                 {quantity}
                             </span>
                             <button
                                 type="button"
                                 onClick={() => setQuantity((q) => q + 1)}
-                                aria-label="Increase quantity"
+                                aria-label={t('homePage.increaseQuantity')}
                                 className="flex h-6 w-6 cursor-pointer items-center justify-center border-0 bg-transparent text-[#14132b] hover:text-[#15803D]"
                             >
                                 <Plus size={13} strokeWidth={2.5} />
