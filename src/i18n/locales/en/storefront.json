@@ -77,7 +77,7 @@
         "signOut": "Sign Out"
     },
     "homePage": {
-        "partnerTitle": "Bite to Business — Direct sourcing partner from certified farms & official importers.",
+        "partnerTitle": "Discover brands in the Bite to Business catalog.",
         "ecosystemTag": "14-CATEGORY B2B FOOD ECOSYSTEM",
         "ecosystemTitle": "Comprehensive Ingredient Catalog",
         "downloadCatalogBtn": "Download 850+ SKU Catalog (Excel)",
@@ -104,11 +104,240 @@
         "newsletterTitle": "Get Weekly Wholesale Price Lists across 14 Categories",
         "newsletterDesc": "Automatically updated weekly price books with volume discount tiers sent straight to your inbox.",
         "newsletterPlaceholder": "Enter your business email or Zalo phone number...",
-        "newsletterBtn": "Get Price List Now"
+        "newsletterBtn": "Get Price List Now",
+        "foodImage": "[ FOOD IMAGE — {{sku}} ]",
+        "viewProductDetails": "Click to view Product Details",
+        "reviewCount": "{{count}} reviews",
+        "discountBadge": "{{percent}}% OFF",
+        "decreaseQuantity": "Decrease quantity",
+        "increaseQuantity": "Increase quantity",
+        "paginationLabel": "Product pagination",
+        "paginationShowing": "Showing {{first}}–{{last}} of {{total}} wholesale products",
+        "choosePage": "Choose page",
+        "firstPage": "First page",
+        "previousPage": "Previous page",
+        "nextPage": "Next page",
+        "lastPage": "Last page",
+        "pageNumber": "Page {{page}}",
+        "sliderLabel": "Promotional Coverflow Slider",
+        "posterPlaceholder": "[ Full Poster Image #{{number}} ]",
+        "posterInstructions": "Put your designed poster image path in",
+        "slideAlt": {
+            "slide-1": "Fresh Farm Vegetables Poster",
+            "slide-2": "Clean Meat & Seafood Poster",
+            "slide-3": "Imported Fresh Fruits Poster",
+            "slide-4": "Barista Milk & Dairy Poster",
+            "slide-5": "Omega-3 Eggs Early Market Poster",
+            "slide-6": "ST25 Rice & Bakery Flour Poster"
+        },
+        "units": {
+            "kg": "kg",
+            "bag": "bag",
+            "tray": "tray",
+            "box": "box",
+            "case": "case",
+            "tin": "tin",
+            "pack": "pack"
+        },
+        "productBadges": {
+            "GlobalGAP • Air Freight": "GlobalGAP • Air Freight",
+            "VietGAP • Dalat Farm": "VietGAP • Dalat Farm",
+            "HACCP • Sashimi Grade": "HACCP • Sashimi Grade",
+            "ASC Certified • Export": "ASC Certified • Export",
+            "MLA Australia • Chilled": "MLA Australia • Chilled",
+            "VietGAP • UV Sterilized": "VietGAP • UV Sterilized",
+            "Fonterra NZ • Imported": "Fonterra NZ • Imported",
+            "OCOP 5-Star • New Crop": "OCOP 5-Star • New Crop",
+            "USDA Choice • Chilled": "USDA Choice • Chilled",
+            "ISO 22000 • Cold Chain": "ISO 22000 • Cold Chain",
+            "VietGAP • Hydroponic": "VietGAP • Hydroponic",
+            "HACCP • Ready to Bake": "HACCP • Ready to Bake",
+            "Imported • Restaurant Tin": "Imported • Restaurant Tin",
+            "ISO 22000 • Non-GMO": "ISO 22000 • Non-GMO",
+            "Imported Italy • Al Dente": "Imported Italy • Al Dente",
+            "UTZ Certified • Medium Roast": "UTZ Certified • Medium Roast",
+            "#1 Best Seller": "#1 Best Seller",
+            "Fresh Harvest": "Fresh Harvest",
+            "Chef Choice": "Chef Choice",
+            "Fresh Daily": "Fresh Daily",
+            "B2B Bulk": "B2B Bulk"
+        },
+        "productCategories": {
+            "meat_poultry": "MEAT & POULTRY",
+            "beverages_barista": "BEVERAGES & BARISTA",
+            "vegetables_mushrooms": "VEGETABLES & MUSHROOMS",
+            "tofu_plant_based": "TOFU & PLANT-BASED",
+            "fresh_eggs": "FRESH EGGS",
+            "fish_seafood": "FISH & SEAFOOD",
+            "oils_spices_sauces": "OILS, SPICES & SAUCES",
+            "rice_grains_flour": "RICE, GRAINS & FLOUR",
+            "milk_dairy": "MILK & DAIRY",
+            "noodles_pasta": "NOODLES & PASTA",
+            "bakery_desserts": "BAKERY & DESSERTS"
+        },
+        "posterInside": "inside",
+        "previousSlide": "Previous slide",
+        "nextSlide": "Next slide",
+        "goToSlide": "Go to slide {{number}}"
     },
     "landingPending": {
         "title": "Our story is on the way",
         "description": "The Landing Page is being developed on a separate feature branch. Once it is integrated, this link will open the full introduction to Bite to Business.",
         "backToShop": "Back to shopping"
+    },
+    "homeProducts": {
+        "flash": {
+            "salmon": {
+                "name": "Fresh Norwegian Salmon Fillet (Sashimi Cut)",
+                "spec": "Whole fillet 5-6kg"
+            },
+            "cabbage": {
+                "name": "Kamereo Shredded White Cabbage (K894)",
+                "spec": "Pre-washed bag 1kg"
+            },
+            "tuna": {
+                "name": "Ocean Yellowfin Saku Tuna Block (500g)",
+                "spec": "Vacuum tray 500g"
+            },
+            "salmon-belly": {
+                "name": "Norwegian Salmon Belly Strips (Trim D)",
+                "spec": "Chilled tray 1kg"
+            },
+            "tiger-shrimp": {
+                "name": "Minh Phu Black Tiger Shrimp HOSO (Size 20)",
+                "spec": "Frozen box 1kg"
+            },
+            "au-striploin": {
+                "name": "Chilled Australian Beef Striploin Steak Cut",
+                "spec": "Vacuum pack 2kg"
+            },
+            "omega-eggs": {
+                "name": "Pasteurized Omega-3 Free-Range Chicken Eggs",
+                "spec": "Tray of 30 eggs"
+            },
+            "anchor-butter": {
+                "name": "Anchor New Zealand Unsalted Culinary Butter",
+                "spec": "Bulk carton 5kg"
+            },
+            "st25-rice": {
+                "name": "Soc Trang ST25 Premium Fragrant Jasmine Rice",
+                "spec": "Commercial sack 25kg"
+            }
+        },
+        "standard": {
+            "salmon": {
+                "name": "Fresh Norwegian Salmon Fillet (Standard Vivian Cut)",
+                "spec": "Whole fish 5-6kg"
+            },
+            "cabbage": {
+                "name": "Kamereo Shredded White Cabbage (K894)",
+                "spec": "Pre-washed bag 1kg"
+            },
+            "tuna": {
+                "name": "Ocean Yellowfin Saku Tuna Block (500g)",
+                "spec": "Vacuum tray 500g"
+            },
+            "b2b-prod-04": {
+                "name": "Hokkaido Japanese Sashimi Scallops (Size 20-30)",
+                "spec": "Frozen box 1kg"
+            },
+            "b2b-prod-05": {
+                "name": "US Choice Beef Short Plate Sliced (Hotpot Cut)",
+                "spec": "Chilled tray 1kg"
+            },
+            "b2b-prod-06": {
+                "name": "Pasteurized Barista Fresh Milk Case (12 x 1L)",
+                "spec": "Case of 12 cartons"
+            },
+            "b2b-prod-07": {
+                "name": "Dalat Hydroponic Mixed Salad Greens (B2B Box)",
+                "spec": "Box 2kg"
+            },
+            "b2b-prod-08": {
+                "name": "French Butter Croissant Frozen Dough (60 pcs)",
+                "spec": "Carton 60 pieces"
+            },
+            "b2b-prod-09": {
+                "name": "Kikkoman Naturally Brewed Soy Sauce (18L Tin)",
+                "spec": "Commercial tin 18L"
+            },
+            "b2b-prod-10": {
+                "name": "Organic Non-GMO Japanese Silken Tofu Tray",
+                "spec": "Case of 12 boxes"
+            },
+            "b2b-prod-11": {
+                "name": "De Cecco Durum Wheat Spaghetti No.12 (Bulk 5kg)",
+                "spec": "Foodservice pack 5kg"
+            },
+            "b2b-prod-12": {
+                "name": "Cau Dat Specialty Roasted Arabica Beans (1kg)",
+                "spec": "Valve bag 1kg"
+            }
+        }
+    },
+    "homeCategories": {
+        "subtitles": {
+            "meatPoultry": "US/AU beef, chilled pork, chicken",
+            "fishSeafood": "Norwegian salmon, shrimp, squid",
+            "eggs": "Free-range, Omega-3, duck, quail",
+            "vegetablesMushrooms": "Dalat greens, organic mushrooms",
+            "fruits": "Seasonal & imported fruits",
+            "riceGrainsFlour": "ST25 rice, pastry flour",
+            "noodlesPasta": "Fresh noodles, spaghetti, dry pho",
+            "beansNuts": "Cashews, almonds, legumes",
+            "dairyProducts": "Fresh milk, butter, cheese",
+            "tofuVegetarian": "Silken tofu, bean curd skin",
+            "oilSpicesSauces": "Cooking oil, Asian & Western sauces",
+            "processedCanned": "Sausages, cold cuts, canned goods",
+            "bakeryDesserts": "Frozen pastry dough, cake bases",
+            "beveragesBarista": "Tea, coffee, syrups, fruit jams"
+        }
+    },
+    "homeCombos": {
+        "combo-home-kitchen": {
+            "audienceBadge": "HOUSEHOLD 30 - 50 PAX",
+            "highlightText": "Save 110,000đ",
+            "title": "5-Day Fresh Kitchen Bundle",
+            "description": "Complete meat, fish, eggs, Dalat vegetables, and seasonal dessert fruits pre-portioned by tray.",
+            "priceNote": "760,000đ",
+            "unit": "/ week",
+            "ctaLabel": "Order Bundle",
+            "features": {
+                "0": "15.5kg Chilled pork, AU beef & salmon fillet",
+                "1": "9.5kg Dalat organic vegetables & mushrooms (7 types)",
+                "2": "20 trays Omega-3 chicken eggs + 2 boxes silken tofu",
+                "3": "18.5kg Seasonal fresh fruits"
+            }
+        },
+        "combo-barista-bakery": {
+            "audienceBadge": "CAFÉ & BAKERY",
+            "highlightText": "18% Wholesale Off",
+            "title": "Morning Barista & Pastry Combo",
+            "description": "Scheduled Mon - Wed - Fri delivery for coffee shops, with full input VAT invoices included.",
+            "priceNote": "Weekly credit terms available",
+            "unit": "/ batch",
+            "ctaLabel": "Schedule Delivery",
+            "features": {
+                "0": "2 Cases Pasteurized Barista Fresh Milk (24L)",
+                "1": "1 Case Frozen Croissant & Danish Dough (60 pcs)",
+                "2": "5kg Navel oranges, strawberries & yellow lemons",
+                "3": "4 Bottles Specialty Caramel Syrup & Sauce"
+            }
+        },
+        "combo-restaurant-catering": {
+            "audienceBadge": "RESTAURANT & CANTEEN",
+            "highlightText": "30-Day Price Lock",
+            "title": "Standard Asian - Western Kitchen Pack",
+            "description": "Portion-cut to Executive Chef specifications, guaranteeing 0% prep waste.",
+            "priceNote": "Master supply contract",
+            "unit": "/ batch",
+            "ctaLabel": "Customize Portions",
+            "features": {
+                "0": "10kg AU Beef Striploin, pork ribs & chicken thighs",
+                "1": "15kg Hydroponic salad greens, tomatoes, potatoes",
+                "2": "25kg ST25 Rice + 5kg Italian Pasta & Fresh Noodles",
+                "3": "10L Cooking Oil Can + Core kitchen base sauces"
+            }
+        }
     }
 }

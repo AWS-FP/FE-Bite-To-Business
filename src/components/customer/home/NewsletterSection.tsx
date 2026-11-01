@@ -9,7 +9,7 @@ export default function NewsletterSection() {
                     <span className="block text-[11px] font-extrabold uppercase tracking-wider text-[#14132b]">
                         {t('homePage.newsletterTag', 'FOR PURCHASING MANAGERS & F&B OWNERS')}
                     </span>
-                    <h2 className="m-0 mt-1 font-serif text-2xl sm:text-3xl font-bold text-[#14132b]">
+                    <h2 className="m-0 mt-1 font-['Times_New_Roman',Georgia,serif] lining-nums text-2xl sm:text-3xl font-bold text-[#14132b]">
                         {t(
                             'homePage.newsletterTitle',
                             'Get Weekly Wholesale Price Lists across 14 Categories',

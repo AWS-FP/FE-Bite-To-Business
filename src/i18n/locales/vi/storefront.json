@@ -77,7 +77,7 @@
         "signOut": "Đăng xuất"
     },
     "homePage": {
-        "partnerTitle": "Bite to Business — Đối tác cung ứng trực tiếp từ nông trại & nhà nhập khẩu chính ngạch.",
+        "partnerTitle": "Khám phá các thương hiệu trong danh mục Bite to Business.",
         "ecosystemTag": "HỆ SINH THÁI 14 NGÀNH HÀNG THỰC PHẨM",
         "ecosystemTitle": "Danh Mục Nguyên Liệu Toàn Diện",
         "downloadCatalogBtn": "Tải danh mục 850+ mã hàng (Excel)",
@@ -89,7 +89,7 @@
         "sec": "giây",
         "freshBatchBadge": "LÔ HÀNG MỚI CẬP KHO",
         "standardSupplyTitle": "Nguồn Thực Phẩm Tiêu Chuẩn B2B",
-        "totalPrice": "Total Price:",
+        "totalPrice": "Tổng tiền:",
         "addToOrder": "Thêm vào đơn",
         "comboTag": "ĐẶT THEO GÓI TIẾT KIỆM TỚI 20%",
         "comboTitle": "Combo Bếp Nhà & Gói Nguyên Liệu F&B",
@@ -104,11 +104,240 @@
         "newsletterTitle": "Nhận Bảng Giá Sỉ 14 Ngành Hàng Qua Email",
         "newsletterDesc": "Báo giá cập nhật tự động mỗi tuần kèm chính sách chiết khấu theo sản lượng.",
         "newsletterPlaceholder": "Nhập Số điện thoại Zalo hoặc Email doanh nghiệp...",
-        "newsletterBtn": "Nhận báo giá ngay"
+        "newsletterBtn": "Nhận báo giá ngay",
+        "foodImage": "[ HÌNH SẢN PHẨM — {{sku}} ]",
+        "viewProductDetails": "Bấm để xem chi tiết sản phẩm",
+        "reviewCount": "{{count}} đánh giá",
+        "discountBadge": "GIẢM {{percent}}%",
+        "decreaseQuantity": "Giảm số lượng",
+        "increaseQuantity": "Tăng số lượng",
+        "paginationLabel": "Phân trang sản phẩm",
+        "paginationShowing": "Hiển thị {{first}}–{{last}} / {{total}} sản phẩm",
+        "choosePage": "Chọn trang",
+        "firstPage": "Trang đầu",
+        "previousPage": "Trang trước",
+        "nextPage": "Trang sau",
+        "lastPage": "Trang cuối",
+        "pageNumber": "Trang {{page}}",
+        "sliderLabel": "Băng chuyền ảnh ưu đãi",
+        "posterPlaceholder": "[ ẢNH POSTER #{{number}} ]",
+        "posterInstructions": "Thêm đường dẫn ảnh poster vào",
+        "slideAlt": {
+            "slide-1": "Poster rau củ từ nông trại",
+            "slide-2": "Poster thịt và hải sản",
+            "slide-3": "Poster trái cây nhập khẩu",
+            "slide-4": "Poster sữa và nguyên liệu pha chế",
+            "slide-5": "Poster trứng Omega-3",
+            "slide-6": "Poster gạo ST25 và bột làm bánh"
+        },
+        "units": {
+            "kg": "kg",
+            "bag": "túi",
+            "tray": "khay",
+            "box": "hộp",
+            "case": "thùng",
+            "tin": "can",
+            "pack": "gói"
+        },
+        "productBadges": {
+            "GlobalGAP • Air Freight": "GlobalGAP • Vận chuyển hàng không",
+            "VietGAP • Dalat Farm": "VietGAP • Nông trại Đà Lạt",
+            "HACCP • Sashimi Grade": "HACCP • Chuẩn sashimi",
+            "ASC Certified • Export": "Chứng nhận ASC • Xuất khẩu",
+            "MLA Australia • Chilled": "MLA Úc • Bảo quản mát",
+            "VietGAP • UV Sterilized": "VietGAP • Tiệt trùng UV",
+            "Fonterra NZ • Imported": "Fonterra New Zealand • Nhập khẩu",
+            "OCOP 5-Star • New Crop": "OCOP 5 sao • Vụ mùa mới",
+            "USDA Choice • Chilled": "USDA Choice • Bảo quản mát",
+            "ISO 22000 • Cold Chain": "ISO 22000 • Chuỗi lạnh",
+            "VietGAP • Hydroponic": "VietGAP • Thủy canh",
+            "HACCP • Ready to Bake": "HACCP • Sẵn sàng nướng",
+            "Imported • Restaurant Tin": "Nhập khẩu • Can nhà hàng",
+            "ISO 22000 • Non-GMO": "ISO 22000 • Không biến đổi gen",
+            "Imported Italy • Al Dente": "Nhập khẩu Ý • Chuẩn al dente",
+            "UTZ Certified • Medium Roast": "Chứng nhận UTZ • Rang vừa",
+            "#1 Best Seller": "#1 Bán chạy nhất",
+            "Fresh Harvest": "Mới thu hoạch",
+            "Chef Choice": "Bếp trưởng lựa chọn",
+            "Fresh Daily": "Tươi mỗi ngày",
+            "B2B Bulk": "Đặt sỉ B2B"
+        },
+        "productCategories": {
+            "fish_seafood": "CÁ & HẢI SẢN",
+            "vegetables_mushrooms": "RAU, CỦ & NẤM",
+            "meat_poultry": "THỊT & GIA CẦM",
+            "fresh_eggs": "TRỨNG TƯƠI",
+            "milk_dairy": "SỮA & SẢN PHẨM TỪ SỮA",
+            "rice_grains_flour": "GẠO, NGŨ CỐC & BỘT",
+            "bakery_desserts": "BÁNH & TRÁNG MIỆNG",
+            "oils_spices_sauces": "DẦU ĂN, GIA VỊ & SỐT",
+            "tofu_plant_based": "ĐẬU HŨ & ĐỒ CHAY",
+            "noodles_pasta": "MÌ & PASTA",
+            "beverages_barista": "ĐỒ UỐNG & PHA CHẾ"
+        },
+        "posterInside": "trong",
+        "previousSlide": "Ảnh trước",
+        "nextSlide": "Ảnh sau",
+        "goToSlide": "Đến ảnh {{number}}"
     },
     "landingPending": {
         "title": "Trang giới thiệu đang được hoàn thiện",
         "description": "Landing Page được phát triển ở nhánh riêng của nhóm. Khi tích hợp vào dự án, đường dẫn này sẽ hiển thị trang giới thiệu Bite to Business đầy đủ.",
         "backToShop": "Quay về trang mua hàng"
+    },
+    "homeProducts": {
+        "flash": {
+            "salmon": {
+                "name": "Phi lê cá hồi Na Uy tươi (cắt sashimi)",
+                "spec": "Phi lê nguyên miếng 5–6 kg"
+            },
+            "cabbage": {
+                "name": "Bắp cải trắng Kamereo cắt sợi (K894)",
+                "spec": "Túi 1 kg, đã rửa sạch"
+            },
+            "tuna": {
+                "name": "Thăn cá ngừ vây vàng Saku (500 g)",
+                "spec": "Khay hút chân không 500 g"
+            },
+            "salmon-belly": {
+                "name": "Dải bụng cá hồi Na Uy (Trim D)",
+                "spec": "Khay bảo quản mát 1 kg"
+            },
+            "tiger-shrimp": {
+                "name": "Tôm sú nguyên con Minh Phú (cỡ 20)",
+                "spec": "Hộp đông lạnh 1 kg"
+            },
+            "au-striploin": {
+                "name": "Thăn ngoại bò Úc mát cắt steak",
+                "spec": "Gói hút chân không 2 kg"
+            },
+            "omega-eggs": {
+                "name": "Trứng gà thả vườn Omega-3 tiệt trùng",
+                "spec": "Khay 30 quả"
+            },
+            "anchor-butter": {
+                "name": "Bơ lạt Anchor New Zealand cho bếp bánh",
+                "spec": "Thùng 5 kg"
+            },
+            "st25-rice": {
+                "name": "Gạo thơm Sóc Trăng ST25 cao cấp",
+                "spec": "Bao 25 kg"
+            }
+        },
+        "standard": {
+            "salmon": {
+                "name": "Phi lê cá hồi Na Uy tươi (cắt tiêu chuẩn)",
+                "spec": "Cá nguyên phi lê 5–6 kg"
+            },
+            "cabbage": {
+                "name": "Bắp cải trắng Kamereo cắt sợi (K894)",
+                "spec": "Túi 1 kg, đã rửa sạch"
+            },
+            "tuna": {
+                "name": "Thăn cá ngừ vây vàng Saku (500 g)",
+                "spec": "Khay hút chân không 500 g"
+            },
+            "b2b-prod-04": {
+                "name": "Sò điệp Hokkaido Nhật Bản dùng sashimi (cỡ 20–30)",
+                "spec": "Hộp đông lạnh 1 kg"
+            },
+            "b2b-prod-05": {
+                "name": "Ba chỉ bò Mỹ Choice thái lát nhúng lẩu",
+                "spec": "Khay thịt mát 1 kg"
+            },
+            "b2b-prod-06": {
+                "name": "Thùng sữa tươi thanh trùng dành cho barista (12 × 1 L)",
+                "spec": "Thùng 12 hộp"
+            },
+            "b2b-prod-07": {
+                "name": "Rau salad thủy canh Đà Lạt (thùng B2B)",
+                "spec": "Thùng 2 kg"
+            },
+            "b2b-prod-08": {
+                "name": "Bột bánh croissant bơ Pháp đông lạnh (60 cái)",
+                "spec": "Thùng 60 cái"
+            },
+            "b2b-prod-09": {
+                "name": "Nước tương Kikkoman lên men tự nhiên (can 18 L)",
+                "spec": "Can 18 L cho nhà hàng"
+            },
+            "b2b-prod-10": {
+                "name": "Đậu hũ non Nhật Bản hữu cơ, không biến đổi gen",
+                "spec": "Thùng 12 hộp"
+            },
+            "b2b-prod-11": {
+                "name": "Mì spaghetti lúa mì cứng De Cecco số 12 (gói 5 kg)",
+                "spec": "Gói 5 kg cho bếp chuyên nghiệp"
+            },
+            "b2b-prod-12": {
+                "name": "Cà phê hạt Arabica Cầu Đất rang mộc (1 kg)",
+                "spec": "Túi có van 1 kg"
+            }
+        }
+    },
+    "homeCategories": {
+        "subtitles": {
+            "meatPoultry": "Bò Mỹ/Úc, thịt heo mát, thịt gà",
+            "fishSeafood": "Cá hồi Na Uy, tôm, mực",
+            "eggs": "Trứng thả vườn, Omega-3, vịt, cút",
+            "vegetablesMushrooms": "Rau Đà Lạt, nấm hữu cơ",
+            "fruits": "Trái cây theo mùa và nhập khẩu",
+            "riceGrainsFlour": "Gạo ST25, bột làm bánh",
+            "noodlesPasta": "Bún tươi, spaghetti, phở khô",
+            "beansNuts": "Hạt điều, hạnh nhân, đậu",
+            "dairyProducts": "Sữa tươi, bơ, phô mai",
+            "tofuVegetarian": "Đậu hũ non, tàu hũ ky",
+            "oilSpicesSauces": "Dầu ăn, gia vị, sốt Á – Âu",
+            "processedCanned": "Xúc xích, thịt nguội, đồ hộp",
+            "bakeryDesserts": "Bột bánh đông lạnh, cốt bánh",
+            "beveragesBarista": "Trà, cà phê, siro, mứt trái cây"
+        }
+    },
+    "homeCombos": {
+        "combo-home-kitchen": {
+            "audienceBadge": "HỘ GIA ĐÌNH 30–50 NGƯỜI",
+            "highlightText": "Tiết kiệm 110.000đ",
+            "title": "Combo thực phẩm tươi cho bếp nhà 5 ngày",
+            "description": "Trọn bộ thịt, cá, trứng, rau Đà Lạt và trái cây theo mùa, chia sẵn theo khay.",
+            "priceNote": "760.000đ",
+            "unit": "/ tuần",
+            "ctaLabel": "Đặt combo",
+            "features": {
+                "0": "15,5 kg thịt heo mát, bò Úc và phi lê cá hồi",
+                "1": "9,5 kg rau củ và nấm hữu cơ Đà Lạt (7 loại)",
+                "2": "20 khay trứng gà Omega-3 và 2 hộp đậu hũ non",
+                "3": "18,5 kg trái cây tươi theo mùa"
+            }
+        },
+        "combo-barista-bakery": {
+            "audienceBadge": "QUÁN CÀ PHÊ & TIỆM BÁNH",
+            "highlightText": "Giảm 18% giá sỉ",
+            "title": "Combo nguyên liệu cà phê sáng & bánh ngọt",
+            "description": "Giao theo lịch thứ Hai – Tư – Sáu cho quán cà phê, kèm đầy đủ hóa đơn VAT đầu vào.",
+            "priceNote": "Hỗ trợ công nợ theo tuần",
+            "unit": "/ đợt",
+            "ctaLabel": "Lên lịch giao",
+            "features": {
+                "0": "2 thùng sữa tươi thanh trùng cho barista (24 L)",
+                "1": "1 thùng bột croissant và bánh Danish đông lạnh (60 cái)",
+                "2": "5 kg cam Navel, dâu tây và chanh vàng",
+                "3": "4 chai siro caramel và sốt pha chế"
+            }
+        },
+        "combo-restaurant-catering": {
+            "audienceBadge": "NHÀ HÀNG & BẾP ĂN",
+            "highlightText": "Khóa giá trong 30 ngày",
+            "title": "Combo nguyên liệu bếp Á – Âu tiêu chuẩn",
+            "description": "Sơ chế theo yêu cầu bếp trưởng, hạn chế hao hụt khi chuẩn bị món.",
+            "priceNote": "Hợp đồng cung ứng dài hạn",
+            "unit": "/ đợt",
+            "ctaLabel": "Tùy chỉnh định lượng",
+            "features": {
+                "0": "10 kg thăn bò Úc, sườn heo và đùi gà",
+                "1": "15 kg salad thủy canh, cà chua và khoai tây",
+                "2": "25 kg gạo ST25 + 5 kg pasta và mì tươi",
+                "3": "10 L dầu ăn và các loại sốt nền cho bếp"
+            }
+        }
     }
 }

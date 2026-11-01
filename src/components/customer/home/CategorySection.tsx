@@ -15,7 +15,7 @@ export default function CategorySection() {
                     <span className="block text-xs font-extrabold uppercase tracking-wider text-[#FACC15]">
                         {t('homePage.ecosystemTag', '14-CATEGORY B2B FOOD ECOSYSTEM')}
                     </span>
-                    <h2 className="m-0 mt-1 font-serif text-3xl sm:text-4xl font-bold text-[#FAF3E3]">
+                    <h2 className="m-0 mt-1 font-['Times_New_Roman',Georgia,serif] lining-nums text-3xl sm:text-4xl font-bold text-[#FAF3E3]">
                         {t('homePage.ecosystemTitle', 'Comprehensive Ingredient Catalog')}
                     </h2>
                 </div>
@@ -36,7 +36,7 @@ export default function CategorySection() {
                     <Link
                         key={cat.key}
                         to={getCatalogSearchPath(cat.searchKeyword)}
-                        className="group relative flex min-h-[168px] flex-col justify-between overflow-hidden rounded-2xl border-2 border-solid border-[#14132b] bg-white p-4 text-[#14132b] no-underline shadow-[4px_4px_0_#14132b] transition-all duration-200 hover:-translate-y-1 hover:bg-[#FFF5C0]"
+                        className="group relative flex min-h-[224px] flex-col overflow-hidden rounded-2xl border-2 border-solid border-[#14132b] bg-white p-3.5 text-[#14132b] no-underline shadow-sm transition-colors duration-200 hover:bg-[#FFF5C0] sm:min-h-[222px]"
                     >
                         <div className="pointer-events-none absolute right-1 bottom-2 transition-transform duration-300 group-hover:scale-110">
                             <CategoryArtwork categoryKey={cat.key} iconUrl={cat.iconUrl} />
@@ -48,12 +48,13 @@ export default function CategorySection() {
                             </span>
                         </div>
 
-                        <div className="relative z-10 mt-6">
-                            <h3 className="m-0 font-serif text-base font-bold leading-tight text-[#14132b]">
+                        {/* Fixed title and description rows: all 14 titles start at the same height. */}
+                        <div className="relative z-10 mt-auto flex h-[124px] min-w-0 flex-col">
+                            <h3 className="m-0 h-[82px] overflow-hidden font-['Times_New_Roman',Georgia,serif] text-[19px] font-bold leading-[1.08] text-[#14132b] [font-variant-numeric:lining-nums]">
                                 {t(`categories.${cat.key}`, cat.title)}
                             </h3>
-                            <p className="m-0 mt-1 text-[11px] leading-snug text-[#4B5563]">
-                                {cat.subtitle}
+                            <p className="m-0 mt-1 line-clamp-2 min-h-[30px] overflow-hidden text-[11px] leading-[15px] text-[#4B5563]">
+                                {t(`homeCategories.subtitles.${cat.key}`, cat.subtitle)}
                             </p>
                         </div>
                     </Link>

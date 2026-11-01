@@ -11,7 +11,7 @@ export default function CommitmentSection() {
                     {t('homePage.b2bTag', 'FOR BUSINESSES & COOPERATIVES')}
                 </span>
 
-                <h2 className="m-0 mt-4 font-serif text-2xl sm:text-3xl font-bold text-[#14132b]">
+                <h2 className="m-0 mt-4 font-['Times_New_Roman',Georgia,serif] lining-nums text-2xl sm:text-3xl font-bold text-[#14132b]">
                     {t('homePage.b2bTitle', 'Restaurants, Cafés & Corporate Offices')}
                 </h2>
 

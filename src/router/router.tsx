@@ -6,33 +6,44 @@ import {
 
 import { AUTH_ROLES } from '@/constants/roles';
 
-// Authentication
+// ==========================================
+// AUTHENTICATION
+// ==========================================
+
 import LoginPage from '@/pages/admin/LoginPage';
 import RegisterPage from '@/pages/admin/RegisterPage';
 import ActivationPage from '@/pages/admin/ActivationPage';
 
-// Public Customer Pages
+// ==========================================
+// PUBLIC CUSTOMER
+// ==========================================
+
 import HomePage from '@/pages/HomePage';
 import LandingPlaceholderPage from '@/pages/LandingPlaceholderPage';
 
-// Admin Pages
+// ==========================================
+// ADMIN
+// ==========================================
+
 import RegistrationsPage from '@/pages/admin/RegistrationsPage';
 import RegistrationDetailPage from '@/pages/admin/RegistrationDetailPage';
 
-// Layouts & Shared Components
+// ==========================================
+// LAYOUTS & COMPONENTS
+// ==========================================
+
 import AdminLayout from '@/layouts/admin/AdminLayout';
 import PendingPage from '@/components/PendingPage';
 
-// Router
+// ==========================================
+// ROUTER
+// ==========================================
+
 import ProtectedRoute from './ProtectedRoute';
 import { ROUTES } from './routes';
-import LandingPage from '@/pages/LandingPage';
-
-import BrandsPage from '@/pages/BrandsPage';
-import BrandDetailPage from '@/pages/BrandDetailPage';
-
 
 export const router = createBrowserRouter([
+
     // ==========================================
     // 1. AUTHENTICATION
     // ==========================================
@@ -60,41 +71,31 @@ export const router = createBrowserRouter([
 
     // ==========================================
     // 2. PUBLIC CUSTOMER PAGES
-    // Không cần đăng nhập
     // ==========================================
 
-    // Homepage
     {
         path: ROUTES.HOME,
         Component: HomePage,
     },
-
-    // Landing Page của thành viên khác
-    // Đang sử dụng placeholder tạm
     {
         path: ROUTES.LANDING,
         Component: LandingPlaceholderPage,
     },
-
-    // Catalog chưa triển khai ở nhánh này
     {
         path: ROUTES.CATALOG,
         Component: PendingPage,
     },
-
-    // Product Details thuộc nhánh riêng
     {
         path: ROUTES.PRODUCT_DETAIL,
         Component: PendingPage,
     },
-
     {
         path: ROUTES.QUOTES,
         Component: PendingPage,
     },
 
     // ==========================================
-    // 3. CUSTOMER PROTECTED ROUTES
+    // 3. CUSTOMER PROTECTED
     // ==========================================
 
     {
@@ -125,9 +126,6 @@ export const router = createBrowserRouter([
                 path: ROUTES.FAVORITES,
                 Component: PendingPage,
             },
-
-            // Profile thuộc nhánh feat/profile-ui
-            // Chưa triển khai trong Home UI
             {
                 path: ROUTES.PROFILE,
                 Component: PendingPage,
