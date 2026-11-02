@@ -10,6 +10,7 @@ import VerifyOtpPage from '@/pages/auth/VerifyOtpPage';
 
 // Public Customer Pages
 import HomePage from '@/pages/HomePage';
+import ProfilePage from '@/pages/customer/ProfilePage';
 
 // Admin Pages
 import RegistrationsPage from '@/pages/admin/RegistrationsPage';
@@ -98,6 +99,9 @@ export const router = createBrowserRouter([
         Component: PendingPage,
     },
 
+    // Preview Profile locally; production uses the protected route below.
+    ...(import.meta.env.DEV ? [{ path: ROUTES.PROFILE, Component: ProfilePage }] : []),
+
     // ==========================================
     // 3. CUSTOMER PROTECTED ROUTES
     // ==========================================
@@ -127,12 +131,7 @@ export const router = createBrowserRouter([
                 Component: PendingPage,
             },
 
-            // Profile thuộc nhánh feat/profile-ui
-            // Chưa triển khai trong Home UI
-            {
-                path: ROUTES.PROFILE,
-                Component: PendingPage,
-            },
+            ...(!import.meta.env.DEV ? [{ path: ROUTES.PROFILE, Component: ProfilePage }] : []),
         ],
     },
 
