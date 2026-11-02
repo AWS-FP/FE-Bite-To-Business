@@ -6,9 +6,9 @@ export default function RegistrationStats({ stats }: { stats?: RegistrationStats
     const { t } = useTranslation('admin');
 
     return (
-        <div className="mt-[26px] grid grid-cols-4 gap-4 max-[1100px]:grid-cols-2 max-[420px]:gap-2.5">
+        <div className="mt-6 grid grid-cols-4 gap-4 max-[1100px]:grid-cols-2">
             {/* Tổng hồ sơ đăng ký */}
-            <section className="flex min-h-[154px] min-w-0 flex-col rounded-[3px] border border-black bg-white px-[19px] pt-[18px] pb-4 max-[600px]:px-3">
+            <section className="flex min-h-[154px] min-w-0 flex-col rounded-[3px] border border-black bg-white p-5">
                 <div className="flex items-center justify-between gap-2">
                     <h2 className="font-body text-[13px] leading-5 font-semibold">
                         {t('stats.total.title')}
@@ -27,7 +27,7 @@ export default function RegistrationStats({ stats }: { stats?: RegistrationStats
             </section>
 
             {/* Hồ sơ chờ duyệt */}
-            <section className="flex min-h-[154px] min-w-0 flex-col rounded-[3px] border border-black bg-white px-[19px] pt-[18px] pb-4 max-[600px]:px-3">
+            <section className="flex min-h-[154px] min-w-0 flex-col rounded-[3px] border border-black bg-white p-5">
                 <div className="flex items-center justify-between gap-2">
                     <h2 className="font-body text-[13px] leading-5 font-semibold">
                         {t('stats.pending.title')}
@@ -45,7 +45,7 @@ export default function RegistrationStats({ stats }: { stats?: RegistrationStats
             </section>
 
             {/* Hồ sơ đã duyệt */}
-            <section className="flex min-h-[154px] min-w-0 flex-col rounded-[3px] border border-black bg-white px-[19px] pt-[18px] pb-4 max-[600px]:px-3">
+            <section className="flex min-h-[154px] min-w-0 flex-col rounded-[3px] border border-black bg-white p-5">
                 <div className="flex items-center justify-between gap-2">
                     <h2 className="font-body text-[13px] leading-5 font-semibold">
                         {t('stats.approved.title')}
@@ -63,7 +63,7 @@ export default function RegistrationStats({ stats }: { stats?: RegistrationStats
             </section>
 
             {/* Hồ sơ bị từ chối */}
-            <section className="flex min-h-[154px] min-w-0 flex-col rounded-[3px] border border-black bg-white px-[19px] pt-[18px] pb-4 max-[600px]:px-3">
+            <section className="flex min-h-[154px] min-w-0 flex-col rounded-[3px] border border-black bg-white p-5">
                 <div className="flex items-center justify-between gap-2">
                     <h2 className="font-body text-[13px] leading-5 font-semibold">
                         {t('stats.rejected.title')}

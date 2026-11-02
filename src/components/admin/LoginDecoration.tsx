@@ -10,7 +10,7 @@ export default function LoginDecoration() {
         <>
             {/* Màn hình từ 1200px: ảnh và nội dung nằm hai bên form. */}
             <div
-                className="auth-desktop-decoration pointer-events-none absolute inset-0 min-h-0 select-none max-[1200px]:hidden"
+                className="auth-desktop-decoration pointer-events-none relative col-start-1 row-start-1 min-h-[900px] select-none max-[1200px]:hidden"
                 aria-hidden="true"
             >
                 <AuthWordmark />
@@ -149,56 +149,6 @@ export default function LoginDecoration() {
                         </li>
                     </ol>
                 </aside>
-            </div>
-
-            {/* Màn hình nhỏ: ba ảnh và lời giới thiệu nằm phía trên form. */}
-            <div
-                className="auth-mobile-intro mx-auto hidden max-w-[540px] px-2 pt-3 pb-[14px]
-          max-[1200px]:block max-[600px]:mx-5 max-[600px]:px-0"
-                aria-hidden="true"
-            >
-                <div className="auth-mobile-photos mb-2.5 flex h-[76px] items-end gap-2.5">
-                    <div
-                        className="auth-photo h-[76px] w-[54px] -rotate-6 overflow-hidden rounded-t-[40px]
-            border-2 border-solid border-auth-cream bg-[#dce1d5] shadow-[4px_4px_0_#17133a]"
-                    >
-                        <img
-                            src="/images/login/beverages.jpg"
-                            className="block h-full w-full object-cover"
-                            alt=""
-                            decoding="async"
-                        />
-                    </div>
-                    <div
-                        className="auth-photo h-10 w-[68px] rotate-6 overflow-hidden rounded-[50px]
-            border-2 border-solid border-auth-cream bg-[#a0afa5] shadow-[4px_4px_0_#17133a]"
-                    >
-                        <img
-                            src="/images/login/porks.jpg"
-                            className="block h-full w-full object-cover"
-                            alt=""
-                            decoding="async"
-                        />
-                    </div>
-                    <div
-                        className="auth-photo h-[54px] w-[54px] overflow-hidden rounded-full
-            border-2 border-solid border-auth-cream bg-[#e7d7c6] shadow-[4px_4px_0_#17133a]"
-                    >
-                        <img
-                            src="/images/login/fishes.jpg"
-                            className="block h-full w-full object-cover"
-                            alt=""
-                            decoding="async"
-                        />
-                    </div>
-                </div>
-
-                <p className="mt-0 mb-[5px] text-[11px] font-bold text-[#ff9bd2]">
-                    {t('auth.food')} | B2B Journal
-                </p>
-                <h2 className="m-0 max-w-[380px] font-display text-[19px] leading-[1.2] font-extrabold text-white">
-                    {t('auth.heroTitle')}
-                </h2>
             </div>
         </>
     );

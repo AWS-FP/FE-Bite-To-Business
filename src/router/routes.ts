@@ -4,8 +4,13 @@ import type { UserRole } from '@/types/admin/auth';
 // mấy routes ở đây là demo th, khi code đặt sao thì sửa lại sau
 export const ROUTES = {
     HOME: '/',
+    LANDING: '/landing',
     CATALOG: '/products',
     PRODUCT_DETAIL: '/products/:productId',
+
+    BRANDS: '/brands',
+    BRAND_DETAIL: '/brands/:brandSlug',
+
 
     LOGIN: '/login',
     REGISTER: '/register',
@@ -25,6 +30,7 @@ export const ROUTES = {
     ADMIN_REGISTRATIONS: '/admin/registration-requests',
     ADMIN_REGISTRATION_DETAIL: '/admin/registration-requests/:requestId',
     ADMIN_STAFF: '/admin/staff',
+    ADMIN_SYSTEM: '/admin/system',
 
     ECOMMERCE: '/e-commerce',
     ECOMMERCE_PRODUCTS: '/e-commerce/products',
@@ -52,6 +58,18 @@ const roleHome: Record<UserRole, string> = {
 
 export function getRoleHome(role: UserRole) {
     return roleHome[role] ?? ROUTES.HOME;
+}
+
+export function getWorkspaceHome(role: UserRole) {
+    if (
+        role === 'ADMIN' ||
+        role === 'ECOMMERCE_EXECUTIVE' ||
+        role === 'LOGISTICS_STAFF' ||
+        role === 'DELIVERY_STAFF'
+    ) {
+        return getRoleHome(role);
+    }
+    return null;
 }
 
 // Encode từng ID để ký tự /, ?, # không làm sai URL khi điều hướng.

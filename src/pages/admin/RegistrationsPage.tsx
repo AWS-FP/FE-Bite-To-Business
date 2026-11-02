@@ -2,6 +2,8 @@
 import { useTranslation } from 'react-i18next';
 import { Outlet, useSearchParams } from 'react-router-dom';
 import AdminIcon from '@/components/admin/AdminIcon';
+import AdminButton from '@/components/admin/AdminButton';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { RegistrationError, RegistrationLoading } from '@/components/admin/RegistrationFeedback';
 import RegistrationPagination from '@/components/admin/RegistrationPagination';
 import RegistrationStats from '@/components/admin/RegistrationStats';
@@ -79,14 +81,20 @@ export default function RegistrationsPage() {
 
     return (
         <>
-            <div className="flex min-h-[55px] items-start justify-between gap-4">
-                <h1 className="font-body text-[34px] leading-[44px] font-bold tracking-[-1px] max-[600px]:text-[27px]">
-                    {t('navigation.registrations')}
-                </h1>
-                <span className="mt-1 mr-2 rotate-5 border-2 border-black bg-[#fff8e8] px-[17px] py-[13px] text-[11px] leading-[16.5px] font-extrabold whitespace-nowrap max-[600px]:hidden">
-                    {t('list.stamp')}
-                </span>
-            </div>
+            <AdminPageHeader
+                sectionNumber="01"
+                eyebrow={t('list.stamp')}
+                title={t('navigation.registrations')}
+                description={t('list.description')}
+            >
+                <AdminButton
+                    icon="refresh"
+                    busy={registrationQuery.isFetching || statsQuery.isFetching}
+                    onClick={handleRefresh}
+                >
+                    {t('actions.refresh')}
+                </AdminButton>
+            </AdminPageHeader>
 
             <RegistrationStats stats={statsQuery.data} />
 
@@ -102,10 +110,10 @@ export default function RegistrationsPage() {
             )}
 
             <section
-                className="mt-[27px] min-w-0 rounded-[3px] border border-black bg-white"
+                className="mt-6 min-w-0 rounded-[3px] border border-black bg-white"
                 aria-labelledby="registration-list-title"
             >
-                <div className="flex items-start justify-between gap-3 px-[22px] pt-[22px]">
+                <div className="flex items-start justify-between gap-3 px-6 pt-6">
                     <div>
                         <h2
                             id="registration-list-title"
@@ -120,28 +128,10 @@ export default function RegistrationsPage() {
                                     : '—'}
                             </span>
                         </h2>
-                        <p className="pt-[7px] text-[12px] leading-5">{t('list.description')}</p>
                     </div>
-                    <button
-                        type="button"
-                        onClick={handleRefresh}
-                        disabled={registrationQuery.isFetching || statsQuery.isFetching}
-                        aria-label={t('actions.refresh')}
-                        title={t('actions.refresh')}
-                        className="grid size-[38px] shrink-0 place-items-center rounded-[3px] border border-black bg-white p-[10px] hover:bg-[#fff8e8] disabled:opacity-60"
-                    >
-                        <AdminIcon
-                            name="refresh"
-                            className={
-                                registrationQuery.isFetching
-                                    ? 'animate-spin motion-reduce:animate-none'
-                                    : ''
-                            }
-                        />
-                    </button>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-4 px-[22px] py-5">
+                <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-6">
                     {/* Bốn nút lọc trạng thái: nhãn và số đếm được viết trực tiếp tại đây. */}
                     <div
                         className="flex max-w-full overflow-x-auto rounded-[3px] border border-black"
@@ -152,7 +142,7 @@ export default function RegistrationsPage() {
                             type="button"
                             onClick={() => handleFilterChange('status', 'ALL')}
                             aria-pressed={status === 'ALL'}
-                            className="flex min-h-[39px] shrink-0 items-center gap-[6px] border-0 border-r border-black bg-white px-[10px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap aria-pressed:bg-[#ffe14d] aria-pressed:font-bold"
+                            className="flex min-h-[42px] shrink-0 items-center gap-[6px] border-0 border-r border-black bg-white px-[10px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap aria-pressed:bg-[#ffe14d] aria-pressed:font-bold"
                         >
                             {t('status.ALL')}
                             <span className="rounded-[2px] border border-black bg-[#fff8e8] px-1 text-[10px] leading-[15px]">
@@ -163,7 +153,7 @@ export default function RegistrationsPage() {
                             type="button"
                             onClick={() => handleFilterChange('status', 'PENDING')}
                             aria-pressed={status === 'PENDING'}
-                            className="flex min-h-[39px] shrink-0 items-center gap-[6px] border-0 border-r border-black bg-white px-[10px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap aria-pressed:bg-[#ffe14d] aria-pressed:font-bold"
+                            className="flex min-h-[42px] shrink-0 items-center gap-[6px] border-0 border-r border-black bg-white px-[10px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap aria-pressed:bg-[#ffe14d] aria-pressed:font-bold"
                         >
                             {t('status.PENDING')}
                             <span className="rounded-[2px] border border-black bg-[#fff8e8] px-1 text-[10px] leading-[15px]">
@@ -174,7 +164,7 @@ export default function RegistrationsPage() {
                             type="button"
                             onClick={() => handleFilterChange('status', 'APPROVED')}
                             aria-pressed={status === 'APPROVED'}
-                            className="flex min-h-[39px] shrink-0 items-center gap-[6px] border-0 border-r border-black bg-white px-[10px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap aria-pressed:bg-[#ffe14d] aria-pressed:font-bold"
+                            className="flex min-h-[42px] shrink-0 items-center gap-[6px] border-0 border-r border-black bg-white px-[10px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap aria-pressed:bg-[#ffe14d] aria-pressed:font-bold"
                         >
                             {t('status.APPROVED')}
                             <span className="rounded-[2px] border border-black bg-[#fff8e8] px-1 text-[10px] leading-[15px]">
@@ -185,7 +175,7 @@ export default function RegistrationsPage() {
                             type="button"
                             onClick={() => handleFilterChange('status', 'REJECTED')}
                             aria-pressed={status === 'REJECTED'}
-                            className="flex min-h-[39px] shrink-0 items-center gap-[6px] border-0 border-black bg-white px-[10px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap aria-pressed:bg-[#ffe14d] aria-pressed:font-bold"
+                            className="flex min-h-[42px] shrink-0 items-center gap-[6px] border-0 border-black bg-white px-[10px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap aria-pressed:bg-[#ffe14d] aria-pressed:font-bold"
                         >
                             {t('status.REJECTED')}
                             <span className="rounded-[2px] border border-black bg-[#fff8e8] px-1 text-[10px] leading-[15px]">
@@ -195,8 +185,8 @@ export default function RegistrationsPage() {
                     </div>
 
                     {/* Tìm kiếm và lọc loại Customer */}
-                    <div className="flex flex-wrap gap-[9px] max-[600px]:w-full">
-                        <label className="flex h-[41px] w-[240px] items-center gap-2 rounded-[3px] border border-black bg-white px-[10px] focus-within:outline-[3px_solid_#ffe14d] max-[600px]:w-full">
+                    <div className="flex flex-wrap gap-[9px]">
+                        <label className="focus-border-group flex h-11 w-[240px] items-center gap-2 rounded-[3px] border border-black bg-white px-[10px]">
                             <AdminIcon name="search" />
                             <span className="sr-only">{t('list.search')}</span>
                             <input
@@ -207,10 +197,10 @@ export default function RegistrationsPage() {
                                     handleFilterChange('keyword', event.target.value, true)
                                 }
                                 placeholder={t('list.search')}
-                                className="min-w-0 flex-1 border-0 bg-transparent p-0 font-body text-[11px] outline-none placeholder:text-[#555]"
+                                className="min-w-0 flex-1 border-0 bg-transparent p-0 font-body text-[13px] outline-none placeholder:text-[#555]"
                             />
                         </label>
-                        <label className="relative flex h-[41px] w-[212px] items-center gap-[6px] rounded-[3px] border border-black bg-white pl-[9px] focus-within:outline-[3px_solid_#ffe14d] max-[600px]:w-full">
+                        <label className="focus-border-group relative flex h-11 w-[212px] items-center gap-[6px] rounded-[3px] border border-black bg-white pl-[9px]">
                             <AdminIcon name="filter" />
                             <span className="sr-only">{t('list.filterType')}</span>
                             <select
@@ -279,14 +269,6 @@ export default function RegistrationsPage() {
                     />
                 )}
             </section>
-
-            <footer className="flex flex-wrap items-center justify-between gap-3 pt-[25px] text-[11px] leading-[16.5px]">
-                <p>{t('footer.copyright', { year: new Date().getFullYear() })}</p>
-                <p className="flex items-center gap-[6px]">
-                    <AdminIcon name="lock" />
-                    {t('footer.adminOnly')}
-                </p>
-            </footer>
 
             <Outlet />
         </>
