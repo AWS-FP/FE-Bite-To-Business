@@ -16,6 +16,7 @@ import SystemMetricsPage from '@/pages/admin/SystemMetricsPage';
 
 // Layouts & Shared Components
 import AdminLayout from '@/layouts/admin/AdminLayout';
+import StaffLayout from '@/layouts/StaffLayout';
 import PendingPage from '@/components/PendingPage';
 
 // Router
@@ -183,6 +184,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: ROUTES.ECOMMERCE,
+                element: <StaffLayout role={AUTH_ROLES.ECOMMERCE_EXECUTIVE} />,
 
                 children: [
                     {
@@ -216,6 +218,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: ROUTES.LOGISTICS,
+                element: <StaffLayout role={AUTH_ROLES.LOGISTICS_STAFF} />,
 
                 children: [
                     {
@@ -245,6 +248,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: ROUTES.DELIVERY,
+                element: <StaffLayout role={AUTH_ROLES.DELIVERY_STAFF} />,
 
                 children: [
                     {

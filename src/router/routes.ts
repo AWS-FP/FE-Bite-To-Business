@@ -58,6 +58,18 @@ export function getRoleHome(role: UserRole) {
     return roleHome[role] ?? ROUTES.HOME;
 }
 
+export function getWorkspaceHome(role: UserRole) {
+    if (
+        role === 'ADMIN' ||
+        role === 'ECOMMERCE_EXECUTIVE' ||
+        role === 'LOGISTICS_STAFF' ||
+        role === 'DELIVERY_STAFF'
+    ) {
+        return getRoleHome(role);
+    }
+    return null;
+}
+
 // Encode từng ID để ký tự /, ?, # không làm sai URL khi điều hướng.
 export const routePaths = {
     productDetail: (productId: string) => `/products/${encodeURIComponent(productId)}`,

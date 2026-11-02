@@ -56,12 +56,12 @@ export default function StoreNavigation() {
                 className="border-0 border-t border-solid border-store-cream/10 bg-store-dark/75"
                 aria-label={t('header.navigation')}
             >
-                <div className="mx-auto flex min-h-[48px] max-w-[1440px] items-center gap-4 px-5 py-1.5 max-[640px]:gap-3 max-[640px]:px-3">
+                <div className="mx-auto flex min-h-[48px] max-w-[1440px] items-center gap-4 px-5 py-1.5">
                     {/* Nút mở danh mục */}
                     <button
                         ref={categoryButtonRef}
                         type="button"
-                        className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border-2 border-solid border-store-ink bg-store-yellow px-3 py-1.5 text-[12px] font-extrabold text-store-ink shadow-[2px_2px_0_#14132b] hover:bg-[#ffe96d] max-[640px]:px-2.5 max-[640px]:text-[11px]"
+                        className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border-2 border-solid border-store-ink bg-store-yellow px-3 py-1.5 text-[12px] font-extrabold text-store-ink shadow-[2px_2px_0_#14132b] hover:bg-[#ffe96d]"
                         aria-haspopup="dialog"
                         aria-expanded={isCategoryMenuOpen}
                         aria-controls={isCategoryMenuOpen ? 'btb-category-mega-menu' : undefined}

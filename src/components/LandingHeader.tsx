@@ -1,52 +1,63 @@
-
 /* Generated from the supplied HTML layout. Edit this section independently. */
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { ROUTES } from '@/router/routes';
 import LanguageSwitcher from './LanguageSwitcher';
 
-export default function LandingHeader({ quoteCount, showToast }: { quoteCount: number; showToast: (message: string) => void }) {
+export default function LandingHeader() {
+    const { t } = useTranslation('storefront');
+
     return (
-        <header className="navbar"><div className="container navbar-inner">
+        <header className="navbar">
+            <div className="container navbar-inner">
+                <Link
+                    to={ROUTES.HOME}
+                    className="flex w-fit shrink-0 items-center gap-2 text-store-ink no-underline"
+                    aria-label={t('home')}
+                >
+                    <img
+                        src="/images/storefront/brand-logo.png"
+                        alt=""
+                        className="block h-auto w-[100px] shrink-0 object-contain"
+                        width={100}
+                        height={67}
+                    />
 
-            <a
-                href="#top-hero"
-                className="brand-logo"
-                aria-label="Bite to Business"
-            >
-                <img
-                    src="/images/storefront/brand-logo.png"
-                    alt="BTB"
-                    className="brand-logo-img"
-                />
-
-                <div className="brand-text-wrap">
-                    <span className="brand-name">
-                        <span>Bite to </span>
+                    <span className="brand-name flex flex-col text-[20px] leading-[1.1] tracking-[-0.5px]">
+                        <span>Bite to</span>
                         <span>Business</span>
                     </span>
+                </Link>
+
+                <ul className="nav-links">
+                    <li>
+                        <a href="#categories">Mua hàng ngay</a>
+                    </li>
+                    <li>
+                        <a href="#why-b2b">Tại sao chọn Bite to Business?</a>
+                    </li>
+                    <li>
+                        <a href="#segments">Mô hình F&amp;B</a>
+                    </li>
+                </ul>
+                <div className="nav-right shrink-0">
+                    <LanguageSwitcher />
+                    <div className="flex shrink-0 items-center gap-1.5">
+                        <Link
+                            className="store-sign-up flex min-h-[40px] items-center justify-center rounded-full border-2 border-solid border-store-ink bg-[#7EBC89] px-3 text-[12px] font-bold whitespace-nowrap text-store-ink no-underline shadow-[2px_2px_0_#14132b] hover:bg-[#91c99b]"
+                            to={ROUTES.REGISTER}
+                        >
+                            {t('header.register')}
+                        </Link>
+                        <Link
+                            className="store-sign-in flex min-h-[40px] items-center justify-center rounded-full border-2 border-solid border-store-ink bg-store-cream px-3 text-[12px] font-bold whitespace-nowrap text-store-ink no-underline shadow-[2px_2px_0_#14132b] hover:bg-white"
+                            to={ROUTES.LOGIN}
+                        >
+                            {t('header.login')}
+                        </Link>
+                    </div>
                 </div>
-            </a>
-
-            <ul className="nav-links">
-                <li>
-                    <a href="#categories">Mua hàng ngay</a>
-                </li>
-                <li>
-                    <a href="#why-b2b">Tại sao chọn Bite to Business?</a>
-                </li>
-                <li>
-                    <a href="#segments">Mô hình F&amp;B</a>
-                </li>
-            </ul>
-            <div className="nav-right">
-                <LanguageSwitcher/>
-                <button type="button" className="quote-pill-btn" id="btnOpenQuoteToast" onClick={() => showToast(`Bạn có ${quoteCount} mặt hàng trong báo giá nháp (minh họa).`)}>
-
-                    Báo giá (
-                    <span id="quoteBadgeCount">{quoteCount}</span>
-                    )
-
-                </button>
-                <a href="#onboarding-cta" className="btn btn-primary" style={{ "padding": "9px 20px", "fontSize": "14px" }}>Đăng ký</a>
             </div>
-        </div></header>
+        </header>
     );
 }

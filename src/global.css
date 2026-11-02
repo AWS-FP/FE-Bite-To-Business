@@ -84,14 +84,6 @@
     select {
         font: inherit;
     }
-
-    button,
-    a,
-    input,
-    textarea,
-    select {
-        -webkit-tap-highlight-color: transparent;
-    }
 }
 
 /* Kiểu focus dùng chung cho chuột và bàn phím. */
