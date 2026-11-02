@@ -4,6 +4,7 @@ import { AUTH_ROLES } from '@/constants/roles';
 import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 import ActivationPage from '@/pages/auth/ActivationPage';
+import VerifyOtpPage from '@/pages/auth/VerifyOtpPage';
 // Public Customer Pages
 import HomePage from '@/pages/HomePage';
 
@@ -40,7 +41,7 @@ export const router = createBrowserRouter([
     },
     {
         path: ROUTES.VERIFY_OTP,
-        Component: ActivationPage,
+        Component: VerifyOtpPage,
     },
     {
         path: ROUTES.SET_PASSWORD,

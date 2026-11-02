@@ -20,11 +20,10 @@ export default function LoginPage() {
       motion-reduce:[&_*]:scroll-auto"
         >
             <AuthHeader />
-            <div className="auth-scene relative mx-auto min-h-[calc(100dvh-81px)] max-w-[1440px]">
+            <div className="auth-scene relative mx-auto grid min-h-[calc(100dvh-81px)] max-w-[1440px] grid-cols-1">
                 <LoginDecoration />
                 <main
-                    className="auth-main relative z-[1] flex justify-center px-6 pt-6 pb-20 max-[1200px]:pt-2.5 max-[600px]:pr-4
-          max-[600px]:pb-[42px] max-[600px]:pl-3"
+                    className="auth-main relative z-[1] col-start-1 row-start-1 flex self-start justify-center px-6 pt-6 pb-20 max-[1200px]:pt-2.5"
                     id="main-content"
                 >
                     <AuthCard className="auth-login-card" isLogin>
