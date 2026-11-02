@@ -3,10 +3,7 @@ import { useHomeModelContext } from './HomeModel.tsx';
 import { PARTNER_CATALOG_BRANDS } from '../../../constants/customer/partnerBrands';
 
 // All names come from 2_brands(1).csv; each lane displays half the catalog.
-const BRAND_LANES = [
-    PARTNER_CATALOG_BRANDS.slice(0, 54),
-    PARTNER_CATALOG_BRANDS.slice(54),
-];
+const BRAND_LANES = [PARTNER_CATALOG_BRANDS.slice(0, 54), PARTNER_CATALOG_BRANDS.slice(54)];
 
 export default function PartnerStrip() {
     const { t } = useHomeModelContext();
@@ -56,8 +53,8 @@ export default function PartnerStrip() {
             aria-label={t('homePage.partnerTitle', 'Brands in the Bite to Business catalog')}
             className="overflow-hidden border-y border-[#17133A]/20 bg-[#FAF3E3] py-7 text-[#14132b]"
         >
-            <div className="mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-6 px-5 lg:grid-cols-[330px_minmax(0,1fr)]">
-                <h2 className="m-0 max-w-[430px] font-['Times_New_Roman',Georgia,serif] text-xl font-bold leading-snug text-[#14132b] sm:text-2xl">
+            <div className="mx-auto grid max-w-[1320px] grid-cols-[330px_minmax(0,1fr)] items-center gap-6 px-5">
+                <h2 className="m-0 max-w-[430px] font-['Times_New_Roman',Georgia,serif] text-2xl font-bold leading-snug text-[#14132b]">
                     {t('homePage.partnerTitle', 'Discover brands in the Bite to Business catalog.')}
                 </h2>
 

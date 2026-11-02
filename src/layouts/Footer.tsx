@@ -1,21 +1,21 @@
-import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import {
     dryCategoryKeys,
     freshCategoryKeys,
     getCatalogSearchPath,
-} from '../constants/catalogNavigation'
-import { ROUTES } from '../router/routes'
+} from '../constants/catalogNavigation';
+import { ROUTES } from '../router/routes';
 
 export default function Footer() {
-    const { t } = useTranslation('storefront')
+    const { t } = useTranslation('storefront');
 
     return (
         <footer className="border-0 border-t border-solid border-white/10 bg-[#0B2418] font-body text-[#D1DDD6]">
             <div className="mx-auto max-w-[1440px] px-5 pt-14 pb-10">
-                <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-12">
+                <div className="grid gap-10 grid-cols-12">
                     {/* Column 1: Logo & Certifications */}
-                    <div className="lg:col-span-4">
+                    <div className="col-span-4">
                         <Link
                             to={ROUTES.HOME}
                             className="flex w-fit items-center gap-3 text-white no-underline"
@@ -28,9 +28,9 @@ export default function Footer() {
                                 className="block h-auto w-[92px] object-contain"
                             />
                             <span className="brand-name flex flex-col text-[20px] leading-[1.1]">
-                <span>Bite to</span>
-                <span>Business</span>
-              </span>
+                                <span>Bite to</span>
+                                <span>Business</span>
+                            </span>
                         </Link>
 
                         <p className="mt-4 max-w-[320px] text-xs leading-relaxed text-[#9FB3A8]">
@@ -38,26 +38,26 @@ export default function Footer() {
                         </p>
 
                         <div className="mt-5 flex flex-wrap items-center gap-2">
-              <span className="rounded-md border border-solid border-white/20 bg-white/5 px-2.5 py-1 text-[10px] font-bold text-white">
-                VietGAP
-              </span>
                             <span className="rounded-md border border-solid border-white/20 bg-white/5 px-2.5 py-1 text-[10px] font-bold text-white">
-                GlobalGAP
-              </span>
+                                VietGAP
+                            </span>
                             <span className="rounded-md border border-solid border-white/20 bg-white/5 px-2.5 py-1 text-[10px] font-bold text-white">
-                ISO 22000 / HACCP
-              </span>
+                                GlobalGAP
+                            </span>
+                            <span className="rounded-md border border-solid border-white/20 bg-white/5 px-2.5 py-1 text-[10px] font-bold text-white">
+                                ISO 22000 / HACCP
+                            </span>
                         </div>
                     </div>
 
                     {/* Column 2: Fresh Produce */}
-                    <div className="lg:col-span-3">
+                    <div className="col-span-3">
                         <h3 className="m-0 font-serif text-sm font-bold text-[#FACC15]">
                             {t('footer.freshHeading')}
                         </h3>
                         <ul className="mt-4 list-none space-y-2.5 p-0 text-xs">
                             {freshCategoryKeys.map((key) => {
-                                const label = t(`categories.${key}`)
+                                const label = t(`categories.${key}`);
                                 return (
                                     <li key={key}>
                                         <Link
@@ -67,19 +67,19 @@ export default function Footer() {
                                             {label}
                                         </Link>
                                     </li>
-                                )
+                                );
                             })}
                         </ul>
                     </div>
 
                     {/* Column 3: Dry Goods, Dairy & Barista */}
-                    <div className="lg:col-span-3">
+                    <div className="col-span-3">
                         <h3 className="m-0 font-serif text-sm font-bold text-[#FACC15]">
                             {t('footer.dryHeading')}
                         </h3>
                         <ul className="mt-4 list-none space-y-2.5 p-0 text-xs">
                             {dryCategoryKeys.map((key) => {
-                                const label = t(`categories.${key}`)
+                                const label = t(`categories.${key}`);
                                 return (
                                     <li key={key}>
                                         <Link
@@ -89,13 +89,13 @@ export default function Footer() {
                                             {label}
                                         </Link>
                                     </li>
-                                )
+                                );
                             })}
                         </ul>
                     </div>
 
                     {/* Column 4: Contact Support at GitHub */}
-                    <div className="lg:col-span-2">
+                    <div className="col-span-2">
                         <h3 className="m-0 font-serif text-sm font-bold text-[#FACC15]">
                             {t('footer.supportHeading')}
                         </h3>
@@ -127,5 +127,5 @@ export default function Footer() {
                 </div>
             </div>
         </footer>
-    )
+    );
 }

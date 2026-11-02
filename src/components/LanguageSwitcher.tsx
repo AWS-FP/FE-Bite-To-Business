@@ -25,7 +25,7 @@ export default function LanguageSwitcher() {
                 </span>
                 <div className="flex items-center gap-[5px]" role="group" aria-labelledby={labelId}>
                     <button
-                        className="flex min-h-[34px] w-[45px] cursor-pointer items-center justify-center gap-1 border border-solid border-black bg-white px-[7px] py-[5px] text-[14px] leading-[21px] font-extrabold text-black hover:bg-[#fff4b8] aria-pressed:bg-[#ffe14d] aria-pressed:shadow-[inset_0_-3px_0_#000] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#376e55]"
+                        className="flex h-[34px] w-[45px] cursor-pointer items-center justify-center gap-1 border border-solid border-black bg-white px-[7px] py-1 text-[14px] leading-[21px] font-extrabold text-black hover:bg-[#fff4b8] aria-pressed:bg-[#ffe14d] focus:px-[6px]"
                         type="button"
                         lang="vi"
                         aria-label="Tiếng Việt"
@@ -38,7 +38,7 @@ export default function LanguageSwitcher() {
                         )}
                     </button>
                     <button
-                        className="flex min-h-[34px] w-[45px] cursor-pointer items-center justify-center gap-1 border border-solid border-black bg-white px-[7px] py-[5px] text-[14px] leading-[21px] font-extrabold text-black hover:bg-[#fff4b8] aria-pressed:bg-[#ffe14d] aria-pressed:shadow-[inset_0_-3px_0_#000] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#376e55]"
+                        className="flex h-[34px] w-[45px] cursor-pointer items-center justify-center gap-1 border border-solid border-black bg-white px-[7px] py-1 text-[14px] leading-[21px] font-extrabold text-black hover:bg-[#fff4b8] aria-pressed:bg-[#ffe14d] focus:px-[6px]"
                         type="button"
                         lang="en"
                         aria-label="English"

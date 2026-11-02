@@ -11,12 +11,12 @@ export default function CombosSection() {
                 <span className="block text-xs font-extrabold uppercase tracking-wider text-[#FACC15]">
                     {t('homePage.comboTag', 'SAVE UP TO 20% WITH BUNDLED PACKAGES')}
                 </span>
-                <h2 className="m-0 mt-1 font-['Times_New_Roman',Georgia,serif] lining-nums text-3xl sm:text-4xl font-bold text-[#FAF3E3]">
+                <h2 className="m-0 mt-1 font-['Times_New_Roman',Georgia,serif] lining-nums text-4xl font-bold text-[#FAF3E3]">
                     {t('homePage.comboTitle', 'Home Kitchen & F&B Ingredient Combos')}
                 </h2>
             </div>
 
-            <div className="mt-7 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-7 grid grid-cols-3 gap-6">
                 {HOME_COMBO_PLANS.map((combo) => (
                     <div
                         key={combo.id}
@@ -34,7 +34,9 @@ export default function CombosSection() {
                                 </span>
                             </div>
 
-                            <h3 className="m-0 mt-4 font-['Times_New_Roman',Georgia,serif] lining-nums text-xl font-bold">{t(`homeCombos.${combo.id}.title`, combo.title)}</h3>
+                            <h3 className="m-0 mt-4 font-['Times_New_Roman',Georgia,serif] lining-nums text-xl font-bold">
+                                {t(`homeCombos.${combo.id}.title`, combo.title)}
+                            </h3>
                             <p className="m-0 mt-1.5 text-xs leading-relaxed text-[#4B5563]">
                                 {t(`homeCombos.${combo.id}.description`, combo.description)}
                             </p>
@@ -46,7 +48,9 @@ export default function CombosSection() {
                                             size={14}
                                             className="mt-0.5 shrink-0 text-[#15803D]"
                                         />
-                                        <span>{t(`homeCombos.${combo.id}.features.${index}`, feat)}</span>
+                                        <span>
+                                            {t(`homeCombos.${combo.id}.features.${index}`, feat)}
+                                        </span>
                                     </li>
                                 ))}
                             </ul>

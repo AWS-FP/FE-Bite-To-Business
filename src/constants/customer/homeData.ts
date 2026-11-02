@@ -57,13 +57,6 @@ export interface HomeComboPlanItem {
     cardBg: string
 }
 
-export type ProfileBadgeType =
-    | 'ADMIN'
-    | 'MAINTENANCE'
-    | 'CUSTOMER'
-    | 'DELIVERY'
-    | 'PENDING PROFILE'
-
 export interface NotificationItemData {
     id: string
     category: 'system' | 'quote' | 'delivery'

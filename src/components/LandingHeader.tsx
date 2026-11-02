@@ -1,90 +1,61 @@
-
-
+/* Generated from the supplied HTML layout. Edit this section independently. */
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { ROUTES } from '@/router/routes';
 import LanguageSwitcher from './LanguageSwitcher';
 
-interface LandingHeaderProps {
-    quoteCount: number;
-    showToast: (message: string) => void;
-}
+export default function LandingHeader() {
+    const { t } = useTranslation('storefront');
 
-export default function LandingHeader({
-                                          quoteCount,
-                                          showToast,
-                                      }: LandingHeaderProps) {
     return (
         <header className="navbar">
             <div className="container navbar-inner">
-
-                {/* Logo */}
-                <a
-                    href="#top-hero"
-                    className="brand-logo"
-                    aria-label="Bite to Business"
+                <Link
+                    to={ROUTES.HOME}
+                    className="flex w-fit shrink-0 items-center gap-2 text-store-ink no-underline"
+                    aria-label={t('home')}
                 >
                     <img
                         src="/images/storefront/brand-logo.png"
-                        alt="BTB"
-                        className="brand-logo-img"
+                        alt=""
+                        className="block h-auto w-[100px] shrink-0 object-contain"
+                        width={100}
+                        height={67}
                     />
 
-                    <div className="brand-text-wrap">
-                        <span className="brand-name">
-                            <span>Bite to </span>
-                            <span>Business</span>
-                        </span>
-                    </div>
-                </a>
+                    <span className="brand-name flex flex-col text-[20px] leading-[1.1] tracking-[-0.5px]">
+                        <span>Bite to</span>
+                        <span>Business</span>
+                    </span>
+                </Link>
 
-                {/* Navigation */}
                 <ul className="nav-links">
                     <li>
-                        <a href="#categories">
-                            Mua hàng ngay
-                        </a>
+                        <Link to={ROUTES.LANDING}>Trang giới thiệu</Link>
                     </li>
-
                     <li>
-                        <a href="#why-b2b">
-                            Tại sao chọn Bite to Business?
-                        </a>
+                        <Link to={ROUTES.WHY_BTB}>Vì sao chọn BTB?</Link>
                     </li>
-
                     <li>
-                        <a href="#segments">
-                            Mô hình F&amp;B
-                        </a>
+                        <Link to={ROUTES.BTB_MODEL}>Mô hình BTB</Link>
                     </li>
                 </ul>
-
-                {/* Actions */}
-                <div className="nav-right">
-
+                <div className="nav-right shrink-0">
                     <LanguageSwitcher />
-
-                    <button
-                        type="button"
-                        className="quote-pill-btn"
-                        id="btnOpenQuoteToast"
-                        onClick={() =>
-                            showToast(
-                                `Bạn có ${quoteCount} mặt hàng trong báo giá nháp (minh họa).`
-                            )
-                        }
-                    >
-                        Báo giá (
-                        <span id="quoteBadgeCount">
-                            {quoteCount}
-                        </span>
-                        )
-                    </button>
-
-                    <a
-                        href="#onboarding-cta"
-                        className="btn btn-primary px-5 py-[9px] text-sm"
-                    >
-                        Đăng ký
-                    </a>
-
+                    <div className="flex shrink-0 items-center gap-1.5">
+                        <Link
+                            className="store-sign-up flex min-h-[40px] items-center justify-center rounded-full border-2 border-solid border-store-ink bg-[#7EBC89] px-3 text-[12px] font-bold whitespace-nowrap text-store-ink no-underline shadow-[2px_2px_0_#14132b] hover:bg-[#91c99b]"
+                            to={ROUTES.REGISTER}
+                        >
+                            {t('header.register')}
+                        </Link>
+                        <Link
+                            className="store-sign-in flex min-h-[40px] items-center justify-center rounded-full border-2 border-solid border-store-ink bg-store-cream px-3 text-[12px] font-bold whitespace-nowrap text-store-ink no-underline shadow-[2px_2px_0_#14132b] hover:bg-white"
+                            to={ROUTES.LOGIN}
+                        >
+                            {t('header.login')}
+                        </Link>
+                    </div>
                 </div>
             </div>
         </header>

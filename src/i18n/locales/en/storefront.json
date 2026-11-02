@@ -7,7 +7,6 @@
         "deliveryArea": "Delivery area:",
         "city": "Ho Chi Minh City",
         "hanoi": "Hanoi",
-        "deliveryNotice": "Order before 10 PM tonight for earlier delivery priority",
         "priceList": "Download B2B Price List (PDF)",
         "certifications": "VietGAP Standard (PDF)",
         "notAvailable": "This feature will be added later",
@@ -28,10 +27,15 @@
         "shopHomepage": "Browse products"
     },
     "search": {
+        "mode": "Search mode",
+        "products": "Find products",
+        "askAI": "Ask AI",
+        "aiPlaceholder": "What would you like to ask?",
+        "aiUnavailable": "Ask AI is not available yet. You can still choose Find products to search.",
         "label": "Search products",
         "category": "Product category",
         "allCategories": "All categories",
-        "placeholder": "Search Norwegian salmon, Australian beef, Dalat vegetables, SKU...",
+        "placeholder": "Search for products, brands, categories...",
         "submit": "Search",
         "history": "Search history",
         "loadingHistory": "Loading recent searches",
@@ -69,11 +73,11 @@
         "checkout": "Checkout"
     },
     "profileDropdown": {
+        "workspace": "Back to workspace",
         "orderHistory": "Order History",
         "recurringLists": "Recurring Shopping Lists",
         "customQuotes": "Custom Quotes & Discounts",
         "accountSettings": "Account Settings",
-        "switchAccount": "Switch Account",
         "signOut": "Sign Out"
     },
     "homePage": {

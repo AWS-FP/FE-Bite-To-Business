@@ -15,7 +15,7 @@ export default function CategorySection() {
                     <span className="block text-xs font-extrabold uppercase tracking-wider text-[#FACC15]">
                         {t('homePage.ecosystemTag', '14-CATEGORY B2B FOOD ECOSYSTEM')}
                     </span>
-                    <h2 className="m-0 mt-1 font-['Times_New_Roman',Georgia,serif] lining-nums text-3xl sm:text-4xl font-bold text-[#FAF3E3]">
+                    <h2 className="m-0 mt-1 font-['Times_New_Roman',Georgia,serif] lining-nums text-4xl font-bold text-[#FAF3E3]">
                         {t('homePage.ecosystemTitle', 'Comprehensive Ingredient Catalog')}
                     </h2>
                 </div>
@@ -31,12 +31,12 @@ export default function CategorySection() {
                 </Link>
             </div>
 
-            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+            <div className="mt-8 grid gap-4 grid-cols-7">
                 {HOME_CATEGORIES.map((cat) => (
                     <Link
                         key={cat.key}
                         to={getCatalogSearchPath(cat.searchKeyword)}
-                        className="group relative flex min-h-[224px] flex-col overflow-hidden rounded-2xl border-2 border-solid border-[#14132b] bg-white p-3.5 text-[#14132b] no-underline shadow-sm transition-colors duration-200 hover:bg-[#FFF5C0] sm:min-h-[222px]"
+                        className="group relative flex min-h-[222px] flex-col overflow-hidden rounded-2xl border-2 border-solid border-[#14132b] bg-white p-3.5 text-[#14132b] no-underline shadow-sm transition-colors duration-200 hover:bg-[#FFF5C0]"
                     >
                         <div className="pointer-events-none absolute right-1 bottom-2 transition-transform duration-300 group-hover:scale-110">
                             <CategoryArtwork categoryKey={cat.key} iconUrl={cat.iconUrl} />

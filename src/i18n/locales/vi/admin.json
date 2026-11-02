@@ -2,15 +2,16 @@
     "workspace": "KHÔNG GIAN QUẢN TRỊ",
     "skipToContent": "Chuyển đến nội dung chính",
     "navigation": {
-        "registrations": "Đăng ký Customer",
-        "staff": "Tài khoản Staff"
+        "registrations": "Quản lý Customer",
+        "staff": "Tài khoản Staff",
+        "system": "Hệ thống & Báo cáo"
     },
     "header": {
         "title": "Góc điều hành.",
         "breadcrumb": "Vị trí hiện tại",
         "language": "NGÔN NGỮ",
         "role": "Quản trị viên",
-        "accountMenu": "Menu tài khoản Admin: {{name}}",
+        "accountMenu": "Menu tài khoản: {{name}}",
         "accountDetails": "Thông tin tài khoản",
         "closeAccount": "Đóng thông tin tài khoản",
         "logout": "Đăng xuất"
@@ -18,10 +19,9 @@
     "sidebar": {
         "label": "Menu quản trị",
         "accountManagement": "QUẢN LÝ TÀI KHOẢN",
+        "systemManagement": "VẬN HÀNH HỆ THỐNG",
         "pendingRegistrations": "Đăng ký Customer, {{count}} hồ sơ chờ duyệt",
         "collapse": "Thu gọn sidebar",
-        "expand": "Mở rộng sidebar",
-        "open": "Mở menu quản trị",
-        "close": "Đóng menu quản trị"
+        "expand": "Mở rộng sidebar"
     }
 }

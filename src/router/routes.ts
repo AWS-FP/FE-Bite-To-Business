@@ -5,12 +5,13 @@ import type { UserRole } from '@/types/admin/auth';
 export const ROUTES = {
     HOME: '/',
     LANDING: '/landing',
+    WHY_BTB: '/landing/why-btb',
+    BTB_MODEL: '/landing/model',
     CATALOG: '/products',
     PRODUCT_DETAIL: '/products/:productId',
 
     BRANDS: '/brands',
     BRAND_DETAIL: '/brands/:brandSlug',
-
 
     LOGIN: '/login',
     REGISTER: '/register',
@@ -30,6 +31,7 @@ export const ROUTES = {
     ADMIN_REGISTRATIONS: '/admin/registration-requests',
     ADMIN_REGISTRATION_DETAIL: '/admin/registration-requests/:requestId',
     ADMIN_STAFF: '/admin/staff',
+    ADMIN_SYSTEM: '/admin/system',
 
     ECOMMERCE: '/e-commerce',
     ECOMMERCE_PRODUCTS: '/e-commerce/products',
@@ -38,10 +40,13 @@ export const ROUTES = {
 
     LOGISTICS: '/logistics',
     LOGISTICS_INVENTORY: '/logistics/inventory',
+    LOGISTICS_RECEIVE: '/logistics/receive',
+    LOGISTICS_PACKING: '/logistics/packing',
     LOGISTICS_PRODUCT_REQUESTS: '/logistics/product-requests',
 
     DELIVERY: '/delivery',
     DELIVERY_TRIPS: '/delivery/trips',
+    DELIVERY_HISTORY: '/delivery/history',
     DELIVERY_TRIP_DETAIL: '/delivery/trips/:tripId',
 } as const;
 
@@ -55,6 +60,18 @@ const roleHome: Record<UserRole, string> = {
 
 export function getRoleHome(role: UserRole) {
     return roleHome[role] ?? ROUTES.HOME;
+}
+
+export function getWorkspaceHome(role: UserRole) {
+    if (
+        role === 'ADMIN' ||
+        role === 'ECOMMERCE_EXECUTIVE' ||
+        role === 'LOGISTICS_STAFF' ||
+        role === 'DELIVERY_STAFF'
+    ) {
+        return getRoleHome(role);
+    }
+    return null;
 }
 
 // Encode từng ID để ký tự /, ?, # không làm sai URL khi điều hướng.
