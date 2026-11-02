@@ -16,7 +16,6 @@ import LandingBusinessSolution from '@/components/LandingBusinessSolution';
 import LandingImpact from '@/components/LandingImpact';
 import LandingSegments from '@/components/LandingSegments';
 import LandingCTA from '@/components/LandingCTA';
-import LandingAIAssistant from '@/components/LandingAIAssistant';
 
 // Landing styles
 import '@/components/landing.css';
@@ -24,7 +23,6 @@ import '@/components/landing.css';
 export default function LandingPage() {
   const { t } = useTranslation('storefront');
 
-  const [quoteCount, setQuoteCount] = useState(2);
   const [category, setCategory] = useState('all');
   const [view, setView] = useState<'grid' | 'table'>('grid');
   const [toast, setToast] = useState('');
@@ -44,8 +42,6 @@ export default function LandingPage() {
   };
 
   const onAddToQuote = (item: string) => {
-    setQuoteCount((count) => count + 1);
-
     showToast(
       `Đã thêm "${item}" vào báo giá mẫu. Chưa lưu lên máy chủ.`
     );
@@ -58,10 +54,7 @@ export default function LandingPage() {
       <div className="btb-landing flex-1">
 
         {/* Header của Landing Page */}
-        <LandingHeader
-          quoteCount={quoteCount}
-          showToast={showToast}
-        />
+        <LandingHeader />
 
         {/* Nội dung Landing Page */}
         <main
@@ -92,12 +85,6 @@ export default function LandingPage() {
 
           <LandingCTA />
         </main>
-
-        {/* Trợ lý AI */}
-        <LandingAIAssistant
-          setCategory={setCategory}
-          setView={setView}
-        />
 
         {/* Thông báo */}
         <div

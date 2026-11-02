@@ -11,12 +11,12 @@ export default function CombosSection() {
                 <span className="block text-xs font-extrabold uppercase tracking-wider text-[#FACC15]">
                     {t('homePage.comboTag', 'SAVE UP TO 20% WITH BUNDLED PACKAGES')}
                 </span>
-                <h2 className="m-0 mt-1 font-serif text-3xl sm:text-4xl font-bold text-[#FAF3E3]">
+                <h2 className="m-0 mt-1 font-serif text-4xl font-bold text-[#FAF3E3]">
                     {t('homePage.comboTitle', 'Home Kitchen & F&B Ingredient Combos')}
                 </h2>
             </div>
 
-            <div className="mt-7 grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="mt-7 grid gap-6 grid-cols-3">
                 {HOME_COMBO_PLANS.map((combo) => (
                     <div
                         key={combo.id}

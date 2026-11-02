@@ -15,7 +15,7 @@ export default function CategorySection() {
                     <span className="block text-xs font-extrabold uppercase tracking-wider text-[#FACC15]">
                         {t('homePage.ecosystemTag', '14-CATEGORY B2B FOOD ECOSYSTEM')}
                     </span>
-                    <h2 className="m-0 mt-1 font-serif text-3xl sm:text-4xl font-bold text-[#FAF3E3]">
+                    <h2 className="m-0 mt-1 font-serif text-4xl font-bold text-[#FAF3E3]">
                         {t('homePage.ecosystemTitle', 'Comprehensive Ingredient Catalog')}
                     </h2>
                 </div>
@@ -31,7 +31,7 @@ export default function CategorySection() {
                 </Link>
             </div>
 
-            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+            <div className="mt-8 grid gap-4 grid-cols-7">
                 {HOME_CATEGORIES.map((cat) => (
                     <Link
                         key={cat.key}

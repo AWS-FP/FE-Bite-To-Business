@@ -30,6 +30,7 @@ export const ROUTES = {
     ADMIN_REGISTRATIONS: '/admin/registration-requests',
     ADMIN_REGISTRATION_DETAIL: '/admin/registration-requests/:requestId',
     ADMIN_STAFF: '/admin/staff',
+    ADMIN_SYSTEM: '/admin/system',
 
     ECOMMERCE: '/e-commerce',
     ECOMMERCE_PRODUCTS: '/e-commerce/products',
@@ -55,6 +56,18 @@ const roleHome: Record<UserRole, string> = {
 
 export function getRoleHome(role: UserRole) {
     return roleHome[role] ?? ROUTES.HOME;
+}
+
+export function getWorkspaceHome(role: UserRole) {
+    if (
+        role === 'ADMIN' ||
+        role === 'ECOMMERCE_EXECUTIVE' ||
+        role === 'LOGISTICS_STAFF' ||
+        role === 'DELIVERY_STAFF'
+    ) {
+        return getRoleHome(role);
+    }
+    return null;
 }
 
 // Encode từng ID để ký tự /, ?, # không làm sai URL khi điều hướng.

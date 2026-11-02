@@ -25,10 +25,7 @@ export default function AuthField({
 
     return (
         <div className="auth-field min-w-0">
-            <label
-                className="mb-[7px] block text-[14px] leading-5 font-semibold max-[600px]:text-[13px]"
-                htmlFor={name}
-            >
+            <label className="mb-[7px] block text-[14px] leading-5 font-semibold" htmlFor={name}>
                 {label}
                 {required && <span className="auth-required text-[#e83d33]"> *</span>}
                 {optional && (

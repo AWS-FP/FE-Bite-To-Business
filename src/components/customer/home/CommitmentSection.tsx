@@ -6,12 +6,12 @@ export default function CommitmentSection() {
     const { t } = useHomeModelContext();
     return (
         <section className="mx-auto max-w-[1320px] px-5 py-6">
-            <div className="rounded-[26px] border-2 border-solid border-[#14132b] bg-[#EAF2EE] p-8 sm:p-10 text-[#14132b] shadow-[7px_7px_0_#14132b]">
+            <div className="rounded-[26px] border-2 border-solid border-[#14132b] bg-[#EAF2EE] p-10 text-[#14132b] shadow-[7px_7px_0_#14132b]">
                 <span className="inline-block rounded-full border border-solid border-[#14132b] bg-[#FACC15] px-4 py-1 text-[11px] font-extrabold uppercase">
                     {t('homePage.b2bTag', 'FOR BUSINESSES & COOPERATIVES')}
                 </span>
 
-                <h2 className="m-0 mt-4 font-serif text-2xl sm:text-3xl font-bold text-[#14132b]">
+                <h2 className="m-0 mt-4 font-serif text-3xl font-bold text-[#14132b]">
                     {t('homePage.b2bTitle', 'Restaurants, Cafés & Corporate Offices')}
                 </h2>
 

@@ -22,7 +22,7 @@ export default function ProductsSection() {
     } = useHomeModelContext();
     return (
         <section className="mx-auto max-w-[1320px] px-5 py-6">
-            <div className="rounded-[28px] border-2 border-solid border-[#14132b] bg-[#FAF3E3] p-6 sm:p-10 text-[#14132b] shadow-[8px_8px_0_#14132b]">
+            <div className="rounded-[28px] border-2 border-solid border-[#14132b] bg-[#FAF3E3] p-10 text-[#14132b] shadow-[8px_8px_0_#14132b]">
                 {/* 4A: EARLY MARKET FLASH DEALS */}
                 <div id="early-market-deals">
                     <div className="flex flex-wrap items-end justify-between gap-4">
@@ -31,7 +31,7 @@ export default function ProductsSection() {
                                 <span className="h-2 w-2 rounded-full bg-white" />
                                 <span>{t('homePage.clearanceBadge', 'WHOLESALE CLEARANCE')}</span>
                             </span>
-                            <h2 className="m-0 mt-2 font-serif text-2xl sm:text-3xl font-bold text-[#14132b]">
+                            <h2 className="m-0 mt-2 font-serif text-3xl font-bold text-[#14132b]">
                                 {t(
                                     'homePage.flashDealsTitle',
                                     'Early Market Flash Deals — Daily Specials',
@@ -56,7 +56,7 @@ export default function ProductsSection() {
                         </div>
                     </div>
 
-                    <div className="mt-7 grid grid-cols-1 gap-6 md:grid-cols-3">
+                    <div className="mt-7 grid gap-6 grid-cols-3">
                         {visibleFlashProducts.map((product) => (
                             <ProductShowcaseCard key={product.id} product={product} />
                         ))}
@@ -82,13 +82,13 @@ export default function ProductsSection() {
                                 <span className="h-2 w-2 rounded-full bg-white" />
                                 <span>{t('homePage.freshBatchBadge', 'FRESH BATCH ARRIVED')}</span>
                             </span>
-                            <h2 className="m-0 mt-2 font-serif text-2xl sm:text-3xl font-bold text-[#14132b]">
+                            <h2 className="m-0 mt-2 font-serif text-3xl font-bold text-[#14132b]">
                                 {t('homePage.standardSupplyTitle', 'B2B Standard Food Supply')}
                             </h2>
                         </div>
                     </div>
 
-                    <div className="mt-7 grid grid-cols-1 gap-6 md:grid-cols-3">
+                    <div className="mt-7 grid gap-6 grid-cols-3">
                         {visibleStandardProducts.map((product) => (
                             <ProductShowcaseCard key={product.id} product={product} />
                         ))}
