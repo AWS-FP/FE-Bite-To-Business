@@ -10,7 +10,7 @@ export default function RegisterDecoration() {
         <>
             {/* Màn hình từ 1200px: giữ các ảnh nằm ngoài hai mép form đăng ký. */}
             <div
-                className="auth-desktop-decoration pointer-events-none absolute inset-0 min-h-[1000px] select-none max-[1200px]:hidden"
+                className="auth-desktop-decoration pointer-events-none relative col-start-1 row-start-1 min-h-[1100px] select-none max-[1200px]:hidden"
                 aria-hidden="true"
             >
                 <AuthWordmark />
@@ -148,56 +148,6 @@ export default function RegisterDecoration() {
                         </li>
                     </ol>
                 </aside>
-            </div>
-
-            {/* Màn hình nhỏ: ba ảnh và lời giới thiệu nằm phía trên form. */}
-            <div
-                className="auth-mobile-intro mx-auto hidden max-w-[540px] px-2 pt-[18px] pb-[14px]
-          max-[1200px]:block max-[600px]:mx-5 max-[600px]:px-0 max-[600px]:pt-4"
-                aria-hidden="true"
-            >
-                <div className="auth-mobile-photos mb-3 flex h-[90px] items-end gap-3">
-                    <div
-                        className="auth-photo h-[90px] w-16 -rotate-6 overflow-hidden rounded-t-[40px]
-            border-2 border-solid border-auth-cream bg-[#dce1d5] shadow-[4px_4px_0_#17133a]"
-                    >
-                        <img
-                            src="/images/register/chicken-boil.jpg"
-                            className="block h-full w-full object-cover"
-                            alt=""
-                            decoding="async"
-                        />
-                    </div>
-                    <div
-                        className="auth-photo h-12 w-20 rotate-6 overflow-hidden rounded-[50px]
-            border-2 border-solid border-auth-cream bg-[#a0afa5] shadow-[4px_4px_0_#17133a]"
-                    >
-                        <img
-                            src="/images/register/canned-food.jpg"
-                            className="block h-full w-full object-cover"
-                            alt=""
-                            decoding="async"
-                        />
-                    </div>
-                    <div
-                        className="auth-photo h-16 w-16 overflow-hidden rounded-full
-            border-2 border-solid border-auth-cream bg-[#e7d7c6] shadow-[4px_4px_0_#17133a]"
-                    >
-                        <img
-                            src="/images/register/beef.jpg"
-                            className="block h-full w-full object-cover"
-                            alt=""
-                            decoding="async"
-                        />
-                    </div>
-                </div>
-
-                <p className="mt-0 mb-[5px] text-[11px] font-bold text-[#ff9bd2]">
-                    {t('auth.food')} | B2B Journal
-                </p>
-                <h2 className="m-0 max-w-[380px] font-display text-[19px] leading-[1.2] font-extrabold text-white">
-                    {t('auth.heroTitle')}
-                </h2>
             </div>
         </>
     );

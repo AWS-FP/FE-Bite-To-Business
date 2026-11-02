@@ -1,47 +1,63 @@
 /* Generated from the supplied HTML layout. Edit this section independently. */
 import { useTranslation } from 'react-i18next';
-import i18n from '@/i18n';
 import { Link } from 'react-router-dom';
-import { useAuthStore } from '@/store/admin/authStore';
+import { ROUTES } from '@/router/routes';
+import LanguageSwitcher from './LanguageSwitcher';
 
-export default function LandingHeader({ quoteCount, showToast }: { quoteCount: number; showToast: (message: string) => void }) {
-    const { i18n: currentI18n } = useTranslation();
-    const language = currentI18n.resolvedLanguage ?? currentI18n.language;
-    const customer = useAuthStore((s) => s.session?.user.role === 'CUSTOMER');
+export default function LandingHeader() {
+    const { t } = useTranslation('storefront');
+
     return (
-        <header className="navbar"><div className="container navbar-inner">
-            <Link to="/landing" className="brand-logo" title="Bite to Business — Landing Page">
-                <img src="/images/storefront/brand-logo.png" alt="Logo BTB Bite to Business" className="brand-logo-img" />
-                <div className="brand-text-wrap">
-                    <span className="brand-name">Bite to Business</span>
-                    <span className="brand-tagline">THỰC PHẨM &amp; ĐỒ CHẾ BIẾN SẴN</span>
+        <header className="navbar">
+            <div className="container navbar-inner">
+                <Link
+                    to={ROUTES.HOME}
+                    className="flex w-fit shrink-0 items-center gap-2 text-store-ink no-underline"
+                    aria-label={t('home')}
+                >
+                    <img
+                        src="/images/storefront/brand-logo.png"
+                        alt=""
+                        className="block h-auto w-[100px] shrink-0 object-contain"
+                        width={100}
+                        height={67}
+                    />
+
+                    <span className="brand-name flex flex-col text-[20px] leading-[1.1] tracking-[-0.5px]">
+                        <span>Bite to</span>
+                        <span>Business</span>
+                    </span>
+                </Link>
+
+                <ul className="nav-links">
+                    <li>
+                        <Link to={ROUTES.LANDING}>Trang giới thiệu</Link>
+                    </li>
+                    <li>
+                        <Link to={ROUTES.WHY_BTB}>Vì sao chọn BTB?</Link>
+                    </li>
+                    <li>
+                        <Link to={ROUTES.BTB_MODEL}>Mô hình BTB</Link>
+                    </li>
+                </ul>
+                <div className="nav-right shrink-0">
+                    <LanguageSwitcher />
+                    <div className="flex shrink-0 items-center gap-1.5">
+                        <Link
+                            className="store-sign-up flex min-h-[40px] items-center justify-center rounded-full border-2 border-solid border-store-ink bg-[#7EBC89] px-3 text-[12px] font-bold whitespace-nowrap text-store-ink no-underline shadow-[2px_2px_0_#14132b] hover:bg-[#91c99b]"
+                            to={ROUTES.REGISTER}
+                        >
+                            {t('header.register')}
+                        </Link>
+                        <Link
+                            className="store-sign-in flex min-h-[40px] items-center justify-center rounded-full border-2 border-solid border-store-ink bg-store-cream px-3 text-[12px] font-bold whitespace-nowrap text-store-ink no-underline shadow-[2px_2px_0_#14132b] hover:bg-white"
+                            to={ROUTES.LOGIN}
+                        >
+                            {t('header.login')}
+                        </Link>
+                    </div>
                 </div>
-            </Link>
-            <ul className="nav-links">
-                <li>
-                    <Link to="/landing">Trang giới thiệu</Link>
-                </li>
-                <li>
-                    <Link to="/landing/why-btb">Vì sao chọn BTB?</Link>
-                </li>
-                <li>
-                    <Link to="/landing/model">Mô hình BTB</Link>
-                </li>
-            </ul>
-            <div className="nav-right">
-                <div className="lang-pill">
-                    <button type="button" className={language === "vi" ? "active" : ""} id="langVi" onClick={() => void i18n.changeLanguage("vi")}>VN</button>
-                    <button type="button" id="langEn" className={language === "en" ? "active" : ""} onClick={() => void i18n.changeLanguage("en")}>EN</button>
-                </div>
-                {quoteCount > 0 ? (
-                    <button type="button" className="quote-pill-btn" id="btnOpenQuoteToast" onClick={() => showToast(`Bạn có ${quoteCount} mặt hàng trong báo giá nháp (minh họa).`)}>
-                        Báo giá (<span id="quoteBadgeCount">{quoteCount}</span>)
-                    </button>
-                ) : (
-                    <Link to="/landing" className="quote-pill-btn">Khám phá sản phẩm</Link>
-                )}
-                <Link to={customer ? "/profile" : "/register"} className="btn btn-primary" style={{ padding: "9px 20px", fontSize: "14px" }}>{customer ? "Trang cá nhân" : "Đăng ký"}</Link>
             </div>
-        </div></header>
+        </header>
     );
 }

@@ -1,21 +1,25 @@
-import { useTranslation } from 'react-i18next';
-import Footer from '@/layouts/Footer';
-import Header from '@/layouts/Header';
+import StorefrontLayout from '../layouts/StorefrontLayout';
+import CoverflowSlider from '../components/customer/CoverflowSlider';
+import { HomeModelProvider } from '../components/customer/home/HomeModel';
+import PartnerStrip from '../components/customer/home/PartnerStrip';
+import CategorySection from '../components/customer/home/CategorySection';
+import ProductsSection from '../components/customer/home/ProductsSection';
+import CombosSection from '../components/customer/home/CombosSection';
+import CommitmentSection from '../components/customer/home/CommitmentSection';
+import NewsletterSection from '../components/customer/home/NewsletterSection';
 
 export default function HomePage() {
-    const { t } = useTranslation('storefront');
-
     return (
-        <div className="flex min-h-dvh flex-col bg-store-cream">
-            <Header />
-            {/* Homepage chưa có nội dung. Khi code, thêm các section vào */}
-            <main
-                className="min-h-[200px] flex-1 outline-none"
-                id="main-content"
-                tabIndex={-1}
-                aria-label={t('main')}
-            />
-            <Footer />
-        </div>
+        <HomeModelProvider>
+            <StorefrontLayout rootClassName="flex min-h-screen flex-col bg-[#133425] text-white">
+                <CoverflowSlider />
+                <PartnerStrip />
+                <CategorySection />
+                <ProductsSection />
+                <CombosSection />
+                <CommitmentSection />
+                <NewsletterSection />
+            </StorefrontLayout>
+        </HomeModelProvider>
     );
 }

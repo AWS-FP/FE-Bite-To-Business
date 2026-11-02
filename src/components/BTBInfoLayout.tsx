@@ -11,23 +11,33 @@ export default function BTBInfoLayout({ title, eyebrow, description, children }:
     return (
         <div className="flex min-h-dvh flex-col bg-store-cream">
             <div className="btb-landing flex-1">
-                <LandingHeader quoteCount={0} showToast={() => undefined} />
+                <LandingHeader />
                 <main id="main-content" className="btb-info">
                     <section className="btb-info__hero">
                         <div className="container">
                             <nav className="btb-info__crumbs" aria-label="Đường dẫn trang">
-                                <Link to="/landing">Landing</Link><span aria-hidden="true">/</span>
+                                <Link to="/landing">Landing</Link>
+                                <span aria-hidden="true">/</span>
                                 <span aria-current="page">{title}</span>
                             </nav>
                             <span className="btb-info-eyebrow">{eyebrow}</span>
                             <h1>{title}</h1>
                             <p>{description}</p>
                             <div className="btb-info__hero-actions">
-                                <Link className="btb-info__action" to="/register">Bắt đầu với BTB</Link>
-                                <Link className="btb-info__action btb-info__action--outline" to="/landing">Khám phá Landing</Link>
+                                <Link className="btb-info__action" to="/register">
+                                    Bắt đầu với BTB
+                                </Link>
+                                <Link
+                                    className="btb-info__action btb-info__action--outline"
+                                    to="/landing"
+                                >
+                                    Khám phá Landing
+                                </Link>
                             </div>
                             <div className="btb-info__visual" aria-hidden="true">
-                                <span>BTB</span><span>CHO DOANH NGHIỆP</span><span>CHO CÁ NHÂN</span>
+                                <span>BTB</span>
+                                <span>CHO DOANH NGHIỆP</span>
+                                <span>CHO CÁ NHÂN</span>
                             </div>
                         </div>
                     </section>
@@ -35,7 +45,10 @@ export default function BTBInfoLayout({ title, eyebrow, description, children }:
                     <LandingPersonalization />
                     <section className="btb-info__bottom">
                         <div className="container btb-info__bottom-inner">
-                            <div><span className="btb-info-eyebrow">TÌM HIỂU TIẾP</span><h2>Khám phá cách BTB đồng hành với bạn.</h2></div>
+                            <div>
+                                <span className="btb-info-eyebrow">TÌM HIỂU TIẾP</span>
+                                <h2>Khám phá cách BTB đồng hành với bạn.</h2>
+                            </div>
                             <div className="btb-info__bottom-links">
                                 <Link to="/landing/why-btb">Vì sao chọn BTB?</Link>
                                 <Link to="/landing/model">Mô hình BTB</Link>

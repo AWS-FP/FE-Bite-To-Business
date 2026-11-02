@@ -40,11 +40,7 @@ export default function InvoiceInformationStep({ form, onEdit }: InvoiceInformat
                 error={errors.invoicePurchaser?.message}
             >
                 <input
-                    className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink
-          outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4]
-          placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18]
-          aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed
-          disabled:bg-[#f1eff8] disabled:text-[#868191] max-[600px]:pl-3 h-12 py-0"
+                    className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4] placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18] aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed disabled:bg-[#f1eff8] disabled:text-[#868191] h-12 py-0"
                     id="invoicePurchaser"
                     maxLength={200}
                     {...register('invoicePurchaser')}
@@ -53,11 +49,7 @@ export default function InvoiceInformationStep({ form, onEdit }: InvoiceInformat
                 />
             </AuthField>
 
-            <div
-                className="auth-field-row grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-3 auth-invoice-row
-        max-[360px]:grid-cols-[minmax(0,1fr)] [&_.auth-field>label]:min-h-10
-        max-[360px]:[&_.auth-field>label]:min-h-0"
-            >
+            <div className="auth-field-row grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-3 auth-invoice-row [&_.auth-field>label]:min-h-10">
                 <AuthField
                     name="invoiceTaxCode"
                     label={t('fields.invoiceTaxCode')}
@@ -65,11 +57,7 @@ export default function InvoiceInformationStep({ form, onEdit }: InvoiceInformat
                     error={errors.invoiceTaxCode?.message}
                 >
                     <input
-                        className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink
-            outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4]
-            placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18]
-            aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed
-            disabled:bg-[#f1eff8] disabled:text-[#868191] max-[600px]:pl-3 h-12 py-0"
+                        className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4] placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18] aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed disabled:bg-[#f1eff8] disabled:text-[#868191] h-12 py-0"
                         id="invoiceTaxCode"
                         inputMode="numeric"
                         maxLength={10}
@@ -86,11 +74,7 @@ export default function InvoiceInformationStep({ form, onEdit }: InvoiceInformat
                     error={errors.invoiceEmail?.message}
                 >
                     <input
-                        className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink
-            outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4]
-            placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18]
-            aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed
-            disabled:bg-[#f1eff8] disabled:text-[#868191] max-[600px]:pl-3 h-12 py-0"
+                        className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4] placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18] aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed disabled:bg-[#f1eff8] disabled:text-[#868191] h-12 py-0"
                         id="invoiceEmail"
                         type="email"
                         autoCapitalize="none"
@@ -126,12 +110,7 @@ export default function InvoiceInformationStep({ form, onEdit }: InvoiceInformat
                     error={errors.invoiceAddress?.message}
                 >
                     <textarea
-                        className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink
-            outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4]
-            placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18]
-            aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed
-            disabled:bg-[#f1eff8] disabled:text-[#868191] max-[600px]:pl-3 h-auto min-h-24 resize-y py-3
-            leading-[1.5]"
+                        className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4] placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18] aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed disabled:bg-[#f1eff8] disabled:text-[#868191] h-auto min-h-24 resize-y py-3 leading-[1.5]"
                         id="invoiceAddress"
                         rows={3}
                         maxLength={1000}
@@ -149,12 +128,7 @@ export default function InvoiceInformationStep({ form, onEdit }: InvoiceInformat
                 aria-labelledby="registration-review-title"
             >
                 <h2 id="registration-review-title">{t('register.reviewTitle')}</h2>
-                <div
-                    className="auth-summary rounded-xl bg-white p-4 [&_dl]:mt-2.5 [&_dl]:mb-0 [&_dl]:flex [&_dl]:flex-col [&_dl]:gap-2
-          [&_dl]:text-[12px] [&_dl]:leading-[1.5] [&_dl>div]:grid [&_dl>div]:grid-cols-[38%_minmax(0,1fr)]
-          [&_dl>div]:gap-2.5 max-[600px]:[&_dl>div]:grid-cols-[34%_minmax(0,1fr)] [&_dt]:font-subtext
-          [&_dt]:text-auth-muted [&_dd]:m-0 [&_dd]:font-semibold [&_dd]:[overflow-wrap:anywhere]"
-                >
+                <div className="auth-summary rounded-xl bg-white p-4 [&_dl]:mt-2.5 [&_dl]:mb-0 [&_dl]:flex [&_dl]:flex-col [&_dl]:gap-2 [&_dl]:text-[12px] [&_dl]:leading-[1.5] [&_dl>div]:grid [&_dl>div]:grid-cols-[38%_minmax(0,1fr)] [&_dl>div]:gap-2.5 [&_dt]:font-subtext [&_dt]:text-auth-muted [&_dd]:m-0 [&_dd]:font-semibold [&_dd]:[overflow-wrap:anywhere]">
                     <div
                         className="auth-summary-heading flex items-center justify-between gap-2 [&_h3]:m-0 [&_h3]:font-subheading
             [&_h3]:text-[11px] [&_h3]:font-bold [&_h3]:text-[#878091] [&_h3]:uppercase"
@@ -195,12 +169,7 @@ export default function InvoiceInformationStep({ form, onEdit }: InvoiceInformat
                         </div>
                     </dl>
                 </div>
-                <div
-                    className="auth-summary rounded-xl bg-white p-4 [&_dl]:mt-2.5 [&_dl]:mb-0 [&_dl]:flex [&_dl]:flex-col [&_dl]:gap-2
-          [&_dl]:text-[12px] [&_dl]:leading-[1.5] [&_dl>div]:grid [&_dl>div]:grid-cols-[38%_minmax(0,1fr)]
-          [&_dl>div]:gap-2.5 max-[600px]:[&_dl>div]:grid-cols-[34%_minmax(0,1fr)] [&_dt]:font-subtext
-          [&_dt]:text-auth-muted [&_dd]:m-0 [&_dd]:font-semibold [&_dd]:[overflow-wrap:anywhere]"
-                >
+                <div className="auth-summary rounded-xl bg-white p-4 [&_dl]:mt-2.5 [&_dl]:mb-0 [&_dl]:flex [&_dl]:flex-col [&_dl]:gap-2 [&_dl]:text-[12px] [&_dl]:leading-[1.5] [&_dl>div]:grid [&_dl>div]:grid-cols-[38%_minmax(0,1fr)] [&_dl>div]:gap-2.5 [&_dt]:font-subtext [&_dt]:text-auth-muted [&_dd]:m-0 [&_dd]:font-semibold [&_dd]:[overflow-wrap:anywhere]">
                     <div
                         className="auth-summary-heading flex items-center justify-between gap-2 [&_h3]:m-0 [&_h3]:font-subheading
             [&_h3]:text-[11px] [&_h3]:font-bold [&_h3]:text-[#878091] [&_h3]:uppercase"
