@@ -2,6 +2,7 @@ import { Check, ChevronDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../LanguageSwitcher';
+import AboutBusinessDropdown from './AboutBusinessDropdown';
 
 export default function StoreUtilityBar() {
     const { t } = useTranslation('storefront');
@@ -28,7 +29,7 @@ export default function StoreUtilityBar() {
 
     return (
         <div className="border-0 border-b border-solid border-store-cream/15 bg-store-dark">
-            <div className="mx-auto flex min-h-[40px] max-w-[1440px] flex-wrap items-center justify-between gap-x-3 gap-y-1.5 px-5 py-1.5 text-[11px] leading-[1.5] max-[640px]:px-3">
+            <div className="mx-auto flex min-h-[40px] max-w-[1440px] flex-wrap items-center justify-between gap-x-3 gap-y-1.5 px-5 py-1.5 text-[11px] leading-[1.5]">
                 <div className="flex items-center gap-3">
                     <div ref={areaDropdownRef} className="relative">
                         <button
@@ -46,7 +47,7 @@ export default function StoreUtilityBar() {
                                 src="/images/storefront/map-pin.svg"
                                 alt=""
                             />
-                            <span className="whitespace-nowrap text-store-cream/85 max-[640px]:sr-only">
+                            <span className="whitespace-nowrap text-store-cream/85">
                                 {t('header.deliveryArea')}
                             </span>
                             <span className="font-extrabold text-white whitespace-nowrap">
@@ -87,11 +88,6 @@ export default function StoreUtilityBar() {
                             </div>
                         )}
                     </div>
-
-                    <p className="m-0 hidden items-center gap-1.5 font-bold text-store-yellow min-[1100px]:flex">
-                        <img className="block shrink-0" src="/images/storefront/clock.svg" alt="" />
-                        {t('header.deliveryNotice')}
-                    </p>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -124,6 +120,7 @@ export default function StoreUtilityBar() {
                         />
                         {t('header.certifications')}
                     </a>
+                    <AboutBusinessDropdown />
                     <LanguageSwitcher />
                 </div>
             </div>

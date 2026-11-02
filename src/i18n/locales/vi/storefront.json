@@ -7,7 +7,6 @@
         "deliveryArea": "Khu vực giao:",
         "city": "TP. Hồ Chí Minh",
         "hanoi": "Hà Nội",
-        "deliveryNotice": "Đặt trước 22:00 đêm nay — Sẽ được ưu tiên giao sớm hơn",
         "priceList": "Tải Bảng Giá Sỉ B2B (PDF)",
         "certifications": "Tiêu chuẩn VietGAP (PDF)",
         "notAvailable": "Tính năng sẽ được bổ sung sau",
@@ -22,13 +21,21 @@
         "deals": "Chợ Sớm Giá Sốc",
         "standardFood": "Nguồn Thực Phẩm Tiêu Chuẩn B2B",
         "combos": "Combo Gói Nguyên Liệu F&B",
-        "invoice": "Xuất hóa đơn VAT tự động"
+        "invoice": "Xuất hóa đơn VAT tự động",
+        "aboutBusiness": "Về Bite to Business",
+        "landingPage": "Trang giới thiệu",
+        "shopHomepage": "Trang mua hàng"
     },
     "search": {
+        "mode": "Chế độ tìm kiếm",
+        "products": "Tìm sản phẩm",
+        "askAI": "Hỏi AI",
+        "aiPlaceholder": "Bạn muốn hỏi gì?",
+        "aiUnavailable": "Hỏi AI chưa sẵn sàng. Bạn vẫn có thể chọn Tìm sản phẩm để tra cứu.",
         "label": "Tìm kiếm sản phẩm",
         "category": "Danh mục sản phẩm",
         "allCategories": "Tất cả danh mục",
-        "placeholder": "Tìm cá hồi Nauy, thăn bò Úc, rau Đà Lạt, mã SKU...",
+        "placeholder": "Tìm kiếm sản phẩm, danh mục, thương hiệu... ",
         "submit": "Tìm kiếm",
         "history": "Lịch sử tìm kiếm",
         "loadingHistory": "Đang tải lịch sử",
@@ -66,11 +73,11 @@
         "checkout": "Thanh toán"
     },
     "profileDropdown": {
+        "workspace": "Về trang quản trị",
         "orderHistory": "Lịch sử nhập hàng",
         "recurringLists": "Danh sách mua định kỳ",
         "customQuotes": "Báo giá & Chiết khấu riêng",
         "accountSettings": "Cài đặt tài khoản",
-        "switchAccount": "Đổi tài khoản",
         "signOut": "Đăng xuất"
     },
     "homePage": {
@@ -102,5 +109,10 @@
         "newsletterDesc": "Báo giá cập nhật tự động mỗi tuần kèm chính sách chiết khấu theo sản lượng.",
         "newsletterPlaceholder": "Nhập Số điện thoại Zalo hoặc Email doanh nghiệp...",
         "newsletterBtn": "Nhận báo giá ngay"
+    },
+    "landingPending": {
+        "title": "Trang giới thiệu đang được hoàn thiện",
+        "description": "Landing Page được phát triển ở nhánh riêng của nhóm. Khi tích hợp vào dự án, đường dẫn này sẽ hiển thị trang giới thiệu Bite to Business đầy đủ.",
+        "backToShop": "Quay về trang mua hàng"
     }
 }

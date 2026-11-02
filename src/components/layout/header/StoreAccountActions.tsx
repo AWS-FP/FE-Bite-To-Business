@@ -1,12 +1,12 @@
 import {
     History,
+    LayoutDashboard,
     LogOut,
     Minus,
     Plus,
     ReceiptText,
     Settings,
     ShoppingCart,
-    UserCircle2,
     Users,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -14,77 +14,37 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import NotificationSystem from '../../customer/NotificationSystem';
 import { formatCurrencyVnd } from '../../../constants/customer/homeData';
-import type { ProfileBadgeType } from '../../../constants/customer/homeData';
-import { getRoleHome, ROUTES } from '../../../router/routes';
+import { getRoleHome, getWorkspaceHome, ROUTES } from '../../../router/routes';
 import { useAuthStore } from '../../../store/admin/authStore';
 import { useCartStore } from '../../../store/customer/cartStore';
 import GuestHeaderActions from './GuestHeaderActions';
-
-const ROLE_SEQUENCE: ProfileBadgeType[] = [
-    'ADMIN',
-    'MAINTENANCE',
-    'CUSTOMER',
-    'DELIVERY',
-    'PENDING PROFILE',
-];
-
-const ROLE_BADGE_STYLES: Record<ProfileBadgeType, { bg: string; text: string; border?: string }> = {
-    ADMIN: { bg: 'bg-[#FACC15]', text: 'text-[#14132b]' },
-    MAINTENANCE: { bg: 'bg-[#133425]', text: 'text-[#FACC15]' },
-    CUSTOMER: { bg: 'bg-[#DBEAFE]', text: 'text-[#2563EB]' },
-    DELIVERY: { bg: 'bg-[#7C2D12]', text: 'text-white' },
-    'PENDING PROFILE': {
-        bg: 'bg-white',
-        text: 'text-[#64748B]',
-        border: 'border border-solid border-[#CBD5E1]',
-    },
-};
 
 export default function StoreAccountActions() {
     const { t } = useTranslation('storefront');
     const session = useAuthStore((state) => state.session);
     const clearSession = useAuthStore((state) => state.clearSession);
     const user = session?.user;
+    const workspacePath = user ? getWorkspaceHome(user.role) : null;
 
-    // UI-only preview in development; never creates an authenticated session.
-    const [demoLoggedIn, setDemoLoggedIn] = useState(() => {
-        if (!import.meta.env.DEV) return false;
-        try {
-            return sessionStorage.getItem('btb:preview-member-header') === '1';
-        } catch {
-            return false;
-        }
-    });
-    useEffect(() => {
-        if (!import.meta.env.DEV) return;
-        try {
-            sessionStorage.setItem('btb:preview-member-header', demoLoggedIn ? '1' : '0');
-        } catch {
-            /* storage may be blocked */
-        }
-    }, [demoLoggedIn]);
     // Dùng chung 1 state duy nhất cho cả 3 dropdown để không bao giờ bị đè lên nhau
     const [openDropdown, setOpenDropdown] = useState<'cart' | 'notifications' | 'profile' | null>(
         null,
     );
-    const [roleIndex, setRoleIndex] = useState(0);
 
     const dropdownRef = useRef<HTMLDivElement>(null);
     const cartItems = useCartStore((state) => state.items);
     const updateCartQuantity = useCartStore((state) => state.updateQuantity);
 
-    const isLoggedIn = Boolean(user) || demoLoggedIn;
-    const currentRole = ROLE_SEQUENCE[roleIndex];
-    const currentBadgeStyle = ROLE_BADGE_STYLES[currentRole];
+    const isLoggedIn = Boolean(user);
 
     const totalItemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
     const subtotalAmount = cartItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
     let accountPath: string = ROUTES.LOGIN;
-    let displayName = 'Vivian Banshee';
-    let subLabel = 'bakery of new Eridu';
+    let displayName = '';
+    let subLabel = '';
     let accountLabel = t('header.login');
-    let initials = 'VB';
+    let initials = '';
 
     if (user) {
         displayName = `${user.lastName} ${user.firstName}`.trim() || user.email;
@@ -108,17 +68,13 @@ export default function StoreAccountActions() {
 
     function handleSignOut() {
         setOpenDropdown(null);
-        setDemoLoggedIn(false);
-        if (user && clearSession) {
+        if (user) {
             clearSession();
         }
     }
 
     return (
-        <div
-            ref={dropdownRef}
-            className="relative flex shrink-0 items-center gap-2.5 max-[960px]:ml-auto max-[640px]:gap-1.5"
-        >
+        <div ref={dropdownRef} className="relative flex shrink-0 items-center gap-2.5">
             <Link
                 className="hidden min-h-[40px] items-center justify-center rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3.5 text-[12px] font-bold text-store-ink no-underline shadow-[2px_2px_0_#14132b] hover:bg-[#ffe96d] min-[1280px]:flex"
                 to={isLoggedIn ? accountPath : ROUTES.REGISTER}
@@ -126,7 +82,7 @@ export default function StoreAccountActions() {
                 {t('header.wholesale')}
             </Link>
 
-            {!isLoggedIn && <GuestHeaderActions t={t} setDemoLoggedIn={setDemoLoggedIn} />}
+            {!isLoggedIn && <GuestHeaderActions t={t} />}
 
             {isLoggedIn && (
                 <>
@@ -143,7 +99,7 @@ export default function StoreAccountActions() {
                                 {totalItemsCount}
                             </span>
                         </div>
-                        <div className="leading-tight max-[640px]:hidden">
+                        <div className="leading-tight">
                             <span className="block text-[10px] font-medium text-gray-600">
                                 Estimated Order
                             </span>
@@ -189,7 +145,7 @@ export default function StoreAccountActions() {
 
             {/* POPUP 1: CART DROPDOWN */}
             {isLoggedIn && openDropdown === 'cart' && (
-                <div className="absolute top-[54px] right-0 z-50 w-[350px] sm:w-[380px] rounded-[22px] border border-solid border-gray-200 bg-white p-5 text-[#14132b] shadow-[0_20px_50px_rgba(0,0,0,0.35)]">
+                <div className="absolute top-[54px] right-0 z-50 w-[380px] rounded-[22px] border border-solid border-gray-200 bg-white p-5 text-[#14132b] shadow-[0_20px_50px_rgba(0,0,0,0.35)]">
                     <div className="pb-3 border-0 border-b border-solid border-gray-100">
                         <h3 className="m-0 text-sm font-extrabold text-[#14132b]">
                             Recently Added Items ({totalItemsCount})
@@ -299,22 +255,30 @@ export default function StoreAccountActions() {
                                 {displayName}
                             </h4>
                             <p className="m-0 truncate text-[11px] text-gray-500">{subLabel}</p>
-                            <span
-                                className={`mt-1.5 inline-block rounded-md px-2 py-0.5 text-[10px] font-extrabold uppercase ${currentBadgeStyle.bg} ${currentBadgeStyle.text} ${currentBadgeStyle.border ?? ''}`}
-                            >
-                                {currentRole}
+                            <span className="mt-1.5 inline-block rounded-md bg-[#DBEAFE] px-2 py-0.5 text-[10px] font-extrabold uppercase text-[#2563EB]">
+                                {user?.role}
                             </span>
                         </div>
                     </div>
 
                     <div className="py-1.5 border-0 border-b border-solid border-[#14132b]/10">
+                        {workspacePath && (
+                            <Link
+                                to={workspacePath}
+                                onClick={() => setOpenDropdown(null)}
+                                className="flex items-center gap-3 px-4 py-2 text-xs font-semibold text-[#14132b] no-underline transition-colors hover:bg-[#14132b]/10"
+                            >
+                                <LayoutDashboard size={15} className="text-[#14132b]" />
+                                <span>{t('profileDropdown.workspace')}</span>
+                            </Link>
+                        )}
                         <Link
                             to={ROUTES.QUOTES}
                             onClick={() => setOpenDropdown(null)}
                             className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-[#14132b] no-underline transition-colors hover:bg-[#14132b]/10"
                         >
                             <History size={15} className="text-[#14132b]" />
-                            <span>Order History</span>
+                            <span>{t('profileDropdown.orderHistory')}</span>
                         </Link>
                         <Link
                             to={ROUTES.QUOTES}
@@ -322,7 +286,7 @@ export default function StoreAccountActions() {
                             className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-[#14132b] no-underline transition-colors hover:bg-[#14132b]/10"
                         >
                             <ReceiptText size={15} className="text-[#14132b]" />
-                            <span>Recurring Shopping Lists</span>
+                            <span>{t('profileDropdown.recurringLists')}</span>
                         </Link>
                         <Link
                             to={ROUTES.QUOTES}
@@ -330,7 +294,7 @@ export default function StoreAccountActions() {
                             className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-[#14132b] no-underline transition-colors hover:bg-[#14132b]/10"
                         >
                             <Users size={15} className="text-[#14132b]" />
-                            <span>Custom Quotes &amp; Discounts</span>
+                            <span>{t('profileDropdown.customQuotes')}</span>
                         </Link>
                     </div>
 
@@ -341,24 +305,8 @@ export default function StoreAccountActions() {
                             className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-[#14132b] no-underline transition-colors hover:bg-[#14132b]/10"
                         >
                             <Settings size={15} className="text-[#14132b]" />
-                            <span>Account Settings</span>
+                            <span>{t('profileDropdown.accountSettings')}</span>
                         </Link>
-
-                        <button
-                            type="button"
-                            onClick={() =>
-                                setRoleIndex((prev) => (prev + 1) % ROLE_SEQUENCE.length)
-                            }
-                            className="flex w-full cursor-pointer items-center justify-between border-0 bg-transparent px-4 py-2 text-left text-xs font-medium text-[#14132b] transition-colors hover:bg-[#14132b]/10"
-                        >
-                            <span className="flex items-center gap-3">
-                                <UserCircle2 size={15} className="text-[#14132b]" />
-                                <span>Switch Account</span>
-                            </span>
-                            <span className="text-[10px] font-bold text-gray-500">
-                                ({currentRole})
-                            </span>
-                        </button>
 
                         <button
                             type="button"
@@ -366,7 +314,7 @@ export default function StoreAccountActions() {
                             className="flex w-full cursor-pointer items-center gap-3 border-0 bg-transparent px-4 py-2 text-left text-xs font-semibold text-[#EF4444] transition-colors hover:bg-[#EF4444]/10"
                         >
                             <LogOut size={15} className="text-[#EF4444]" />
-                            <span>Sign Out</span>
+                            <span>{t('profileDropdown.signOut')}</span>
                         </button>
                     </div>
                 </div>

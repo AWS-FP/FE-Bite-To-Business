@@ -1,0 +1,26 @@
+{
+    "navigationGroup": "WORKSPACE OPERATIONS",
+    "ecommerce": {
+        "workspace": "E-COMMERCE WORKSPACE",
+        "title": "Commerce desk.",
+        "role": "E-commerce executive"
+    },
+    "logistics": {
+        "workspace": "LOGISTICS WORKSPACE",
+        "title": "Logistics desk.",
+        "role": "Logistics staff"
+    },
+    "delivery": {
+        "workspace": "DELIVERY WORKSPACE",
+        "title": "Delivery desk.",
+        "role": "Shipper"
+    },
+    "navigation": {
+        "products": "Products",
+        "promotions": "Promotions",
+        "coupons": "Coupons",
+        "inventory": "Inventory",
+        "productRequests": "Product requests",
+        "trips": "Delivery trips"
+    }
+}

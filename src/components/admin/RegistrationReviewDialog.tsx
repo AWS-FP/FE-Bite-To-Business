@@ -73,7 +73,7 @@ export default function RegistrationReviewDialog({
                 <div className="min-h-0 overflow-y-auto px-[25px] pt-[21px] pb-[25px]">
                     <h2
                         id="registration-review-title"
-                        className="font-body text-[23px] leading-[34.5px] font-bold tracking-[-0.5px]"
+                        className="font-body text-[24px] leading-9 font-bold tracking-[-0.5px]"
                     >
                         {decision === 'APPROVE'
                             ? t('review.approveTitle')
