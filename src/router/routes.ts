@@ -11,7 +11,6 @@ export const ROUTES = {
     BRANDS: '/brands',
     BRAND_DETAIL: '/brands/:brandSlug',
 
-
     LOGIN: '/login',
     REGISTER: '/register',
     VERIFY_OTP: '/verify-otp',
@@ -45,6 +44,7 @@ export const ROUTES = {
 
     DELIVERY: '/delivery',
     DELIVERY_TRIPS: '/delivery/trips',
+    DELIVERY_HISTORY: '/delivery/history',
     DELIVERY_TRIP_DETAIL: '/delivery/trips/:tripId',
 } as const;
 

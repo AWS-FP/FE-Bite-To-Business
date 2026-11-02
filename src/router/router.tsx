@@ -12,6 +12,10 @@ import VerifyOtpPage from '@/pages/auth/VerifyOtpPage';
 import HomePage from '@/pages/HomePage';
 import ProfilePage from '@/pages/customer/ProfilePage';
 
+// Delivery Pages
+import DeliveryLayout from '@/layouts/shipper/DeliveryLayout';
+import CurrentTripPage from '@/pages/shipper/CurrentTripPage';
+import DeliveryHistoryPage from '@/pages/shipper/DeliveryHistoryPage';
 // Logistics Pages
 import LogisticsLayout from '@/layouts/logistic/LogisticsLayout';
 import InventoryPage from '@/pages/logistic/InventoryPage';
@@ -265,7 +269,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: ROUTES.DELIVERY,
-                element: <StaffLayout role={AUTH_ROLES.DELIVERY_STAFF} />,
+                element: <DeliveryLayout />,
 
                 children: [
                     {
@@ -274,11 +278,15 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: ROUTES.DELIVERY_TRIPS,
-                        Component: PendingPage,
+                        Component: CurrentTripPage,
+                    },
+                    {
+                        path: ROUTES.DELIVERY_HISTORY,
+                        Component: DeliveryHistoryPage,
                     },
                     {
                         path: ROUTES.DELIVERY_TRIP_DETAIL,
-                        Component: PendingPage,
+                        Component: CurrentTripPage,
                     },
                 ],
             },
