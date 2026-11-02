@@ -131,3 +131,49 @@
 :root body :is(input, select, textarea)[aria-invalid='true']:focus {
     border-color: #e8453c;
 }
+
+/* Kiểu focus dùng chung cho chuột và bàn phím. */
+:root
+    body
+    :is(
+        a[href],
+        button,
+        input,
+        select,
+        textarea,
+        summary,
+        [role='button'],
+        [role='tab'],
+        [role='combobox'],
+        :where([tabindex]:not([tabindex='-1']))
+    ):focus {
+    border-width: 2px;
+    border-style: solid;
+    border-color: currentColor;
+    outline: none;
+    box-shadow: none;
+}
+
+:root
+    body
+    :is(
+        .focus-border-group,
+        .staff-control,
+        label:has(> input:is([type='radio'], [type='checkbox']))
+    ):focus-within {
+    border-width: 2px;
+    border-style: solid;
+    border-color: currentColor;
+    outline: none;
+    box-shadow: none;
+}
+
+:root body :is(.focus-border-group, .staff-control) :is(input, select, textarea):focus {
+    border: 0;
+    outline: none;
+    box-shadow: none;
+}
+
+:root body :is(input, select, textarea)[aria-invalid='true']:focus {
+    border-color: #e8453c;
+}
