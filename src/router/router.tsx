@@ -38,6 +38,8 @@ import PendingPage from '@/components/PendingPage';
 import ProtectedRoute from './ProtectedRoute';
 import { ROUTES } from './routes';
 import LandingPage from '@/pages/LandingPage';
+import WhyBTBPage from '@/pages/WhyBTBPage';
+import BTBModelPage from '@/pages/BTBModelPage';
 
 import BrandsPage from '@/pages/BrandsPage';
 import BrandDetailPage from '@/pages/BrandDetailPage';
@@ -83,6 +85,14 @@ export const router = createBrowserRouter([
     {
         path: ROUTES.LANDING,
         Component: LandingPage,
+    },
+    {
+        path: ROUTES.WHY_BTB,
+        Component: WhyBTBPage,
+    },
+    {
+        path: ROUTES.BTB_MODEL,
+        Component: BTBModelPage,
     },
     {
         path: ROUTES.BRANDS,

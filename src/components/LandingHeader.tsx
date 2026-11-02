@@ -31,13 +31,13 @@ export default function LandingHeader() {
 
                 <ul className="nav-links">
                     <li>
-                        <a href="#categories">Mua hàng ngay</a>
+                        <Link to={ROUTES.LANDING}>Trang giới thiệu</Link>
                     </li>
                     <li>
-                        <a href="#why-b2b">Tại sao chọn Bite to Business?</a>
+                        <Link to={ROUTES.WHY_BTB}>Vì sao chọn BTB?</Link>
                     </li>
                     <li>
-                        <a href="#segments">Mô hình F&amp;B</a>
+                        <Link to={ROUTES.BTB_MODEL}>Mô hình BTB</Link>
                     </li>
                 </ul>
                 <div className="nav-right shrink-0">
