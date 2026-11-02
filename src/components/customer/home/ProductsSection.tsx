@@ -31,7 +31,7 @@ export default function ProductsSection() {
                                 <span className="h-2 w-2 rounded-full bg-white" />
                                 <span>{t('homePage.clearanceBadge', 'WHOLESALE CLEARANCE')}</span>
                             </span>
-                            <h2 className="m-0 mt-2 font-serif text-3xl font-bold text-[#14132b]">
+                            <h2 className="m-0 mt-2 font-['Times_New_Roman',Georgia,serif] lining-nums text-3xl font-bold text-[#14132b]">
                                 {t(
                                     'homePage.flashDealsTitle',
                                     'Early Market Flash Deals — Daily Specials',
@@ -58,7 +58,11 @@ export default function ProductsSection() {
 
                     <div className="mt-7 grid gap-6 grid-cols-3">
                         {visibleFlashProducts.map((product) => (
-                            <ProductShowcaseCard key={product.id} product={product} />
+                            <ProductShowcaseCard
+                                key={product.id}
+                                product={product}
+                                section="flash"
+                            />
                         ))}
                     </div>
 
@@ -82,7 +86,7 @@ export default function ProductsSection() {
                                 <span className="h-2 w-2 rounded-full bg-white" />
                                 <span>{t('homePage.freshBatchBadge', 'FRESH BATCH ARRIVED')}</span>
                             </span>
-                            <h2 className="m-0 mt-2 font-serif text-3xl font-bold text-[#14132b]">
+                            <h2 className="m-0 mt-2 font-['Times_New_Roman',Georgia,serif] lining-nums text-3xl font-bold text-[#14132b]">
                                 {t('homePage.standardSupplyTitle', 'B2B Standard Food Supply')}
                             </h2>
                         </div>
@@ -90,7 +94,11 @@ export default function ProductsSection() {
 
                     <div className="mt-7 grid gap-6 grid-cols-3">
                         {visibleStandardProducts.map((product) => (
-                            <ProductShowcaseCard key={product.id} product={product} />
+                            <ProductShowcaseCard
+                                key={product.id}
+                                product={product}
+                                section="standard"
+                            />
                         ))}
                     </div>
 
