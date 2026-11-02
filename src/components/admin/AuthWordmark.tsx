@@ -3,7 +3,7 @@ import './AuthWordmark.css';
 export default function AuthWordmark() {
     return (
         <div
-            className="auth-wordmark brand-name pointer-events-none absolute inset-0 select-none"
+            className="auth-wordmark brand-name pointer-events-none absolute inset-x-0 top-6 bottom-24 select-none"
             aria-hidden="true"
         >
             {/* Bite to: mỗi chữ cái có vị trí và chuyển động riêng trong file CSS. */}

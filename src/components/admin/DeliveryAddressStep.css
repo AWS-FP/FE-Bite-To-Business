@@ -48,9 +48,3 @@ textarea.auth-delivery-control {
     resize: vertical;
     line-height: 1.6;
 }
-
-@media (max-width: 600px) {
-    .auth-delivery-control {
-        padding-left: 12px;
-    }
-}

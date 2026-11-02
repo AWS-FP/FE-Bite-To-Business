@@ -37,10 +37,7 @@ export default function RegisterForm() {
             <h1 id="auth-title" ref={titleRef} tabIndex={-1}>
                 {t('register.title')}
             </h1>
-            <p
-                className="auth-introduction mt-2.5 mb-0 font-subtext text-[16px] leading-[1.6] text-auth-muted
-        max-[600px]:text-[15px]"
-            >
+            <p className="auth-introduction mt-2.5 mb-0 font-subtext text-[16px] leading-[1.6] text-auth-muted">
                 {t('register.description')}
             </p>
 
@@ -49,14 +46,14 @@ export default function RegisterForm() {
                 aria-label={t('register.progress')}
             >
                 <li
-                    className="group/step is-reached min-w-0 flex-1 font-label text-[11px] leading-[1.5] font-bold text-auth-ink max-[600px]:text-[10px]"
+                    className="group/step is-reached min-w-0 flex-1 font-label text-[11px] leading-[1.5] font-bold text-auth-ink"
                     aria-current={step === 1 ? 'step' : undefined}
                 >
                     <span className="auth-progress-bar mb-[9px] block h-1.5 rounded bg-auth-green group-aria-[current=step]/step:bg-auth-ink" />
                     <span>1. {t('register.customerStep')}</span>
                 </li>
                 <li
-                    className={`group/step min-w-0 flex-1 font-label text-[11px] leading-[1.5] font-bold max-[600px]:text-[10px] ${step >= 2 ? 'is-reached text-auth-ink' : 'text-[#a59baa]'}`}
+                    className={`group/step min-w-0 flex-1 font-label text-[11px] leading-[1.5] font-bold ${step >= 2 ? 'is-reached text-auth-ink' : 'text-[#a59baa]'}`}
                     aria-current={step === 2 ? 'step' : undefined}
                 >
                     <span
@@ -65,7 +62,7 @@ export default function RegisterForm() {
                     <span>2. {t('register.deliveryStep')}</span>
                 </li>
                 <li
-                    className={`group/step min-w-0 flex-1 font-label text-[11px] leading-[1.5] font-bold max-[600px]:text-[10px] ${step === 3 ? 'is-reached text-auth-ink' : 'text-[#a59baa]'}`}
+                    className={`group/step min-w-0 flex-1 font-label text-[11px] leading-[1.5] font-bold ${step === 3 ? 'is-reached text-auth-ink' : 'text-[#a59baa]'}`}
                     aria-current={step === 3 ? 'step' : undefined}
                 >
                     <span
@@ -116,14 +113,10 @@ export default function RegisterForm() {
                     {step === 3 && <InvoiceInformationStep form={form} onEdit={editStep} />}
                 </fieldset>
 
-                <div className="auth-form-actions mt-6 flex gap-3 max-[600px]:gap-2">
+                <div className="auth-form-actions mt-6 flex gap-3">
                     {step > 1 && (
                         <button
-                            className="auth-button inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-solid
-            px-[18px] py-3 text-center text-[14px] leading-[1.4] font-bold no-underline
-            transition-[background,transform] duration-150 active:translate-y-px disabled:active:translate-y-0 disabled:opacity-[0.65]
-            max-[600px]:px-3 max-[600px]:text-[13px] auth-button-secondary w-auto shrink-0 border-[#17133a26]
-            bg-white text-auth-ink hover:bg-[#f4f2ff] disabled:hover:bg-white"
+                            className="auth-button inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-solid px-[18px] py-3 text-center text-[14px] leading-[1.4] font-bold no-underline transition-[background,transform] duration-150 active:translate-y-px disabled:active:translate-y-0 disabled:opacity-[0.65] auth-button-secondary w-auto shrink-0 border-[#17133a26] bg-white text-auth-ink hover:bg-[#f4f2ff] disabled:hover:bg-white"
                             type="button"
                             onClick={goBack}
                             disabled={isSubmitting}
@@ -133,11 +126,7 @@ export default function RegisterForm() {
                         </button>
                     )}
                     <button
-                        className="auth-button inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-solid
-            px-[18px] py-3 text-center text-[14px] leading-[1.4] font-bold no-underline
-            transition-[background,transform] duration-150 active:translate-y-px disabled:active:translate-y-0 disabled:opacity-[0.65]
-            max-[600px]:px-3 max-[600px]:text-[13px] auth-button-primary w-full border-transparent bg-auth-ink
-            text-white hover:bg-auth-green disabled:hover:bg-auth-ink"
+                        className="auth-button inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-solid px-[18px] py-3 text-center text-[14px] leading-[1.4] font-bold no-underline transition-[background,transform] duration-150 active:translate-y-px disabled:active:translate-y-0 disabled:opacity-[0.65] auth-button-primary w-full border-transparent bg-auth-ink text-white hover:bg-auth-green disabled:hover:bg-auth-ink"
                         type="submit"
                         disabled={isSubmitting}
                     >
@@ -154,11 +143,7 @@ export default function RegisterForm() {
                     </button>
                 </div>
             </form>
-            <p
-                className="auth-switch-page mt-6 mb-0 text-center font-subtext text-[14px] leading-[1.6] text-[#797183]
-        max-[600px]:text-[12px] [&_a]:font-bold [&_a]:text-auth-ink [&_a]:decoration-[#ff9bd2]
-        [&_a]:decoration-[3px] [&_a]:underline-offset-4 [&_a:hover]:text-auth-green"
-            >
+            <p className="auth-switch-page mt-6 mb-0 text-center font-subtext text-[14px] leading-[1.6] text-[#797183] [&_a]:font-bold [&_a]:text-auth-ink [&_a]:decoration-[#ff9bd2] [&_a]:decoration-[3px] [&_a]:underline-offset-4 [&_a:hover]:text-auth-green">
                 {t('register.hasAccount')} <Link to={ROUTES.LOGIN}>{t('login.submit')}</Link>
             </p>
         </>
