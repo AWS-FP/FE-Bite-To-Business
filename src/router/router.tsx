@@ -16,6 +16,12 @@ import ProfilePage from '@/pages/customer/ProfilePage';
 import DeliveryLayout from '@/layouts/shipper/DeliveryLayout';
 import CurrentTripPage from '@/pages/shipper/CurrentTripPage';
 import DeliveryHistoryPage from '@/pages/shipper/DeliveryHistoryPage';
+// Logistics Pages
+import LogisticsLayout from '@/layouts/logistic/LogisticsLayout';
+import InventoryPage from '@/pages/logistic/InventoryPage';
+import ReceivePage from '@/pages/logistic/ReceivePage';
+import PackingPage from '@/pages/logistic/PackingPage';
+import ProductRequestsPage from '@/pages/logistic/ProductRequestsPage';
 
 // Admin Pages
 import RegistrationsPage from '@/pages/admin/RegistrationsPage';
@@ -225,7 +231,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: ROUTES.LOGISTICS,
-                element: <StaffLayout role={AUTH_ROLES.LOGISTICS_STAFF} />,
+                element: <LogisticsLayout />,
 
                 children: [
                     {
@@ -234,11 +240,19 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: ROUTES.LOGISTICS_INVENTORY,
-                        Component: PendingPage,
+                        Component: InventoryPage,
+                    },
+                    {
+                        path: ROUTES.LOGISTICS_RECEIVE,
+                        Component: ReceivePage,
+                    },
+                    {
+                        path: ROUTES.LOGISTICS_PACKING,
+                        Component: PackingPage,
                     },
                     {
                         path: ROUTES.LOGISTICS_PRODUCT_REQUESTS,
-                        Component: PendingPage,
+                        Component: ProductRequestsPage,
                     },
                 ],
             },
