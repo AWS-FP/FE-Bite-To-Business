@@ -962,136 +962,6 @@
     bottom: 90px;
 }
 
-@media (max-width: 1024px) {
-    .btb-brand-directory__grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .btb-brand-hero__layout {
-        gap: 30px;
-    }
-
-    .btb-brand-product-grid {
-        gap: 15px;
-    }
-}
-
-@media (max-width: 760px) {
-    .btb-brand .btb-brand-container {
-        width: min(100% - 32px, 1190px);
-    }
-
-    .btb-brand-hero {
-        padding: 52px 0;
-    }
-
-    .btb-brand-hero__layout {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .btb-brand-hero__feature {
-        min-height: 240px;
-    }
-
-    .btb-brand-hero__feature>.btb-brand-placeholder {
-        min-height: 240px;
-    }
-
-    .btb-brand-section-heading,
-    .btb-brand-products__heading {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .btb-brand-directory__grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .btb-brand-quote__card {
-        grid-template-columns: 1fr;
-    }
-
-    .btb-brand-detail-page {
-        padding: 32px 0 48px;
-    }
-
-    .btb-brand-detail-hero {
-        grid-template-columns: 1fr;
-    }
-
-    .btb-brand-detail-hero__visual {
-        min-height: 200px;
-        border-left: 0;
-        border-top: 1px dashed #ffffff70;
-    }
-
-    .btb-brand-product-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .btb-brand-products__count,
-    .btb-brand-related__hint {
-        white-space: normal;
-    }
-}
-
-@media (max-width: 520px) {
-    .btb-brand-hero h1 {
-        font-size: 41px;
-    }
-
-    .btb-brand-directory {
-        padding: 42px 0;
-    }
-
-    .btb-brand-directory__grid {
-        gap: 12px;
-    }
-
-    .btb-brand-tile {
-        min-height: 175px;
-        padding: 12px;
-    }
-
-    .btb-brand-tile__text strong {
-        font-size: 16px;
-    }
-
-    .btb-brand-product-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .btb-brand-showcase {
-        padding: 25px 15px;
-    }
-
-    .btb-brand-detail-hero__copy {
-        padding: 25px 19px;
-    }
-
-    .btb-brand-detail-hero h1 {
-        font-size: 43px;
-    }
-
-    .btb-brand-quote__form {
-        flex-direction: column;
-    }
-
-    .btb-brand-quote__form input,
-    .btb-brand-quote__form .btb-brand-btn {
-        width: 100%;
-    }
-
-    .btb-brand-quote {
-        padding: 28px 0 48px;
-    }
-
-    .btb-brand-demo-cart {
-        bottom: 12px;
-        right: 12px;
-    }
-}
-
 @media (prefers-reduced-motion: reduce) {
 
     .btb-brand *,
@@ -1659,84 +1529,6 @@
     line-height: 1.2;
 }
 
-@media (max-width: 990px) {
-    .btb-brand .btb-brand-product-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
-    .btb-brand .btb-brand-discovery__sticker {
-        display: none;
-    }
-}
-
-@media (max-width: 800px) {
-    .btb-brand .btb-brand-product-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .btb-brand .btb-brand-discovery__columns {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 620px) {
-    .btb-brand .btb-brand-product-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
-    }
-
-    .btb-brand .btb-brand-product-card__image {
-        height: 125px;
-    }
-
-    .btb-brand .btb-brand-product-card__body {
-        padding: 9px 8px;
-    }
-
-    .btb-brand .btb-brand-product-card__controls {
-        flex-wrap: wrap;
-    }
-
-    .btb-brand .btb-brand-product-card__add {
-        min-height: 34px;
-    }
-
-    .btb-brand .btb-brand-breadcrumb {
-        margin-top: -8px;
-    }
-
-    .btb-brand .btb-brand-discovery__panel {
-        padding: 15px;
-    }
-
-    .btb-brand .btb-brand-discovery__heading {
-        display: block;
-    }
-}
-
-@media (max-width: 440px) {
-    .btb-brand .btb-brand-product-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .btb-brand .btb-brand-product-card__controls {
-        flex-wrap: nowrap;
-    }
-
-    .btb-brand .btb-brand-product-card__image {
-        height: 180px;
-    }
-
-    .btb-brand .btb-brand-breadcrumb__label {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .btb-brand .btb-brand-breadcrumb__trail {
-        gap: 4px;
-    }
-}
-
 /* =============================================
    Brand Detail v3 — purchased carousel + compact
    recent search + taller 5-column product images.
@@ -1850,7 +1642,6 @@
     border-radius: 17px;
     background: #ebf2eb;
     cursor: grab;
-    touch-action: auto;
     /* Cảm ứng: trình duyệt cuộn ngang tự nhiên, desktop kéo bằng chuột. */
 }
 
@@ -2179,83 +1970,6 @@
     font-size: 10px;
 }
 
-@media (max-width: 900px) {
-
-    .btb-brand .btb-brand-purchased__visual,
-    .btb-brand .btb-brand-purchased__visual .btb-brand-placeholder {
-        min-height: 255px;
-    }
-
-    .btb-brand .btb-brand-product-card__image {
-        height: 205px;
-    }
-}
-
-@media (max-width: 620px) {
-    .btb-brand .btb-brand-purchased__heading {
-        align-items: flex-start;
-    }
-
-    .btb-brand .btb-brand-purchased__heading h2 {
-        font-size: 25px;
-    }
-
-    .btb-brand .btb-brand-purchased__navigation {
-        gap: 5px;
-    }
-
-    .btb-brand .btb-brand-purchased__navigation button {
-        width: 35px;
-        height: 35px;
-        border-radius: 9px;
-    }
-
-    .btb-brand .btb-brand-purchased__navigation span {
-        min-width: 35px;
-        font-size: 12px;
-    }
-
-    .btb-brand .btb-brand-purchased__slide {
-        grid-template-columns: 1fr;
-    }
-
-    .btb-brand .btb-brand-purchased__visual {
-        border-right: 0;
-        border-bottom: 2px solid #17133a;
-        min-height: 260px;
-    }
-
-    .btb-brand .btb-brand-purchased__visual .btb-brand-placeholder {
-        min-height: 260px;
-    }
-
-    .btb-brand .btb-brand-purchased__info {
-        padding: 22px;
-    }
-
-    .btb-brand .btb-brand-product-card__image {
-        height: 195px;
-    }
-
-    .btb-brand .btb-brand-recent {
-        padding: 15px;
-    }
-}
-
-@media (max-width: 440px) {
-    .btb-brand .btb-brand-purchased__heading {
-        flex-direction: column;
-    }
-
-    .btb-brand .btb-brand-purchased__navigation {
-        align-self: flex-end;
-    }
-
-    .btb-brand .btb-brand-product-card__image {
-        height: 245px;
-    }
-}
-
 
 /* ============================================================
    GÓC KHÁM PHÁ: tìm gần đây + sản phẩm đã mua nằm trong 1 khu vực
@@ -2347,24 +2061,5 @@
 
     .btb-brand .btb-brand-history-hub .btb-brand-recent {
         height: auto;
-    }
-}
-
-@media (max-width: 620px) {
-    .btb-brand .btb-brand-history-hub {
-        margin-top: 30px;
-        padding: 14px;
-    }
-
-    .btb-brand .btb-brand-history-hub__grid {
-        gap: 14px;
-    }
-
-    .btb-brand .btb-brand-history-hub .btb-brand-purchased {
-        padding: 12px;
-    }
-
-    .btb-brand .btb-brand-history-hub .btb-brand-purchased__slide {
-        grid-template-columns: 1fr;
     }
 }

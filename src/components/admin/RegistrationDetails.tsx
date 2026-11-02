@@ -22,9 +22,7 @@ function DetailSection({
                 <AdminIcon name={icon} />
                 {title}
             </h3>
-            <dl className="m-0 mt-[18px] grid grid-cols-2 gap-x-[22px] gap-y-[18px] max-[420px]:grid-cols-1">
-                {children}
-            </dl>
+            <dl className="m-0 mt-[18px] grid grid-cols-2 gap-x-[22px] gap-y-[18px]">{children}</dl>
         </section>
     );
 }
@@ -41,7 +39,7 @@ function DetailField({
     const { t } = useTranslation('admin');
     const isEmpty = children === null || children === undefined || children === '';
     return (
-        <div className={`min-w-0 ${full ? 'col-span-2 max-[420px]:col-span-1' : ''}`}>
+        <div className={`min-w-0 ${full ? 'col-span-2' : ''}`}>
             <dt className="text-[12px] leading-[18px]">{label}</dt>
             <dd
                 className={`m-0 pt-[6px] text-[14px] leading-[21px] wrap-anywhere whitespace-pre-wrap ${isEmpty ? 'text-[13px] font-normal italic' : 'font-semibold'}`}

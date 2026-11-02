@@ -51,13 +51,19 @@
       --font-serif: var(--font-heading, "Prata", Georgia, serif);
       --font-sans: var(--font-body, "Be Vietnam Pro", sans-serif);
      }
-.btb-landing * { 
+@layer base {
+  .btb-landing * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-     }
+  }
+}
 .btb-landing { 
       scroll-behavior: smooth;
+      padding-top: 104px;
+     }
+.btb-landing main [id] {
+      scroll-margin-top: 120px;
      }
 .btb-landing { 
       font-family: var(--font-sans);
@@ -185,8 +191,11 @@
       font-size: 12px;
      }
 .btb-landing .navbar { 
-      position: sticky;
+      position: fixed;
       top: 0;
+      right: 0;
+      left: 0;
+      height: 104px;
       z-index: 1000;
       background: var(--bg-cream);
       border-bottom: 3px solid var(--navy);
@@ -195,16 +204,10 @@
      }
 .btb-landing .navbar-inner { 
       display: flex;
+      height: 100%;
       align-items: center;
       justify-content: space-between;
       gap: 24px;
-     }
-.btb-landing .brand-logo { 
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: var(--navy);
      }
 .btb-landing .brand-mark { 
       background: var(--yellow-soft);
@@ -217,22 +220,6 @@
       border: 2px solid var(--navy);
       box-shadow: 3px 3px 0px var(--navy);
       letter-spacing: 0.02em;
-     }
-.btb-landing .brand-logo-img { 
-      height: 52px;
-      width: auto;
-      max-width: 100%;
-      object-fit: contain;
-      display: block;
-      background: var(--yellow-soft);
-      padding: 4px 8px;
-      border-radius: 10px;
-      border: 2px solid var(--navy);
-      box-shadow: 3px 3px 0px var(--navy);
-      transition: transform 0.2s ease;
-     }
-.btb-landing .brand-logo:hover .brand-logo-img { 
-      transform: scale(1.04);
      }
 .btb-landing .footer-logo-pill { 
       background: var(--yellow-soft);
@@ -255,17 +242,6 @@
       border-radius: 14px;
       border: 2.5px solid var(--navy);
       box-shadow: 4px 4px 0px var(--navy);
-     }
-.btb-landing .brand-text-wrap { 
-      display: flex;
-      flex-direction: column;
-     }
-.btb-landing .brand-name { 
-      font-family: var(--font-serif);
-      font-weight: 900;
-      font-size: 21px;
-      line-height: 1.1;
-      color: var(--navy);
      }
 .btb-landing .brand-tagline { 
       font-size: 11px;
@@ -293,44 +269,6 @@
       display: flex;
       align-items: center;
       gap: 12px;
-     }
-.btb-landing .lang-pill { 
-      display: inline-flex;
-      align-items: center;
-      background: var(--bg-cream-strong);
-      padding: 4px;
-      border-radius: var(--radius-pill);
-      border: 2px solid var(--navy);
-      box-shadow: 2px 2px 0px var(--navy);
-      font-size: 12px;
-      font-weight: 700;
-     }
-.btb-landing .lang-pill button { 
-      border: none;
-      background: transparent;
-      padding: 4px 10px;
-      border-radius: var(--radius-pill);
-      cursor: pointer;
-      color: var(--text-body);
-      font-family: var(--font-sans);
-      font-weight: 700;
-     }
-.btb-landing .lang-pill button.active { 
-      background: var(--yellow-soft);
-      color: var(--navy);
-      border: 1.5px solid var(--navy);
-     }
-.btb-landing .quote-pill-btn { 
-      background: var(--yellow-soft);
-      border: var(--border-card);
-      box-shadow: 3px 3px 0px var(--navy);
-      color: var(--navy);
-      padding: 8px 14px;
-      border-radius: var(--radius-pill);
-      font-family: var(--font-sans);
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
      }
 .btb-landing .hero-section { 
       padding: 56px 0 44px;
@@ -1461,53 +1399,6 @@
 .btb-landing .footer a:hover { 
       color: var(--pink-soft);
      }
-.btb-landing .ai-bubble { 
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 9500;
-      width: 340px;
-      background: var(--surface-white);
-      border: 3px solid var(--navy);
-      border-radius: var(--radius-md);
-      box-shadow: 6px 6px 0px var(--navy);
-      overflow: hidden;
-     }
-.btb-landing .ai-bubble-head { 
-      background: var(--navy);
-      color: var(--yellow-soft);
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-     }
-.btb-landing .ai-bubble-content { 
-      padding: 14px;
-      font-size: 12.5px;
-      color: var(--text-body);
-     }
-.btb-landing .ai-suggestion { 
-      display: block;
-      width: 100%;
-      text-align: left;
-      background: var(--bg-cream-strong);
-      border: 2px solid var(--navy);
-      box-shadow: 2px 2px 0px var(--navy);
-      padding: 8px 10px;
-      border-radius: 8px;
-      margin-top: 6px;
-      font-family: var(--font-sans);
-      font-weight: 600;
-      font-size: 12px;
-      color: var(--navy);
-      cursor: pointer;
-     }
-.btb-landing .ai-suggestion:hover { 
-      background: var(--yellow-soft);
-     }
 .btb-landing .toast-notification { 
       position: fixed;
       bottom: 24px;
@@ -1665,18 +1556,9 @@
       opacity: 0.18;
       transform: rotate(-4deg) scale(1.1);
      }
-@media (max-width: 1024px) {
-.btb-landing .video-carousel-viewport {  height: 440px;  }
-.btb-landing .carousel-chapter-bar {  grid-template-columns: repeat(2, 1fr);  }
-.btb-landing .cat-split-head, .btb-landing .dark-split-grid, .btb-landing .segment-showcase-card, .btb-landing .testimonials-layout, .btb-landing .cta-banner-grid {  grid-template-columns: 1fr;  }
-.btb-landing .stats-4-grid, .btb-landing .product-4-grid, .btb-landing .metric-4-grid {  grid-template-columns: repeat(2, 1fr);  }
-.btb-landing .pain-3-grid {  grid-template-columns: 1fr;  }
-.btb-landing .footer-grid {  grid-template-columns: 1fr 1fr;  }
-}
 /* Landing layout from the supplied HTML prototype; scoped to this page only.
  * Brand typography follows the project's eight-font Google Fonts system. */
 .btb-landing { --font-serif: var(--font-heading); --font-sans: var(--font-body); }
-.btb-landing .brand-name { font-family: var(--font-brand); font-weight: 400; }
 .btb-landing .section-h2, .btb-landing .hero-title, .btb-landing .slide-headline { font-family: var(--font-heading); font-weight: 400; }
 .btb-landing .section-num-tag, .btb-landing .slide-scene-tag { font-family: var(--font-label); }
 .btb-landing .soft-price-now, .btb-landing .soft-price-old, .btb-landing .metric-big { font-family: var(--font-price); font-variant-numeric: tabular-nums; }
@@ -1687,30 +1569,4 @@
 
 
 /* Responsive refinements absent from the static prototype. */
-@media (max-width: 700px) {
-  .btb-landing .container { padding-left: 16px; padding-right: 16px; }
-  .btb-landing .navbar { position: relative; padding: 12px 0; }
-  .btb-landing .navbar-inner { display: grid; grid-template-columns: 1fr; justify-items: center; gap: 12px; }
-  .btb-landing .brand-logo { justify-self: center; }
-  .btb-landing .brand-logo-img { height: 44px; }
-  .btb-landing .brand-name { font-size: 18px; }
-  .btb-landing .brand-tagline { font-size: 9px; }
-  .btb-landing .nav-links { order: 3; width: 100%; justify-content: flex-start; overflow-x: auto; padding: 3px 0 6px; gap: 18px; white-space: nowrap; font-size: 12px; }
-  .btb-landing .nav-links a { white-space: nowrap; }
-  .btb-landing .nav-right { width: 100%; justify-content: center; flex-wrap: wrap; gap: 10px; }
-  .btb-landing .hero-section { padding-top: 38px; }
-  .btb-landing .hero-title { font-size: clamp(30px, 8vw, 42px); line-height: 1.25; }
-  .btb-landing .hero-subtitle { font-size: 13px; line-height: 1.7; }
-  .btb-landing .hero-ctas .btn { font-size: 12px; padding: 10px 14px; }
-  .btb-landing .carousel-chapter-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .btb-landing .chapter-pill { padding: 8px; font-size: 10px; }
-  .btb-landing .video-carousel-viewport { height: 440px; }
-  .btb-landing .slide-content-box { padding: 24px 16px; }
-  .btb-landing .slide-headline { font-size: 23px; }
-  .btb-landing .slide-floating-card { display: none; }
-  .btb-landing .product-4-grid, .btb-landing .stats-4-grid, .btb-landing .metric-4-grid { grid-template-columns: 1fr; }
-  .btb-landing .footer-grid { grid-template-columns: 1fr; }
-  .btb-landing .ai-bubble { width: min(340px, calc(100vw - 24px)); bottom: 12px; right: 12px; }
-  .btb-landing .section-h2 { font-size: 28px; }
-}
 
