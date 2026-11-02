@@ -31,7 +31,7 @@ export default function RegistrationTable({
             aria-label={t('list.tableLabel')}
             tabIndex={0}
         >
-            <table className="w-full min-w-[1366px] border-collapse text-left text-[12px] leading-[18px]">
+            <table className="w-full min-w-[1366px] border-collapse text-left text-[13px] leading-[19.5px]">
                 {/* Độ rộng các cột: họ tên, Gmail, điện thoại, loại khách, doanh nghiệp, ngày gửi, xét duyệt, kích hoạt, thao tác. */}
                 <colgroup>
                     <col style={{ width: '14.7145%' }} />
@@ -44,9 +44,9 @@ export default function RegistrationTable({
                     <col style={{ width: '10.8346%' }} />
                     <col style={{ width: '10.1757%' }} />
                 </colgroup>
-                <thead className="border-y border-black bg-[#fff8e8] font-semibold">
+                <thead className="border-y border-black bg-[#fff8e8] text-[12px] leading-[18px] font-semibold">
                     <tr className="h-[47px] [&_th]:px-3 [&_th]:py-[14px] [&_th]:font-semibold">
-                        <th scope="col" className="pl-[22px]!">
+                        <th scope="col" className="pl-6!">
                             {t('fields.name')}
                         </th>
                         <th scope="col">Gmail</th>
@@ -80,9 +80,9 @@ export default function RegistrationTable({
                     {rows.map((registration) => (
                         <tr
                             key={registration.id}
-                            className="group h-[78px] border-b border-black last:border-b-0 hover:bg-[#fffdf5] [&_td]:px-3 [&_td]:py-[18px]"
+                            className="group h-[78px] border-b border-[#deded8] last:border-b-0 hover:bg-[#fffdf5] [&_td]:px-3 [&_td]:py-[18px]"
                         >
-                            <td className="pl-[22px]!">
+                            <td className="pl-6!">
                                 <div className="flex items-center gap-[9px]">
                                     <span
                                         className="admin-customer-avatar grid size-[34px] shrink-0 place-items-center rounded-full border border-black text-[11px] font-bold"

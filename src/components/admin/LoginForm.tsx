@@ -81,10 +81,7 @@ export default function LoginForm() {
     return (
         <>
             <h1 id="auth-title">{t('login.title')}</h1>
-            <p
-                className="auth-introduction mt-2.5 mb-0 font-subtext text-[16px] leading-[1.6] text-auth-muted
-        max-[600px]:text-[15px]"
-            >
+            <p className="auth-introduction mt-2.5 mb-0 font-subtext text-[16px] leading-[1.6] text-auth-muted">
                 {t('login.description')}
             </p>
             {location.state?.activationComplete && (
@@ -117,11 +114,7 @@ export default function LoginForm() {
 
                 <AuthField name="login-email" label={t('fields.email')} error={errors.email}>
                     <input
-                        className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink
-            outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4]
-            placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18]
-            aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed
-            disabled:bg-[#f1eff8] disabled:text-[#868191] max-[600px]:pl-3 h-12 py-0"
+                        className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4] placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18] aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed disabled:bg-[#f1eff8] disabled:text-[#868191] h-12 py-0"
                         id="login-email"
                         ref={emailRef}
                         type="email"
@@ -148,11 +141,7 @@ export default function LoginForm() {
                 >
                     <div className="auth-password-input relative flex items-center">
                         <input
-                            className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink
-              outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4]
-              placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18]
-              aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed
-              disabled:bg-[#f1eff8] disabled:text-[#868191] max-[600px]:pl-3 h-12 py-0 pr-[50px] max-[600px]:pr-[46px]"
+                            className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4] placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18] aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed disabled:bg-[#f1eff8] disabled:text-[#868191] h-12 py-0 pr-[50px]"
                             id="login-password"
                             ref={passwordRef}
                             type={showPassword ? 'text' : 'password'}
@@ -207,11 +196,7 @@ export default function LoginForm() {
                 )}
 
                 <button
-                    className="auth-button inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-solid
-          px-[18px] py-3 text-center text-[14px] leading-[1.4] font-bold no-underline
-          transition-[background,transform] duration-150 active:translate-y-px disabled:active:translate-y-0 disabled:opacity-[0.65]
-          max-[600px]:px-3 max-[600px]:text-[13px] auth-button-primary w-full border-transparent bg-auth-ink
-          text-white hover:bg-auth-green disabled:hover:bg-auth-ink"
+                    className="auth-button inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-solid px-[18px] py-3 text-center text-[14px] leading-[1.4] font-bold no-underline transition-[background,transform] duration-150 active:translate-y-px disabled:active:translate-y-0 disabled:opacity-[0.65] auth-button-primary w-full border-transparent bg-auth-ink text-white hover:bg-auth-green disabled:hover:bg-auth-ink"
                     type="submit"
                     disabled={isLoading}
                 >
@@ -228,11 +213,7 @@ export default function LoginForm() {
                     {isLoading && t('login.submitting')}
                 </span>
             </form>
-            <p
-                className="auth-switch-page mt-6 mb-0 text-center font-subtext text-[14px] leading-[1.6] text-[#797183]
-        max-[600px]:text-[12px] [&_a]:font-bold [&_a]:text-auth-ink [&_a]:decoration-[#ff9bd2]
-        [&_a]:decoration-[3px] [&_a]:underline-offset-4 [&_a:hover]:text-auth-green"
-            >
+            <p className="auth-switch-page mt-6 mb-0 text-center font-subtext text-[14px] leading-[1.6] text-[#797183] [&_a]:font-bold [&_a]:text-auth-ink [&_a]:decoration-[#ff9bd2] [&_a]:decoration-[3px] [&_a]:underline-offset-4 [&_a:hover]:text-auth-green">
                 {t('login.noAccount')} <Link to={ROUTES.REGISTER}>{t('register.title')}</Link>
             </p>
             <p className="mt-3 mb-0 text-center font-subtext text-[12px] leading-[1.6] text-auth-muted">

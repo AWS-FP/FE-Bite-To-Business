@@ -10,11 +10,18 @@ import viAdmin from './locales/vi/admin.json';
 import enAdmin from './locales/en/admin.json';
 import viRegistrations from './locales/vi/registrations.json';
 import enRegistrations from './locales/en/registrations.json';
+import viStaff from './locales/vi/staff.json';
+import enStaff from './locales/en/staff.json';
+import viSystem from './locales/vi/system.json';
+import enSystem from './locales/en/system.json';
+import viWorkspace from './locales/vi/workspace.json';
+import enWorkspace from './locales/en/workspace.json';
 
 const storageKey = 'bitetobusiness.language';
-let language = 'vi';
+let language = 'en';
 try {
-    if (localStorage.getItem(storageKey) === 'en') language = 'en';
+    const saved = localStorage.getItem(storageKey);
+    if (saved === 'vi' || saved === 'en') language = saved;
 } catch {
     /* Language selection works even when browser storage is unavailable. */
 }
@@ -25,17 +32,19 @@ void i18n.use(initReactI18next).init({
             translation: vi,
             common: viCommon,
             storefront: viStorefront,
-            admin: { ...viAdmin, ...viRegistrations },
+            admin: { ...viAdmin, ...viRegistrations, ...viStaff, ...viSystem },
+            workspace: viWorkspace,
         },
         en: {
             translation: en,
             common: enCommon,
             storefront: enStorefront,
-            admin: { ...enAdmin, ...enRegistrations },
+            admin: { ...enAdmin, ...enRegistrations, ...enStaff, ...enSystem },
+            workspace: enWorkspace,
         },
     },
     lng: language,
-    fallbackLng: 'vi',
+    fallbackLng: 'en',
     supportedLngs: ['vi', 'en'],
     interpolation: { escapeValue: false },
 });

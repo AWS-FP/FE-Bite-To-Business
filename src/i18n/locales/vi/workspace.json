@@ -1,0 +1,26 @@
+{
+    "navigationGroup": "VẬN HÀNH CÔNG VIỆC",
+    "ecommerce": {
+        "workspace": "KHÔNG GIAN THƯƠNG MẠI ĐIỆN TỬ",
+        "title": "Góc kinh doanh.",
+        "role": "Nhân viên E-commerce"
+    },
+    "logistics": {
+        "workspace": "KHÔNG GIAN KHO VẬN",
+        "title": "Góc kho vận.",
+        "role": "Nhân viên Logistics"
+    },
+    "delivery": {
+        "workspace": "KHÔNG GIAN GIAO HÀNG",
+        "title": "Góc giao hàng.",
+        "role": "Shipper"
+    },
+    "navigation": {
+        "products": "Sản phẩm",
+        "promotions": "Chương trình khuyến mãi",
+        "coupons": "Mã giảm giá",
+        "inventory": "Kho hàng",
+        "productRequests": "Yêu cầu sản phẩm",
+        "trips": "Chuyến giao hàng"
+    }
+}
