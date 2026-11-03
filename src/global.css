@@ -24,6 +24,18 @@
     --color-auth-ink: #17133a;
     --color-auth-cream: #fff1e0;
     --color-auth-muted: #787386;
+
+    --color-store-muted: #667184;
+    --color-store-placeholder: #a8a3b4;
+    --color-store-line: #d3dbd5;
+    --color-surface-soft: #f8f7f3;
+    --color-surface-green: #eaf3ec;
+    --color-surface-yellow: #fff3b1;
+    --color-success: #15803d;
+    --color-danger: #e8453c;
+    --color-danger-strong: #9b2018;
+    --color-danger-soft: #ffedeb;
+    --color-danger-line: #f5c2bc;
 }
 
 @utility brand-name {
