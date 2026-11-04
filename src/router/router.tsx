@@ -80,13 +80,10 @@ export const router = createBrowserRouter([
     // 2. PUBLIC CUSTOMER PAGES
     // Không cần đăng nhập
     // ==========================================
-    // Homepage
     {
         path: ROUTES.HOME,
         Component: HomePage,
     },
-
-    // Landing Page
     {
         path: ROUTES.LANDING,
         Component: LandingPage,
@@ -121,6 +118,11 @@ export const router = createBrowserRouter([
     {
         path: ROUTES.QUOTES,
         Component: PendingPage,
+    },
+
+    {
+        path: ROUTES.DISTRIBUTION_NETWORK,
+        Component: DistributionNetworkPage,
     },
 
     // ==========================================
