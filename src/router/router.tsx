@@ -44,6 +44,10 @@ import BTBModelPage from '@/pages/BTBModelPage';
 import BrandsPage from '@/pages/BrandsPage';
 import BrandDetailPage from '@/pages/BrandDetailPage';
 
+
+import DistributionNetworkPage from '@/pages/DistributionNetworkPage';
+
+
 export const router = createBrowserRouter([
     // ==========================================
     // 1. AUTHENTICATION
@@ -101,6 +105,11 @@ export const router = createBrowserRouter([
     {
         path: ROUTES.BRAND_DETAIL,
         Component: BrandDetailPage,
+    },
+
+    {
+        path: ROUTES.DISTRIBUTION_NETWORK,
+        Component: DistributionNetworkPage,
     },
 
     // Catalog chưa triển khai ở nhánh này
