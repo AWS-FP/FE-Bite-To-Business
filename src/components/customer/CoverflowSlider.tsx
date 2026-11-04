@@ -32,7 +32,7 @@ export default function CoverflowSlider() {
 
     return (
         <section
-            className="relative overflow-hidden bg-[#133425] pt-8 pb-11 select-none"
+            className="relative overflow-hidden bg-store-green pt-8 pb-11 select-none"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
             aria-label="Promotional Coverflow Slider"
@@ -88,7 +88,7 @@ export default function CoverflowSlider() {
                                     transformStyle: 'preserve-3d',
                                     pointerEvents: isVisible ? 'auto' : 'none',
                                 }}
-                                className="absolute h-[415px] w-[405px] cursor-pointer overflow-hidden rounded-[24px] border-2 border-solid border-[#0D261A] bg-[#183F2D] shadow-[0_24px_48px_rgba(0,0,0,0.45)]"
+                                className="absolute h-[415px] w-[405px] cursor-pointer overflow-hidden rounded-[24px] border-2 border-solid border-store-dark bg-store-green shadow-[0_24px_48px_color-mix(in_srgb,_var(--color-black)_45%,_transparent)]"
                             >
                                 {slide.imageUrl ? (
                                     <img
@@ -97,18 +97,18 @@ export default function CoverflowSlider() {
                                         className="block h-full w-full object-cover"
                                     />
                                 ) : (
-                                    <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-[#1B4632] to-[#0F291D] p-6 text-center text-white">
-                                        <ImageIcon size={40} className="mb-3 text-[#FACC15]" />
-                                        <span className="text-sm font-extrabold uppercase tracking-wider text-[#FACC15]">
+                                    <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-store-green to-store-dark p-6 text-center text-white">
+                                        <ImageIcon size={40} className="mb-3 text-store-yellow" />
+                                        <span className="text-sm font-extrabold uppercase tracking-wider text-store-yellow">
                                             [ Full Poster Image #{index + 1} ]
                                         </span>
                                         <span className="mt-1.5 max-w-[240px] text-xs leading-relaxed text-white/70">
                                             Put your designed poster image path in{' '}
-                                            <code className="text-[#A7F3D0]">
+                                            <code className="text-surface-green">
                                                 COVERFLOW_SLIDES[{index}].imageUrl
                                             </code>{' '}
                                             inside{' '}
-                                            <code className="text-[#A7F3D0]">homeData.ts</code>
+                                            <code className="text-surface-green">homeData.ts</code>
                                         </span>
                                     </div>
                                 )}
@@ -120,7 +120,7 @@ export default function CoverflowSlider() {
                         type="button"
                         onClick={handlePrev}
                         aria-label="Previous slide"
-                        className="absolute left-2 z-40 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-solid border-white/25 bg-[#0B1F16]/85 text-white shadow-lg transition-all hover:scale-105 hover:border-[#FACC15] hover:text-[#FACC15]"
+                        className="absolute left-2 z-40 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-solid border-white/25 bg-store-dark/85 text-white shadow-lg transition-all hover:scale-105 hover:border-store-yellow hover:text-store-yellow"
                     >
                         <ChevronLeft size={20} />
                     </button>
@@ -129,7 +129,7 @@ export default function CoverflowSlider() {
                         type="button"
                         onClick={handleNext}
                         aria-label="Next slide"
-                        className="absolute right-2 z-40 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-solid border-white/25 bg-[#0B1F16]/85 text-white shadow-lg transition-all hover:scale-105 hover:border-[#FACC15] hover:text-[#FACC15]"
+                        className="absolute right-2 z-40 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-solid border-white/25 bg-store-dark/85 text-white shadow-lg transition-all hover:scale-105 hover:border-store-yellow hover:text-store-yellow"
                     >
                         <ChevronRight size={20} />
                     </button>
@@ -146,8 +146,8 @@ export default function CoverflowSlider() {
                                 aria-label={`Go to slide ${idx + 1}`}
                                 className={`h-4 cursor-pointer rounded-full border-0 transition-all duration-300 ${
                                     isActive
-                                        ? 'w-5 scale-110 bg-[#FACC15]'
-                                        : 'w-4 bg-[#A3B8AE]/60 hover:bg-[#A3B8AE]'
+                                        ? 'w-5 scale-110 bg-store-yellow'
+                                        : 'w-4 bg-surface-soft/60 hover:bg-surface-soft'
                                 }`}
                             />
                         );

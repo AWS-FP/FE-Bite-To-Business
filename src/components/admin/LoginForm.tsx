@@ -86,7 +86,7 @@ export default function LoginForm() {
             </p>
             {location.state?.activationComplete && (
                 <p
-                    className="mt-5 mb-0 rounded-xl border border-solid border-[#123b2e26] bg-[#eaf3ec] px-4 py-[14px] text-[13px] leading-[1.6] text-auth-green"
+                    className="mt-5 mb-0 rounded-xl border border-solid border-auth-green/15 bg-surface-green px-4 py-[14px] text-[13px] leading-[1.6] text-auth-green"
                     role="status"
                 >
                     {t('login.activationComplete')}
@@ -100,8 +100,8 @@ export default function LoginForm() {
             >
                 {serverError && (
                     <div
-                        className="auth-error-banner mb-5 rounded-xl border border-solid border-[#f5c2bc] bg-[#ffedeb] px-4 py-[14px]
-            text-[13px] leading-[1.6] text-[#9b2018]"
+                        className="auth-error-banner mb-5 rounded-xl border border-solid border-danger-line bg-danger-soft px-4 py-[14px]
+ text-[13px] leading-[1.6] text-danger-strong"
                         role="alert"
                     >
                         {t(serverError.messageKey)}
@@ -114,7 +114,7 @@ export default function LoginForm() {
 
                 <AuthField name="login-email" label={t('fields.email')} error={errors.email}>
                     <input
-                        className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4] placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18] aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed disabled:bg-[#f1eff8] disabled:text-[#868191] h-12 py-0"
+                        className="w-full rounded-xl border border-solid border-auth-ink/13 bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-store-placeholder placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_color-mix(in_srgb,_var(--color-auth-green)_9.41%,_transparent)] aria-invalid:border-danger aria-invalid:focus:shadow-[0_0_0_3px_color-mix(in_srgb,_var(--color-danger)_9.41%,_transparent)] disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-auth-muted h-12 py-0"
                         id="login-email"
                         ref={emailRef}
                         type="email"
@@ -141,7 +141,7 @@ export default function LoginForm() {
                 >
                     <div className="auth-password-input relative flex items-center">
                         <input
-                            className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4] placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18] aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed disabled:bg-[#f1eff8] disabled:text-[#868191] h-12 py-0 pr-[50px]"
+                            className="w-full rounded-xl border border-solid border-auth-ink/13 bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-store-placeholder placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_color-mix(in_srgb,_var(--color-auth-green)_9.41%,_transparent)] aria-invalid:border-danger aria-invalid:focus:shadow-[0_0_0_3px_color-mix(in_srgb,_var(--color-danger)_9.41%,_transparent)] disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-auth-muted h-12 py-0 pr-[50px]"
                             id="login-password"
                             ref={passwordRef}
                             type={showPassword ? 'text' : 'password'}
@@ -159,7 +159,7 @@ export default function LoginForm() {
                         <button
                             type="button"
                             className="auth-password-toggle absolute right-1 grid size-10 place-items-center rounded-lg border-0 bg-transparent
-                p-0 text-auth-green hover:bg-[#123b2e0d]"
+ p-0 text-auth-green hover:bg-auth-green/5"
                             aria-label={
                                 showPassword ? t('login.hidePassword') : t('login.showPassword')
                             }
@@ -175,7 +175,7 @@ export default function LoginForm() {
                 <div className="auth-forgot-row -mt-2 flex justify-end">
                     <button
                         className="auth-text-button border-0 bg-transparent px-0 py-[3px] text-[12px] leading-[1.5] font-bold
-              text-auth-green underline-offset-4 hover:underline"
+ text-auth-green underline-offset-4 hover:underline"
                         type="button"
                         aria-expanded={showPasswordHelp}
                         aria-controls="password-help"
@@ -186,8 +186,8 @@ export default function LoginForm() {
                 </div>
                 {showPasswordHelp && (
                     <p
-                        className="auth-info-banner m-0 rounded-xl border border-solid border-[#123b2e26] bg-[#e8eaff] px-4 py-[14px]
-            text-[13px] leading-[1.6] text-[#343282]"
+                        className="auth-info-banner m-0 rounded-xl border border-solid border-auth-green/15 bg-surface-blue px-4 py-[14px]
+ text-[13px] leading-[1.6] text-info"
                         id="password-help"
                         role="status"
                     >
@@ -213,7 +213,7 @@ export default function LoginForm() {
                     {isLoading && t('login.submitting')}
                 </span>
             </form>
-            <p className="auth-switch-page mt-6 mb-0 text-center font-subtext text-[14px] leading-[1.6] text-[#797183] [&_a]:font-bold [&_a]:text-auth-ink [&_a]:decoration-[#ff9bd2] [&_a]:decoration-[3px] [&_a]:underline-offset-4 [&_a:hover]:text-auth-green">
+            <p className="auth-switch-page mt-6 mb-0 text-center font-subtext text-[14px] leading-[1.6] text-auth-muted [&_a]:font-bold [&_a]:text-auth-ink [&_a]:decoration-store-pink [&_a]:decoration-[3px] [&_a]:underline-offset-4 [&_a:hover]:text-auth-green">
                 {t('login.noAccount')} <Link to={ROUTES.REGISTER}>{t('register.title')}</Link>
             </p>
             <p className="mt-3 mb-0 text-center font-subtext text-[12px] leading-[1.6] text-auth-muted">

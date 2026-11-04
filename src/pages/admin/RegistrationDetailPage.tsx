@@ -113,7 +113,7 @@ export default function RegistrationDetailPage() {
                         </p>
                         <h2
                             id="registration-detail-title"
-                            className="pt-[5px] font-body text-[24px] leading-9 font-bold tracking-[-0.5px]"
+                            className="pt-[5px] font-subheading text-[24px] leading-9 font-bold tracking-[-0.5px]"
                         >
                             {t('detail.title')}
                         </h2>
@@ -151,7 +151,7 @@ export default function RegistrationDetailPage() {
                                 !registration.activatedAt &&
                                 !registration.otpSentAt && (
                                     <div
-                                        className="mt-[22px] flex items-start gap-[9px] rounded-[3px] border border-black bg-[#fffaee] p-[14px]"
+                                        className="mt-[22px] flex items-start gap-[9px] rounded-[3px] border border-black bg-store-cream p-[14px]"
                                         role="status"
                                     >
                                         <span className="pt-0.5">
@@ -175,7 +175,7 @@ export default function RegistrationDetailPage() {
                                             ? 'alert'
                                             : 'status'
                                     }
-                                    className={`mt-[22px]! rounded-[3px] border border-black p-[14px] text-[13px] leading-6 ${successMessage === 'notices.rejectionEmailFailed' ? 'bg-[#fff8e8]' : 'bg-[#eaf4ed]'}`}
+                                    className={`mt-[22px]! rounded-[3px] border border-black p-[14px] text-[13px] leading-6 ${successMessage === 'notices.rejectionEmailFailed' ? 'bg-store-cream' : 'bg-surface-green'}`}
                                 >
                                     {t(successMessage)}
                                 </p>

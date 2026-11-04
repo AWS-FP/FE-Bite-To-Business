@@ -61,12 +61,12 @@ function StaffWorkspace({ role }: { role: StaffRole }) {
 
     return (
         <div
-            className={`admin-layout grid min-h-dvh bg-[#f8f7f3] font-body text-black [&_button]:cursor-pointer [&_a]:text-inherit [&_p]:m-0 [&_h1]:m-0 [&_h2]:m-0 [&_button:focus-visible]:outline-[3px_solid_#376e55] [&_button:focus-visible]:outline-offset-4 [&_a:focus-visible]:outline-[3px_solid_#376e55] [&_a:focus-visible]:outline-offset-4 ${isCollapsed ? 'is-collapsed grid-cols-[84px_minmax(0,1fr)]' : 'grid-cols-[272px_minmax(0,1fr)]'}`}
+            className={`admin-layout grid min-h-dvh bg-surface-soft font-body text-black [&_button]:cursor-pointer [&_a]:text-inherit [&_p]:m-0 [&_h1]:m-0 [&_h2]:m-0 [&_button:focus-visible]:outline-[3px_solid_var(--color-status-active)] [&_button:focus-visible]:outline-offset-4 [&_a:focus-visible]:outline-[3px_solid_var(--color-status-active)] [&_a:focus-visible]:outline-offset-4 ${isCollapsed ? 'is-collapsed grid-cols-[84px_minmax(0,1fr)]' : 'grid-cols-[272px_minmax(0,1fr)]'}`}
             data-layout="staff"
             data-role={role}
         >
             <a
-                className="admin-skip-link fixed top-2 left-3 z-[60] -translate-y-[180%] border border-black bg-[#ffe14d] px-4 py-3 focus:translate-y-0"
+                className="admin-skip-link fixed top-2 left-3 z-[60] -translate-y-[180%] border border-black bg-store-yellow px-4 py-3 focus:translate-y-0"
                 href="#staff-main-content"
             >
                 {common('skipToContent')}

@@ -64,10 +64,10 @@ export default function WorkspaceHeader({
     }, [isAccountOpen]);
 
     return (
-        <header className="admin-header relative z-10 flex min-h-[142px] items-center justify-between gap-6 border-b-[5px] border-black bg-[#fff8e8] px-8 py-6 max-[1151px]:flex-wrap max-[1151px]:gap-[22px]">
+        <header className="admin-header relative z-10 flex min-h-[142px] items-center justify-between gap-6 border-b-[5px] border-black bg-store-cream px-8 py-6 max-[1151px]:flex-wrap max-[1151px]:gap-[22px]">
             <div className="admin-header-heading flex min-w-0 items-center gap-5">
                 <div
-                    className="admin-section-stamp flex h-[76px] w-[58px] shrink-0 -rotate-5 flex-col items-center justify-center border border-black bg-[#ffe14d] p-[7px] shadow-[3px_3px_0_#000]"
+                    className="admin-section-stamp flex h-[76px] w-[58px] shrink-0 -rotate-5 flex-col items-center justify-center border border-black bg-store-yellow p-[7px] shadow-[3px_3px_0_var(--color-black)]"
                     aria-hidden="true"
                 >
                     <span className="w-[42px] border-b border-black pb-[3px] text-center font-label text-[11px] leading-[16.5px] font-semibold tracking-[1px]">
@@ -117,7 +117,7 @@ export default function WorkspaceHeader({
                             onClick={() => setIsAccountOpen(!isAccountOpen)}
                         >
                             <span
-                                className="admin-avatar grid size-[35px] shrink-0 place-items-center rounded-full border border-black bg-[#d9eea3] text-[11px] leading-[16.5px] font-bold"
+                                className="admin-avatar grid size-[35px] shrink-0 place-items-center rounded-full border border-black bg-store-mint text-[11px] leading-[16.5px] font-bold"
                                 aria-hidden="true"
                             >
                                 {initials}
@@ -141,15 +141,15 @@ export default function WorkspaceHeader({
 
                         {isAccountOpen && (
                             <div
-                                className="admin-account-popover absolute top-[calc(100%+12px)] right-0 w-[270px] border border-black bg-white p-4 text-[13px] leading-[1.6] wrap-anywhere shadow-[4px_4px_0_#000]"
+                                className="admin-account-popover absolute top-[calc(100%+12px)] right-0 w-[270px] border border-black bg-white p-4 text-[13px] leading-[1.6] wrap-anywhere shadow-[4px_4px_0_var(--color-black)]"
                                 id="admin-account-details"
                             >
-                                <div className="admin-account-popover-heading mb-[10px] flex items-center justify-between gap-2 border-b border-[#e0ddd4] pb-[10px]">
+                                <div className="admin-account-popover-heading mb-[10px] flex items-center justify-between gap-2 border-b border-store-line pb-[10px]">
                                     <strong className="font-subheading">
                                         {t('header.accountDetails')}
                                     </strong>
                                     <button
-                                        className="admin-icon-button grid place-items-center border-0 bg-transparent p-[3px] text-black hover:bg-[#0000000d]"
+                                        className="admin-icon-button grid place-items-center border-0 bg-transparent p-[3px] text-black hover:bg-black/5"
                                         type="button"
                                         aria-label={t('header.closeAccount')}
                                         onClick={() => {
@@ -161,10 +161,10 @@ export default function WorkspaceHeader({
                                     </button>
                                 </div>
                                 <p>{displayName}</p>
-                                <p className="admin-account-email font-subtext text-[12px] text-[#655f53] wrap-anywhere">
+                                <p className="admin-account-email font-subtext text-[12px] text-store-muted wrap-anywhere">
                                     {user.email}
                                 </p>
-                                <span className="admin-account-role mt-3 inline-block border border-black bg-[#d9eea3] px-2 py-[3px] font-label text-[11px]">
+                                <span className="admin-account-role mt-3 inline-block border border-black bg-store-mint px-2 py-[3px] font-label text-[11px]">
                                     {roleLabel}
                                 </span>
                             </div>
@@ -173,7 +173,7 @@ export default function WorkspaceHeader({
                 )}
 
                 <button
-                    className="admin-logout-button flex min-h-[45px] items-center justify-center gap-2 border border-black bg-[#ffb4ba] px-[13px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap text-black shadow-[3px_3px_0_#000] hover:bg-[#ff9da6] active:translate-[2px] active:shadow-[1px_1px_0_#000]"
+                    className="admin-logout-button flex min-h-[45px] items-center justify-center gap-2 border border-black bg-surface-pink px-[13px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap text-black shadow-[3px_3px_0_var(--color-black)] hover:bg-store-pink active:translate-[2px] active:shadow-[1px_1px_0_var(--color-black)]"
                     type="button"
                     onClick={onLogout}
                 >

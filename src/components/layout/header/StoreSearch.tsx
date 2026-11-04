@@ -52,7 +52,7 @@ export default function StoreSearch() {
     return (
         <div className="min-w-0 flex-1">
             <form
-                className="flex h-[46px] min-w-0 items-center rounded-full border-2 border-solid border-store-ink bg-[#fffdf9] shadow-[3px_3px_0_#14132b]"
+                className="flex h-[46px] min-w-0 items-center rounded-full border-2 border-solid border-store-ink bg-store-cream shadow-[3px_3px_0_var(--color-store-ink)]"
                 role="search"
                 aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.label')}
                 onSubmit={handleSearch}
@@ -66,7 +66,7 @@ export default function StoreSearch() {
                 />
 
                 <input
-                    className="h-9 min-w-0 flex-1 rounded-full border-0 bg-transparent px-2.5 text-[12px] text-store-ink outline-none placeholder:text-[#7a7d85] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-store-green"
+                    className="h-9 min-w-0 flex-1 rounded-full border-0 bg-transparent px-2.5 text-[12px] text-store-ink outline-none placeholder:text-store-muted focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-store-green"
                     type="search"
                     name="q"
                     aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.label')}
@@ -79,7 +79,7 @@ export default function StoreSearch() {
                 />
 
                 <button
-                    className="flex h-full shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-r-full border-0 border-l-2 border-solid border-store-ink bg-store-yellow px-3.5 text-[12px] font-extrabold text-store-ink transition-colors hover:bg-[#ffe96d] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white disabled:cursor-wait disabled:opacity-70"
+                    className="flex h-full shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-r-full border-0 border-l-2 border-solid border-store-ink bg-store-yellow px-3.5 text-[12px] font-extrabold text-store-ink transition-colors hover:bg-store-yellow focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white disabled:cursor-wait disabled:opacity-70"
                     type="submit"
                     aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.submit')}
                     disabled={isSearching}

@@ -31,10 +31,10 @@ export default function Header() {
             <div ref={spacerRef} className="shrink-0" aria-hidden="true" />
             <header
                 ref={headerRef}
-                className="fixed inset-x-0 top-0 z-30 border-0 border-b-2 border-solid border-[#00b9c9] bg-store-green font-body text-store-cream"
+                className="fixed inset-x-0 top-0 z-30 border-0 border-b-2 border-solid border-role-logistics bg-store-green font-body text-store-cream"
             >
                 <a
-                    className="sr-only rounded   bg-store-yellow p-3 text-store-ink focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
+                    className="sr-only rounded bg-store-yellow p-3 text-store-ink focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
                     href="#main-content"
                 >
                     {t('skipToContent')}

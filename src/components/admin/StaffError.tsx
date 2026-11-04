@@ -9,7 +9,7 @@ export default function StaffError({ error, onRetry }: { error: unknown; onRetry
     return (
         <div
             role="alert"
-            className="rounded-[3px] border border-[#a52c2c] bg-[#fbeeed] p-4 text-[13px] leading-6"
+            className="rounded-[3px] border border-danger bg-surface-pink p-4 text-[13px] leading-6"
         >
             <p>
                 {details.status === 403

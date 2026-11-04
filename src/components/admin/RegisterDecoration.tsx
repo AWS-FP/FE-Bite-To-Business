@@ -18,8 +18,8 @@ export default function RegisterDecoration() {
                 {/* Ảnh gà và thịt bò bên trái. */}
                 <div
                     className="auth-photo absolute top-[105px] left-[6%] h-[300px] w-[220px] -rotate-6
-          overflow-hidden rounded-t-[130px] border-4 border-solid border-auth-cream
-          bg-[#dce1d5] shadow-[10px_10px_0_#17133a]"
+ overflow-hidden rounded-t-[130px] border-4 border-solid border-auth-cream
+ bg-surface-green shadow-[10px_10px_0_var(--color-auth-ink)]"
                 >
                     <img
                         src="/images/register/chicken-boil.jpg"
@@ -31,8 +31,8 @@ export default function RegisterDecoration() {
 
                 <div
                     className="auth-photo absolute top-[315px] right-[calc(50%_+_300px)] h-[170px] w-[170px]
-          overflow-hidden rounded-full border-4 border-solid border-auth-cream
-          bg-[#e7d7c6] shadow-[10px_10px_0_#17133a]"
+ overflow-hidden rounded-full border-4 border-solid border-auth-cream
+ bg-warning-soft shadow-[10px_10px_0_var(--color-auth-ink)]"
                 >
                     <img
                         src="/images/register/beef.jpg"
@@ -45,8 +45,8 @@ export default function RegisterDecoration() {
                 {/* Ảnh đồ hộp và nước sốt bên phải. */}
                 <div
                     className="auth-photo absolute top-[180px] left-[calc(50%_+_325px)] h-[150px]
-          w-[clamp(218px,18vw,260px)] rotate-[8deg] overflow-hidden rounded-[100px]
-          border-4 border-solid border-auth-cream bg-[#a0afa5] shadow-[10px_10px_0_#17133a]"
+ w-[clamp(218px,18vw,260px)] rotate-[8deg] overflow-hidden rounded-[100px]
+ border-4 border-solid border-auth-cream bg-surface-soft shadow-[10px_10px_0_var(--color-auth-ink)]"
                 >
                     <img
                         src="/images/register/canned-food.jpg"
@@ -58,8 +58,8 @@ export default function RegisterDecoration() {
 
                 <div
                     className="auth-photo absolute top-[45px] left-[calc(50%_+_310px)] h-[112px] w-[112px]
-          overflow-hidden rounded-full border-4 border-solid border-auth-cream
-          bg-[#c9d5ac] shadow-[4px_4px_0_#17133a]"
+ overflow-hidden rounded-full border-4 border-solid border-auth-cream
+ bg-store-mint shadow-[4px_4px_0_var(--color-auth-ink)]"
                 >
                     <img
                         src="/images/register/sauces.jpg"
@@ -71,8 +71,8 @@ export default function RegisterDecoration() {
 
                 <div
                     className="auth-photo absolute top-[695px] left-[calc(50%_+_320px)] h-[150px] w-[150px]
-          -rotate-[8deg] overflow-hidden rounded-[32px] border-4 border-solid border-auth-cream
-          bg-[#ddd5b6] shadow-[10px_10px_0_#17133a]"
+ -rotate-[8deg] overflow-hidden rounded-[32px] border-4 border-solid border-auth-cream
+ bg-store-yellow shadow-[10px_10px_0_var(--color-auth-ink)]"
                 >
                     <img
                         src="/images/register/ham.jpg"
@@ -84,8 +84,8 @@ export default function RegisterDecoration() {
 
                 <div
                     className="auth-fresh-sticker absolute top-[320px] left-[3%] grid h-28 w-28
-          -rotate-[14deg] content-center rounded-full bg-[#ff9bd2] text-center font-label
-          text-[12px] leading-[1.25] font-bold uppercase shadow-[4px_4px_0_#17133a]"
+ -rotate-[14deg] content-center rounded-full bg-store-pink text-center font-label
+ text-[12px] leading-[1.25] font-bold uppercase shadow-[4px_4px_0_var(--color-auth-ink)]"
                 >
                     {t('auth.fresh')}
                     <br />
@@ -99,9 +99,9 @@ export default function RegisterDecoration() {
                 {/* Hướng dẫn đăng ký viết rõ từng bước. */}
                 <aside
                     className="auth-paper-note absolute top-[355px] left-[calc(50%_+_310px)]
-          w-[clamp(250px,calc(50%_-_340px),290px)] rotate-2 bg-white px-6 pt-7 pb-6 shadow-[8px_8px_0_#17133a]"
+ w-[clamp(250px,calc(50%_-_340px),290px)] rotate-2 bg-white px-6 pt-7 pb-6 shadow-[8px_8px_0_var(--color-auth-ink)]"
                 >
-                    <span className="absolute -top-3 left-[calc(50%_-_48px)] h-6 w-24 -rotate-3 bg-[#ff9bd2d9]" />
+                    <span className="absolute -top-3 left-[calc(50%_-_48px)] h-6 w-24 -rotate-3 bg-store-pink/85" />
                     <h2 className="m-0 font-subheading text-[24px] leading-[1.15] font-bold">
                         {t('auth.registerNote.title')}
                     </h2>
@@ -120,7 +120,7 @@ export default function RegisterDecoration() {
                                 </p>
                             </div>
                         </li>
-                        <li className="mt-3 flex items-baseline gap-3 border-0 border-t border-dashed border-[#17133a25] pt-3">
+                        <li className="mt-3 flex items-baseline gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-3">
                             <span className="auth-note-number font-display text-[24px] leading-none font-bold text-auth-green">
                                 02
                             </span>
@@ -133,7 +133,7 @@ export default function RegisterDecoration() {
                                 </p>
                             </div>
                         </li>
-                        <li className="mt-3 flex items-baseline gap-3 border-0 border-t border-dashed border-[#17133a25] pt-3">
+                        <li className="mt-3 flex items-baseline gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-3">
                             <span className="auth-note-number font-display text-[24px] leading-none font-bold text-auth-green">
                                 03
                             </span>

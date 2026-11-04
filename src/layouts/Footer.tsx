@@ -11,7 +11,7 @@ export default function Footer() {
     const { t } = useTranslation('storefront');
 
     return (
-        <footer className="border-0 border-t border-solid border-white/10 bg-[#0B2418] font-body text-[#D1DDD6]">
+        <footer className="border-0 border-t border-solid border-white/10 bg-store-dark font-body text-store-placeholder">
             <div className="mx-auto max-w-[1440px] px-5 pt-14 pb-10">
                 <div className="grid gap-10 grid-cols-12">
                     {/* Column 1: Logo & Certifications */}
@@ -33,7 +33,7 @@ export default function Footer() {
                             </span>
                         </Link>
 
-                        <p className="mt-4 max-w-[320px] text-xs leading-relaxed text-[#9FB3A8]">
+                        <p className="mt-4 max-w-[320px] text-xs leading-relaxed text-store-placeholder">
                             {t('footer.description')}
                         </p>
 
@@ -52,7 +52,7 @@ export default function Footer() {
 
                     {/* Column 2: Fresh Produce */}
                     <div className="col-span-3">
-                        <h3 className="m-0 font-serif text-sm font-bold text-[#FACC15]">
+                        <h3 className="m-0 font-subheading text-sm font-bold text-store-yellow">
                             {t('footer.freshHeading')}
                         </h3>
                         <ul className="mt-4 list-none space-y-2.5 p-0 text-xs">
@@ -62,7 +62,7 @@ export default function Footer() {
                                     <li key={key}>
                                         <Link
                                             to={getCatalogSearchPath(label)}
-                                            className="text-[#B8C9C0] no-underline hover:text-[#FACC15]"
+                                            className="text-store-muted-light no-underline hover:text-store-yellow"
                                         >
                                             {label}
                                         </Link>
@@ -74,7 +74,7 @@ export default function Footer() {
 
                     {/* Column 3: Dry Goods, Dairy & Barista */}
                     <div className="col-span-3">
-                        <h3 className="m-0 font-serif text-sm font-bold text-[#FACC15]">
+                        <h3 className="m-0 font-subheading text-sm font-bold text-store-yellow">
                             {t('footer.dryHeading')}
                         </h3>
                         <ul className="mt-4 list-none space-y-2.5 p-0 text-xs">
@@ -84,7 +84,7 @@ export default function Footer() {
                                     <li key={key}>
                                         <Link
                                             to={getCatalogSearchPath(label)}
-                                            className="text-[#B8C9C0] no-underline hover:text-[#FACC15]"
+                                            className="text-store-muted-light no-underline hover:text-store-yellow"
                                         >
                                             {label}
                                         </Link>
@@ -96,7 +96,7 @@ export default function Footer() {
 
                     {/* Column 4: Contact Support at GitHub */}
                     <div className="col-span-2">
-                        <h3 className="m-0 font-serif text-sm font-bold text-[#FACC15]">
+                        <h3 className="m-0 font-subheading text-sm font-bold text-store-yellow">
                             {t('footer.supportHeading')}
                         </h3>
                         <a
@@ -104,7 +104,7 @@ export default function Footer() {
                             target="_blank"
                             rel="noreferrer"
                             aria-label="GitHub Repository"
-                            className="mt-4 inline-flex h-20 w-20 items-center justify-center rounded-xl bg-white p-2 text-[#0B2418] shadow-md transition-transform hover:scale-105"
+                            className="mt-4 inline-flex h-20 w-20 items-center justify-center rounded-xl bg-white p-2 text-store-ink shadow-md transition-transform hover:scale-105"
                         >
                             <svg
                                 viewBox="0 0 24 24"
@@ -121,7 +121,7 @@ export default function Footer() {
                     </div>
                 </div>
 
-                <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-0 border-t border-solid border-white/10 pt-6 text-[11px] text-[#7D9488]">
+                <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-0 border-t border-solid border-white/10 pt-6 text-[11px] text-store-muted">
                     <span>{t('footer.copyright')}</span>
                     <span>{t('footer.educationalNote')}</span>
                 </div>

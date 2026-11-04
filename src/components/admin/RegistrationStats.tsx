@@ -10,10 +10,10 @@ export default function RegistrationStats({ stats }: { stats?: RegistrationStats
             {/* Tổng hồ sơ đăng ký */}
             <section className="flex min-h-[154px] min-w-0 flex-col rounded-[3px] border border-black bg-white p-5">
                 <div className="flex items-center justify-between gap-2">
-                    <h2 className="font-body text-[13px] leading-5 font-semibold">
+                    <h2 className="font-subheading text-[13px] leading-5 font-semibold">
                         {t('stats.total.title')}
                     </h2>
-                    <span className="grid size-8 shrink-0 place-items-center rounded-full border border-black bg-[#fff8e8]">
+                    <span className="grid size-8 shrink-0 place-items-center rounded-full border border-black bg-store-cream">
                         <AdminIcon name="total" />
                     </span>
                 </div>
@@ -29,10 +29,10 @@ export default function RegistrationStats({ stats }: { stats?: RegistrationStats
             {/* Hồ sơ chờ duyệt */}
             <section className="flex min-h-[154px] min-w-0 flex-col rounded-[3px] border border-black bg-white p-5">
                 <div className="flex items-center justify-between gap-2">
-                    <h2 className="font-body text-[13px] leading-5 font-semibold">
+                    <h2 className="font-subheading text-[13px] leading-5 font-semibold">
                         {t('stats.pending.title')}
                     </h2>
-                    <span className="grid size-8 shrink-0 place-items-center rounded-full border border-black bg-[#ffe14d]">
+                    <span className="grid size-8 shrink-0 place-items-center rounded-full border border-black bg-store-yellow">
                         <AdminIcon name="pending" />
                     </span>
                 </div>
@@ -47,10 +47,10 @@ export default function RegistrationStats({ stats }: { stats?: RegistrationStats
             {/* Hồ sơ đã duyệt */}
             <section className="flex min-h-[154px] min-w-0 flex-col rounded-[3px] border border-black bg-white p-5">
                 <div className="flex items-center justify-between gap-2">
-                    <h2 className="font-body text-[13px] leading-5 font-semibold">
+                    <h2 className="font-subheading text-[13px] leading-5 font-semibold">
                         {t('stats.approved.title')}
                     </h2>
-                    <span className="grid size-8 shrink-0 place-items-center rounded-full border border-black bg-[#d9eea3]">
+                    <span className="grid size-8 shrink-0 place-items-center rounded-full border border-black bg-store-mint">
                         <AdminIcon name="approved" />
                     </span>
                 </div>
@@ -65,10 +65,10 @@ export default function RegistrationStats({ stats }: { stats?: RegistrationStats
             {/* Hồ sơ bị từ chối */}
             <section className="flex min-h-[154px] min-w-0 flex-col rounded-[3px] border border-black bg-white p-5">
                 <div className="flex items-center justify-between gap-2">
-                    <h2 className="font-body text-[13px] leading-5 font-semibold">
+                    <h2 className="font-subheading text-[13px] leading-5 font-semibold">
                         {t('stats.rejected.title')}
                     </h2>
-                    <span className="grid size-8 shrink-0 place-items-center rounded-full border border-black bg-[#ffb4ba]">
+                    <span className="grid size-8 shrink-0 place-items-center rounded-full border border-black bg-surface-pink">
                         <AdminIcon name="rejected" />
                     </span>
                 </div>

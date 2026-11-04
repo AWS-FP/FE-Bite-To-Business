@@ -1,10 +1,4 @@
-
-import {
-    ArrowUpRight,
-    BriefcaseBusiness,
-    ChevronDown,
-    Info,
-} from 'lucide-react';
+import { ArrowUpRight, BriefcaseBusiness, ChevronDown, Info } from 'lucide-react';
 
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,14 +16,8 @@ export default function AboutBusinessDropdown() {
     useEffect(() => {
         if (!isOpen) return;
 
-        const handlePointerDown = (
-            event: globalThis.PointerEvent
-        ) => {
-            if (
-                !wrapperRef.current?.contains(
-                    event.target as Node
-                )
-            ) {
+        const handlePointerDown = (event: globalThis.PointerEvent) => {
+            if (!wrapperRef.current?.contains(event.target as Node)) {
                 setIsOpen(false);
             }
         };
@@ -41,24 +29,12 @@ export default function AboutBusinessDropdown() {
             }
         };
 
-        document.addEventListener(
-            'pointerdown',
-            handlePointerDown
-        );
-        document.addEventListener(
-            'keydown',
-            handleEscape
-        );
+        document.addEventListener('pointerdown', handlePointerDown);
+        document.addEventListener('keydown', handleEscape);
 
         return () => {
-            document.removeEventListener(
-                'pointerdown',
-                handlePointerDown
-            );
-            document.removeEventListener(
-                'keydown',
-                handleEscape
-            );
+            document.removeEventListener('pointerdown', handlePointerDown);
+            document.removeEventListener('keydown', handleEscape);
         };
     }, [isOpen]);
 
@@ -83,9 +59,7 @@ export default function AboutBusinessDropdown() {
                 <ChevronDown
                     size={13}
                     aria-hidden="true"
-                    className={`transition-transform ${
-                        isOpen ? 'rotate-180' : ''
-                    }`}
+                    className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
                 />
             </button>
 
@@ -93,14 +67,14 @@ export default function AboutBusinessDropdown() {
                 <div
                     role="menu"
                     aria-label={t('header.aboutBusiness')}
-                    className="absolute right-0 top-[calc(100%+9px)] z-[80] w-[230px] overflow-hidden rounded-2xl border border-solid border-[#D9E6DC] bg-[#FFFDF8] p-1.5 text-[#123B2E] shadow-sm"
+                    className="absolute right-0 top-[calc(100%+9px)] z-[80] w-[230px] overflow-hidden rounded-2xl border border-solid border-store-line bg-store-cream p-1.5 text-store-green shadow-sm"
                 >
                     {/* Landing Page */}
                     <Link
                         role="menuitem"
                         to={ROUTES.LANDING}
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center justify-between gap-3 rounded-xl px-3 py-3 text-[12px] font-bold text-[#123B2E] no-underline hover:bg-[#EBF4EC]"
+                        className="flex items-center justify-between gap-3 rounded-xl px-3 py-3 text-[12px] font-bold text-store-green no-underline hover:bg-surface-green"
                     >
                         <span className="inline-flex items-center gap-2">
                             <Info size={16} aria-hidden="true" />
@@ -110,19 +84,16 @@ export default function AboutBusinessDropdown() {
                         <ArrowUpRight size={15} aria-hidden="true" />
                     </Link>
 
-                    <div className="mx-2 border-t border-solid border-[#E5EBE5]" />
+                    <div className="mx-2 border-t border-solid border-store-line" />
 
                     {/* B2B Business Models */}
                     <Link
                         role="menuitem"
                         to={`${ROUTES.LANDING}#segments`}
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-2 rounded-xl px-3 py-3 text-[12px] font-semibold text-[#123B2E] no-underline hover:bg-[#EBF4EC]"
+                        className="flex items-center gap-2 rounded-xl px-3 py-3 text-[12px] font-semibold text-store-green no-underline hover:bg-surface-green"
                     >
-                        <BriefcaseBusiness
-                            size={16}
-                            aria-hidden="true"
-                        />
+                        <BriefcaseBusiness size={16} aria-hidden="true" />
                         B2B Business Models
                     </Link>
                 </div>

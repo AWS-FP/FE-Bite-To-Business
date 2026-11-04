@@ -8,7 +8,7 @@ export function ReviewBadge({ status }: { status: RegistrationStatus }) {
 
     if (status === 'PENDING') {
         return (
-            <span className="inline-flex items-center gap-[5px] rounded-[3px] border border-black bg-[#fff6df] px-[7px] py-[5px] text-[11px] leading-[15px] font-semibold whitespace-nowrap">
+            <span className="inline-flex items-center gap-[5px] rounded-[3px] border border-black bg-store-cream px-[7px] py-[5px] text-[11px] leading-[15px] font-semibold whitespace-nowrap">
                 <span className="size-[4px] rounded-full bg-black" aria-hidden="true" />
                 {t('status.PENDING')}
             </span>
@@ -17,7 +17,7 @@ export function ReviewBadge({ status }: { status: RegistrationStatus }) {
 
     if (status === 'APPROVED') {
         return (
-            <span className="inline-flex items-center gap-[5px] rounded-[3px] border border-black bg-[#eaf4ed] px-[7px] py-[5px] text-[11px] leading-[15px] font-semibold whitespace-nowrap">
+            <span className="inline-flex items-center gap-[5px] rounded-[3px] border border-black bg-surface-green px-[7px] py-[5px] text-[11px] leading-[15px] font-semibold whitespace-nowrap">
                 <span className="size-[4px] rounded-full bg-black" aria-hidden="true" />
                 {t('status.APPROVED')}
             </span>
@@ -25,7 +25,7 @@ export function ReviewBadge({ status }: { status: RegistrationStatus }) {
     }
 
     return (
-        <span className="inline-flex items-center gap-[5px] rounded-[3px] border border-black bg-[#fbeeed] px-[7px] py-[5px] text-[11px] leading-[15px] font-semibold whitespace-nowrap">
+        <span className="inline-flex items-center gap-[5px] rounded-[3px] border border-black bg-surface-pink px-[7px] py-[5px] text-[11px] leading-[15px] font-semibold whitespace-nowrap">
             <span className="size-[4px] rounded-full bg-black" aria-hidden="true" />
             {t('status.REJECTED')}
         </span>
@@ -37,7 +37,7 @@ export function ActivationBadge({ registration }: { registration: RegistrationRe
 
     if (registration.activatedAt) {
         return (
-            <span className="inline-flex items-center gap-1 rounded-[3px] border border-black bg-[#eaf4ed] px-[7px] py-[5px] text-[11px] leading-[16.5px] whitespace-nowrap">
+            <span className="inline-flex items-center gap-1 rounded-[3px] border border-black bg-surface-green px-[7px] py-[5px] text-[11px] leading-[16.5px] whitespace-nowrap">
                 <AdminIcon name="activated" />
                 {t('activation.active')}
             </span>
@@ -62,7 +62,7 @@ export function ActivationBadge({ registration }: { registration: RegistrationRe
     }
 
     return (
-        <span className="inline-flex items-center gap-1 rounded-[3px] border border-black bg-[#fbeeed] px-[7px] py-[5px] text-[11px] leading-[16.5px] whitespace-nowrap">
+        <span className="inline-flex items-center gap-1 rounded-[3px] border border-black bg-surface-pink px-[7px] py-[5px] text-[11px] leading-[16.5px] whitespace-nowrap">
             <AdminIcon name="otp-failed" />
             {t('activation.otpFailed')}
         </span>

@@ -17,8 +17,8 @@
 
     display: flex;
 
-    font-family: var(--font-body, 'Be Vietnam Pro', sans-serif);
-    color: #17133a;
+    font-family: var(--font-body);
+    color: var(--color-store-ink);
 }
 
 /* BACKDROP */
@@ -27,7 +27,7 @@
     position: absolute;
     inset: 0;
 
-    background: rgb(11 36 27 / 66%);
+    background: color-mix(in srgb, var(--color-store-dark) 66%, transparent);
     backdrop-filter: blur(2px);
 }
 
@@ -43,9 +43,9 @@
     height: 100%;
     overflow: hidden;
 
-    border-right: 3px solid #17133a;
-    background: #fff1e0;
-    box-shadow: 9px 0 0 #17133a;
+    border-right: 3px solid var(--color-store-ink);
+    background: var(--color-store-cream);
+    box-shadow: 9px 0 0 var(--color-store-ink);
 }
 
 /* TOOLBAR */
@@ -59,31 +59,31 @@
     gap: 16px;
     padding: 17px 26px;
 
-    background: #123b2e;
-    border-bottom: 2px solid #17133a;
+    background: var(--color-store-green);
+    border-bottom: 2px solid var(--color-store-ink);
 }
 
 .btb-cmega-kicker {
     display: block;
 
-    font-family: var(--font-label, 'Oswald', sans-serif);
+    font-family: var(--font-label);
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 1.3px;
     text-transform: uppercase;
 
-    color: #ff5a4e;
+    color: var(--color-store-coral);
 }
 
 .btb-cmega-toolbar h2 {
     margin: 4px 0 0;
 
-    font-family: var(--font-heading, Georgia, serif);
+    font-family: var(--font-subheading);
     font-size: clamp(20px, 2vw, 27px);
     font-weight: 400;
     line-height: 1.15;
 
-    color: #fff1e0;
+    color: var(--color-store-cream);
 }
 
 .btb-cmega-toolbar-actions {
@@ -98,16 +98,16 @@
 
     padding: 9px 12px;
 
-    border: 2px solid #17133a;
+    border: 2px solid var(--color-store-ink);
     border-radius: 7px;
 
-    background: #ffe14d;
-    color: #17133a;
+    background: var(--color-store-yellow);
+    color: var(--color-store-ink);
 
     font-size: 12px;
     font-weight: 700;
 
-    box-shadow: 3px 3px 0 #17133a;
+    box-shadow: 3px 3px 0 var(--color-store-ink);
 }
 
 /* CLOSE BUTTON */
@@ -120,21 +120,21 @@
     height: 38px;
     flex-shrink: 0;
 
-    border: 2px solid #17133a;
+    border: 2px solid var(--color-store-ink);
     border-radius: 7px;
 
-    background: #fff1e0;
+    background: var(--color-store-cream);
     cursor: pointer;
 
-    box-shadow: 3px 3px 0 #17133a;
+    box-shadow: 3px 3px 0 var(--color-store-ink);
 }
 
 .btb-cmega-close:hover {
-    background: #ffe14d;
+    background: var(--color-store-yellow);
 }
 
 .btb-cmega-close:focus-visible {
-    outline: 3px solid #ff5a4e;
+    outline: 3px solid var(--color-store-coral);
     outline-offset: 3px;
 }
 
@@ -154,8 +154,8 @@
     padding: 12px 8px;
     overflow-y: auto;
 
-    background: #fffaf0;
-    border-right: 2px solid #17133a;
+    background: var(--color-store-cream);
+    border-right: 2px solid var(--color-store-ink);
 
     scrollbar-width: thin;
 }
@@ -175,9 +175,9 @@
     border-radius: 7px;
 
     background: transparent;
-    color: #17133a;
+    color: var(--color-store-ink);
 
-    font-family: var(--font-body, sans-serif);
+    font-family: var(--font-body);
     font-size: 12px;
     font-weight: 600;
 
@@ -190,13 +190,13 @@
 .btb-cmega-nav-item:hover,
 .btb-cmega-nav-item:focus-visible,
 .btb-cmega-nav-item.is-active {
-    background: #ffe14d;
-    border-color: #17133a;
+    background: var(--color-store-yellow);
+    border-color: var(--color-store-ink);
     outline: none;
 }
 
 .btb-cmega-nav-item.is-active {
-    box-shadow: 2px 2px 0 #17133a;
+    box-shadow: 2px 2px 0 var(--color-store-ink);
 }
 
 .btb-cmega-nav-icon {
@@ -212,10 +212,10 @@
 }
 
 .btb-cmega-nav-index {
-    font-family: var(--font-price, sans-serif);
+    font-family: var(--font-price);
     font-size: 10px;
     font-weight: 600;
-    color: #787386;
+    color: var(--color-store-muted);
 }
 
 .btb-cmega-chevron {
@@ -243,26 +243,26 @@
     gap: 18px;
     padding-bottom: 17px;
 
-    border-bottom: 1px dashed rgb(23 19 58 / 26%);
+    border-bottom: 1px dashed color-mix(in srgb, var(--color-store-ink) 26%, transparent);
 }
 
 .btb-cmega-detail-head h3 {
     margin: 4px 0 5px;
 
-    font-family: var(--font-heading, Georgia, serif);
+    font-family: var(--font-subheading);
     font-size: clamp(25px, 3vw, 35px);
     font-weight: 400;
     line-height: 1.15;
 
-    color: #17133a;
+    color: var(--color-store-ink);
 }
 
 .btb-cmega-detail-head p {
     margin: 0;
 
-    color: #787386;
+    color: var(--color-store-muted);
 
-    font-family: var(--font-subtext, sans-serif);
+    font-family: var(--font-subtext);
     font-size: 12px;
     font-weight: 500;
     line-height: 1.6;
@@ -273,17 +273,17 @@
 
     padding: 10px 13px;
 
-    border: 2px solid #17133a;
+    border: 2px solid var(--color-store-ink);
     border-radius: 6px;
 
-    background: #ff5a4e;
-    color: #17133a;
+    background: var(--color-store-coral);
+    color: var(--color-store-ink);
 
-    font-family: var(--font-price, sans-serif);
+    font-family: var(--font-price);
     font-size: 12px;
     font-weight: 700;
 
-    box-shadow: 3px 3px 0 #17133a;
+    box-shadow: 3px 3px 0 var(--color-store-ink);
 }
 
 /* SUBCATEGORIES */
@@ -291,7 +291,7 @@
 .btb-cmega-subheading {
     margin: 23px 0 13px;
 
-    font-family: var(--font-subheading, sans-serif);
+    font-family: var(--font-subheading);
     font-size: 16px;
     font-weight: 700;
     line-height: 1.4;
@@ -315,16 +315,16 @@
     gap: 8px;
     padding: 12px 7px 11px;
 
-    border: 2px solid #17133a;
+    border: 2px solid var(--color-store-ink);
     border-radius: 9px;
 
-    background: #fffaf4;
-    color: #17133a;
+    background: var(--color-store-cream);
+    color: var(--color-store-ink);
 
-    font-family: var(--font-body, sans-serif);
+    font-family: var(--font-body);
     cursor: pointer;
 
-    box-shadow: 3px 3px 0 #17133a;
+    box-shadow: 3px 3px 0 var(--color-store-ink);
 
     transition:
         transform 140ms,
@@ -335,13 +335,13 @@
 .btb-cmega-subcard:hover,
 .btb-cmega-subcard:focus-visible {
     transform: translate(-2px, -2px);
-    box-shadow: 5px 5px 0 #17133a;
+    box-shadow: 5px 5px 0 var(--color-store-ink);
     outline: none;
 }
 
 .btb-cmega-subcard.is-selected {
-    background: #ffe14d;
-    border-color: #17133a;
+    background: var(--color-store-yellow);
+    border-color: var(--color-store-ink);
 }
 
 .btb-cmega-sub-image {
@@ -354,20 +354,20 @@
     aspect-ratio: 1;
     gap: 4px;
 
-    border: 1.5px dashed #b5aab8;
+    border: 1.5px dashed var(--color-store-line);
     border-radius: 7px;
 
-    background: #fbf3e4;
-    color: #787386;
+    background: var(--color-store-cream);
+    color: var(--color-store-muted);
 
-    font-family: var(--font-label, sans-serif);
+    font-family: var(--font-label);
     font-size: 10px;
 }
 
 .btb-cmega-sub-name {
     text-align: center;
 
-    font-family: var(--font-subheading, sans-serif);
+    font-family: var(--font-subheading);
     font-size: 12px;
     font-weight: 600;
     line-height: 1.35;
@@ -378,9 +378,9 @@
     top: 5px;
     left: 6px;
 
-    color: #787386;
+    color: var(--color-store-muted);
 
-    font-family: var(--font-price, sans-serif);
+    font-family: var(--font-price);
     font-size: 10px;
 }
 
@@ -388,13 +388,13 @@
     margin: 16px 0 0;
     padding: 10px 12px;
 
-    border-left: 3px solid #ff5a4e;
+    border-left: 3px solid var(--color-store-coral);
     border-radius: 4px;
 
-    background: #fffaf4;
-    color: #123b2e;
+    background: var(--color-store-cream);
+    color: var(--color-store-green);
 
-    font-family: var(--font-body, sans-serif);
+    font-family: var(--font-body);
     font-size: 12px;
     line-height: 1.6;
 }
@@ -409,7 +409,7 @@
 
 .btb-cmega-brands-head p {
     margin: -8px 0 13px;
-    color: #787386;
+    color: var(--color-store-muted);
     font-size: 11px;
 }
 
@@ -429,11 +429,11 @@
     min-height: 75px;
     gap: 5px;
 
-    border: 1px dashed #9e9aa9;
+    border: 1px dashed var(--color-store-line);
     border-radius: 8px;
 
-    background: #fffaf4;
-    color: #787386;
+    background: var(--color-store-cream);
+    color: var(--color-store-muted);
 
     font-size: 10px;
 }
@@ -449,18 +449,18 @@
     gap: 16px;
     padding: 13px 26px;
 
-    border-top: 2px solid #17133a;
+    border-top: 2px solid var(--color-store-ink);
 
-    background: #e9f4ed;
-    color: #123b2e;
+    background: var(--color-surface-green);
+    color: var(--color-store-green);
 
     font-size: 11px;
     font-weight: 600;
 }
 
 .btb-cmega-bottom strong {
-    font-family: var(--font-subheading, sans-serif);
-    color: #17133a;
+    font-family: var(--font-subheading);
+    color: var(--color-store-ink);
 }
 
 /* RESPONSIVE TABLET */

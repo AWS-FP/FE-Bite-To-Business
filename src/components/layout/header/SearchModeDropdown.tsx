@@ -92,7 +92,7 @@ export default function SearchModeDropdown({ value, onChange }: SearchModeDropdo
                 aria-expanded={isOpen}
                 aria-controls={isOpen ? menuId : undefined}
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex h-8 w-full cursor-pointer items-center justify-between gap-1.5 rounded-full border-2 border-solid border-transparent bg-store-cream px-2 text-[11px] leading-4 font-bold text-store-green transition-colors hover:bg-[#fff4b8] aria-expanded:bg-store-yellow"
+                className="flex h-8 w-full cursor-pointer items-center justify-between gap-1.5 rounded-full border-2 border-solid border-transparent bg-store-cream px-2 text-[11px] leading-4 font-bold text-store-green transition-colors hover:bg-surface-yellow aria-expanded:bg-store-yellow"
             >
                 <span className="truncate">
                     {t(value === 'ai' ? 'search.askAI' : 'search.products')}
@@ -121,7 +121,7 @@ export default function SearchModeDropdown({ value, onChange }: SearchModeDropdo
                         tabIndex={-1}
                         aria-checked={value === 'products'}
                         onClick={() => selectMode('products')}
-                        className="mt-1 flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl border-2 border-solid border-transparent bg-transparent px-3 text-left text-[12px] leading-5 font-semibold text-store-green hover:bg-[#eaf3ec] focus:bg-[#eaf3ec] aria-checked:bg-store-yellow"
+                        className="mt-1 flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl border-2 border-solid border-transparent bg-transparent px-3 text-left text-[12px] leading-5 font-semibold text-store-green hover:bg-surface-green focus:bg-surface-green aria-checked:bg-store-yellow"
                     >
                         <Search size={16} className="shrink-0" aria-hidden="true" />
                         <span className="flex-1">{t('search.products')}</span>
@@ -133,7 +133,7 @@ export default function SearchModeDropdown({ value, onChange }: SearchModeDropdo
                         tabIndex={-1}
                         aria-checked={value === 'ai'}
                         onClick={() => selectMode('ai')}
-                        className="mt-1 flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl border-2 border-solid border-transparent bg-transparent px-3 text-left text-[12px] leading-5 font-semibold text-store-green hover:bg-[#eaf3ec] focus:bg-[#eaf3ec] aria-checked:bg-store-yellow"
+                        className="mt-1 flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl border-2 border-solid border-transparent bg-transparent px-3 text-left text-[12px] leading-5 font-semibold text-store-green hover:bg-surface-green focus:bg-surface-green aria-checked:bg-store-yellow"
                     >
                         <Sparkles size={16} className="shrink-0" aria-hidden="true" />
                         <span className="flex-1">{t('search.askAI')}</span>

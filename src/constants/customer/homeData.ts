@@ -1,160 +1,160 @@
 export interface CoverflowBannerSlide {
-    id: string
-    alt: string
-    targetLink: string
+    id: string;
+    alt: string;
+    targetLink: string;
     /**
      * TODO: PUT YOUR FULL DESIGNED POSTER IMAGE HERE
      * Example: imageUrl: '/images/banners/poster-1.png'
      */
-    imageUrl: string
+    imageUrl: string;
 }
 
 export interface HomeCategoryItem {
-    key: string
-    searchKeyword: string
-    skuCount: number
-    title: string
-    subtitle: string
-    cardBg: string
-    iconUrl: string
+    key: string;
+    searchKeyword: string;
+    skuCount: number;
+    title: string;
+    subtitle: string;
+    cardBg: string;
+    iconUrl: string;
 }
 
 export interface HomeProductCardItem {
-    id: string
-    categoryLabel: string
-    sku: string
-    name: string
-    spec: string
-    rating: number
-    reviewCount: number
-    listPrice: number
-    salePrice?: number
-    discountBadge?: string
-    topLeftBadge?: string
-    certBadge: string
-    unit: string
+    id: string;
+    categoryLabel: string;
+    sku: string;
+    name: string;
+    spec: string;
+    rating: number;
+    reviewCount: number;
+    listPrice: number;
+    salePrice?: number;
+    discountBadge?: string;
+    topLeftBadge?: string;
+    certBadge: string;
+    unit: string;
     /**
      * TODO: PUT YOUR FOOD PRODUCT IMAGE HERE
      * Example: imageUrl: '/images/products/salmon.jpg'
      */
-    imageUrl: string
+    imageUrl: string;
 }
 
 export interface HomeComboPlanItem {
-    id: string
-    audienceBadge: string
-    audienceBadgeBg: string
-    highlightText: string
-    title: string
-    description: string
-    features: string[]
-    priceNote: string
-    oldPrice?: string
-    price: string
-    unit: string
-    ctaLabel: string
-    ctaLink: string
-    cardBg: string
+    id: string;
+    audienceBadge: string;
+    audienceBadgeBg: string;
+    highlightText: string;
+    title: string;
+    description: string;
+    features: string[];
+    priceNote: string;
+    oldPrice?: string;
+    price: string;
+    unit: string;
+    ctaLabel: string;
+    ctaLink: string;
+    cardBg: string;
 }
 
 export interface NotificationItemData {
-    id: string
-    category: 'system' | 'quote' | 'delivery'
-    badge: string
-    badgeBg: string
-    badgeText: string
-    title: string
-    description: string
-    timeAgo: string
-    unread: boolean
-    primaryActionLabel?: string
-    secondaryActionLabel?: string
-    isSystemUpdatePopup?: boolean
-    popupVersion?: string
-    popupHighlights?: { title: string; detail: string }[]
+    id: string;
+    category: 'system' | 'quote' | 'delivery';
+    badge: string;
+    badgeBg: string;
+    badgeText: string;
+    title: string;
+    description: string;
+    timeAgo: string;
+    unread: boolean;
+    primaryActionLabel?: string;
+    secondaryActionLabel?: string;
+    isSystemUpdatePopup?: boolean;
+    popupVersion?: string;
+    popupHighlights?: { title: string; detail: string }[];
 }
 
 export interface ProductReviewItem {
-    id: string
-    author: string
-    roleBadge?: string
-    date: string
-    rating: number
-    comment: string
-    cutenessScore: string
-    likesLabel: string
-    avatarBg: string
+    id: string;
+    author: string;
+    roleBadge?: string;
+    date: string;
+    rating: number;
+    comment: string;
+    cutenessScore: string;
+    likesLabel: string;
+    avatarBg: string;
 }
 
 export interface ProductDetailCatalogItem {
-    id: string
-    sampleButtonLabel: string
-    breadcrumbCategory: string
-    breadcrumbSubcategory: string
-    categoryUpper: string
-    enterpriseName: string
-    warehouseBadge: string
-    skuCode: string
-    masterCatalogCode: string
-    name: string
-    topLeftBadge: string
-    certBadge: string
-    listPrice: number
-    sellingPrice: number
-    priceWithVat: number
-    vatRateLabel: string
-    unit: string
-    originCountry: string
-    moqLabel: string
-    nextOrderPromoText: string
-    rating: number
-    reviewCount: number
+    id: string;
+    sampleButtonLabel: string;
+    breadcrumbCategory: string;
+    breadcrumbSubcategory: string;
+    categoryUpper: string;
+    enterpriseName: string;
+    warehouseBadge: string;
+    skuCode: string;
+    masterCatalogCode: string;
+    name: string;
+    topLeftBadge: string;
+    certBadge: string;
+    listPrice: number;
+    sellingPrice: number;
+    priceWithVat: number;
+    vatRateLabel: string;
+    unit: string;
+    originCountry: string;
+    moqLabel: string;
+    nextOrderPromoText: string;
+    rating: number;
+    reviewCount: number;
     /**
      * TODO: PUT 3 GALLERY IMAGES FOR THIS PRODUCT HERE
      */
-    galleryImages: string[]
+    galleryImages: string[];
     highlights: {
-        title: string
-        subtitle: string
-    }[]
+        title: string;
+        subtitle: string;
+    }[];
     technicalSpecs: {
-        enterpriseName: string
-        enterpriseTaxId: string
-        industryGroup: string
-        tradeName: string
-        netWeight: string
-        tareWeight: string
-        volume: string
-        dimensions: string
-        minimumQuantity: string
-        vatInfo: string
-        attributeFilter: string
-    }
+        enterpriseName: string;
+        enterpriseTaxId: string;
+        industryGroup: string;
+        tradeName: string;
+        netWeight: string;
+        tareWeight: string;
+        volume: string;
+        dimensions: string;
+        minimumQuantity: string;
+        vatInfo: string;
+        attributeFilter: string;
+    };
     kitchenCommitment: {
-        badge: string
-        title: string
-        description: string
-        bullets: string[]
-    }
+        badge: string;
+        title: string;
+        description: string;
+        bullets: string[];
+    };
     chefStorageGuidelines: {
-        tempZone: string
-        shelfLifeUnopened: string
-        shelfLifeOpened: string
-        thawingMethod: string
-        chefNotes: string[]
-    }
+        tempZone: string;
+        shelfLifeUnopened: string;
+        shelfLifeOpened: string;
+        thawingMethod: string;
+        chefNotes: string[];
+    };
     foodSafetyDossier: {
-        certifications: { code: string; issuer: string; validUntil: string }[]
-        microbialStandards: { parameter: string; limit: string; result: string }[]
-    }
+        certifications: { code: string; issuer: string; validUntil: string }[];
+        microbialStandards: { parameter: string; limit: string; result: string }[];
+    };
     originTraceability: {
-        harvestRegion: string
-        processingFacility: string
-        importPort: string
-        coldChainHub: string
-        lotTimeline: { step: string; timestamp: string; detail: string }[]
-    }
-    reviews: ProductReviewItem[]
+        harvestRegion: string;
+        processingFacility: string;
+        importPort: string;
+        coldChainHub: string;
+        lotTimeline: { step: string; timestamp: string; detail: string }[];
+    };
+    reviews: ProductReviewItem[];
 }
 
 // 1. Coverflow Slider (6 full-card image posters)
@@ -195,7 +195,7 @@ export const COVERFLOW_SLIDES: CoverflowBannerSlide[] = [
         targetLink: '/catalog?q=Rice',
         imageUrl: '', // <-- TODO: NHÉT HÌNH POSTER SLIDER #6 VÀO ĐÂY
     },
-]
+];
 
 // 2. Partner Brands
 export const PARTNER_BRANDS: string[] = [
@@ -204,7 +204,7 @@ export const PARTNER_BRANDS: string[] = [
     'MEATDELI PARTNER',
     'MEKONG DELTA CO-OP',
     'GREENHOUSE VIET',
-]
+];
 
 // 3. 14 Categories
 export const HOME_CATEGORIES: HomeCategoryItem[] = [
@@ -334,7 +334,7 @@ export const HOME_CATEGORIES: HomeCategoryItem[] = [
         cardBg: 'bg-white',
         iconUrl: '/icons/drink-soda-svgrepo-com.svg',
     },
-]
+];
 
 // 4. Early Market Flash Deals
 export const FLASH_SALE_PRODUCTS: HomeProductCardItem[] = [
@@ -473,7 +473,7 @@ export const FLASH_SALE_PRODUCTS: HomeProductCardItem[] = [
         unit: 'bag',
         imageUrl: '',
     },
-]
+];
 
 // 5. B2B Standard Food Supply
 export const STANDARD_B2B_PRODUCTS: HomeProductCardItem[] = [
@@ -645,14 +645,14 @@ export const STANDARD_B2B_PRODUCTS: HomeProductCardItem[] = [
         unit: 'bag',
         imageUrl: '',
     },
-]
+];
 
 // 6. Combo Packages
 export const HOME_COMBO_PLANS: HomeComboPlanItem[] = [
     {
         id: 'combo-home-kitchen',
         audienceBadge: 'HOUSEHOLD 30 - 50 PAX',
-        audienceBadgeBg: 'bg-[#FACC15]',
+        audienceBadgeBg: 'bg-store-yellow',
         highlightText: 'Save 110,000đ',
         title: '5-Day Fresh Kitchen Bundle',
         description:
@@ -669,12 +669,12 @@ export const HOME_COMBO_PLANS: HomeComboPlanItem[] = [
         unit: '/ week',
         ctaLabel: 'Order Bundle',
         ctaLink: '/catalog?type=combo',
-        cardBg: 'bg-[#F6EFE2]',
+        cardBg: 'bg-store-cream',
     },
     {
         id: 'combo-barista-bakery',
         audienceBadge: 'CAFÉ & BAKERY',
-        audienceBadgeBg: 'bg-[#F490B1]',
+        audienceBadgeBg: 'bg-store-pink',
         highlightText: '18% Wholesale Off',
         title: 'Morning Barista & Pastry Combo',
         description:
@@ -690,16 +690,15 @@ export const HOME_COMBO_PLANS: HomeComboPlanItem[] = [
         unit: '/ batch',
         ctaLabel: 'Schedule Delivery',
         ctaLink: '/quotes',
-        cardBg: 'bg-[#FFFFFF]',
+        cardBg: 'bg-white',
     },
     {
         id: 'combo-restaurant-catering',
         audienceBadge: 'RESTAURANT & CANTEEN',
-        audienceBadgeBg: 'bg-[#FACC15]',
+        audienceBadgeBg: 'bg-store-yellow',
         highlightText: '30-Day Price Lock',
         title: 'Standard Asian - Western Kitchen Pack',
-        description:
-            'Portion-cut to Executive Chef specifications, guaranteeing 0% prep waste.',
+        description: 'Portion-cut to Executive Chef specifications, guaranteeing 0% prep waste.',
         features: [
             '10kg AU Beef Striploin, pork ribs & chicken thighs',
             '15kg Hydroponic salad greens, tomatoes, potatoes',
@@ -711,9 +710,9 @@ export const HOME_COMBO_PLANS: HomeComboPlanItem[] = [
         unit: '/ batch',
         ctaLabel: 'Customize Portions',
         ctaLink: '/quotes',
-        cardBg: 'bg-[#FFFFFF]',
+        cardBg: 'bg-white',
     },
-]
+];
 
 // 7. Notifications Data
 export const INITIAL_NOTIFICATIONS: NotificationItemData[] = [
@@ -721,7 +720,7 @@ export const INITIAL_NOTIFICATIONS: NotificationItemData[] = [
         id: 'noti-system-v42',
         category: 'system',
         badge: 'ADMIN ANNOUNCEMENT • V4.2',
-        badgeBg: 'bg-[#EF4444]',
+        badgeBg: 'bg-danger',
         badgeText: 'text-white',
         title: 'System Update: Launching 5-Star Reviews & Auto e-VAT Invoice',
         description:
@@ -734,18 +733,15 @@ export const INITIAL_NOTIFICATIONS: NotificationItemData[] = [
         popupHighlights: [
             {
                 title: 'Public 5-Star Product Reviews:',
-                detail:
-                    'B2B partners can now submit half-star ratings and upload real kitchen photos directly on the product detail page for full transparency.',
+                detail: 'B2B partners can now submit half-star ratings and upload real kitchen photos directly on the product detail page for full transparency.',
             },
             {
                 title: 'Automated e-VAT Invoicing:',
-                detail:
-                    'Connected directly with your 10-digit Tax ID (MST) and accounting Gmail to issue electronic VAT invoices automatically once delivery is completed.',
+                detail: 'Connected directly with your 10-digit Tax ID (MST) and accounting Gmail to issue electronic VAT invoices automatically once delivery is completed.',
             },
             {
                 title: 'Performance & Adaptive UI (A2UI) Upgrade:',
-                detail:
-                    'Upgraded quantity selectors, instant category filters, and smart AI shopping assistant bubble.',
+                detail: 'Upgraded quantity selectors, instant category filters, and smart AI shopping assistant bubble.',
             },
         ],
     },
@@ -753,8 +749,8 @@ export const INITIAL_NOTIFICATIONS: NotificationItemData[] = [
         id: 'noti-quote-884',
         category: 'quote',
         badge: 'QUOTE APPROVED',
-        badgeBg: 'bg-[#DDF0E6]',
-        badgeText: 'text-[#133425]',
+        badgeBg: 'bg-surface-green',
+        badgeText: 'text-store-ink',
         title: 'Quote #QT-2026-884 has been approved',
         description:
             '100% stock verified for all 5 line items. Please confirm your order within 24 hours to lock inventory reservation.',
@@ -767,8 +763,8 @@ export const INITIAL_NOTIFICATIONS: NotificationItemData[] = [
         id: 'noti-delivery-512',
         category: 'delivery',
         badge: 'IN_DELIVERY • ETA 18M',
-        badgeBg: 'bg-[#FACC15]',
-        badgeText: 'text-[#14132b]',
+        badgeBg: 'bg-store-yellow',
+        badgeText: 'text-store-ink',
         title: 'Cold truck is delivering Order #ORD-2026-512',
         description:
             'Departed from Tan Thuan Cold Hub for 2 drop-off stops. Estimated arrival at District 3 Central Kitchen at 05:30 AM.',
@@ -780,565 +776,556 @@ export const INITIAL_NOTIFICATIONS: NotificationItemData[] = [
         id: 'noti-sourcing-anchor',
         category: 'quote',
         badge: 'NEW SOURCING REPLY',
-        badgeBg: 'bg-gray-200',
-        badgeText: 'text-gray-700',
+        badgeBg: 'bg-surface-soft',
+        badgeText: 'text-store-muted',
         title: 'Added to Catalog: Anchor Unsalted Butter 25kg Block',
         description:
             'Selling Price: 4,250,000đ/carton • Available Stock: 18 cartons ready to order.',
         timeAgo: 'Yesterday',
         unread: false,
     },
-]
+];
 
 // 8. Sample Product Detail Datasets (With full 1-star to 5-star reviews for testing filter reload!)
-export const CATALOG_PRODUCT_DETAILS: Record<string, ProductDetailCatalogItem> =
-    {
-        salmon: {
-            id: 'salmon',
-            sampleButtonLabel: 'Norwegian Salmon',
-            breadcrumbCategory: 'Fish & Seafood',
-            breadcrumbSubcategory: 'Fresh Fish & Sashimi',
-            categoryUpper: 'FISH AND SEAFOOD',
-            enterpriseName: 'NORWAY SALMON AIR',
-            warehouseBadge: 'Available in District 7 warehouse',
-            skuCode: 'SEA-SAL-01 / MDF-FISH-SALMONFILLET-CH-1KG',
-            masterCatalogCode: 'MDF-FISH-SALMONFILLET-CH-1KG',
-            name: 'Fresh Norwegian Salmon Fillet (Standard Vivian-style cut)',
-            topLeftBadge: '#1 Best Seller',
-            certBadge: 'GlobalGAP - Air Freight',
-            listPrice: 719000,
-            sellingPrice: 485000,
-            priceWithVat: 523800,
-            vatRateLabel: '8%',
-            unit: 'kg',
-            originCountry: 'Norway / Vietnam',
-            moqLabel: '2kg',
-            nextOrderPromoText: 'Save up to 20% on your next order.',
-            rating: 4.5,
-            reviewCount: 420,
-            galleryImages: ['', '', ''], // <-- TODO: NHÉT 3 HÌNH GALLERY CỦA CÁ HỒI VÀO ĐÂY
-            highlights: [
+export const CATALOG_PRODUCT_DETAILS: Record<string, ProductDetailCatalogItem> = {
+    salmon: {
+        id: 'salmon',
+        sampleButtonLabel: 'Norwegian Salmon',
+        breadcrumbCategory: 'Fish & Seafood',
+        breadcrumbSubcategory: 'Fresh Fish & Sashimi',
+        categoryUpper: 'FISH AND SEAFOOD',
+        enterpriseName: 'NORWAY SALMON AIR',
+        warehouseBadge: 'Available in District 7 warehouse',
+        skuCode: 'SEA-SAL-01 / MDF-FISH-SALMONFILLET-CH-1KG',
+        masterCatalogCode: 'MDF-FISH-SALMONFILLET-CH-1KG',
+        name: 'Fresh Norwegian Salmon Fillet (Standard Vivian-style cut)',
+        topLeftBadge: '#1 Best Seller',
+        certBadge: 'GlobalGAP - Air Freight',
+        listPrice: 719000,
+        sellingPrice: 485000,
+        priceWithVat: 523800,
+        vatRateLabel: '8%',
+        unit: 'kg',
+        originCountry: 'Norway / Vietnam',
+        moqLabel: '2kg',
+        nextOrderPromoText: 'Save up to 20% on your next order.',
+        rating: 4.5,
+        reviewCount: 420,
+        galleryImages: ['', '', ''], // <-- TODO: NHÉT 3 HÌNH GALLERY CỦA CÁ HỒI VÀO ĐÂY
+        highlights: [
+            {
+                title: 'Standard Trim C',
+                subtitle: 'Remove all pin bones',
+            },
+            {
+                title: 'Store at 0–2°C',
+                subtitle: 'Refrigerated truck',
+            },
+            {
+                title: '1-to-1 replacement',
+                subtitle: 'Within 2 hours in the kitchen',
+            },
+        ],
+        technicalSpecs: {
+            enterpriseName: 'MD Foods Direct Supply (Partner: SalMar Norway Salmon Air Co., Ltd)',
+            enterpriseTaxId: '0318899201 (Verified B2B Supplier)',
+            industryGroup: 'Fish and seafood',
+            tradeName: 'Fresh Norwegian Salmon Fillet Trim C Tray 1kg Breakdown',
+            netWeight: '1.0 kg (Can be cut into individual 0.5 kg trays)',
+            tareWeight: '0.020 kg (Foam tray & vacuum sealed)',
+            volume: '0.0018 m³',
+            dimensions: '20 cm × 3 cm × 30 cm',
+            minimumQuantity: '2kg',
+            vatInfo: '8% (Automatic electronic invoice issuance)',
+            attributeFilter: 'Eat raw, Fresh, Sashimi grade',
+        },
+        kitchenCommitment: {
+            badge: '0% WEIGHT LOSS COMMITMENT FOR KITCHENS',
+            title: 'Optimizing Food Cost for Japanese & European Restaurants',
+            description:
+                'Ingredients are processed according to international Trim C standards: spinal bone, ribs, belly fin, excess belly fat have been removed, and 100% of the pin bones have been plucked clean. Upon receiving the product, chefs can immediately cut and slice it for Sashimi, Nigiri, or pan-sear it right away.',
+            bullets: [
+                'Sashimi-grade freshness maintained within 72 hours of arriving at Tan Son Nhat Airport.',
+                'Support the portion tray division as requested by the Head Chef.',
+                '30-day price stabilization contract for F&B chains and corporate canteens.',
+            ],
+        },
+        chefStorageGuidelines: {
+            tempZone: 'Chilled 0°C to 2°C (Dedicated Sashimi Chiller)',
+            shelfLifeUnopened: '5 Days from packing date (Vacuum sealed)',
+            shelfLifeOpened: 'Consume within 24 hours after opening vacuum seal',
+            thawingMethod:
+                'Never freeze or soak in water; keep chilled on crushed ice bed covered with absorbent paper.',
+            chefNotes: [
+                'Use separate sanitized sashimi knife (Yanagiba) to prevent cross-contamination.',
+                'Pat dry with culinary paper towel every 12 hours to preserve firm flesh texture.',
+                'Belly section is ideal for Aburi Nigiri; loin section is best for thick Sashimi cuts.',
+            ],
+        },
+        foodSafetyDossier: {
+            certifications: [
                 {
-                    title: 'Standard Trim C',
-                    subtitle: 'Remove all pin bones',
+                    code: 'GlobalGAP Aquaculture #GGN-4052852',
+                    issuer: 'Norwegian Seafood Council',
+                    validUntil: '31/12/2027',
                 },
                 {
-                    title: 'Store at 0–2°C',
-                    subtitle: 'Refrigerated truck',
+                    code: 'HACCP & ISO 22000:2018 Cold Chain',
+                    issuer: 'SGS Vietnam Certification',
+                    validUntil: '15/09/2027',
                 },
                 {
-                    title: '1-to-1 replacement',
-                    subtitle: 'Within 2 hours in the kitchen',
+                    code: 'Veterinary Health & Quarantine Certificate',
+                    issuer: 'Tan Son Nhat Animal Quarantine Dept.',
+                    validUntil: 'Updated per Air Batch',
                 },
             ],
-            technicalSpecs: {
-                enterpriseName:
-                    'MD Foods Direct Supply (Partner: SalMar Norway Salmon Air Co., Ltd)',
-                enterpriseTaxId: '0318899201 (Verified B2B Supplier)',
-                industryGroup: 'Fish and seafood',
-                tradeName: 'Fresh Norwegian Salmon Fillet Trim C Tray 1kg Breakdown',
-                netWeight: '1.0 kg (Can be cut into individual 0.5 kg trays)',
-                tareWeight: '0.020 kg (Foam tray & vacuum sealed)',
-                volume: '0.0018 m³',
-                dimensions: '20 cm × 3 cm × 30 cm',
-                minimumQuantity: '2kg',
-                vatInfo: '8% (Automatic electronic invoice issuance)',
-                attributeFilter: 'Eat raw, Fresh, Sashimi grade',
-            },
-            kitchenCommitment: {
-                badge: '0% WEIGHT LOSS COMMITMENT FOR KITCHENS',
-                title: 'Optimizing Food Cost for Japanese & European Restaurants',
-                description:
-                    'Ingredients are processed according to international Trim C standards: spinal bone, ribs, belly fin, excess belly fat have been removed, and 100% of the pin bones have been plucked clean. Upon receiving the product, chefs can immediately cut and slice it for Sashimi, Nigiri, or pan-sear it right away.',
-                bullets: [
-                    'Sashimi-grade freshness maintained within 72 hours of arriving at Tan Son Nhat Airport.',
-                    'Support the portion tray division as requested by the Head Chef.',
-                    '30-day price stabilization contract for F&B chains and corporate canteens.',
-                ],
-            },
-            chefStorageGuidelines: {
-                tempZone: 'Chilled 0°C to 2°C (Dedicated Sashimi Chiller)',
-                shelfLifeUnopened: '5 Days from packing date (Vacuum sealed)',
-                shelfLifeOpened: 'Consume within 24 hours after opening vacuum seal',
-                thawingMethod:
-                    'Never freeze or soak in water; keep chilled on crushed ice bed covered with absorbent paper.',
-                chefNotes: [
-                    'Use separate sanitized sashimi knife (Yanagiba) to prevent cross-contamination.',
-                    'Pat dry with culinary paper towel every 12 hours to preserve firm flesh texture.',
-                    'Belly section is ideal for Aburi Nigiri; loin section is best for thick Sashimi cuts.',
-                ],
-            },
-            foodSafetyDossier: {
-                certifications: [
-                    {
-                        code: 'GlobalGAP Aquaculture #GGN-4052852',
-                        issuer: 'Norwegian Seafood Council',
-                        validUntil: '31/12/2027',
-                    },
-                    {
-                        code: 'HACCP & ISO 22000:2018 Cold Chain',
-                        issuer: 'SGS Vietnam Certification',
-                        validUntil: '15/09/2027',
-                    },
-                    {
-                        code: 'Veterinary Health & Quarantine Certificate',
-                        issuer: 'Tan Son Nhat Animal Quarantine Dept.',
-                        validUntil: 'Updated per Air Batch',
-                    },
-                ],
-                microbialStandards: [
-                    {
-                        parameter: 'Histamine Level',
-                        limit: '< 50 mg/kg',
-                        result: '4.2 mg/kg (Passed)',
-                    },
-                    {
-                        parameter: 'Salmonella spp.',
-                        limit: 'Not detected / 25g',
-                        result: 'Negative (Passed)',
-                    },
-                    {
-                        parameter: 'Core Flesh Temperature on Arrival',
-                        limit: '0.0°C – 2.0°C',
-                        result: '1.1°C (Passed)',
-                    },
-                ],
-            },
-            originTraceability: {
-                harvestRegion: 'Frøya Fjords, Trøndelag, Norway (FAO Area 27)',
-                processingFacility: 'MD Foods Cleanroom Processing Hub — District 7',
-                importPort: 'Tan Son Nhat International Cargo Terminal (SGN)',
-                coldChainHub: 'Landmark 81 / Tan Thuan Cold Storage Hub',
-                lotTimeline: [
-                    {
-                        step: '1. Harvest & Primary Ice Packing',
-                        timestamp: 'Day 0 — 06:00 UTC',
-                        detail:
-                            'Harvested at Frøya cold-water fjords and packed in thermo boxes at 0.5°C.',
-                    },
-                    {
-                        step: '2. Air Freight Express to Ho Chi Minh City',
-                        timestamp: 'Day 1 — 18:30 GMT+7',
-                        detail:
-                            'Direct temperature-controlled cargo flight to Tan Son Nhat Airport.',
-                    },
-                    {
-                        step: '3. Trim C Filleting & Pin-Bone Removal',
-                        timestamp: 'Day 2 — 02:00 GMT+7',
-                        detail:
-                            'Filleted in 4°C cleanroom, vacuum-packed in 1kg trays, ready for 05:00 AM kitchen delivery.',
-                    },
-                ],
-            },
-            reviews: [
+            microbialStandards: [
                 {
-                    id: 'rev-sal-5a',
-                    author: "kimo's no.1 fan",
-                    roleBadge: 'HEAD CHEF • OMAKASE D1',
-                    date: '12/04/2026',
-                    rating: 5,
-                    comment:
-                        'Trim C quality is super consistent across all 20 trays we ordered this week. Automatic VAT invoice arrived in our accounting Gmail right after delivery!',
-                    cutenessScore: 'sashimi grade: 10/10',
-                    likesLabel: '69k',
-                    avatarBg: 'from-[#A7F3D0] to-[#10B981]',
+                    parameter: 'Histamine Level',
+                    limit: '< 50 mg/kg',
+                    result: '4.2 mg/kg (Passed)',
                 },
                 {
-                    id: 'rev-sal-5b',
-                    author: 'Chef Kenji Sato',
-                    roleBadge: 'SUSHI BAR CHAIN',
-                    date: '11/04/2026',
-                    rating: 5,
-                    comment:
-                        'Zero pin bones, firm orange flesh and clean white marbling. Core temperature upon arrival at 05:20 AM was 1.2°C.',
-                    cutenessScore: 'freshness: 100/10',
-                    likesLabel: '24k',
-                    avatarBg: 'from-[#BAE6FD] to-[#0284C7]',
+                    parameter: 'Salmonella spp.',
+                    limit: 'Not detected / 25g',
+                    result: 'Negative (Passed)',
                 },
                 {
-                    id: 'rev-sal-4a',
-                    author: 'Vivian Banshee',
-                    roleBadge: 'VIP PARTNER',
-                    date: '09/04/2026',
-                    rating: 4,
-                    comment:
-                        'omg this has to be the best design ever from Kimo, i just love him so much >O<, if i ever win a lottery i would hire Mr. Kimo immediately ^w^',
-                    cutenessScore: 'cuteness: ∞∞∞∞∞∞∞∞∞∞/10',
-                    likesLabel: '42k',
-                    avatarBg: 'from-[#C4B5FD] to-[#818CF8]',
-                },
-                {
-                    id: 'rev-sal-4b',
-                    author: 'not Vivian fr',
-                    roleBadge: 'BISTRO OWNER',
-                    date: '08/04/2026',
-                    rating: 4,
-                    comment:
-                        'Great salmon fillet, vacuum trays are super clean. Deducting 1 star only because our security guard delayed the truck by 10 mins.',
-                    cutenessScore: 'packaging: 9.5/10',
-                    likesLabel: '10k',
-                    avatarBg: 'from-[#FBCFE8] to-[#EC4899]',
-                },
-                {
-                    id: 'rev-sal-3a',
-                    author: 'Lotus Hotel Purchasing',
-                    roleBadge: 'HOTEL BANQUET',
-                    date: '05/04/2026',
-                    rating: 3,
-                    comment:
-                        'Fish quality is good, but one tray in our 15kg batch was cut slightly thinner near the tail section. Still worked fine for pan-seared salmon.',
-                    cutenessScore: 'portion uniformity: 7.5/10',
-                    likesLabel: '1.2k',
-                    avatarBg: 'from-[#FDE68A] to-[#D97706]',
-                },
-                {
-                    id: 'rev-sal-2a',
-                    author: 'poke_station_d7',
-                    roleBadge: 'POKE KITCHEN',
-                    date: '02/04/2026',
-                    rating: 2,
-                    comment:
-                        'Ordered late at 11:30 PM so missed the first 05:00 AM cold truck wave and had to wait for the 08:30 AM trip. Fish itself was fresh though.',
-                    cutenessScore: 'delivery slot: 6/10',
-                    likesLabel: '340',
-                    avatarBg: 'from-[#FED7AA] to-[#EA580C]',
-                },
-                {
-                    id: 'rev-sal-1a',
-                    author: 'ramen_alley_q3',
-                    roleBadge: 'NEW BUYER',
-                    date: '29/03/2026',
-                    rating: 1,
-                    comment:
-                        'Accidentally ordered whole fillet instead of 0.5kg pre-portioned trays because I forgot to fill the kitchen note box. Support helped us swap it within 2 hours.',
-                    cutenessScore: 'resolved by support',
-                    likesLabel: '128',
-                    avatarBg: 'from-[#FECACA] to-[#DC2626]',
+                    parameter: 'Core Flesh Temperature on Arrival',
+                    limit: '0.0°C – 2.0°C',
+                    result: '1.1°C (Passed)',
                 },
             ],
         },
+        originTraceability: {
+            harvestRegion: 'Frøya Fjords, Trøndelag, Norway (FAO Area 27)',
+            processingFacility: 'MD Foods Cleanroom Processing Hub — District 7',
+            importPort: 'Tan Son Nhat International Cargo Terminal (SGN)',
+            coldChainHub: 'Landmark 81 / Tan Thuan Cold Storage Hub',
+            lotTimeline: [
+                {
+                    step: '1. Harvest & Primary Ice Packing',
+                    timestamp: 'Day 0 — 06:00 UTC',
+                    detail: 'Harvested at Frøya cold-water fjords and packed in thermo boxes at 0.5°C.',
+                },
+                {
+                    step: '2. Air Freight Express to Ho Chi Minh City',
+                    timestamp: 'Day 1 — 18:30 GMT+7',
+                    detail: 'Direct temperature-controlled cargo flight to Tan Son Nhat Airport.',
+                },
+                {
+                    step: '3. Trim C Filleting & Pin-Bone Removal',
+                    timestamp: 'Day 2 — 02:00 GMT+7',
+                    detail: 'Filleted in 4°C cleanroom, vacuum-packed in 1kg trays, ready for 05:00 AM kitchen delivery.',
+                },
+            ],
+        },
+        reviews: [
+            {
+                id: 'rev-sal-5a',
+                author: "kimo's no.1 fan",
+                roleBadge: 'HEAD CHEF • OMAKASE D1',
+                date: '12/04/2026',
+                rating: 5,
+                comment:
+                    'Trim C quality is super consistent across all 20 trays we ordered this week. Automatic VAT invoice arrived in our accounting Gmail right after delivery!',
+                cutenessScore: 'sashimi grade: 10/10',
+                likesLabel: '69k',
+                avatarBg: 'from-surface-green to-status-active',
+            },
+            {
+                id: 'rev-sal-5b',
+                author: 'Chef Kenji Sato',
+                roleBadge: 'SUSHI BAR CHAIN',
+                date: '11/04/2026',
+                rating: 5,
+                comment:
+                    'Zero pin bones, firm orange flesh and clean white marbling. Core temperature upon arrival at 05:20 AM was 1.2°C.',
+                cutenessScore: 'freshness: 100/10',
+                likesLabel: '24k',
+                avatarBg: 'from-surface-blue to-info',
+            },
+            {
+                id: 'rev-sal-4a',
+                author: 'Vivian Banshee',
+                roleBadge: 'VIP PARTNER',
+                date: '09/04/2026',
+                rating: 4,
+                comment:
+                    'omg this has to be the best design ever from Kimo, i just love him so much >O<, if i ever win a lottery i would hire Mr. Kimo immediately ^w^',
+                cutenessScore: 'cuteness: ∞∞∞∞∞∞∞∞∞∞/10',
+                likesLabel: '42k',
+                avatarBg: 'from-surface-blue to-info',
+            },
+            {
+                id: 'rev-sal-4b',
+                author: 'not Vivian fr',
+                roleBadge: 'BISTRO OWNER',
+                date: '08/04/2026',
+                rating: 4,
+                comment:
+                    'Great salmon fillet, vacuum trays are super clean. Deducting 1 star only because our security guard delayed the truck by 10 mins.',
+                cutenessScore: 'packaging: 9.5/10',
+                likesLabel: '10k',
+                avatarBg: 'from-surface-pink to-danger',
+            },
+            {
+                id: 'rev-sal-3a',
+                author: 'Lotus Hotel Purchasing',
+                roleBadge: 'HOTEL BANQUET',
+                date: '05/04/2026',
+                rating: 3,
+                comment:
+                    'Fish quality is good, but one tray in our 15kg batch was cut slightly thinner near the tail section. Still worked fine for pan-seared salmon.',
+                cutenessScore: 'portion uniformity: 7.5/10',
+                likesLabel: '1.2k',
+                avatarBg: 'from-store-yellow to-warning',
+            },
+            {
+                id: 'rev-sal-2a',
+                author: 'poke_station_d7',
+                roleBadge: 'POKE KITCHEN',
+                date: '02/04/2026',
+                rating: 2,
+                comment:
+                    'Ordered late at 11:30 PM so missed the first 05:00 AM cold truck wave and had to wait for the 08:30 AM trip. Fish itself was fresh though.',
+                cutenessScore: 'delivery slot: 6/10',
+                likesLabel: '340',
+                avatarBg: 'from-warning-soft to-store-coral',
+            },
+            {
+                id: 'rev-sal-1a',
+                author: 'ramen_alley_q3',
+                roleBadge: 'NEW BUYER',
+                date: '29/03/2026',
+                rating: 1,
+                comment:
+                    'Accidentally ordered whole fillet instead of 0.5kg pre-portioned trays because I forgot to fill the kitchen note box. Support helped us swap it within 2 hours.',
+                cutenessScore: 'resolved by support',
+                likesLabel: '128',
+                avatarBg: 'from-surface-pink to-danger',
+            },
+        ],
+    },
 
-        cabbage: {
-            id: 'cabbage',
-            sampleButtonLabel: 'Kamereo Cabbage (K894)',
-            breadcrumbCategory: 'Vegetables & Mushrooms',
-            breadcrumbSubcategory: 'Pre-washed Salad Greens',
-            categoryUpper: 'VEGETABLES AND MUSHROOMS',
-            enterpriseName: 'DALAT GAP FARMS',
-            warehouseBadge: 'Available in District 7 warehouse',
-            skuCode: 'KAM-VEG-02 / KAM-VEG-CABBAGE-SHRED-1KG',
-            masterCatalogCode: 'KAM-VEG-CABBAGE-SHRED-1KG',
-            name: 'Kamereo Shredded White Cabbage (Ready-to-Use 1kg Pack)',
-            topLeftBadge: 'Kitchen Saver',
-            certBadge: 'VietGAP - Dalat Farm',
-            listPrice: 55000,
-            sellingPrice: 45000,
-            priceWithVat: 48600,
-            vatRateLabel: '8%',
-            unit: 'bag',
-            originCountry: 'Lam Dong, Vietnam',
-            moqLabel: '5 bags',
-            nextOrderPromoText: 'Volume discount available from 20 bags.',
-            rating: 4.6,
-            reviewCount: 185,
-            galleryImages: ['', '', ''],
-            highlights: [
+    cabbage: {
+        id: 'cabbage',
+        sampleButtonLabel: 'Kamereo Cabbage (K894)',
+        breadcrumbCategory: 'Vegetables & Mushrooms',
+        breadcrumbSubcategory: 'Pre-washed Salad Greens',
+        categoryUpper: 'VEGETABLES AND MUSHROOMS',
+        enterpriseName: 'DALAT GAP FARMS',
+        warehouseBadge: 'Available in District 7 warehouse',
+        skuCode: 'KAM-VEG-02 / KAM-VEG-CABBAGE-SHRED-1KG',
+        masterCatalogCode: 'KAM-VEG-CABBAGE-SHRED-1KG',
+        name: 'Kamereo Shredded White Cabbage (Ready-to-Use 1kg Pack)',
+        topLeftBadge: 'Kitchen Saver',
+        certBadge: 'VietGAP - Dalat Farm',
+        listPrice: 55000,
+        sellingPrice: 45000,
+        priceWithVat: 48600,
+        vatRateLabel: '8%',
+        unit: 'bag',
+        originCountry: 'Lam Dong, Vietnam',
+        moqLabel: '5 bags',
+        nextOrderPromoText: 'Volume discount available from 20 bags.',
+        rating: 4.6,
+        reviewCount: 185,
+        galleryImages: ['', '', ''],
+        highlights: [
+            {
+                title: '1.5mm Fine Shred',
+                subtitle: 'Zero knife prep needed',
+            },
+            {
+                title: 'Store at 2–6°C',
+                subtitle: 'Crisp for 4 days',
+            },
+            {
+                title: '100% Usable Yield',
+                subtitle: 'Outer leaves & core removed',
+            },
+        ],
+        technicalSpecs: {
+            enterpriseName:
+                'MD Foods Direct Supply (Partner: Dalat GAP High-Tech Agriculture Co., Ltd)',
+            enterpriseTaxId: '5800412903 (Verified VietGAP Producer)',
+            industryGroup: 'Vegetables and mushrooms',
+            tradeName: 'Pre-Washed Shredded White Cabbage 1kg Foodservice Bag',
+            netWeight: '1.0 kg (100% edible shredded yield)',
+            tareWeight: '0.015 kg (Breathable food-grade PE bag)',
+            volume: '0.0032 m³',
+            dimensions: '25 cm × 8 cm × 32 cm',
+            minimumQuantity: '5 bags',
+            vatInfo: '8% (Automatic electronic invoice issuance)',
+            attributeFilter: 'Pre-washed, Ready-to-eat salad, Tonkatsu side',
+        },
+        kitchenCommitment: {
+            badge: 'SAVE 45 MINS PREP TIME PER SHIFT',
+            title: 'Standardized Crispness for Tonkatsu & Salad Bars',
+            description:
+                'Harvested at 1,500m elevation in Dalat, triple-washed in ozonated chilled water, spin-dried, and precision-shredded to 1.5mm ribbons.',
+            bullets: [
+                'Eliminates 25% core & outer leaf waste in commercial kitchens.',
+                'Packed in breathable micro-perforated bags to prevent condensation.',
+                'Daily morning harvest delivery straight to Ho Chi Minh City kitchens.',
+            ],
+        },
+        chefStorageGuidelines: {
+            tempZone: 'Chilled Vegetable Crisper 2°C to 6°C',
+            shelfLifeUnopened: '4 Days from delivery date',
+            shelfLifeOpened: 'Use within 12 hours after opening bag',
+            thawingMethod: 'Keep away from rear evaporator fans to prevent leaf dehydration.',
+            chefNotes: [
+                'Soak in ice water for 2 minutes before plating for extra crunch.',
+                'Keep bags in separate crate on delivery truck to avoid crushing.',
+            ],
+        },
+        foodSafetyDossier: {
+            certifications: [
                 {
-                    title: '1.5mm Fine Shred',
-                    subtitle: 'Zero knife prep needed',
-                },
-                {
-                    title: 'Store at 2–6°C',
-                    subtitle: 'Crisp for 4 days',
-                },
-                {
-                    title: '100% Usable Yield',
-                    subtitle: 'Outer leaves & core removed',
+                    code: 'VietGAP Crop Certificate #VG-LD-2026',
+                    issuer: 'Lam Dong Dept. of Agriculture',
+                    validUntil: '20/11/2027',
                 },
             ],
-            technicalSpecs: {
-                enterpriseName:
-                    'MD Foods Direct Supply (Partner: Dalat GAP High-Tech Agriculture Co., Ltd)',
-                enterpriseTaxId: '5800412903 (Verified VietGAP Producer)',
-                industryGroup: 'Vegetables and mushrooms',
-                tradeName: 'Pre-Washed Shredded White Cabbage 1kg Foodservice Bag',
-                netWeight: '1.0 kg (100% edible shredded yield)',
-                tareWeight: '0.015 kg (Breathable food-grade PE bag)',
-                volume: '0.0032 m³',
-                dimensions: '25 cm × 8 cm × 32 cm',
-                minimumQuantity: '5 bags',
-                vatInfo: '8% (Automatic electronic invoice issuance)',
-                attributeFilter: 'Pre-washed, Ready-to-eat salad, Tonkatsu side',
-            },
-            kitchenCommitment: {
-                badge: 'SAVE 45 MINS PREP TIME PER SHIFT',
-                title: 'Standardized Crispness for Tonkatsu & Salad Bars',
-                description:
-                    'Harvested at 1,500m elevation in Dalat, triple-washed in ozonated chilled water, spin-dried, and precision-shredded to 1.5mm ribbons.',
-                bullets: [
-                    'Eliminates 25% core & outer leaf waste in commercial kitchens.',
-                    'Packed in breathable micro-perforated bags to prevent condensation.',
-                    'Daily morning harvest delivery straight to Ho Chi Minh City kitchens.',
-                ],
-            },
-            chefStorageGuidelines: {
-                tempZone: 'Chilled Vegetable Crisper 2°C to 6°C',
-                shelfLifeUnopened: '4 Days from delivery date',
-                shelfLifeOpened: 'Use within 12 hours after opening bag',
-                thawingMethod:
-                    'Keep away from rear evaporator fans to prevent leaf dehydration.',
-                chefNotes: [
-                    'Soak in ice water for 2 minutes before plating for extra crunch.',
-                    'Keep bags in separate crate on delivery truck to avoid crushing.',
-                ],
-            },
-            foodSafetyDossier: {
-                certifications: [
-                    {
-                        code: 'VietGAP Crop Certificate #VG-LD-2026',
-                        issuer: 'Lam Dong Dept. of Agriculture',
-                        validUntil: '20/11/2027',
-                    },
-                ],
-                microbialStandards: [
-                    {
-                        parameter: 'Pesticide Residue',
-                        limit: 'Below MRL',
-                        result: 'Not Detected (Passed)',
-                    },
-                    {
-                        parameter: 'E. coli',
-                        limit: '< 10 CFU/g',
-                        result: 'Negative (Passed)',
-                    },
-                ],
-            },
-            originTraceability: {
-                harvestRegion: 'Lac Duong Highland Farms, Dalat, Lam Dong',
-                processingFacility: 'MD Foods Vegetable Wash & Cut Center',
-                importPort: 'Domestic Cold Truck Line (Dalat -> HCMC)',
-                coldChainHub: 'Landmark 81 / Tan Thuan Cold Storage Hub',
-                lotTimeline: [
-                    {
-                        step: '1. Morning Farm Harvest',
-                        timestamp: 'Day 0 — 05:00 AM',
-                        detail: 'Hand-harvested at Lac Duong farm and pre-cooled to 4°C.',
-                    },
-                    {
-                        step: '2. Ozonated Wash & 1.5mm Shredding',
-                        timestamp: 'Day 0 — 14:00 PM',
-                        detail: 'Processed in cleanroom and packed in 1kg breathable bags.',
-                    },
-                ],
-            },
-            reviews: [
+            microbialStandards: [
                 {
-                    id: 'rev-cab-5',
-                    author: 'Vivian Banshee',
-                    roleBadge: 'TONKATSU HOUSE',
-                    date: '10/04/2026',
-                    rating: 5,
-                    comment:
-                        'Saves our kitchen staff so much time every morning! Shreds are super even and crisp.',
-                    cutenessScore: 'crispness: 10/10',
-                    likesLabel: '12k',
-                    avatarBg: 'from-[#C4B5FD] to-[#818CF8]',
+                    parameter: 'Pesticide Residue',
+                    limit: 'Below MRL',
+                    result: 'Not Detected (Passed)',
                 },
                 {
-                    id: 'rev-cab-4',
-                    author: 'Green Bowl Salad',
-                    roleBadge: 'SALAD CHAIN',
-                    date: '07/04/2026',
-                    rating: 4,
-                    comment:
-                        'Very clean and dry inside the bag, zero water pooling at the bottom.',
-                    cutenessScore: 'dryness: 9/10',
-                    likesLabel: '3.4k',
-                    avatarBg: 'from-[#A7F3D0] to-[#10B981]',
-                },
-                {
-                    id: 'rev-cab-3',
-                    author: 'Bento Express D3',
-                    roleBadge: 'CLOUD KITCHEN',
-                    date: '04/04/2026',
-                    rating: 3,
-                    comment:
-                        'Good quality overall, wish there was a 2.5kg jumbo bag option for high-volume lunch shifts.',
-                    cutenessScore: 'pack size: 7.5/10',
-                    likesLabel: '820',
-                    avatarBg: 'from-[#FDE68A] to-[#D97706]',
-                },
-                {
-                    id: 'rev-cab-2',
-                    author: 'Katsu Corner',
-                    roleBadge: 'BISTRO',
-                    date: '01/04/2026',
-                    rating: 2,
-                    comment:
-                        'One bag had slightly thicker 3mm cuts near the bottom, though still fresh.',
-                    cutenessScore: 'cut thickness: 6.5/10',
-                    likesLabel: '190',
-                    avatarBg: 'from-[#FED7AA] to-[#EA580C]',
-                },
-                {
-                    id: 'rev-cab-1',
-                    author: 'test_kitchen_09',
-                    roleBadge: 'CANTEEN',
-                    date: '28/03/2026',
-                    rating: 1,
-                    comment:
-                        'Our kitchen staff left the bag next to the hot stove so it wilted—reminding our team to put it straight into the 4°C chiller next time.',
-                    cutenessScore: 'storage note',
-                    likesLabel: '95',
-                    avatarBg: 'from-[#FECACA] to-[#DC2626]',
+                    parameter: 'E. coli',
+                    limit: '< 10 CFU/g',
+                    result: 'Negative (Passed)',
                 },
             ],
         },
+        originTraceability: {
+            harvestRegion: 'Lac Duong Highland Farms, Dalat, Lam Dong',
+            processingFacility: 'MD Foods Vegetable Wash & Cut Center',
+            importPort: 'Domestic Cold Truck Line (Dalat -> HCMC)',
+            coldChainHub: 'Landmark 81 / Tan Thuan Cold Storage Hub',
+            lotTimeline: [
+                {
+                    step: '1. Morning Farm Harvest',
+                    timestamp: 'Day 0 — 05:00 AM',
+                    detail: 'Hand-harvested at Lac Duong farm and pre-cooled to 4°C.',
+                },
+                {
+                    step: '2. Ozonated Wash & 1.5mm Shredding',
+                    timestamp: 'Day 0 — 14:00 PM',
+                    detail: 'Processed in cleanroom and packed in 1kg breathable bags.',
+                },
+            ],
+        },
+        reviews: [
+            {
+                id: 'rev-cab-5',
+                author: 'Vivian Banshee',
+                roleBadge: 'TONKATSU HOUSE',
+                date: '10/04/2026',
+                rating: 5,
+                comment:
+                    'Saves our kitchen staff so much time every morning! Shreds are super even and crisp.',
+                cutenessScore: 'crispness: 10/10',
+                likesLabel: '12k',
+                avatarBg: 'from-surface-blue to-info',
+            },
+            {
+                id: 'rev-cab-4',
+                author: 'Green Bowl Salad',
+                roleBadge: 'SALAD CHAIN',
+                date: '07/04/2026',
+                rating: 4,
+                comment: 'Very clean and dry inside the bag, zero water pooling at the bottom.',
+                cutenessScore: 'dryness: 9/10',
+                likesLabel: '3.4k',
+                avatarBg: 'from-surface-green to-status-active',
+            },
+            {
+                id: 'rev-cab-3',
+                author: 'Bento Express D3',
+                roleBadge: 'CLOUD KITCHEN',
+                date: '04/04/2026',
+                rating: 3,
+                comment:
+                    'Good quality overall, wish there was a 2.5kg jumbo bag option for high-volume lunch shifts.',
+                cutenessScore: 'pack size: 7.5/10',
+                likesLabel: '820',
+                avatarBg: 'from-store-yellow to-warning',
+            },
+            {
+                id: 'rev-cab-2',
+                author: 'Katsu Corner',
+                roleBadge: 'BISTRO',
+                date: '01/04/2026',
+                rating: 2,
+                comment:
+                    'One bag had slightly thicker 3mm cuts near the bottom, though still fresh.',
+                cutenessScore: 'cut thickness: 6.5/10',
+                likesLabel: '190',
+                avatarBg: 'from-warning-soft to-store-coral',
+            },
+            {
+                id: 'rev-cab-1',
+                author: 'test_kitchen_09',
+                roleBadge: 'CANTEEN',
+                date: '28/03/2026',
+                rating: 1,
+                comment:
+                    'Our kitchen staff left the bag next to the hot stove so it wilted—reminding our team to put it straight into the 4°C chiller next time.',
+                cutenessScore: 'storage note',
+                likesLabel: '95',
+                avatarBg: 'from-surface-pink to-danger',
+            },
+        ],
+    },
 
-        tuna: {
-            id: 'tuna',
-            sampleButtonLabel: 'Saku Tuna (500g)',
-            breadcrumbCategory: 'Fish & Seafood',
-            breadcrumbSubcategory: 'Sashimi Blocks',
-            categoryUpper: 'FISH AND SEAFOOD',
-            enterpriseName: 'MEKONG DELTA CO-OP',
-            warehouseBadge: 'Available in District 7 warehouse',
-            skuCode: 'HNM-TUN-03 / HNM-FISH-TUNASAKU-FZ-500G',
-            masterCatalogCode: 'HNM-FISH-TUNASAKU-FZ-500G',
-            name: 'Ocean Yellowfin Saku Tuna Block (Sashimi AAA Grade 500g)',
-            topLeftBadge: 'Sashimi AAA',
-            certBadge: 'HACCP - Ultra Low Temp',
-            listPrice: 310000,
-            sellingPrice: 260000,
-            priceWithVat: 280800,
-            vatRateLabel: '8%',
-            unit: 'tray',
-            originCountry: 'Khanh Hoa, Vietnam',
-            moqLabel: '3 trays',
-            nextOrderPromoText: 'Buy 10 trays to unlock Tier-2 wholesale pricing.',
-            rating: 4.8,
-            reviewCount: 310,
-            galleryImages: ['', '', ''],
-            highlights: [
+    tuna: {
+        id: 'tuna',
+        sampleButtonLabel: 'Saku Tuna (500g)',
+        breadcrumbCategory: 'Fish & Seafood',
+        breadcrumbSubcategory: 'Sashimi Blocks',
+        categoryUpper: 'FISH AND SEAFOOD',
+        enterpriseName: 'MEKONG DELTA CO-OP',
+        warehouseBadge: 'Available in District 7 warehouse',
+        skuCode: 'HNM-TUN-03 / HNM-FISH-TUNASAKU-FZ-500G',
+        masterCatalogCode: 'HNM-FISH-TUNASAKU-FZ-500G',
+        name: 'Ocean Yellowfin Saku Tuna Block (Sashimi AAA Grade 500g)',
+        topLeftBadge: 'Sashimi AAA',
+        certBadge: 'HACCP - Ultra Low Temp',
+        listPrice: 310000,
+        sellingPrice: 260000,
+        priceWithVat: 280800,
+        vatRateLabel: '8%',
+        unit: 'tray',
+        originCountry: 'Khanh Hoa, Vietnam',
+        moqLabel: '3 trays',
+        nextOrderPromoText: 'Buy 10 trays to unlock Tier-2 wholesale pricing.',
+        rating: 4.8,
+        reviewCount: 310,
+        galleryImages: ['', '', ''],
+        highlights: [
+            {
+                title: 'Rectangular Saku Block',
+                subtitle: 'Zero sinew, uniform slices',
+            },
+            {
+                title: 'Store at -18°C to -40°C',
+                subtitle: 'Flash-frozen at sea',
+            },
+            {
+                title: 'Ruby Red Color',
+                subtitle: 'poke & sashimi ready',
+            },
+        ],
+        technicalSpecs: {
+            enterpriseName: 'MD Foods Direct Supply (Partner: Hai Nam Ocean Fishery Export JSC)',
+            enterpriseTaxId: '4200591824 (Verified Export Fishery)',
+            industryGroup: 'Fish and seafood',
+            tradeName: 'Yellowfin Tuna Saku Block AAA Sashimi Grade 500g',
+            netWeight: '0.50 kg (2 blocks per vacuum pack)',
+            tareWeight: '0.015 kg (PE vacuum film)',
+            volume: '0.0009 m³',
+            dimensions: '18 cm × 3 cm × 12 cm',
+            minimumQuantity: '3 trays',
+            vatInfo: '8% (Automatic electronic invoice issuance)',
+            attributeFilter: 'Sashimi block, Poke bowl, Tataki',
+        },
+        kitchenCommitment: {
+            badge: '100% SINEW-FREE RECTANGULAR SAKU CUT',
+            title: 'Uniform Portioning for Sushi Bars & Poke Chains',
+            description:
+                'Cut from the prime center loin of line-caught ocean Yellowfin Tuna. Every block is shaped to uniform height and width so chefs can slice identical sashimi pieces with zero trim loss.',
+            bullets: [
+                'Blast-frozen at -60°C immediately after catch to lock ruby-red myoglobin.',
+                'Individually vacuum-packed for accurate daily inventory control.',
+                'Full export-grade histamine and heavy-metal lab clearance.',
+            ],
+        },
+        chefStorageGuidelines: {
+            tempZone: 'Deep Freezer -18°C or below',
+            shelfLifeUnopened: '6 Months frozen at -18°C',
+            shelfLifeOpened: '24 Hours chilled at 0–2°C after thawing',
+            thawingMethod:
+                'Thaw in warm salted water (3% salinity at 30°C) for 3 minutes, pat dry, then chill in refrigerator for 30 minutes.',
+            chefNotes: [
+                'Never thaw inside the vacuum bag to avoid drip purge.',
+                'Wrap in absorbent paper after thawing for firm ruby-red slices.',
+            ],
+        },
+        foodSafetyDossier: {
+            certifications: [
                 {
-                    title: 'Rectangular Saku Block',
-                    subtitle: 'Zero sinew, uniform slices',
-                },
-                {
-                    title: 'Store at -18°C to -40°C',
-                    subtitle: 'Flash-frozen at sea',
-                },
-                {
-                    title: 'Ruby Red Color',
-                    subtitle: 'poke & sashimi ready',
+                    code: 'EU Export Fishery Code #DL-408',
+                    issuer: 'NAFIQAD Vietnam',
+                    validUntil: '30/12/2027',
                 },
             ],
-            technicalSpecs: {
-                enterpriseName:
-                    'MD Foods Direct Supply (Partner: Hai Nam Ocean Fishery Export JSC)',
-                enterpriseTaxId: '4200591824 (Verified Export Fishery)',
-                industryGroup: 'Fish and seafood',
-                tradeName: 'Yellowfin Tuna Saku Block AAA Sashimi Grade 500g',
-                netWeight: '0.50 kg (2 blocks per vacuum pack)',
-                tareWeight: '0.015 kg (PE vacuum film)',
-                volume: '0.0009 m³',
-                dimensions: '18 cm × 3 cm × 12 cm',
-                minimumQuantity: '3 trays',
-                vatInfo: '8% (Automatic electronic invoice issuance)',
-                attributeFilter: 'Sashimi block, Poke bowl, Tataki',
-            },
-            kitchenCommitment: {
-                badge: '100% SINEW-FREE RECTANGULAR SAKU CUT',
-                title: 'Uniform Portioning for Sushi Bars & Poke Chains',
-                description:
-                    'Cut from the prime center loin of line-caught ocean Yellowfin Tuna. Every block is shaped to uniform height and width so chefs can slice identical sashimi pieces with zero trim loss.',
-                bullets: [
-                    'Blast-frozen at -60°C immediately after catch to lock ruby-red myoglobin.',
-                    'Individually vacuum-packed for accurate daily inventory control.',
-                    'Full export-grade histamine and heavy-metal lab clearance.',
-                ],
-            },
-            chefStorageGuidelines: {
-                tempZone: 'Deep Freezer -18°C or below',
-                shelfLifeUnopened: '6 Months frozen at -18°C',
-                shelfLifeOpened: '24 Hours chilled at 0–2°C after thawing',
-                thawingMethod:
-                    'Thaw in warm salted water (3% salinity at 30°C) for 3 minutes, pat dry, then chill in refrigerator for 30 minutes.',
-                chefNotes: [
-                    'Never thaw inside the vacuum bag to avoid drip purge.',
-                    'Wrap in absorbent paper after thawing for firm ruby-red slices.',
-                ],
-            },
-            foodSafetyDossier: {
-                certifications: [
-                    {
-                        code: 'EU Export Fishery Code #DL-408',
-                        issuer: 'NAFIQAD Vietnam',
-                        validUntil: '30/12/2027',
-                    },
-                ],
-                microbialStandards: [
-                    {
-                        parameter: 'Mercury (Hg)',
-                        limit: '< 1.0 mg/kg',
-                        result: '0.18 mg/kg (Passed)',
-                    },
-                ],
-            },
-            originTraceability: {
-                harvestRegion: 'Central Vietnam Deep Sea Fishing Grounds (FAO 71)',
-                processingFacility: 'Nha Trang Export Seafood Plant',
-                importPort: 'Cold Chain Container to HCMC',
-                coldChainHub: 'Landmark 81 / Tan Thuan Cold Storage Hub',
-                lotTimeline: [
-                    {
-                        step: '1. Line-Caught & -60°C Blast Frozen',
-                        timestamp: 'Batch #TUN-2026-10',
-                        detail: 'Processed into center-loin Saku blocks and vacuum sealed.',
-                    },
-                ],
-            },
-            reviews: [
+            microbialStandards: [
                 {
-                    id: 'rev-tun-5',
-                    author: 'Vivian Banshee',
-                    roleBadge: 'IZAKAYA OWNER',
-                    date: '11/04/2026',
-                    rating: 5,
-                    comment:
-                        'Ruby red color holds up beautifully in our Poke bowls. Zero sinew!',
-                    cutenessScore: 'saku cut: 10/10',
-                    likesLabel: '19k',
-                    avatarBg: 'from-[#C4B5FD] to-[#818CF8]',
-                },
-                {
-                    id: 'rev-tun-4',
-                    author: 'Aloha Poke Saigon',
-                    roleBadge: 'POKE CHAIN',
-                    date: '08/04/2026',
-                    rating: 4,
-                    comment:
-                        'Uniform block geometry makes cubing for poke bowls super fast and accurate.',
-                    cutenessScore: 'yield: 9.5/10',
-                    likesLabel: '5.1k',
-                    avatarBg: 'from-[#BAE6FD] to-[#0284C7]',
-                },
-                {
-                    id: 'rev-tun-3',
-                    author: 'Sakura Dining',
-                    roleBadge: 'JAPANESE RESTAURANT',
-                    date: '03/04/2026',
-                    rating: 3,
-                    comment:
-                        'Requires following the warm salt-water thawing guide strictly for best color.',
-                    cutenessScore: 'thawing care: 8/10',
-                    likesLabel: '610',
-                    avatarBg: 'from-[#FDE68A] to-[#D97706]',
+                    parameter: 'Mercury (Hg)',
+                    limit: '< 1.0 mg/kg',
+                    result: '0.18 mg/kg (Passed)',
                 },
             ],
         },
-    }
+        originTraceability: {
+            harvestRegion: 'Central Vietnam Deep Sea Fishing Grounds (FAO 71)',
+            processingFacility: 'Nha Trang Export Seafood Plant',
+            importPort: 'Cold Chain Container to HCMC',
+            coldChainHub: 'Landmark 81 / Tan Thuan Cold Storage Hub',
+            lotTimeline: [
+                {
+                    step: '1. Line-Caught & -60°C Blast Frozen',
+                    timestamp: 'Batch #TUN-2026-10',
+                    detail: 'Processed into center-loin Saku blocks and vacuum sealed.',
+                },
+            ],
+        },
+        reviews: [
+            {
+                id: 'rev-tun-5',
+                author: 'Vivian Banshee',
+                roleBadge: 'IZAKAYA OWNER',
+                date: '11/04/2026',
+                rating: 5,
+                comment: 'Ruby red color holds up beautifully in our Poke bowls. Zero sinew!',
+                cutenessScore: 'saku cut: 10/10',
+                likesLabel: '19k',
+                avatarBg: 'from-surface-blue to-info',
+            },
+            {
+                id: 'rev-tun-4',
+                author: 'Aloha Poke Saigon',
+                roleBadge: 'POKE CHAIN',
+                date: '08/04/2026',
+                rating: 4,
+                comment:
+                    'Uniform block geometry makes cubing for poke bowls super fast and accurate.',
+                cutenessScore: 'yield: 9.5/10',
+                likesLabel: '5.1k',
+                avatarBg: 'from-surface-blue to-info',
+            },
+            {
+                id: 'rev-tun-3',
+                author: 'Sakura Dining',
+                roleBadge: 'JAPANESE RESTAURANT',
+                date: '03/04/2026',
+                rating: 3,
+                comment:
+                    'Requires following the warm salt-water thawing guide strictly for best color.',
+                cutenessScore: 'thawing care: 8/10',
+                likesLabel: '610',
+                avatarBg: 'from-store-yellow to-warning',
+            },
+        ],
+    },
+};
 
 export function formatCurrencyVnd(amount: number): string {
-    return `${amount.toLocaleString('vi-VN')}đ`
+    return `${amount.toLocaleString('vi-VN')}đ`;
 }

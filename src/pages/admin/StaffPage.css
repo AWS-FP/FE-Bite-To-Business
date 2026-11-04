@@ -41,7 +41,7 @@
 }
 
 .staff-panel-heading h2 {
-    font-family: var(--font-body);
+    font-family: var(--font-subheading);
     font-size: 18px;
     font-weight: 700;
     line-height: 1.5;
@@ -63,7 +63,7 @@
 }
 
 .staff-count {
-    background: #fff8e8;
+    background: var(--color-store-cream);
 }
 
 .staff-role-badge {
@@ -71,24 +71,24 @@
 }
 
 .staff-role-badge[data-role='ECOMMERCE_EXECUTIVE'] {
-    background: #9333ea;
+    background: var(--color-role-ecommerce);
 }
 
 .staff-role-badge[data-role='LOGISTICS_STAFF'] {
-    background: #0f766e;
+    background: var(--color-role-logistics);
 }
 
 .staff-role-badge[data-role='DELIVERY_STAFF'] {
-    background: #2563eb;
+    background: var(--color-role-delivery);
 }
 
 .staff-status-badge {
-    background: #22c55e;
+    background: var(--color-status-active);
     color: black;
 }
 
 .staff-status-badge[data-banned='true'] {
-    background: #fbeeed;
+    background: var(--color-surface-pink);
 }
 
 .staff-department-summary {
@@ -147,7 +147,7 @@
 }
 
 .staff-control input::placeholder {
-    color: #686868;
+    color: var(--color-store-muted);
     opacity: 1;
 }
 
@@ -195,7 +195,7 @@
 }
 
 .staff-table-scroll:focus-visible {
-    outline: 2px solid #376e55;
+    outline: 2px solid var(--color-store-line);
     outline-offset: -2px;
 }
 
@@ -224,7 +224,7 @@
 
 .staff-table th {
     border-block: 1px solid black;
-    background: #fff8e8;
+    background: var(--color-store-cream);
     padding: 14px 12px;
     font-size: 12px;
     font-weight: 600;
@@ -233,7 +233,7 @@
 
 .staff-table td {
     height: 78px;
-    border-bottom: 1px solid #deded8;
+    border-bottom: 1px solid var(--color-store-line);
     padding: 12px;
     font-size: 13px;
     line-height: 1.5;
@@ -268,7 +268,7 @@
     place-items: center;
     border: 1px solid black;
     border-radius: 50%;
-    background: #eaf0e8;
+    background: var(--color-surface-green);
     font-size: 12px;
     font-weight: 700;
 }
@@ -282,7 +282,7 @@
 .staff-account-id {
     display: block;
     margin-top: 4px;
-    color: #686868;
+    color: var(--color-store-muted);
     font-size: 11px;
 }
 
@@ -309,9 +309,9 @@
 }
 
 .staff-success {
-    border: 1px solid #376e55;
+    border: 1px solid var(--color-store-line);
     border-radius: 3px;
-    background: #eaf4ed;
+    background: var(--color-surface-green);
     padding: 16px;
     font-size: 13px;
     line-height: 1.8;
@@ -323,7 +323,7 @@
 }
 
 .staff-create-modal::backdrop {
-    background: #0006;
+    background: color-mix(in srgb, var(--color-black) 40%, transparent);
 }
 
 .staff-modal-header {
@@ -331,7 +331,7 @@
     flex-shrink: 0;
     align-items: flex-start;
     gap: 16px;
-    background: #fff8e8;
+    background: var(--color-store-cream);
     padding: 24px;
 }
 
@@ -343,7 +343,7 @@
     place-items: center;
     border: 2px solid black;
     border-radius: 4px;
-    background: #ffe14d;
+    background: var(--color-store-yellow);
     box-shadow: 2px 2px 0 black;
 }
 
@@ -353,7 +353,7 @@
 }
 
 .staff-modal-titles h2 {
-    font-family: var(--font-body);
+    font-family: var(--font-subheading);
     font-size: 24px;
     font-weight: 700;
     line-height: 36px;
@@ -416,7 +416,7 @@
 }
 
 .staff-password-fields legend {
-    border-top: 1px solid #deded8;
+    border-top: 1px solid var(--color-store-line);
     padding-top: 21px;
 }
 
@@ -448,12 +448,12 @@
 }
 
 .staff-form-fields input::placeholder {
-    color: #686868;
+    color: var(--color-store-muted);
     opacity: 1;
 }
 
 .staff-form-fields [aria-invalid='true'] {
-    border-color: #a52c2c;
+    border-color: var(--color-danger);
 }
 
 .staff-form-full {
@@ -471,7 +471,7 @@
 }
 
 .staff-form-select select:has(option[value='']:checked) {
-    color: #686868;
+    color: var(--color-store-muted);
 }
 
 .staff-form-select > img {
@@ -501,7 +501,7 @@
 
 .staff-create-modal .auth-field-hint {
     padding-top: 8px;
-    color: #686868;
+    color: var(--color-store-muted);
     font-family: var(--font-body);
     font-size: 11px;
     line-height: 17px;

@@ -4,10 +4,10 @@
     min-width: 0;
     height: 48px;
     padding: 0 15px;
-    border: 1px solid #17133a20;
+    border: 1px solid color-mix(in srgb, var(--color-auth-ink) 12.55%, transparent);
     border-radius: 12px;
     background: white;
-    color: var(--color-auth-ink, #17133a);
+    color: var(--color-auth-ink, var(--color-auth-ink));
     font: inherit;
     font-size: 14px;
     outline: none;
@@ -17,27 +17,27 @@
 }
 
 .auth-delivery-control::placeholder {
-    color: #a8a3b4;
+    color: var(--color-store-placeholder);
     opacity: 1;
 }
 
 .auth-delivery-control:focus {
-    border-color: #123b2e;
-    box-shadow: 0 0 0 3px #123b2e18;
+    border-color: var(--color-auth-green);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-auth-green) 9.41%, transparent);
 }
 
 .auth-delivery-control[aria-invalid='true'] {
-    border-color: #e8453c;
+    border-color: var(--color-danger);
 }
 
 .auth-delivery-control[aria-invalid='true']:focus {
-    box-shadow: 0 0 0 3px #e8453c18;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger) 9.41%, transparent);
 }
 
 .auth-delivery-control:disabled {
     cursor: not-allowed;
-    background: #f1eff8;
-    color: #868191;
+    background: var(--color-surface-muted);
+    color: var(--color-auth-muted);
 }
 
 textarea.auth-delivery-control {

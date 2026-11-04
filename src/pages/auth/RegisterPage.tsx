@@ -19,9 +19,9 @@ export default function RegisterPage() {
     return (
         <div
             className="auth-page auth-register-page min-h-dvh overflow-clip bg-auth-green text-auth-ink
-      [&_button]:cursor-pointer [&_button:disabled]:cursor-wait [&_:focus-visible]:outline-[3px_solid_#f2adce]
-      [&_:focus-visible]:outline-offset-4 motion-reduce:[&_*]:animate-none motion-reduce:[&_*]:transition-none
-      motion-reduce:[&_*]:scroll-auto"
+ [&_button]:cursor-pointer [&_button:disabled]:cursor-wait [&_:focus-visible]:outline-[3px_solid_var(--color-store-pink)]
+ [&_:focus-visible]:outline-offset-4 motion-reduce:[&_*]:animate-none motion-reduce:[&_*]:transition-none
+ motion-reduce:[&_*]:scroll-auto"
         >
             <AuthHeader />
             <div className="auth-scene relative mx-auto grid min-h-[calc(100dvh-81px)] max-w-[1440px] grid-cols-1">

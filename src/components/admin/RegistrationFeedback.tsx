@@ -7,7 +7,7 @@ export function RegistrationError({ error, onRetry }: { error: unknown; onRetry?
     return (
         <div
             role="alert"
-            className="flex flex-wrap items-center gap-3 rounded-[3px] border border-black bg-[#fbeeed] p-4 text-[13px] leading-6"
+            className="flex flex-wrap items-center gap-3 rounded-[3px] border border-black bg-surface-pink p-4 text-[13px] leading-6"
         >
             <AdminIcon name="warning" />
             <span className="min-w-0 flex-1">{t(registrationErrorKey(error))}</span>

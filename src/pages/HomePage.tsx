@@ -11,7 +11,7 @@ import NewsletterSection from '../components/customer/home/NewsletterSection';
 export default function HomePage() {
     return (
         <HomeModelProvider>
-            <StorefrontLayout rootClassName="flex min-h-screen flex-col bg-[#133425] text-white">
+            <StorefrontLayout rootClassName="flex min-h-screen flex-col bg-store-green text-white">
                 <CoverflowSlider />
                 <PartnerStrip />
                 <CategorySection />

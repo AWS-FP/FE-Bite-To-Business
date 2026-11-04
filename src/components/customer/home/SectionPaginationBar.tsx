@@ -46,12 +46,12 @@ function getPageItems(current: number, total: number): PageItem[] {
 }
 
 export default function SectionPaginationBar({
-                                                 currentPage,
-                                                 totalPages,
-                                                 totalItems,
-                                                 pageSize,
-                                                 onPageChange,
-                                             }: PaginationBarProps) {
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    onPageChange,
+}: PaginationBarProps) {
     const { t } = useTranslation('storefront');
     const hasItems = totalItems > 0 && totalPages > 0;
     const lastPage = Math.max(1, Math.trunc(totalPages));
@@ -67,25 +67,32 @@ export default function SectionPaginationBar({
     };
 
     const buttonBase =
-        'inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-solid border-[#14132b] px-2 text-xs font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#123B2E] disabled:cursor-not-allowed disabled:opacity-40';
+        'inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-solid border-store-ink px-2 text-xs font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-store-green disabled:cursor-not-allowed disabled:opacity-40';
 
     return (
         <nav
             aria-label={t('homePage.paginationLabel')}
-            className="mt-8 flex flex-wrap items-center justify-between gap-x-5 gap-y-3 border-0 border-t border-solid border-[#14132b]/15 pt-4 text-xs text-[#14132b]"
+            className="mt-8 flex flex-wrap items-center justify-between gap-x-5 gap-y-3 border-0 border-t border-solid border-store-ink/15 pt-4 text-xs text-store-ink"
         >
-            <p className="m-0 font-medium text-[#4B5563]">
-                {t('homePage.paginationShowing', { first: firstItem, last: lastItem, total: totalItems })}
+            <p className="m-0 font-medium text-store-muted">
+                {t('homePage.paginationShowing', {
+                    first: firstItem,
+                    last: lastItem,
+                    total: totalItems,
+                })}
             </p>
 
-            <div className="flex flex-wrap items-center gap-1.5" aria-label={t('homePage.choosePage')}>
+            <div
+                className="flex flex-wrap items-center gap-1.5"
+                aria-label={t('homePage.choosePage')}
+            >
                 <button
                     type="button"
                     aria-label={t('homePage.firstPage')}
                     title={t('homePage.firstPage')}
                     disabled={!hasItems || page === 1}
                     onClick={() => goTo(1)}
-                    className={`${buttonBase} bg-white hover:bg-[#FFF5C0]`}
+                    className={`${buttonBase} bg-white hover:bg-surface-yellow`}
                 >
                     <ChevronFirst size={16} aria-hidden="true" />
                 </button>
@@ -95,7 +102,7 @@ export default function SectionPaginationBar({
                     title={t('homePage.previousPage')}
                     disabled={!hasItems || page === 1}
                     onClick={() => goTo(page - 1)}
-                    className={`${buttonBase} bg-white hover:bg-[#FFF5C0]`}
+                    className={`${buttonBase} bg-white hover:bg-surface-yellow`}
                 >
                     <ChevronLeft size={16} aria-hidden="true" />
                 </button>
@@ -105,7 +112,7 @@ export default function SectionPaginationBar({
                         <span
                             key={`ellipsis-${index}`}
                             aria-hidden="true"
-                            className="inline-flex h-9 w-6 items-center justify-center text-[#6B7280]"
+                            className="inline-flex h-9 w-6 items-center justify-center text-store-muted"
                         >
                             …
                         </span>
@@ -118,8 +125,8 @@ export default function SectionPaginationBar({
                             onClick={() => goTo(item)}
                             className={`${buttonBase} tabular-nums ${
                                 item === page
-                                    ? 'bg-[#FFE14D] text-[#14132b]'
-                                    : 'bg-white hover:bg-[#FFF5C0]'
+                                    ? 'bg-store-yellow text-store-ink'
+                                    : 'bg-white hover:bg-surface-yellow'
                             }`}
                         >
                             {item}
@@ -133,7 +140,7 @@ export default function SectionPaginationBar({
                     title={t('homePage.nextPage')}
                     disabled={!hasItems || page === lastPage}
                     onClick={() => goTo(page + 1)}
-                    className={`${buttonBase} bg-white hover:bg-[#FFF5C0]`}
+                    className={`${buttonBase} bg-white hover:bg-surface-yellow`}
                 >
                     <ChevronRight size={16} aria-hidden="true" />
                 </button>
@@ -143,7 +150,7 @@ export default function SectionPaginationBar({
                     title={t('homePage.lastPage')}
                     disabled={!hasItems || page === lastPage}
                     onClick={() => goTo(lastPage)}
-                    className={`${buttonBase} bg-white hover:bg-[#FFF5C0]`}
+                    className={`${buttonBase} bg-white hover:bg-surface-yellow`}
                 >
                     <ChevronLast size={16} aria-hidden="true" />
                 </button>

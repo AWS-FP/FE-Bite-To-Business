@@ -74,13 +74,12 @@ function AdminWorkspace() {
 
     return (
         <div
-            className={`admin-layout grid min-h-dvh bg-[#f8f7f3] font-body text-black [&_button]:cursor-pointer [&_a]:text-inherit [&_p]:m-0 [&_h1]:m-0 [&_h2]:m-0 [&_h1]:font-body [&_h2]:font-body [&_h3]:font-body [&_h4]:font-body [&_label]:font-body [&_small]:font-body
-        ${isCollapsed ? 'is-collapsed grid-cols-[84px_minmax(0,1fr)]' : 'grid-cols-[272px_minmax(0,1fr)]'}
+            className={`admin-layout grid min-h-dvh bg-surface-soft font-body text-black [&_button]:cursor-pointer [&_a]:text-inherit [&_p]:m-0 [&_h1]:m-0 [&_h2]:m-0 [&_label]:font-body [&_small]:font-body ${isCollapsed ? 'is-collapsed grid-cols-[84px_minmax(0,1fr)]' : 'grid-cols-[272px_minmax(0,1fr)]'}
         `}
             data-layout="admin"
         >
             <a
-                className="admin-skip-link fixed top-2 left-3 z-[60] -translate-y-[180%] border border-black bg-[#ffe14d] px-4 py-3 focus:translate-y-0"
+                className="admin-skip-link fixed top-2 left-3 z-[60] -translate-y-[180%] border border-black bg-store-yellow px-4 py-3 focus:translate-y-0"
                 href="#admin-main-content"
             >
                 {t('skipToContent')}
@@ -107,7 +106,7 @@ function AdminWorkspace() {
                     tabIndex={-1}
                 >
                     <Outlet />
-                    <footer className="mt-6 flex flex-wrap items-center justify-between gap-3 text-[11px] leading-[16.5px] text-[#65655e]">
+                    <footer className="mt-6 flex flex-wrap items-center justify-between gap-3 text-[11px] leading-[16.5px] text-store-muted">
                         <p>{t('footer.copyright', { year: new Date().getFullYear() })}</p>
                         <p className="flex items-center gap-1.5">
                             <AdminIcon name="lock" />

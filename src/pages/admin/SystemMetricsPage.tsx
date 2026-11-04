@@ -86,13 +86,13 @@ export default function SystemMetricsPage() {
                 title={t('system.title')}
                 description={t('system.description')}
             >
-                <div className="flex items-center gap-3 rounded-[3px] border border-black bg-[#fff8e8] px-4 py-3">
+                <div className="flex items-center gap-3 rounded-[3px] border border-black bg-store-cream px-4 py-3">
                     <ShieldCheck size={20} strokeWidth={1.5} aria-hidden="true" />
                     <div>
                         <strong className="block text-[12px] leading-[18px] font-semibold">
                             {t('system.adminOnly')}
                         </strong>
-                        <span className="block pt-1 text-[11px] leading-[16.5px] text-[#65655e]">
+                        <span className="block pt-1 text-[11px] leading-[16.5px] text-store-muted">
                             {t('system.timezone')}
                         </span>
                     </div>

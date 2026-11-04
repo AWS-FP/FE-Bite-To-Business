@@ -18,8 +18,8 @@ export default function LoginDecoration() {
                 {/* Ảnh đồ uống bên trái. */}
                 <div
                     className="auth-photo absolute top-[65px] left-[6%] h-[252px] w-[184px] -rotate-6
-          overflow-hidden rounded-t-[130px] border-4 border-solid border-auth-cream
-          bg-[#dce1d5] shadow-[10px_10px_0_#17133a]"
+ overflow-hidden rounded-t-[130px] border-4 border-solid border-auth-cream
+ bg-surface-green shadow-[10px_10px_0_var(--color-auth-ink)]"
                 >
                     <img
                         src="/images/login/beverages.jpg"
@@ -32,8 +32,8 @@ export default function LoginDecoration() {
                 {/* Ảnh cá trong khung tròn. */}
                 <div
                     className="auth-photo absolute top-[255px] left-[17%] h-[142px] w-[142px]
-          overflow-hidden rounded-full border-4 border-solid border-auth-cream
-          bg-[#e7d7c6] shadow-[10px_10px_0_#17133a]"
+ overflow-hidden rounded-full border-4 border-solid border-auth-cream
+ bg-warning-soft shadow-[10px_10px_0_var(--color-auth-ink)]"
                 >
                     <img
                         src="/images/login/fishes.jpg"
@@ -46,8 +46,8 @@ export default function LoginDecoration() {
                 {/* Ảnh thịt và rau bên phải. */}
                 <div
                     className="auth-photo absolute top-[90px] right-[6%] h-[126px] w-[218px] rotate-[8deg]
-          overflow-hidden rounded-[100px] border-4 border-solid border-auth-cream
-          bg-[#a0afa5] shadow-[10px_10px_0_#17133a]"
+ overflow-hidden rounded-[100px] border-4 border-solid border-auth-cream
+ bg-surface-soft shadow-[10px_10px_0_var(--color-auth-ink)]"
                 >
                     <img
                         src="/images/login/porks.jpg"
@@ -59,8 +59,8 @@ export default function LoginDecoration() {
 
                 <div
                     className="auth-photo absolute top-[60px] right-[19%] h-[94px] w-[94px]
-          overflow-hidden rounded-full border-4 border-solid border-auth-cream
-          bg-[#c9d5ac] shadow-[4px_4px_0_#17133a]"
+ overflow-hidden rounded-full border-4 border-solid border-auth-cream
+ bg-store-mint shadow-[4px_4px_0_var(--color-auth-ink)]"
                 >
                     <img
                         src="/images/login/vegies.jpg"
@@ -72,8 +72,8 @@ export default function LoginDecoration() {
 
                 <div
                     className="auth-photo absolute top-[540px] right-[22%] h-[120px] w-[120px] -rotate-[8deg]
-          overflow-hidden rounded-[32px] border-4 border-solid border-auth-cream
-          bg-[#ddd5b6] shadow-[10px_10px_0_#17133a]"
+ overflow-hidden rounded-[32px] border-4 border-solid border-auth-cream
+ bg-store-yellow shadow-[10px_10px_0_var(--color-auth-ink)]"
                 >
                     <img
                         src="/images/login/snack.jpg"
@@ -85,8 +85,8 @@ export default function LoginDecoration() {
 
                 <div
                     className="auth-fresh-sticker absolute top-[260px] left-[3%] grid h-24 w-24
-          -rotate-[14deg] content-center rounded-full bg-[#ff9bd2] text-center font-label
-          text-[11px] leading-[1.25] font-bold uppercase shadow-[4px_4px_0_#17133a]"
+ -rotate-[14deg] content-center rounded-full bg-store-pink text-center font-label
+ text-[11px] leading-[1.25] font-bold uppercase shadow-[4px_4px_0_var(--color-auth-ink)]"
                 >
                     {t('auth.fresh')}
                     <br />
@@ -100,9 +100,9 @@ export default function LoginDecoration() {
                 {/* Ba bước dành cho Customer vừa gửi đăng ký. */}
                 <aside
                     className="auth-paper-note absolute top-[295px] right-[3%] w-[290px]
-          origin-top-right rotate-2 scale-[0.86] bg-white px-6 pt-7 pb-6 shadow-[8px_8px_0_#17133a]"
+ origin-top-right rotate-2 scale-[0.86] bg-white px-6 pt-7 pb-6 shadow-[8px_8px_0_var(--color-auth-ink)]"
                 >
-                    <span className="absolute -top-3 left-[calc(50%_-_48px)] h-6 w-24 -rotate-3 bg-[#ff9bd2d9]" />
+                    <span className="absolute -top-3 left-[calc(50%_-_48px)] h-6 w-24 -rotate-3 bg-store-pink/85" />
                     <h2 className="m-0 font-subheading text-[24px] leading-[1.15] font-bold">
                         {t('auth.loginNote.title')}
                     </h2>
@@ -121,7 +121,7 @@ export default function LoginDecoration() {
                                 </p>
                             </div>
                         </li>
-                        <li className="mt-3 flex items-baseline gap-3 border-0 border-t border-dashed border-[#17133a25] pt-3">
+                        <li className="mt-3 flex items-baseline gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-3">
                             <span className="auth-note-number font-display text-[24px] leading-none font-bold text-auth-green">
                                 02
                             </span>
@@ -134,7 +134,7 @@ export default function LoginDecoration() {
                                 </p>
                             </div>
                         </li>
-                        <li className="mt-3 flex items-baseline gap-3 border-0 border-t border-dashed border-[#17133a25] pt-3">
+                        <li className="mt-3 flex items-baseline gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-3">
                             <span className="auth-note-number font-display text-[24px] leading-none font-bold text-auth-green">
                                 03
                             </span>

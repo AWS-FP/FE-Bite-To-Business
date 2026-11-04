@@ -1,5 +1,5 @@
 /* Font dùng chung và tiêu đề Staff tải từ Google Fonts. */
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Inter:wght@100..900&family=Kavoon&family=Manrope:wght@200..800&family=Oswald:wght@200..700&family=Playfair+Display:ital,wght@0,800;1,500&family=Prata&family=Space+Grotesk:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Inter:wght@100..900&family=Kavoon&family=Manrope:wght@200..800&family=Oswald:wght@200..700&family=Prata&family=Space+Grotesk:wght@300..700&display=swap');
 
 @layer theme, base, components, utilities;
 @import 'tailwindcss/theme.css' layer(theme);
@@ -15,6 +15,7 @@
     --font-price: 'Inter', sans-serif;
     --font-label: 'Oswald', sans-serif;
     --font-display: 'Bricolage Grotesque', sans-serif;
+    --font-mono: ui-monospace, 'SFMono-Regular', Consolas, monospace;
     --color-store-green: #12372a;
     --color-store-dark: #0b241b;
     --color-store-yellow: #fce043;
@@ -25,17 +26,36 @@
     --color-auth-cream: #fff1e0;
     --color-auth-muted: #787386;
 
+    --color-store-coral: #ff5a4e;
+    --color-store-pink: #ff9bd2;
+    --color-store-mint: #d9eea3;
+    --color-store-sage: #71877b;
     --color-store-muted: #667184;
+    --color-store-muted-light: #b8c9c0;
     --color-store-placeholder: #a8a3b4;
     --color-store-line: #d3dbd5;
+    --color-store-line-strong: #73756e;
+
     --color-surface-soft: #f8f7f3;
+    --color-surface-muted: #f1eff8;
     --color-surface-green: #eaf3ec;
     --color-surface-yellow: #fff3b1;
+    --color-surface-pink: #fff0f4;
+    --color-surface-blue: #e8eaff;
+
     --color-success: #15803d;
+    --color-warning: #a16207;
+    --color-warning-soft: #fff5db;
     --color-danger: #e8453c;
     --color-danger-strong: #9b2018;
     --color-danger-soft: #ffedeb;
     --color-danger-line: #f5c2bc;
+    --color-info: #1e2699;
+
+    --color-role-delivery: #2563eb;
+    --color-role-ecommerce: #9333ea;
+    --color-role-logistics: #0f766e;
+    --color-status-active: #22c55e;
 }
 
 @utility brand-name {
@@ -141,51 +161,5 @@
 }
 
 :root body :is(input, select, textarea)[aria-invalid='true']:focus {
-    border-color: #e8453c;
-}
-
-/* Kiểu focus dùng chung cho chuột và bàn phím. */
-:root
-    body
-    :is(
-        a[href],
-        button,
-        input,
-        select,
-        textarea,
-        summary,
-        [role='button'],
-        [role='tab'],
-        [role='combobox'],
-        :where([tabindex]:not([tabindex='-1']))
-    ):focus {
-    border-width: 2px;
-    border-style: solid;
-    border-color: currentColor;
-    outline: none;
-    box-shadow: none;
-}
-
-:root
-    body
-    :is(
-        .focus-border-group,
-        .staff-control,
-        label:has(> input:is([type='radio'], [type='checkbox']))
-    ):focus-within {
-    border-width: 2px;
-    border-style: solid;
-    border-color: currentColor;
-    outline: none;
-    box-shadow: none;
-}
-
-:root body :is(.focus-border-group, .staff-control) :is(input, select, textarea):focus {
-    border: 0;
-    outline: none;
-    box-shadow: none;
-}
-
-:root body :is(input, select, textarea)[aria-invalid='true']:focus {
-    border-color: #e8453c;
+    border-color: var(--color-danger);
 }

@@ -59,7 +59,7 @@ export default function AdminModal({
             data-drawer={drawer}
             onCancel={handleCancel}
             onClick={handleBackdropClick}
-            className={`admin-modal fixed overflow-hidden border-2 border-black bg-white p-0 font-body text-black backdrop:bg-[#0009] [&_button]:cursor-pointer [&_button:disabled]:cursor-wait [&_button:disabled]:opacity-60 [&_button:focus-visible]:outline-[3px_solid_#ffe14d] [&_button:focus-visible]:outline-offset-2 [&_h2]:m-0 [&_h3]:m-0 [&_p]:m-0 ${className}`}
+            className={`admin-modal fixed overflow-hidden border-2 border-black bg-white p-0 font-body text-black backdrop:bg-black/60 [&_button]:cursor-pointer [&_button:disabled]:cursor-wait [&_button:disabled]:opacity-60 [&_button:focus-visible]:outline-[3px_solid_var(--color-store-yellow)] [&_button:focus-visible]:outline-offset-2 [&_h2]:m-0 [&_h3]:m-0 [&_p]:m-0 ${className}`}
         >
             <div className={`flex flex-col ${drawer ? 'h-dvh' : 'max-h-[calc(100dvh-48px)]'}`}>
                 {children}
