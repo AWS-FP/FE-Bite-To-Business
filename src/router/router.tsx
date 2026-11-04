@@ -10,6 +10,8 @@ import VerifyOtpPage from '@/pages/auth/VerifyOtpPage';
 
 // Public Customer Pages
 import HomePage from '@/pages/HomePage';
+
+// Customer Pages
 import ProfilePage from '@/pages/customer/ProfilePage';
 
 // Delivery Pages
@@ -53,7 +55,6 @@ export const router = createBrowserRouter([
     // ==========================================
     // 1. AUTHENTICATION
     // ==========================================
-
     {
         path: ROUTES.LOGIN,
         Component: LoginPage,
@@ -79,7 +80,6 @@ export const router = createBrowserRouter([
     // 2. PUBLIC CUSTOMER PAGES
     // Không cần đăng nhập
     // ==========================================
-
     // Homepage
     {
         path: ROUTES.HOME,
@@ -109,17 +109,10 @@ export const router = createBrowserRouter([
     },
 
     {
-        path: ROUTES.DISTRIBUTION_NETWORK,
-        Component: DistributionNetworkPage,
-    },
-
-    // Catalog chưa triển khai ở nhánh này
-    {
         path: ROUTES.CATALOG,
         Component: PendingPage,
     },
 
-    // Product Details thuộc nhánh riêng
     {
         path: ROUTES.PRODUCT_DETAIL,
         Component: PendingPage,
@@ -129,9 +122,6 @@ export const router = createBrowserRouter([
         path: ROUTES.QUOTES,
         Component: PendingPage,
     },
-
-    // Preview Profile locally; production uses the protected route below.
-    ...(import.meta.env.DEV ? [{ path: ROUTES.PROFILE, Component: ProfilePage }] : []),
 
     // ==========================================
     // 3. CUSTOMER PROTECTED ROUTES
@@ -158,8 +148,10 @@ export const router = createBrowserRouter([
                 path: ROUTES.FAVORITES,
                 Component: PendingPage,
             },
-
-            ...(!import.meta.env.DEV ? [{ path: ROUTES.PROFILE, Component: ProfilePage }] : []),
+            {
+                path: ROUTES.PROFILE,
+                Component: ProfilePage,
+            },
         ],
     },
 

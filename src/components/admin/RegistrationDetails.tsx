@@ -18,7 +18,7 @@ function DetailSection({
 }) {
     return (
         <section className="pt-[25px]">
-            <h3 className="flex items-center gap-[9px] border-b border-black pb-3 font-body text-[15px] leading-[23px] font-bold">
+            <h3 className="flex items-center gap-[9px] border-b border-black pb-3 font-subheading text-[15px] leading-[23px] font-bold">
                 <AdminIcon name={icon} />
                 {title}
             </h3>
@@ -62,13 +62,13 @@ export default function RegistrationDetails({
         <>
             <div className="flex flex-wrap items-center gap-[13px] border-b border-black pb-6">
                 <span
-                    className="grid size-[47px] shrink-0 place-items-center rounded-full border border-black bg-[#eaf0e8] text-[15px] font-bold"
+                    className="grid size-[47px] shrink-0 place-items-center rounded-full border border-black bg-surface-green text-[15px] font-bold"
                     aria-hidden="true"
                 >
                     {customerInitials(registration.customer)}
                 </span>
                 <div className="min-w-0 flex-1">
-                    <h3 className="font-body text-[18px] leading-[27px] font-bold">
+                    <h3 className="font-subheading text-[18px] leading-[27px] font-bold">
                         {customerName(registration.customer)}
                     </h3>
                     <p className="pt-[5px] text-[13px] leading-[19.5px] wrap-anywhere">

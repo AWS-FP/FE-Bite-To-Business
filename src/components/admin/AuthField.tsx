@@ -27,9 +27,9 @@ export default function AuthField({
         <div className="auth-field min-w-0">
             <label className="mb-[7px] block text-[14px] leading-5 font-semibold" htmlFor={name}>
                 {label}
-                {required && <span className="auth-required text-[#e83d33]"> *</span>}
+                {required && <span className="auth-required text-danger"> *</span>}
                 {optional && (
-                    <span className="auth-optional font-subtext text-[11px] font-normal text-[#797183]">
+                    <span className="auth-optional font-subtext text-[11px] font-normal text-auth-muted">
                         {' '}
                         ({t('auth.optional')})
                     </span>
@@ -38,12 +38,12 @@ export default function AuthField({
             {children}
             <div id={`${name}-help`}>
                 {error && (
-                    <p className="auth-field-error mt-1.5 mb-0 font-subtext text-[12px] leading-[1.5] text-[#b92e25]">
+                    <p className="auth-field-error mt-1.5 mb-0 font-subtext text-[12px] leading-[1.5] text-danger">
                         {t(error)}
                     </p>
                 )}
                 {!error && hint && (
-                    <p className="auth-field-hint mt-1.5 mb-0 font-subtext text-[12px] leading-[1.5] text-[#878091]">
+                    <p className="auth-field-hint mt-1.5 mb-0 font-subtext text-[12px] leading-[1.5] text-auth-muted">
                         {hint}
                     </p>
                 )}

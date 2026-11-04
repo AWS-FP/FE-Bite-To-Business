@@ -48,7 +48,7 @@ export default function DeliveryAddressStep({ form }: DeliveryAddressStepProps) 
 
     return (
         <div className="auth-fields flex flex-col gap-5">
-            <div className="auth-info-banner flex items-start gap-2.5 rounded-xl border border-solid border-[#123b2e26] bg-[#e8eaff] px-4 py-[14px] text-[13px] leading-[1.6] text-[#343282]">
+            <div className="auth-info-banner flex items-start gap-2.5 rounded-xl border border-solid border-auth-green/15 bg-surface-blue px-4 py-[14px] text-[13px] leading-[1.6] text-info">
                 <MapPin className="mt-0.5 shrink-0" size={19} aria-hidden="true" />
                 <div>
                     <strong>{t('register.deliveryTitle')}</strong>
@@ -134,7 +134,7 @@ export default function DeliveryAddressStep({ form }: DeliveryAddressStepProps) 
 
             {citiesQuery.isError && (
                 <div
-                    className="rounded-xl border border-solid border-[#f5c2bc] bg-[#ffedeb] p-4 text-[13px] leading-6 text-[#9b2018]"
+                    className="rounded-xl border border-solid border-danger-line bg-danger-soft p-4 text-[13px] leading-6 text-danger-strong"
                     role="alert"
                 >
                     <p className="m-0">{t('address.loadError')}</p>
@@ -173,7 +173,7 @@ export default function DeliveryAddressStep({ form }: DeliveryAddressStepProps) 
             </AuthField>
 
             {province && ward && deliveryAddress?.trim() && (
-                <div className="rounded-xl border border-solid border-[#123b2e26] bg-[#eaf3ec] p-4 text-[13px] leading-6 text-auth-green">
+                <div className="rounded-xl border border-solid border-auth-green/15 bg-surface-green p-4 text-[13px] leading-6 text-auth-green">
                     <strong className="block">{t('fields.fullDeliveryAddress')}</strong>
                     <output className="block break-words" aria-live="polite">
                         {fullDeliveryAddress(deliveryAddress, ward, null, province)}

@@ -28,7 +28,7 @@ export default function WorkspaceSidebar({
 
     return (
         <aside
-            className="admin-sidebar sticky top-0 flex h-dvh min-h-[450px] flex-col overflow-y-auto border-r-2 border-black bg-[#fff8e8] px-4 pt-[25px] pb-4 [scrollbar-width:thin]"
+            className="admin-sidebar sticky top-0 flex h-dvh min-h-[450px] flex-col overflow-y-auto border-r-2 border-black bg-store-cream px-4 pt-[25px] pb-4 [scrollbar-width:thin]"
             id="workspace-sidebar"
             aria-label={workspaceLabel}
         >
@@ -69,7 +69,7 @@ export default function WorkspaceSidebar({
                         {group.items.map((item) => (
                             <NavLink
                                 key={item.path}
-                                className="admin-navigation-link relative flex min-h-[51px] items-center gap-[9px] rounded-[3px] border border-black bg-white px-[11px] py-[9px] text-[13px] leading-[18.2px] font-normal no-underline hover:bg-[#fff3b1] aria-[current=page]:bg-[#ffe14d] aria-[current=page]:font-bold aria-[current=page]:shadow-[3px_3px_0_#000] hover:aria-[current=page]:bg-[#ffe14d] [.is-collapsed_&]:justify-center [.is-collapsed_&]:px-2"
+                                className="admin-navigation-link relative flex min-h-[51px] items-center gap-[9px] rounded-[3px] border border-black bg-white px-[11px] py-[9px] text-[13px] leading-[18.2px] font-normal no-underline hover:bg-surface-yellow aria-[current=page]:bg-store-yellow aria-[current=page]:font-bold aria-[current=page]:shadow-[3px_3px_0_var(--color-black)] hover:aria-[current=page]:bg-store-yellow [.is-collapsed_&]:justify-center [.is-collapsed_&]:px-2"
                                 to={item.path}
                                 title={item.label}
                                 aria-label={item.ariaLabel || item.label}
@@ -96,7 +96,7 @@ export default function WorkspaceSidebar({
 
             <div className="admin-sidebar-bottom mt-auto pt-12 before:mb-[15px] before:block before:border-t before:border-black before:content-['']">
                 <button
-                    className="admin-collapse-button admin-icon-button ml-auto grid place-items-center border-0 bg-transparent p-[3px] text-black hover:bg-[#0000000d] [.is-collapsed_&]:mr-auto"
+                    className="admin-collapse-button admin-icon-button ml-auto grid place-items-center border-0 bg-transparent p-[3px] text-black hover:bg-black/5 [.is-collapsed_&]:mr-auto"
                     type="button"
                     title={isCollapsed ? t('sidebar.expand') : t('sidebar.collapse')}
                     aria-label={isCollapsed ? t('sidebar.expand') : t('sidebar.collapse')}

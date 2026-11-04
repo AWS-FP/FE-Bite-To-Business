@@ -35,7 +35,7 @@ export default function CustomerInformationStep({ form }: CustomerInformationSte
                     error={errors.lastName?.message}
                 >
                     <input
-                        className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4] placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18] aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed disabled:bg-[#f1eff8] disabled:text-[#868191] h-12 py-0"
+                        className="w-full rounded-xl border border-solid border-auth-ink/13 bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-store-placeholder placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_color-mix(in_srgb,_var(--color-auth-green)_9.41%,_transparent)] aria-invalid:border-danger aria-invalid:focus:shadow-[0_0_0_3px_color-mix(in_srgb,_var(--color-danger)_9.41%,_transparent)] disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-auth-muted h-12 py-0"
                         id="lastName"
                         autoComplete="family-name"
                         required
@@ -53,7 +53,7 @@ export default function CustomerInformationStep({ form }: CustomerInformationSte
                     error={errors.firstName?.message}
                 >
                     <input
-                        className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4] placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18] aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed disabled:bg-[#f1eff8] disabled:text-[#868191] h-12 py-0"
+                        className="w-full rounded-xl border border-solid border-auth-ink/13 bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-store-placeholder placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_color-mix(in_srgb,_var(--color-auth-green)_9.41%,_transparent)] aria-invalid:border-danger aria-invalid:focus:shadow-[0_0_0_3px_color-mix(in_srgb,_var(--color-danger)_9.41%,_transparent)] disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-auth-muted h-12 py-0"
                         id="firstName"
                         autoComplete="given-name"
                         required
@@ -74,7 +74,7 @@ export default function CustomerInformationStep({ form }: CustomerInformationSte
                 error={errors.email?.message}
             >
                 <input
-                    className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4] placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18] aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed disabled:bg-[#f1eff8] disabled:text-[#868191] h-12 py-0"
+                    className="w-full rounded-xl border border-solid border-auth-ink/13 bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-store-placeholder placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_color-mix(in_srgb,_var(--color-auth-green)_9.41%,_transparent)] aria-invalid:border-danger aria-invalid:focus:shadow-[0_0_0_3px_color-mix(in_srgb,_var(--color-danger)_9.41%,_transparent)] disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-auth-muted h-12 py-0"
                     id="email"
                     type="email"
                     autoComplete="email"
@@ -97,7 +97,7 @@ export default function CustomerInformationStep({ form }: CustomerInformationSte
                 error={errors.phone?.message}
             >
                 <input
-                    className="w-full rounded-xl border border-solid border-[#17133a20] bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#a8a3b4] placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_#123b2e18] aria-invalid:border-[#e8453c] aria-invalid:focus:shadow-[0_0_0_3px_#e8453c18] disabled:cursor-not-allowed disabled:bg-[#f1eff8] disabled:text-[#868191] h-12 py-0"
+                    className="w-full rounded-xl border border-solid border-auth-ink/13 bg-white px-[15px] text-[14px] text-auth-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-store-placeholder placeholder:opacity-100 focus:border-auth-green focus:shadow-[0_0_0_3px_color-mix(in_srgb,_var(--color-auth-green)_9.41%,_transparent)] aria-invalid:border-danger aria-invalid:focus:shadow-[0_0_0_3px_color-mix(in_srgb,_var(--color-danger)_9.41%,_transparent)] disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-auth-muted h-12 py-0"
                     id="phone"
                     type="tel"
                     autoComplete="tel"
@@ -113,10 +113,10 @@ export default function CustomerInformationStep({ form }: CustomerInformationSte
             <fieldset className="auth-customer-types m-0 min-w-0 border-0 p-0">
                 <legend className="mb-[7px] block p-0 text-[14px] leading-5 font-semibold">
                     {t('fields.customerType')}
-                    <span className="auth-required text-[#e83d33]"> *</span>
+                    <span className="auth-required text-danger"> *</span>
                 </legend>
                 <div className="auth-type-options grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-3">
-                    <label className="auth-type-card flex cursor-pointer flex-col items-start rounded-xl border-2 border-solid border-[#17133a1a] p-[14px] transition-[background,border-color] duration-150 hover:border-[#123b2e80] has-[input:checked]:border-auth-green has-[input:checked]:bg-[#eaf3ec] [&_input]:mt-0 [&_input]:mr-0 [&_input]:mb-[9px] [&_input]:ml-0 [&_input]:size-[19px] [&_input]:cursor-pointer [&_input]:accent-auth-green [&_strong]:font-label [&_strong]:text-[12px] [&_strong]:leading-[1.5] [&>span]:mt-[3px] [&>span]:font-subtext [&>span]:text-[11px] [&>span]:leading-[1.5] [&>span]:text-auth-muted">
+                    <label className="auth-type-card flex cursor-pointer flex-col items-start rounded-xl border-2 border-solid border-auth-ink/10 p-[14px] transition-[background,border-color] duration-150 hover:border-auth-green/50 has-[input:checked]:border-auth-green has-[input:checked]:bg-surface-green [&_input]:mt-0 [&_input]:mr-0 [&_input]:mb-[9px] [&_input]:ml-0 [&_input]:size-[19px] [&_input]:cursor-pointer [&_input]:accent-auth-green [&_strong]:font-label [&_strong]:text-[12px] [&_strong]:leading-[1.5] [&>span]:mt-[3px] [&>span]:font-subtext [&>span]:text-[11px] [&>span]:leading-[1.5] [&>span]:text-auth-muted">
                         <input
                             type="radio"
                             value="HOUSEHOLD_INDIVIDUAL_BUSINESS"
@@ -125,7 +125,7 @@ export default function CustomerInformationStep({ form }: CustomerInformationSte
                         <strong>{t('customerTypes.household')}</strong>
                         <span>{t('customerTypes.householdHint')}</span>
                     </label>
-                    <label className="auth-type-card flex cursor-pointer flex-col items-start rounded-xl border-2 border-solid border-[#17133a1a] p-[14px] transition-[background,border-color] duration-150 hover:border-[#123b2e80] has-[input:checked]:border-auth-green has-[input:checked]:bg-[#eaf3ec] [&_input]:mt-0 [&_input]:mr-0 [&_input]:mb-[9px] [&_input]:ml-0 [&_input]:size-[19px] [&_input]:cursor-pointer [&_input]:accent-auth-green [&_strong]:font-label [&_strong]:text-[12px] [&_strong]:leading-[1.5] [&>span]:mt-[3px] [&>span]:font-subtext [&>span]:text-[11px] [&>span]:leading-[1.5] [&>span]:text-auth-muted">
+                    <label className="auth-type-card flex cursor-pointer flex-col items-start rounded-xl border-2 border-solid border-auth-ink/10 p-[14px] transition-[background,border-color] duration-150 hover:border-auth-green/50 has-[input:checked]:border-auth-green has-[input:checked]:bg-surface-green [&_input]:mt-0 [&_input]:mr-0 [&_input]:mb-[9px] [&_input]:ml-0 [&_input]:size-[19px] [&_input]:cursor-pointer [&_input]:accent-auth-green [&_strong]:font-label [&_strong]:text-[12px] [&_strong]:leading-[1.5] [&>span]:mt-[3px] [&>span]:font-subtext [&>span]:text-[11px] [&>span]:leading-[1.5] [&>span]:text-auth-muted">
                         <input
                             type="radio"
                             value="BUSINESS_COOPERATIVE"

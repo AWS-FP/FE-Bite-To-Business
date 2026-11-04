@@ -61,7 +61,7 @@ export default function StoreNavigation() {
                     <button
                         ref={categoryButtonRef}
                         type="button"
-                        className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border-2 border-solid border-store-ink bg-store-yellow px-3 py-1.5 text-[12px] font-extrabold text-store-ink shadow-[2px_2px_0_#14132b] hover:bg-[#ffe96d]"
+                        className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border-2 border-solid border-store-ink bg-store-yellow px-3 py-1.5 text-[12px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)] hover:bg-store-yellow"
                         aria-haspopup="dialog"
                         aria-expanded={isCategoryMenuOpen}
                         aria-controls={isCategoryMenuOpen ? 'btb-category-mega-menu' : undefined}
@@ -103,7 +103,7 @@ export default function StoreNavigation() {
                     </div>
 
                     {/* Thông điệp VAT */}
-                    <span className="ml-auto hidden shrink-0 items-center gap-1.5 text-[12px] font-semibold text-[#f490b1] min-[1440px]:flex">
+                    <span className="ml-auto hidden shrink-0 items-center gap-1.5 text-[12px] font-semibold text-store-pink min-[1440px]:flex">
                         {t('header.invoice')}
 
                         <img

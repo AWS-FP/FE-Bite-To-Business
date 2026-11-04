@@ -55,7 +55,7 @@ export default function RegistrationReviewDialog({
         <AdminModal labelledBy="registration-review-title" onDismiss={onDismiss} busy={busy}>
             <div className="flex shrink-0 items-start justify-between px-[25px] pt-[25px]">
                 <span
-                    className={`grid size-[46px] place-items-center rounded-full border border-black ${decision === 'APPROVE' ? 'bg-[#d9eea3]' : 'bg-[#ffb4ba]'}`}
+                    className={`grid size-[46px] place-items-center rounded-full border border-black ${decision === 'APPROVE' ? 'bg-store-mint' : 'bg-surface-pink'}`}
                 >
                     <AdminIcon name={decision === 'APPROVE' ? 'approve-large' : 'reject-large'} />
                 </span>
@@ -73,7 +73,7 @@ export default function RegistrationReviewDialog({
                 <div className="min-h-0 overflow-y-auto px-[25px] pt-[21px] pb-[25px]">
                     <h2
                         id="registration-review-title"
-                        className="font-body text-[24px] leading-9 font-bold tracking-[-0.5px]"
+                        className="font-subheading text-[24px] leading-9 font-bold tracking-[-0.5px]"
                     >
                         {decision === 'APPROVE'
                             ? t('review.approveTitle')
@@ -88,7 +88,7 @@ export default function RegistrationReviewDialog({
                     </p>
                     {decision === 'APPROVE' ? (
                         <>
-                            <div className="mt-[18px] flex items-center gap-[10px] rounded-[3px] border border-black bg-[#fff8e8] p-[14px]">
+                            <div className="mt-[18px] flex items-center gap-[10px] rounded-[3px] border border-black bg-store-cream p-[14px]">
                                 <AdminIcon name="mail" />
                                 <div className="min-w-0">
                                     <p className="pb-1 text-[12px] leading-[18px]">
@@ -99,7 +99,7 @@ export default function RegistrationReviewDialog({
                                     </strong>
                                 </div>
                             </div>
-                            <div className="mt-[18px] mb-[21px] flex items-start gap-[9px] rounded-[3px] border border-black bg-[#fff8e8] p-[14px]">
+                            <div className="mt-[18px] mb-[21px] flex items-start gap-[9px] rounded-[3px] border border-black bg-store-cream p-[14px]">
                                 <span className="pt-0.5">
                                     <AdminIcon name="info" />
                                 </span>
@@ -129,13 +129,13 @@ export default function RegistrationReviewDialog({
                                     noteError ? 'registration-rejection-note-error' : undefined
                                 }
                                 placeholder={t('review.reasonPlaceholder')}
-                                className="block min-h-[120px] w-full resize-y rounded-[3px] border border-black bg-white p-3 font-body text-[13px] leading-[22px] outline-none focus:shadow-[0_0_0_3px_#ffe14d]"
+                                className="block min-h-[120px] w-full resize-y rounded-[3px] border border-black bg-white p-3 font-body text-[13px] leading-[22px] outline-none focus:shadow-[0_0_0_3px_var(--color-store-yellow)]"
                             />
                             {noteError && (
                                 <span
                                     id="registration-rejection-note-error"
                                     role="alert"
-                                    className="block pt-2 text-[12px] text-[#9b2018]"
+                                    className="block pt-2 text-[12px] text-danger-strong"
                                 >
                                     {t(noteError)}
                                 </span>

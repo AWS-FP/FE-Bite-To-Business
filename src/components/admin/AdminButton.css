@@ -4,31 +4,31 @@
 }
 
 .admin-button[data-tone='plain']:hover {
-    background: #fff8e8;
+    background: var(--color-store-cream);
 }
 
 .admin-button[data-tone='primary'] {
-    background: #ffe14d;
-    box-shadow: 3px 3px 0 #000;
+    background: var(--color-store-yellow);
+    box-shadow: 3px 3px 0 var(--color-black);
 }
 
 .admin-button[data-tone='primary']:hover {
-    background: #ffda24;
+    background: var(--color-store-yellow);
 }
 
 .admin-button[data-tone='danger'] {
-    background: #ffb4ba;
-    box-shadow: 3px 3px 0 #000;
+    background: var(--color-surface-pink);
+    box-shadow: 3px 3px 0 var(--color-black);
 }
 
 .admin-button[data-tone='danger']:hover {
-    background: #ffa0a8;
+    background: var(--color-store-pink);
 }
 
 .admin-button[data-tone='subtleDanger'] {
-    background: #fbeeed;
+    background: var(--color-surface-pink);
 }
 
 .admin-button[data-tone='subtleDanger']:hover {
-    background: #f7deda;
+    background: var(--color-surface-pink);
 }

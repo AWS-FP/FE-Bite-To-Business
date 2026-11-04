@@ -22,16 +22,16 @@ export default function ProductsSection() {
     } = useHomeModelContext();
     return (
         <section className="mx-auto max-w-[1320px] px-5 py-6">
-            <div className="rounded-[28px] border-2 border-solid border-[#14132b] bg-[#FAF3E3] p-10 text-[#14132b] shadow-[8px_8px_0_#14132b]">
+            <div className="rounded-[28px] border-2 border-solid border-store-ink bg-store-cream p-10 text-store-ink shadow-[8px_8px_0_var(--color-store-ink)]">
                 {/* 4A: EARLY MARKET FLASH DEALS */}
                 <div id="early-market-deals">
                     <div className="flex flex-wrap items-end justify-between gap-4">
                         <div>
-                            <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-[#14132b] bg-[#EF4444] px-3 py-1 text-[10px] font-extrabold uppercase text-white shadow-[2px_2px_0_#14132b]">
+                            <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-store-ink bg-danger px-3 py-1 text-[10px] font-extrabold uppercase text-white shadow-[2px_2px_0_var(--color-store-ink)]">
                                 <span className="h-2 w-2 rounded-full bg-white" />
                                 <span>{t('homePage.clearanceBadge', 'WHOLESALE CLEARANCE')}</span>
                             </span>
-                            <h2 className="m-0 mt-2 font-['Times_New_Roman',Georgia,serif] lining-nums text-3xl font-bold text-[#14132b]">
+                            <h2 className="m-0 mt-2 font-subheading lining-nums text-3xl font-bold text-store-ink">
                                 {t(
                                     'homePage.flashDealsTitle',
                                     'Early Market Flash Deals — Daily Specials',
@@ -41,15 +41,15 @@ export default function ProductsSection() {
 
                         {/* Countdown + Quick Prev/Next Arrows */}
                         <div className="flex flex-wrap items-center gap-3">
-                            <div className="flex items-center gap-2 text-xs font-bold text-[#14132b]">
+                            <div className="flex items-center gap-2 text-xs font-bold text-store-ink">
                                 <span>{t('homePage.batchClosesIn', 'Batch closes in:')}</span>
-                                <span className="rounded-lg bg-[#14132b] px-2.5 py-1.5 font-mono text-xs font-extrabold text-[#FACC15]">
+                                <span className="rounded-lg bg-store-ink px-2.5 py-1.5 font-mono text-xs font-extrabold text-store-yellow">
                                     {hours} {t('homePage.hrs', 'hrs')}
                                 </span>
-                                <span className="rounded-lg bg-[#14132b] px-2.5 py-1.5 font-mono text-xs font-extrabold text-[#FACC15]">
+                                <span className="rounded-lg bg-store-ink px-2.5 py-1.5 font-mono text-xs font-extrabold text-store-yellow">
                                     {minutes} {t('homePage.min', 'min')}
                                 </span>
-                                <span className="rounded-lg bg-[#14132b] px-2.5 py-1.5 font-mono text-xs font-extrabold text-[#FACC15]">
+                                <span className="rounded-lg bg-store-ink px-2.5 py-1.5 font-mono text-xs font-extrabold text-store-yellow">
                                     {seconds} {t('homePage.sec', 'sec')}
                                 </span>
                             </div>
@@ -76,17 +76,17 @@ export default function ProductsSection() {
                     />
                 </div>
 
-                <hr className="my-12 border-0 border-t border-dashed border-[#14132b]/35" />
+                <hr className="my-12 border-0 border-t border-dashed border-store-ink/35" />
 
                 {/* 4B: B2B STANDARD FOOD SUPPLY */}
                 <div id="b2b-standard-supply">
                     <div className="flex flex-wrap items-end justify-between gap-4">
                         <div>
-                            <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-[#14132b] bg-[#15803D] px-3 py-1 text-[10px] font-extrabold uppercase text-white shadow-[2px_2px_0_#14132b]">
+                            <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-store-ink bg-success px-3 py-1 text-[10px] font-extrabold uppercase text-white shadow-[2px_2px_0_var(--color-store-ink)]">
                                 <span className="h-2 w-2 rounded-full bg-white" />
                                 <span>{t('homePage.freshBatchBadge', 'FRESH BATCH ARRIVED')}</span>
                             </span>
-                            <h2 className="m-0 mt-2 font-['Times_New_Roman',Georgia,serif] lining-nums text-3xl font-bold text-[#14132b]">
+                            <h2 className="m-0 mt-2 font-subheading lining-nums text-3xl font-bold text-store-ink">
                                 {t('homePage.standardSupplyTitle', 'B2B Standard Food Supply')}
                             </h2>
                         </div>

@@ -3,15 +3,15 @@
    UI ONLY: không có ảnh thật, dữ liệu API hay trạng thái đơn hàng thật.
 */
 .btb-brand {
-    --btb-forest: #123b2e;
-    --btb-dark: #0b241b;
-    --btb-cream: #fff1e0;
-    --btb-navy: #17133a;
-    --btb-yellow: #ffe14d;
-    --btb-coral: #ff5a4e;
-    --btb-pink: #ff9bd2;
-    --btb-ink-soft: #646073;
-    font-family: var(--font-body, 'Be Vietnam Pro', sans-serif);
+    --btb-forest: var(--color-store-green);
+    --btb-dark: var(--color-store-dark);
+    --btb-cream: var(--color-store-cream);
+    --btb-navy: var(--color-store-ink);
+    --btb-yellow: var(--color-store-yellow);
+    --btb-coral: var(--color-store-coral);
+    --btb-pink: var(--color-store-pink);
+    --btb-ink-soft: var(--color-store-muted);
+    font-family: var(--font-body);
     color: var(--btb-navy);
     min-width: 0;
 }
@@ -52,16 +52,49 @@
     outline-offset: 3px;
 }
 
-.btb-brand-hero h1,
-.btb-brand-directory h2,
-.btb-brand-quote h2,
-.btb-brand-detail-hero h1,
-.btb-brand-products h2,
-.btb-brand-related h2,
-.btb-brand-not-found h1 {
-    font-family: var(--font-heading, Prata, Georgia, serif);
+.btb-brand-hero h1 {
+    font-family: var(--font-heading);
     font-weight: 400;
     letter-spacing: -.05em;
+    font-synthesis: none;
+}
+
+.btb-brand-directory h2 {
+    font-family: var(--font-subheading);
+    font-weight: 400;
+    letter-spacing: -.05em;
+}
+
+.btb-brand-quote h2 {
+    font-family: var(--font-subheading);
+    font-weight: 400;
+    letter-spacing: -.05em;
+}
+
+.btb-brand-detail-hero h1 {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    letter-spacing: -.05em;
+    font-synthesis: none;
+}
+
+.btb-brand-products h2 {
+    font-family: var(--font-subheading);
+    font-weight: 400;
+    letter-spacing: -.05em;
+}
+
+.btb-brand-related h2 {
+    font-family: var(--font-subheading);
+    font-weight: 400;
+    letter-spacing: -.05em;
+}
+
+.btb-brand-not-found h1 {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    letter-spacing: -.05em;
+    font-synthesis: none;
 }
 
 .btb-brand h1,
@@ -77,7 +110,7 @@
     width: fit-content;
     padding: 8px 13px;
     border-radius: 999px;
-    font-family: var(--font-label, Oswald, sans-serif);
+    font-family: var(--font-label);
     font-size: 11px;
     font-weight: 600;
     letter-spacing: .025em;
@@ -93,7 +126,7 @@
 }
 
 .btb-brand-pill--lavender {
-    background: #d7d2fc;
+    background: var(--color-surface-blue);
 }
 
 .btb-brand-btn {
@@ -140,7 +173,7 @@
 }
 
 .btb-brand-btn--navy:hover {
-    box-shadow: 3px 3px 0 #ff5a4e;
+    box-shadow: 3px 3px 0 var(--color-store-coral);
 }
 
 /* Hero — trang danh sách thương hiệu */
@@ -164,7 +197,7 @@
     bottom: 30px;
     width: 160px;
     height: 160px;
-    background: #ff9bd233;
+    background: color-mix(in srgb, var(--color-store-pink) 20%, transparent);
     border-radius: 50%;
     pointer-events: none;
 }
@@ -183,18 +216,23 @@
     color: var(--btb-cream);
     font-size: clamp(39px, 5vw, 69px);
     line-height: 1.13;
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-synthesis: none;
 }
 
 .btb-brand-hero h1 em {
     color: var(--btb-yellow);
     font-weight: 400;
+    font-family: var(--font-heading);
+    font-synthesis: none;
 }
 
 .btb-brand-hero__copy>p {
     margin: 0 0 25px;
     max-width: 520px;
-    color: #dce8e3;
-    font-family: var(--font-subtext, Manrope, sans-serif);
+    color: var(--color-surface-green);
+    font-family: var(--font-subtext);
     font-size: 15px;
     line-height: 1.85;
 }
@@ -213,7 +251,7 @@
     border: 3px solid var(--btb-navy);
     border-radius: 25px;
     box-shadow: 6px 6px 0 var(--btb-navy);
-    background: #4d6756;
+    background: var(--color-store-muted);
     color: white;
     isolation: isolate;
 }
@@ -236,13 +274,14 @@
     align-items: flex-start;
     gap: 7px;
     padding: 28px 26px 22px;
-    background: linear-gradient(transparent, rgb(11 36 27 / 95%));
+    background: linear-gradient(transparent, color-mix(in srgb, var(--color-store-dark) 95%, transparent));
 }
 
 .btb-brand-hero__feature-info>strong {
-    font-family: var(--font-heading, Georgia, serif);
+    font-family: var(--font-heading);
     font-size: clamp(25px, 3vw, 39px);
     font-weight: 400;
+    font-synthesis: none;
 }
 
 .btb-brand-hero__feature-info>span:not(.btb-brand-pill, .btb-brand-hero__feature-arrow) {
@@ -275,12 +314,12 @@
     gap: 7px;
     padding: 18px;
     min-height: 145px;
-    background: repeating-linear-gradient(-45deg, #f8eddb, #f8eddb 12px, #f2e6d4 12px, #f2e6d4 24px);
-    border: 2px dashed #a9a3a9;
+    background: repeating-linear-gradient(-45deg, var(--color-warning-soft), var(--color-warning-soft) 12px, var(--color-warning-soft) 12px, var(--color-warning-soft) 24px);
+    border: 2px dashed var(--color-store-line);
     border-radius: 10px;
-    color: #625d6f;
+    color: var(--color-store-muted);
     text-align: center;
-    font-family: var(--font-subtext, Manrope, sans-serif);
+    font-family: var(--font-subtext);
     font-size: 11px;
     line-height: 1.5;
 }
@@ -292,9 +331,9 @@
 }
 
 .btb-brand-placeholder--hero {
-    background: repeating-linear-gradient(-45deg, #406452, #406452 17px, #355645 17px, #355645 34px);
-    color: #e8f0e7;
-    border-color: #a4bba9;
+    background: repeating-linear-gradient(-45deg, var(--color-store-sage), var(--color-store-sage) 17px, var(--color-store-green) 17px, var(--color-store-green) 34px);
+    color: var(--color-surface-green);
+    border-color: var(--color-store-line);
     font-size: 12px;
 }
 
@@ -326,8 +365,8 @@
 
 .btb-brand-eyebrow {
     margin: 0 0 5px;
-    color: #123b2e;
-    font-family: var(--font-label, Oswald, sans-serif);
+    color: var(--color-store-green);
+    font-family: var(--font-label);
     font-size: 12px;
     font-weight: 600;
     letter-spacing: .1em;
@@ -337,11 +376,12 @@
     margin: 0;
     font-size: clamp(32px, 4vw, 50px);
     line-height: 1.2;
+    font-family: var(--font-subheading);
 }
 
 .btb-brand-section-heading>p {
     max-width: 300px;
-    color: #5e5a68;
+    color: var(--color-store-muted);
     font-size: 13px;
     line-height: 1.65;
 }
@@ -378,7 +418,7 @@
     top: -32%;
     z-index: -1;
     border-radius: 50%;
-    background: #ffffff11;
+    background: color-mix(in srgb, var(--color-white) 6.67%, transparent);
 }
 
 .btb-brand-tile:hover {
@@ -387,23 +427,23 @@
 }
 
 .btb-brand-tile--rose {
-    background: linear-gradient(135deg, #bc2848, #a31f39);
+    background: linear-gradient(135deg, var(--color-danger), var(--color-danger-strong));
 }
 
 .btb-brand-tile--orange {
-    background: linear-gradient(135deg, #f8733b, #e44f26);
+    background: linear-gradient(135deg, var(--color-store-coral), var(--color-danger));
 }
 
 .btb-brand-tile--blue {
-    background: linear-gradient(135deg, #3589dc, #2064af);
+    background: linear-gradient(135deg, var(--color-info), var(--color-info));
 }
 
 .btb-brand-tile--indigo {
-    background: linear-gradient(135deg, #3f65b3, #25488f);
+    background: linear-gradient(135deg, var(--color-info), var(--color-info));
 }
 
 .btb-brand-tile--teal {
-    background: linear-gradient(135deg, #10a3ac, #067e8f);
+    background: linear-gradient(135deg, var(--color-role-logistics), var(--color-role-logistics));
 }
 
 .btb-brand-tile__monogram {
@@ -415,9 +455,10 @@
     border: 2px solid var(--btb-navy);
     background: var(--btb-yellow);
     color: var(--btb-navy);
-    font-family: var(--font-heading, Georgia, serif);
+    font-family: var(--font-heading);
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 400;
+    font-synthesis: none;
 }
 
 .btb-brand-tile__text {
@@ -427,14 +468,15 @@
 }
 
 .btb-brand-tile__text strong {
-    font-family: var(--font-heading, Georgia, serif);
+    font-family: var(--font-heading);
     font-size: clamp(16px, 1.7vw, 23px);
     line-height: 1.3;
     font-weight: 400;
+    font-synthesis: none;
 }
 
 .btb-brand-tile__text small {
-    font-family: var(--font-subtext, sans-serif);
+    font-family: var(--font-subtext);
     font-size: 11px;
 }
 
@@ -448,7 +490,7 @@
     border-radius: 4px;
     background: var(--btb-yellow);
     color: var(--btb-navy);
-    font-family: var(--font-label, Oswald, sans-serif);
+    font-family: var(--font-label);
     font-size: 11px;
     font-weight: 700;
 }
@@ -460,9 +502,9 @@
 
 .btb-brand-directory__note {
     margin: 20px 0 0;
-    font-family: var(--font-subtext, sans-serif);
+    font-family: var(--font-subtext);
     font-size: 11px;
-    color: #696576;
+    color: var(--color-store-muted);
 }
 
 /* Quote CTA */
@@ -484,7 +526,7 @@
 }
 
 .btb-brand-quote__eyebrow {
-    font-family: var(--font-label, Oswald, sans-serif);
+    font-family: var(--font-label);
     letter-spacing: .05em;
     font-size: 11px;
     font-weight: 600;
@@ -494,15 +536,17 @@
     margin: 8px 0 7px;
     font-size: clamp(30px, 3.3vw, 48px);
     line-height: 1.25;
+    font-family: var(--font-subheading);
 }
 
 .btb-brand-quote h2 em {
     font-weight: 400;
+    font-family: var(--font-subheading);
 }
 
 .btb-brand-quote__card>div>p {
     margin: 0;
-    font-family: var(--font-subtext, sans-serif);
+    font-family: var(--font-subtext);
     font-size: 12px;
     line-height: 1.7;
 }
@@ -550,7 +594,7 @@
     gap: 6px;
     margin: 0 0 23px;
     color: var(--btb-cream);
-    font-family: var(--font-body, sans-serif);
+    font-family: var(--font-body);
     font-size: 13px;
     font-weight: 700;
     text-decoration: underline !important;
@@ -572,24 +616,24 @@
     overflow: hidden;
     border: 2px solid var(--btb-navy);
     border-radius: 22px 22px 0 0;
-    background: linear-gradient(100deg, #17133a, #383150);
+    background: linear-gradient(100deg, var(--color-store-ink), var(--color-store-ink));
     color: white;
 }
 
 .btb-brand-detail-hero--orange {
-    background: linear-gradient(105deg, #482c2a, #bb5c32);
+    background: linear-gradient(105deg, var(--color-danger-strong), var(--color-store-coral));
 }
 
 .btb-brand-detail-hero--blue {
-    background: linear-gradient(105deg, #163b69, #3467a0);
+    background: linear-gradient(105deg, var(--color-store-ink), var(--color-info));
 }
 
 .btb-brand-detail-hero--indigo {
-    background: linear-gradient(105deg, #212359, #3d4a85);
+    background: linear-gradient(105deg, var(--color-store-ink), var(--color-info));
 }
 
 .btb-brand-detail-hero--teal {
-    background: linear-gradient(105deg, #07555b, #168d97);
+    background: linear-gradient(105deg, var(--color-store-dark), var(--color-role-logistics));
 }
 
 .btb-brand-detail-hero__copy {
@@ -603,11 +647,14 @@
     color: var(--btb-cream);
     font-size: clamp(44px, 5vw, 76px);
     line-height: 1.05;
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-synthesis: none;
 }
 
 .btb-brand-detail-hero h2 {
     margin: 0 0 18px;
-    font-family: var(--font-subheading, sans-serif);
+    font-family: var(--font-subheading);
     font-size: 16px;
     color: var(--btb-yellow);
     font-weight: 700;
@@ -617,7 +664,7 @@
     max-width: 545px;
     font-size: 13px;
     line-height: 1.75;
-    color: #eee9e7;
+    color: var(--color-warning-soft);
 }
 
 .btb-brand-detail-hero__lead {
@@ -633,7 +680,7 @@
 
 .btb-brand-detail-hero__chips span {
     padding: 7px 11px;
-    border: 1px solid #ffffff88;
+    border: 1px solid color-mix(in srgb, var(--color-white) 53.33%, transparent);
     border-radius: 999px;
     font-size: 11px;
 }
@@ -663,13 +710,13 @@
 .btb-brand-detail-hero__visual {
     min-height: 360px;
     border: 0;
-    border-left: 1px dashed #ffffff70;
+    border-left: 1px dashed color-mix(in srgb, var(--color-white) 43.92%, transparent);
     border-radius: 0;
-    background: repeating-linear-gradient(-45deg, #7f6f7a99, #7f6f7a99 16px, #947f86aa 16px, #947f86aa 32px);
+    background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--color-store-muted) 60%, transparent), color-mix(in srgb, var(--color-store-muted) 60%, transparent) 16px, color-mix(in srgb, var(--color-store-muted) 66.67%, transparent) 16px, color-mix(in srgb, var(--color-store-muted) 66.67%, transparent) 32px);
 }
 
 .btb-brand-detail-hero--orange .btb-brand-detail-hero__visual {
-    background: repeating-linear-gradient(-45deg, #9f5b4999, #9f5b4999 16px, #b9785e99 16px, #b9785e99 32px);
+    background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--color-danger) 60%, transparent), color-mix(in srgb, var(--color-danger) 60%, transparent) 16px, color-mix(in srgb, var(--color-store-coral) 60%, transparent) 16px, color-mix(in srgb, var(--color-store-coral) 60%, transparent) 32px);
 }
 
 /* Product showcase */
@@ -695,10 +742,12 @@
     margin: 10px 0 0;
     font-size: clamp(29px, 4vw, 48px);
     line-height: 1.2;
+    font-family: var(--font-subheading);
 }
 
 .btb-brand-products h2 em {
     font-style: normal;
+    font-family: var(--font-subheading);
 }
 
 .btb-brand-products__count,
@@ -724,7 +773,7 @@
     min-width: 0;
     border: 2px solid var(--btb-navy);
     border-radius: 15px;
-    background: #fffcf7;
+    background: var(--color-store-cream);
     box-shadow: 4px 4px 0 var(--btb-navy);
 }
 
@@ -732,7 +781,7 @@
     position: relative;
     height: 192px;
     overflow: hidden;
-    background: #f4ebdc;
+    background: var(--color-warning-soft);
 }
 
 .btb-brand-product-card__image>.btb-brand-placeholder {
@@ -747,7 +796,7 @@
     border: 1.5px solid var(--btb-navy);
     border-radius: 999px;
     background: var(--btb-yellow);
-    font-family: var(--font-label, Oswald, sans-serif);
+    font-family: var(--font-label);
     font-weight: 700;
     font-size: 10px;
 }
@@ -776,7 +825,7 @@
     gap: 8px;
     color: var(--btb-forest);
     text-transform: uppercase;
-    font-family: var(--font-label, Oswald, sans-serif);
+    font-family: var(--font-label);
     font-size: 10px;
     font-weight: 700;
 }
@@ -784,7 +833,7 @@
 .btb-brand-product-card__body h3 {
     margin: 10px 0 5px;
     color: var(--btb-navy);
-    font-family: var(--font-heading, Georgia, serif);
+    font-family: var(--font-subheading);
     font-weight: 400;
     font-size: clamp(17px, 1.6vw, 21px);
     line-height: 1.35;
@@ -793,14 +842,14 @@
 
 .btb-brand-product-card__description {
     margin: 0 0 15px;
-    font-family: var(--font-subtext, sans-serif);
+    font-family: var(--font-subtext);
     font-size: 11px;
     line-height: 1.6;
-    color: #5d5a67;
+    color: var(--color-store-muted);
 }
 
 .btb-brand-product-card__purchase {
-    border-top: 1px dashed #c5bdba;
+    border-top: 1px dashed var(--color-store-line);
     padding-top: 10px;
     margin-top: auto;
 }
@@ -808,7 +857,7 @@
 .btb-brand-product-card__price {
     margin-bottom: 12px;
     color: var(--btb-forest);
-    font-family: var(--font-price, Inter, sans-serif);
+    font-family: var(--font-price);
     font-size: 21px;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
@@ -856,7 +905,7 @@
 }
 
 .btb-brand-quantity output {
-    font-family: var(--font-price, Inter, sans-serif);
+    font-family: var(--font-price);
     font-size: 12px;
     font-weight: 800;
 }
@@ -874,26 +923,26 @@
 }
 
 .btb-brand-product-card__add:hover {
-    background: #205a45;
+    background: var(--color-store-green);
 }
 
 .btb-brand-related {
     margin-top: 40px;
     padding-top: 30px;
-    border-top: 1px dashed #c5bdba;
+    border-top: 1px dashed var(--color-store-line);
 }
 
 .btb-brand-related .btb-brand-products__heading p {
     margin: 8px 0 0;
     font-size: 12px;
-    color: #5d5a67;
+    color: var(--color-store-muted);
 }
 
 .btb-brand-showcase__disclaimer {
     margin: 26px 0 0;
-    font-family: var(--font-subtext, sans-serif);
+    font-family: var(--font-subtext);
     font-size: 11px;
-    color: #686473;
+    color: var(--color-store-muted);
 }
 
 .btb-brand-not-found {
@@ -903,6 +952,9 @@
 
 .btb-brand-not-found h1 {
     color: var(--btb-cream);
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-synthesis: none;
 }
 
 .btb-brand-not-found p {
@@ -985,10 +1037,10 @@
     gap: 12px;
     margin: -14px 0 25px;
     padding: 10px 14px 10px 10px;
-    border: 1.5px solid #ffe14d70;
+    border: 1.5px solid color-mix(in srgb, var(--color-store-yellow) 43.92%, transparent);
     border-radius: 12px;
-    background: #0b241b;
-    color: #fff1e0;
+    background: var(--color-store-dark);
+    color: var(--color-store-cream);
 }
 
 .btb-brand .btb-brand-breadcrumb__label {
@@ -996,9 +1048,9 @@
     align-items: center;
     padding: 9px 11px;
     border-radius: 7px;
-    color: #17133a;
-    background: #ffe14d;
-    font-family: var(--font-label, Oswald, sans-serif);
+    color: var(--color-store-ink);
+    background: var(--color-store-yellow);
+    font-family: var(--font-label);
     font-weight: 700;
     font-size: 10px;
     letter-spacing: .07em;
@@ -1026,14 +1078,14 @@
     gap: 6px;
     padding: 7px 9px;
     border-radius: 6px;
-    color: #fff1e0;
+    color: var(--color-store-cream);
     font-size: 12px;
     font-weight: 600;
 }
 
 .btb-brand .btb-brand-breadcrumb__trail a:hover {
-    background: #ffffff1a;
-    color: #ffe14d;
+    background: color-mix(in srgb, var(--color-white) 10.2%, transparent);
+    color: var(--color-store-yellow);
 }
 
 .btb-brand .btb-brand-breadcrumb__trail a img,
@@ -1055,11 +1107,11 @@
     gap: 8px;
     max-width: 100%;
     padding: 7px 12px;
-    background: #ff9bd2;
-    color: #17133a;
-    border: 1.5px solid #17133a;
+    background: var(--color-store-pink);
+    color: var(--color-store-ink);
+    border: 1.5px solid var(--color-store-ink);
     border-radius: 999px;
-    box-shadow: 2px 2px 0 #ffe14d;
+    box-shadow: 2px 2px 0 var(--color-store-yellow);
     font-size: 12px;
     font-weight: 800;
 }
@@ -1068,14 +1120,14 @@
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #123b2e;
+    background: var(--color-store-green);
 }
 
 /* Discovery section — search-only vs purchased-history demo */
 .btb-brand .btb-brand-discovery {
     margin-bottom: 38px;
     padding-bottom: 35px;
-    border-bottom: 1px dashed #bcb2b1;
+    border-bottom: 1px dashed var(--color-store-line);
 }
 
 .btb-brand .btb-brand-discovery__heading {
@@ -1088,7 +1140,7 @@
 
 .btb-brand .btb-brand-discovery__heading h2 {
     margin: 11px 0 7px;
-    font-family: var(--font-heading, Prata, Georgia, serif);
+    font-family: var(--font-subheading);
     font-weight: 400;
     font-size: clamp(23px, 3vw, 36px);
     line-height: 1.2;
@@ -1096,15 +1148,16 @@
 }
 
 .btb-brand .btb-brand-discovery__heading h2 em {
-    color: #ff5a4e;
+    color: var(--color-store-coral);
     font-weight: 400;
+    font-family: var(--font-subheading);
 }
 
 .btb-brand .btb-brand-discovery__heading p {
     margin: 0;
-    font-family: var(--font-subtext, Manrope, sans-serif);
+    font-family: var(--font-subtext);
     font-size: 12px;
-    color: #646073;
+    color: var(--color-store-muted);
     line-height: 1.65;
 }
 
@@ -1112,15 +1165,15 @@
     display: inline-block;
     padding: 9px 12px;
     flex-shrink: 0;
-    border: 2px solid #17133a;
+    border: 2px solid var(--color-store-ink);
     border-radius: 4px;
-    background: #ffe14d;
-    color: #17133a;
-    font-family: var(--font-label, Oswald, sans-serif);
+    background: var(--color-store-yellow);
+    color: var(--color-store-ink);
+    font-family: var(--font-label);
     font-size: 10px;
     font-weight: 700;
     transform: rotate(2deg);
-    box-shadow: 3px 3px 0 #17133a;
+    box-shadow: 3px 3px 0 var(--color-store-ink);
 }
 
 .btb-brand .btb-brand-discovery__columns {
@@ -1132,14 +1185,14 @@
 .btb-brand .btb-brand-discovery__panel {
     min-width: 0;
     padding: 21px;
-    background: #fffcf7;
-    border: 2px solid #17133a;
+    background: var(--color-store-cream);
+    border: 2px solid var(--color-store-ink);
     border-radius: 15px;
-    box-shadow: 4px 4px 0 #17133a;
+    box-shadow: 4px 4px 0 var(--color-store-ink);
 }
 
 .btb-brand .btb-brand-discovery__panel--bought {
-    background: #ebf2eb;
+    background: var(--color-surface-green);
 }
 
 .btb-brand .btb-brand-discovery__panel-title {
@@ -1155,8 +1208,8 @@
     flex-shrink: 0;
     display: grid;
     place-items: center;
-    background: #ffe14d;
-    border: 2px solid #17133a;
+    background: var(--color-store-yellow);
+    border: 2px solid var(--color-store-ink);
     border-radius: 10px;
 }
 
@@ -1167,8 +1220,8 @@
 
 .btb-brand .btb-brand-discovery__panel-title strong {
     display: block;
-    color: #17133a;
-    font-family: var(--font-subheading, 'Space Grotesk', sans-serif);
+    color: var(--color-store-ink);
+    font-family: var(--font-subheading);
     font-size: 17px;
     line-height: 1.3;
 }
@@ -1176,7 +1229,7 @@
 .btb-brand .btb-brand-discovery__panel-title small {
     display: block;
     margin-top: 3px;
-    color: #646073;
+    color: var(--color-store-muted);
     font-size: 11px;
     line-height: 1.45;
 }
@@ -1191,11 +1244,11 @@
     flex: 1;
     min-width: 0;
     padding: 0 12px;
-    border: 1.5px solid #17133a;
+    border: 1.5px solid var(--color-store-ink);
     border-right: 0;
     border-radius: 8px 0 0 8px;
-    background: #fff1e0;
-    color: #17133a;
+    background: var(--color-store-cream);
+    color: var(--color-store-ink);
     font-size: 12px;
 }
 
@@ -1203,9 +1256,9 @@
     width: 47px;
     display: grid;
     place-items: center;
-    border: 1.5px solid #17133a;
+    border: 1.5px solid var(--color-store-ink);
     border-radius: 0 8px 8px 0;
-    background: #ffe14d;
+    background: var(--color-store-yellow);
     cursor: pointer;
 }
 
@@ -1228,7 +1281,7 @@
 }
 
 .btb-brand .btb-brand-discovery__row-title span {
-    font-family: var(--font-label, Oswald, sans-serif);
+    font-family: var(--font-label);
     font-size: 10px;
     font-weight: 700;
     letter-spacing: .08em;
@@ -1237,7 +1290,7 @@
 .btb-brand .btb-brand-discovery__row-title button {
     border: 0;
     padding: 2px 0;
-    color: #a54034;
+    color: var(--color-danger);
     background: none;
     cursor: pointer;
     font-size: 11px;
@@ -1256,10 +1309,10 @@
     align-items: center;
     gap: 6px;
     padding: 8px 10px;
-    border: 1px solid #17133a;
+    border: 1px solid var(--color-store-ink);
     border-radius: 999px;
-    background: #fff1e0;
-    color: #17133a;
+    background: var(--color-store-cream);
+    color: var(--color-store-ink);
     cursor: pointer;
     font-size: 11px;
     font-weight: 600;
@@ -1267,7 +1320,7 @@
 
 .btb-brand .btb-brand-discovery__chips button:hover,
 .btb-brand .btb-brand-discovery__chips button.is-active {
-    background: #ff9bd2;
+    background: var(--color-store-pink);
 }
 
 .btb-brand .btb-brand-discovery__chips button img {
@@ -1278,7 +1331,7 @@
 .btb-brand .btb-brand-discovery__caption {
     margin: 17px 0 0;
     font-size: 10px;
-    color: #787386;
+    color: var(--color-store-muted);
     line-height: 1.55;
 }
 
@@ -1292,8 +1345,8 @@
     align-items: center;
     gap: 11px;
     padding: 8px 10px;
-    background: #fffaf4;
-    border: 1px solid #b7c8bd;
+    background: var(--color-store-cream);
+    border: 1px solid var(--color-store-line);
     border-radius: 8px;
 }
 
@@ -1303,7 +1356,7 @@
 
 .btb-brand .btb-brand-discovery__purchase-item strong {
     display: block;
-    font-family: var(--font-subheading, sans-serif);
+    font-family: var(--font-subheading);
     font-size: 12px;
     line-height: 1.35;
 }
@@ -1311,7 +1364,7 @@
 .btb-brand .btb-brand-discovery__purchase-item small {
     display: block;
     margin-top: 3px;
-    color: #646073;
+    color: var(--color-store-muted);
     font-size: 10px;
 }
 
@@ -1321,9 +1374,9 @@
     flex-shrink: 0;
     display: grid;
     place-items: center;
-    border: 1px dashed #999;
+    border: 1px dashed var(--color-store-line);
     border-radius: 5px;
-    background: #fff1e0;
+    background: var(--color-store-cream);
 }
 
 .btb-brand .btb-brand-discovery__purchase-thumb img {
@@ -1339,9 +1392,9 @@
     width: 100%;
     margin-top: 13px;
     padding: 10px;
-    border: 1.5px solid #17133a;
+    border: 1.5px solid var(--color-store-ink);
     border-radius: 7px;
-    background: #123b2e;
+    background: var(--color-store-green);
     color: white;
     font-size: 12px;
     font-weight: 700;
@@ -1349,7 +1402,7 @@
 }
 
 .btb-brand .btb-brand-discovery__recommend:hover {
-    background: #205a45;
+    background: var(--color-store-green);
 }
 
 .btb-brand .btb-brand-discovery__recommend img {
@@ -1366,15 +1419,15 @@
     margin-top: 13px;
     padding: 12px;
     border-radius: 8px;
-    background: #fff1e0;
-    border: 1px dashed #17133a;
+    background: var(--color-store-cream);
+    border: 1px dashed var(--color-store-ink);
     font-size: 11px;
-    color: #17133a;
+    color: var(--color-store-ink);
 }
 
 .btb-brand .btb-brand-discovery__result strong {
     display: block;
-    font-family: var(--font-subheading, sans-serif);
+    font-family: var(--font-subheading);
 }
 
 .btb-brand .btb-brand-discovery__result ul {
@@ -1438,6 +1491,7 @@
     -webkit-line-clamp: 3;
     line-clamp: 3;
     overflow: hidden;
+    font-family: var(--font-subheading);
 }
 
 .btb-brand .btb-brand-product-card__description {
@@ -1473,10 +1527,10 @@
     grid-template-columns: 26px 1fr 26px;
     width: 82px;
     height: 34px;
-    border: 1px solid #17133a;
+    border: 1px solid var(--color-store-ink);
     border-radius: 6px;
     overflow: hidden;
-    background: #fff1e0;
+    background: var(--color-store-cream);
 }
 
 .btb-brand .btb-brand-quantity button {
@@ -1487,20 +1541,20 @@
     padding: 0;
     border: 0;
     border-radius: 0;
-    background: #ffe14d;
+    background: var(--color-store-yellow);
     cursor: pointer;
 }
 
 .btb-brand .btb-brand-quantity button:first-child {
-    border-right: 1px solid #17133a;
+    border-right: 1px solid var(--color-store-ink);
 }
 
 .btb-brand .btb-brand-quantity button:last-child {
-    border-left: 1px solid #17133a;
+    border-left: 1px solid var(--color-store-ink);
 }
 
 .btb-brand .btb-brand-quantity button:disabled {
-    background: #eadfd1;
+    background: var(--color-warning-soft);
     opacity: 1;
     cursor: not-allowed;
 }
@@ -1519,7 +1573,7 @@
     display: grid;
     place-items: center;
     font-size: 12px;
-    color: #17133a;
+    color: var(--color-store-ink);
 }
 
 .btb-brand .btb-brand-product-card__add {
@@ -1557,7 +1611,7 @@
 .btb-brand .btb-brand-purchased {
     margin: 0 0 42px;
     padding: 0 0 30px;
-    border-bottom: 1px dashed #c5bdba;
+    border-bottom: 1px dashed var(--color-store-line);
 }
 
 .btb-brand .btb-brand-purchased__heading {
@@ -1570,8 +1624,8 @@
 
 .btb-brand .btb-brand-purchased__heading h2 {
     margin: 11px 0 7px;
-    color: #17133a;
-    font-family: var(--font-heading, Prata, Georgia, serif);
+    color: var(--color-store-ink);
+    font-family: var(--font-subheading);
     font-size: clamp(25px, 3vw, 36px);
     font-weight: 400;
     letter-spacing: -.03em;
@@ -1579,14 +1633,15 @@
 }
 
 .btb-brand .btb-brand-purchased__heading h2 em {
-    color: #ff5a4e;
+    color: var(--color-store-coral);
     font-weight: 400;
+    font-family: var(--font-subheading);
 }
 
 .btb-brand .btb-brand-purchased__heading p {
     margin: 0;
-    color: #646073;
-    font-family: var(--font-subtext, Manrope, sans-serif);
+    color: var(--color-store-muted);
+    font-family: var(--font-subtext);
     font-size: 12px;
     line-height: 1.6;
 }
@@ -1603,12 +1658,12 @@
     place-items: center;
     width: 44px;
     height: 44px;
-    border: 2px solid #17133a;
+    border: 2px solid var(--color-store-ink);
     border-radius: 12px;
-    background: #ffe14d;
-    color: #17133a;
+    background: var(--color-store-yellow);
+    color: var(--color-store-ink);
     cursor: pointer;
-    box-shadow: 2px 2px 0 #17133a;
+    box-shadow: 2px 2px 0 var(--color-store-ink);
 }
 
 .btb-brand .btb-brand-purchased__navigation button img {
@@ -1625,7 +1680,7 @@
 .btb-brand .btb-brand-purchased__navigation span {
     min-width: 48px;
     text-align: center;
-    font-family: var(--font-price, Inter, sans-serif);
+    font-family: var(--font-price);
     font-weight: 800;
     font-size: 14px;
     font-variant-numeric: tabular-nums;
@@ -1638,9 +1693,9 @@
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     scrollbar-width: none;
-    border: 2px solid #17133a;
+    border: 2px solid var(--color-store-ink);
     border-radius: 17px;
-    background: #ebf2eb;
+    background: var(--color-surface-green);
     cursor: grab;
     /* Cảm ứng: trình duyệt cuộn ngang tự nhiên, desktop kéo bằng chuột. */
 }
@@ -1667,7 +1722,7 @@
     min-width: 0;
     min-height: 300px;
     overflow: hidden;
-    border-right: 2px solid #17133a;
+    border-right: 2px solid var(--color-store-ink);
 }
 
 .btb-brand .btb-brand-purchased__visual .btb-brand-placeholder {
@@ -1690,9 +1745,9 @@
     bottom: 14px;
     padding: 7px 10px;
     border-radius: 6px;
-    color: #fff1e0;
-    background: #123b2e;
-    font-family: var(--font-label, Oswald, sans-serif);
+    color: var(--color-store-cream);
+    background: var(--color-store-green);
+    font-family: var(--font-label);
     font-weight: 600;
     font-size: 10px;
 }
@@ -1706,25 +1761,25 @@
 }
 
 .btb-brand .btb-brand-purchased__tag {
-    font-family: var(--font-label, Oswald, sans-serif);
+    font-family: var(--font-label);
     font-size: 11px;
     font-weight: 600;
     letter-spacing: .08em;
-    color: #123b2e;
+    color: var(--color-store-green);
 }
 
 .btb-brand .btb-brand-purchased__info h3 {
     margin: 8px 0 10px;
-    font-family: var(--font-heading, Prata, Georgia, serif);
-    color: #17133a;
+    font-family: var(--font-subheading);
+    color: var(--color-store-ink);
     font-size: clamp(21px, 2.6vw, 32px);
     font-weight: 400;
     line-height: 1.3;
 }
 
 .btb-brand .btb-brand-purchased__info>p {
-    color: #646073;
-    font-family: var(--font-subtext, Manrope, sans-serif);
+    color: var(--color-store-muted);
+    font-family: var(--font-subtext);
     line-height: 1.7;
     font-size: 13px;
 }
@@ -1741,25 +1796,25 @@
     justify-content: space-between;
     gap: 8px;
     padding-bottom: 7px;
-    border-bottom: 1px dashed #b7c8bd;
+    border-bottom: 1px dashed var(--color-store-line);
 }
 
 .btb-brand .btb-brand-purchased__info dt {
     font-size: 11px;
-    color: #646073;
+    color: var(--color-store-muted);
 }
 
 .btb-brand .btb-brand-purchased__info dd {
     margin: 0;
     font-size: 11px;
     font-weight: 700;
-    color: #123b2e;
+    color: var(--color-store-green);
     text-align: right;
 }
 
 .btb-brand .btb-brand-purchased__hint {
     font-size: 10px;
-    color: #787386;
+    color: var(--color-store-muted);
 }
 
 .btb-brand .btb-brand-purchased__dots {
@@ -1773,16 +1828,16 @@
 .btb-brand .btb-brand-purchased__dots button {
     width: 11px;
     height: 11px;
-    border: 2px solid #17133a;
+    border: 2px solid var(--color-store-ink);
     border-radius: 50%;
-    background: #fff1e0;
+    background: var(--color-store-cream);
     cursor: pointer;
 }
 
 .btb-brand .btb-brand-purchased__dots button.is-active {
     width: 24px;
     border-radius: 999px;
-    background: #ffe14d;
+    background: var(--color-store-yellow);
 }
 
 .btb-brand .btb-brand-purchased__suggest-toggle {
@@ -1791,10 +1846,10 @@
     gap: 9px;
     margin-top: 9px;
     padding: 10px 15px;
-    border: 2px solid #17133a;
+    border: 2px solid var(--color-store-ink);
     border-radius: 9px;
-    color: #fff;
-    background: #123b2e;
+    color: var(--color-white);
+    background: var(--color-store-green);
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
@@ -1815,9 +1870,9 @@
 
 .btb-brand .btb-brand-purchased__suggestions span {
     padding: 8px 11px;
-    border: 1px solid #17133a;
+    border: 1px solid var(--color-store-ink);
     border-radius: 20px;
-    background: #fffaf4;
+    background: var(--color-store-cream);
     font-size: 11px;
 }
 
@@ -1826,10 +1881,10 @@
     width: min(100%, 680px);
     margin: 34px auto 0;
     padding: 18px 21px;
-    border: 2px solid #17133a;
+    border: 2px solid var(--color-store-ink);
     border-radius: 14px;
-    background: #fffcf7;
-    box-shadow: 4px 4px 0 #17133a;
+    background: var(--color-store-cream);
+    box-shadow: 4px 4px 0 var(--color-store-ink);
 }
 
 .btb-brand .btb-brand-recent__heading {
@@ -1845,9 +1900,9 @@
     flex-shrink: 0;
     width: 40px;
     height: 40px;
-    border: 2px solid #17133a;
+    border: 2px solid var(--color-store-ink);
     border-radius: 9px;
-    background: #ffe14d;
+    background: var(--color-store-yellow);
 }
 
 .btb-brand .btb-brand-recent__icon img {
@@ -1857,8 +1912,8 @@
 
 .btb-brand .btb-brand-recent__heading h2 {
     margin: 0;
-    color: #17133a;
-    font-family: var(--font-subheading, 'Space Grotesk', sans-serif);
+    color: var(--color-store-ink);
+    font-family: var(--font-subheading);
     font-size: 18px;
     font-weight: 700;
     line-height: 1.25;
@@ -1866,7 +1921,7 @@
 
 .btb-brand .btb-brand-recent__heading p {
     margin: 3px 0 0;
-    color: #646073;
+    color: var(--color-store-muted);
     font-size: 11px;
     line-height: 1.5;
 }
@@ -1875,9 +1930,9 @@
     display: flex;
     overflow: hidden;
     height: 40px;
-    border: 1.5px solid #17133a;
+    border: 1.5px solid var(--color-store-ink);
     border-radius: 8px;
-    background: #fff1e0;
+    background: var(--color-store-cream);
 }
 
 .btb-brand .btb-brand-recent__form input {
@@ -1888,7 +1943,7 @@
     border: 0;
     outline: none;
     background: transparent;
-    color: #17133a;
+    color: var(--color-store-ink);
     font-size: 12px;
 }
 
@@ -1899,8 +1954,8 @@
     height: 100%;
     flex-shrink: 0;
     border: 0;
-    border-left: 1.5px solid #17133a;
-    background: #ffe14d;
+    border-left: 1.5px solid var(--color-store-ink);
+    background: var(--color-store-yellow);
     cursor: pointer;
 }
 
@@ -1923,10 +1978,10 @@
 
 .btb-brand .btb-brand-recent__chips button {
     padding: 6px 10px;
-    border: 1px solid #17133a;
+    border: 1px solid var(--color-store-ink);
     border-radius: 999px;
-    background: #fff1e0;
-    color: #17133a;
+    background: var(--color-store-cream);
+    color: var(--color-store-ink);
     cursor: pointer;
     font-size: 10px;
     font-weight: 600;
@@ -1934,21 +1989,21 @@
 
 .btb-brand .btb-brand-recent__chips button.is-active,
 .btb-brand .btb-brand-recent__chips button:hover {
-    background: #ff9bd2;
+    background: var(--color-store-pink);
 }
 
 .btb-brand .btb-brand-recent__chips button.btb-brand-recent__clear {
     margin-left: auto;
     background: transparent;
     border: 0;
-    color: #a54034;
+    color: var(--color-danger);
     text-decoration: underline;
 }
 
 .btb-brand .btb-brand-recent__results {
     margin-top: 12px;
     padding: 10px;
-    border: 1px dashed #17133a;
+    border: 1px dashed var(--color-store-ink);
     border-radius: 7px;
     font-size: 11px;
 }
@@ -1966,7 +2021,7 @@
 
 .btb-brand .btb-brand-recent__footnote {
     margin: 10px 0 0;
-    color: #787386;
+    color: var(--color-store-muted);
     font-size: 10px;
 }
 
@@ -1978,10 +2033,10 @@
 .btb-brand .btb-brand-history-hub {
     margin-top: 42px;
     padding: clamp(20px, 2.6vw, 32px);
-    border: 2px solid #17133A;
+    border: 2px solid var(--color-store-ink);
     border-radius: 20px;
-    background: #E9F4ED;
-    box-shadow: 5px 6px 0 #17133A;
+    background: var(--color-surface-green);
+    box-shadow: 5px 6px 0 var(--color-store-ink);
 }
 
 .btb-brand .btb-brand-history-hub__intro {
@@ -1990,22 +2045,23 @@
 
 .btb-brand .btb-brand-history-hub__intro h2 {
     margin: 12px 0 7px;
-    color: #17133A;
-    font-family: var(--font-heading, Prata, Georgia, serif);
+    color: var(--color-store-ink);
+    font-family: var(--font-subheading);
     font-size: clamp(25px, 3vw, 35px);
     font-weight: 400;
     line-height: 1.3;
 }
 
 .btb-brand .btb-brand-history-hub__intro h2 em {
-    color: #FF5A4E;
+    color: var(--color-store-coral);
     font-weight: 400;
+    font-family: var(--font-subheading);
 }
 
 .btb-brand .btb-brand-history-hub__intro p {
     margin: 0;
-    color: #123B2E;
-    font-family: var(--font-subtext, Manrope, sans-serif);
+    color: var(--color-store-green);
+    font-family: var(--font-subtext);
     font-size: 12px;
     line-height: 1.6;
 }
@@ -2025,8 +2081,8 @@
     margin: 0;
     padding: 18px;
     border-radius: 14px;
-    background: #FFFCF7;
-    box-shadow: 3px 3px 0 #17133A;
+    background: var(--color-store-cream);
+    box-shadow: 3px 3px 0 var(--color-store-ink);
 }
 
 .btb-brand .btb-brand-history-hub .btb-brand-purchased {
@@ -2034,10 +2090,10 @@
     height: 100%;
     margin: 0;
     padding: 18px;
-    border: 2px solid #17133A;
+    border: 2px solid var(--color-store-ink);
     border-radius: 14px;
-    background: #FFF1E0;
-    box-shadow: 3px 3px 0 #17133A;
+    background: var(--color-store-cream);
+    box-shadow: 3px 3px 0 var(--color-store-ink);
 }
 
 .btb-brand .btb-brand-history-hub .btb-brand-purchased__heading {
@@ -2047,6 +2103,7 @@
 
 .btb-brand .btb-brand-history-hub .btb-brand-purchased__heading h2 {
     font-size: clamp(21px, 2.1vw, 28px);
+    font-family: var(--font-subheading);
 }
 
 .btb-brand .btb-brand-history-hub .btb-brand-purchased__visual,

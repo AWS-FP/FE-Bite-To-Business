@@ -26,7 +26,7 @@ export default function RegistrationTable({
     const location = useLocation();
     return (
         <div
-            className="overflow-x-auto focus-visible:outline-[3px_solid_#ffe14d]"
+            className="overflow-x-auto focus-visible:outline-[3px_solid_var(--color-store-yellow)]"
             role="region"
             aria-label={t('list.tableLabel')}
             tabIndex={0}
@@ -44,7 +44,7 @@ export default function RegistrationTable({
                     <col style={{ width: '10.8346%' }} />
                     <col style={{ width: '10.1757%' }} />
                 </colgroup>
-                <thead className="border-y border-black bg-[#fff8e8] text-[12px] leading-[18px] font-semibold">
+                <thead className="border-y border-black bg-store-cream text-[12px] leading-[18px] font-semibold">
                     <tr className="h-[47px] [&_th]:px-3 [&_th]:py-[14px] [&_th]:font-semibold">
                         <th scope="col" className="pl-6!">
                             {t('fields.name')}
@@ -70,7 +70,7 @@ export default function RegistrationTable({
                         <th scope="col">{t('fields.activation')}</th>
                         <th
                             scope="col"
-                            className="sticky right-0 border-l border-black bg-[#fff8e8]"
+                            className="sticky right-0 border-l border-black bg-store-cream"
                         >
                             {t('fields.actions')}
                         </th>
@@ -80,7 +80,7 @@ export default function RegistrationTable({
                     {rows.map((registration) => (
                         <tr
                             key={registration.id}
-                            className="group h-[78px] border-b border-[#deded8] last:border-b-0 hover:bg-[#fffdf5] [&_td]:px-3 [&_td]:py-[18px]"
+                            className="group h-[78px] border-b border-store-line last:border-b-0 hover:bg-store-cream [&_td]:px-3 [&_td]:py-[18px]"
                         >
                             <td className="pl-6!">
                                 <div className="flex items-center gap-[9px]">
@@ -149,7 +149,7 @@ export default function RegistrationTable({
                             <td>
                                 <ActivationBadge registration={registration} />
                             </td>
-                            <td className="sticky right-0 border-l border-black bg-white group-hover:bg-[#fffdf5]">
+                            <td className="sticky right-0 border-l border-black bg-white group-hover:bg-store-cream">
                                 <Link
                                     to={{
                                         pathname: routePaths.adminRegistrationDetail(
@@ -161,7 +161,7 @@ export default function RegistrationTable({
                                     aria-label={t('actions.viewNamed', {
                                         name: customerName(registration.customer),
                                     })}
-                                    className="inline-flex min-h-9 items-center justify-center gap-[6px] rounded-[3px] border border-black bg-white px-[10px] py-2 text-[12px] whitespace-nowrap no-underline hover:bg-[#fff3b1]"
+                                    className="inline-flex min-h-9 items-center justify-center gap-[6px] rounded-[3px] border border-black bg-white px-[10px] py-2 text-[12px] whitespace-nowrap no-underline hover:bg-surface-yellow"
                                 >
                                     <AdminIcon name="eye" />
                                     {t('actions.view')}

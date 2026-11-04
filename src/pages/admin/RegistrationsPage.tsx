@@ -117,10 +117,10 @@ export default function RegistrationsPage() {
                     <div>
                         <h2
                             id="registration-list-title"
-                            className="flex flex-wrap items-center gap-[9px] font-body text-[18px] leading-[27px] font-bold"
+                            className="flex flex-wrap items-center gap-[9px] font-subheading text-[18px] leading-[27px] font-bold"
                         >
                             {t('list.title')}
-                            <span className="rounded-[2px] border border-black bg-[#d9eea3] px-[7px] py-0.5 text-[11px] leading-[17px] font-semibold">
+                            <span className="rounded-[2px] border border-black bg-store-mint px-[7px] py-0.5 text-[11px] leading-[17px] font-semibold">
                                 {registrationQuery.data
                                     ? t('list.count', {
                                           count: registrationQuery.data.totalElements,
@@ -142,10 +142,10 @@ export default function RegistrationsPage() {
                             type="button"
                             onClick={() => handleFilterChange('status', 'ALL')}
                             aria-pressed={status === 'ALL'}
-                            className="flex min-h-[42px] shrink-0 items-center gap-[6px] border-0 border-r border-black bg-white px-[10px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap aria-pressed:bg-[#ffe14d] aria-pressed:font-bold"
+                            className="flex min-h-[42px] shrink-0 items-center gap-[6px] border-0 border-r border-black bg-white px-[10px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap aria-pressed:bg-store-yellow aria-pressed:font-bold"
                         >
                             {t('status.ALL')}
-                            <span className="rounded-[2px] border border-black bg-[#fff8e8] px-1 text-[10px] leading-[15px]">
+                            <span className="rounded-[2px] border border-black bg-store-cream px-1 text-[10px] leading-[15px]">
                                 {statsQuery.data?.total ?? '—'}
                             </span>
                         </button>
@@ -153,10 +153,10 @@ export default function RegistrationsPage() {
                             type="button"
                             onClick={() => handleFilterChange('status', 'PENDING')}
                             aria-pressed={status === 'PENDING'}
-                            className="flex min-h-[42px] shrink-0 items-center gap-[6px] border-0 border-r border-black bg-white px-[10px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap aria-pressed:bg-[#ffe14d] aria-pressed:font-bold"
+                            className="flex min-h-[42px] shrink-0 items-center gap-[6px] border-0 border-r border-black bg-white px-[10px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap aria-pressed:bg-store-yellow aria-pressed:font-bold"
                         >
                             {t('status.PENDING')}
-                            <span className="rounded-[2px] border border-black bg-[#fff8e8] px-1 text-[10px] leading-[15px]">
+                            <span className="rounded-[2px] border border-black bg-store-cream px-1 text-[10px] leading-[15px]">
                                 {statsQuery.data?.pending ?? '—'}
                             </span>
                         </button>
@@ -164,10 +164,10 @@ export default function RegistrationsPage() {
                             type="button"
                             onClick={() => handleFilterChange('status', 'APPROVED')}
                             aria-pressed={status === 'APPROVED'}
-                            className="flex min-h-[42px] shrink-0 items-center gap-[6px] border-0 border-r border-black bg-white px-[10px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap aria-pressed:bg-[#ffe14d] aria-pressed:font-bold"
+                            className="flex min-h-[42px] shrink-0 items-center gap-[6px] border-0 border-r border-black bg-white px-[10px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap aria-pressed:bg-store-yellow aria-pressed:font-bold"
                         >
                             {t('status.APPROVED')}
-                            <span className="rounded-[2px] border border-black bg-[#fff8e8] px-1 text-[10px] leading-[15px]">
+                            <span className="rounded-[2px] border border-black bg-store-cream px-1 text-[10px] leading-[15px]">
                                 {statsQuery.data?.approved ?? '—'}
                             </span>
                         </button>
@@ -175,10 +175,10 @@ export default function RegistrationsPage() {
                             type="button"
                             onClick={() => handleFilterChange('status', 'REJECTED')}
                             aria-pressed={status === 'REJECTED'}
-                            className="flex min-h-[42px] shrink-0 items-center gap-[6px] border-0 border-black bg-white px-[10px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap aria-pressed:bg-[#ffe14d] aria-pressed:font-bold"
+                            className="flex min-h-[42px] shrink-0 items-center gap-[6px] border-0 border-black bg-white px-[10px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap aria-pressed:bg-store-yellow aria-pressed:font-bold"
                         >
                             {t('status.REJECTED')}
-                            <span className="rounded-[2px] border border-black bg-[#fff8e8] px-1 text-[10px] leading-[15px]">
+                            <span className="rounded-[2px] border border-black bg-store-cream px-1 text-[10px] leading-[15px]">
                                 {statsQuery.data?.rejected ?? '—'}
                             </span>
                         </button>
@@ -197,7 +197,7 @@ export default function RegistrationsPage() {
                                     handleFilterChange('keyword', event.target.value, true)
                                 }
                                 placeholder={t('list.search')}
-                                className="min-w-0 flex-1 border-0 bg-transparent p-0 font-body text-[13px] outline-none placeholder:text-[#555]"
+                                className="min-w-0 flex-1 border-0 bg-transparent p-0 font-body text-[13px] outline-none placeholder:text-store-muted"
                             />
                         </label>
                         <label className="focus-border-group relative flex h-11 w-[212px] items-center gap-[6px] rounded-[3px] border border-black bg-white pl-[9px]">
@@ -247,10 +247,10 @@ export default function RegistrationsPage() {
 
                 {registrationQuery.isSuccess && registrationQuery.data.content.length === 0 && (
                     <div className="flex min-h-72 flex-col items-center justify-center gap-3 border-t border-black px-6 py-12 text-center">
-                        <span className="grid size-12 place-items-center rounded-full border border-black bg-[#fff8e8]">
+                        <span className="grid size-12 place-items-center rounded-full border border-black bg-store-cream">
                             <AdminIcon name="total" />
                         </span>
-                        <h3 className="font-body text-[16px] font-bold">{t('list.empty')}</h3>
+                        <h3 className="font-subheading text-[16px] font-bold">{t('list.empty')}</h3>
                         <p className="text-[13px] leading-6">
                             {keyword || customerType || status !== 'ALL'
                                 ? t('list.emptyFiltered')

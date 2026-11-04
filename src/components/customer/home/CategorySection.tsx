@@ -12,17 +12,17 @@ export default function CategorySection() {
         <section className="mx-auto max-w-[1320px] px-5 pt-14 pb-12">
             <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <span className="block text-xs font-extrabold uppercase tracking-wider text-[#FACC15]">
+                    <span className="block text-xs font-extrabold uppercase tracking-wider text-store-yellow">
                         {t('homePage.ecosystemTag', '14-CATEGORY B2B FOOD ECOSYSTEM')}
                     </span>
-                    <h2 className="m-0 mt-1 font-['Times_New_Roman',Georgia,serif] lining-nums text-4xl font-bold text-[#FAF3E3]">
+                    <h2 className="m-0 mt-1 font-subheading lining-nums text-4xl font-bold text-store-cream">
                         {t('homePage.ecosystemTitle', 'Comprehensive Ingredient Catalog')}
                     </h2>
                 </div>
 
                 <Link
                     to={ROUTES.CATALOG}
-                    className="inline-flex items-center gap-2 rounded-xl border-2 border-solid border-[#14132b] bg-[#FAF3E3] px-5 py-3 text-xs font-extrabold text-[#14132b] no-underline shadow-[4px_4px_0_#14132b] transition-transform hover:-translate-y-0.5 hover:bg-white"
+                    className="inline-flex items-center gap-2 rounded-xl border-2 border-solid border-store-ink bg-store-cream px-5 py-3 text-xs font-extrabold text-store-ink no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-y-0.5 hover:bg-white"
                 >
                     <span>
                         {t('homePage.downloadCatalogBtn', 'Download 850+ SKU Catalog (Excel)')}
@@ -36,24 +36,24 @@ export default function CategorySection() {
                     <Link
                         key={cat.key}
                         to={getCatalogSearchPath(cat.searchKeyword)}
-                        className="group relative flex min-h-[222px] flex-col overflow-hidden rounded-2xl border-2 border-solid border-[#14132b] bg-white p-3.5 text-[#14132b] no-underline shadow-sm transition-colors duration-200 hover:bg-[#FFF5C0]"
+                        className="group relative flex min-h-[222px] flex-col overflow-hidden rounded-2xl border-2 border-solid border-store-ink bg-white p-3.5 text-store-ink no-underline shadow-sm transition-colors duration-200 hover:bg-surface-yellow"
                     >
                         <div className="pointer-events-none absolute right-1 bottom-2 transition-transform duration-300 group-hover:scale-110">
                             <CategoryArtwork categoryKey={cat.key} iconUrl={cat.iconUrl} />
                         </div>
 
                         <div className="relative z-10">
-                            <span className="inline-block rounded-full border border-solid border-[#14132b] bg-[#E8F3EE] px-2.5 py-0.5 text-[10px] font-extrabold text-[#133425]">
+                            <span className="inline-block rounded-full border border-solid border-store-ink bg-surface-green px-2.5 py-0.5 text-[10px] font-extrabold text-store-ink">
                                 {cat.skuCount} SKU
                             </span>
                         </div>
 
                         {/* Fixed title and description rows: all 14 titles start at the same height. */}
                         <div className="relative z-10 mt-auto flex h-[124px] min-w-0 flex-col">
-                            <h3 className="m-0 h-[82px] overflow-hidden font-['Times_New_Roman',Georgia,serif] text-[19px] font-bold leading-[1.08] text-[#14132b] [font-variant-numeric:lining-nums]">
+                            <h3 className="m-0 h-[82px] overflow-hidden font-subheading text-[19px] font-bold leading-[1.08] text-store-ink [font-variant-numeric:lining-nums]">
                                 {t(`categories.${cat.key}`, cat.title)}
                             </h3>
-                            <p className="m-0 mt-1 line-clamp-2 min-h-[30px] overflow-hidden text-[11px] leading-[15px] text-[#4B5563]">
+                            <p className="m-0 mt-1 line-clamp-2 min-h-[30px] overflow-hidden text-[11px] leading-[15px] text-store-muted">
                                 {t(`homeCategories.subtitles.${cat.key}`, cat.subtitle)}
                             </p>
                         </div>

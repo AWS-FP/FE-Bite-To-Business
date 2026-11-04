@@ -6,7 +6,7 @@
     max-width: calc(100vw - 32px);
     max-height: calc(100dvh - 44px);
     border-radius: 4px;
-    box-shadow: 7px 7px 0 #000;
+    box-shadow: 7px 7px 0 var(--color-black);
 }
 
 /* Khung hồ sơ nằm sát bên phải màn hình. */
@@ -21,5 +21,5 @@
     border-right: 0;
     border-bottom: 0;
     border-radius: 0;
-    box-shadow: -15px 0 35px #12332917;
+    box-shadow: -15px 0 35px color-mix(in srgb, var(--color-store-green) 9.02%, transparent);
 }

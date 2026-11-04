@@ -76,7 +76,7 @@ export default function RegistrationPagination({
                         )}
                         <button
                             type="button"
-                            className="grid size-[33px] place-items-center rounded-[2px] border border-black bg-white p-0 text-[12px] aria-[current=page]:bg-[#ffe14d] aria-[current=page]:font-extrabold disabled:cursor-not-allowed disabled:opacity-40"
+                            className="grid size-[33px] place-items-center rounded-[2px] border border-black bg-white p-0 text-[12px] aria-[current=page]:bg-store-yellow aria-[current=page]:font-extrabold disabled:cursor-not-allowed disabled:opacity-40"
                             onClick={() => onPage(pageNumber)}
                             aria-label={t('actions.page', { page: pageNumber + 1 })}
                             aria-current={pageNumber === page ? 'page' : undefined}

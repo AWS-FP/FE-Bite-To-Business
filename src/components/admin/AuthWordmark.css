@@ -3,7 +3,7 @@
     display: block;
     line-height: 1;
     color: transparent;
-    -webkit-text-stroke: 2px #ffffff40;
+    -webkit-text-stroke: 2px color-mix(in srgb, var(--color-white) 25.1%, transparent);
     animation: auth-letter-float var(--float-duration) ease-in-out var(--float-delay) infinite;
 }
 

@@ -94,7 +94,9 @@ export default function SystemSettingsForm({ storageKey }: { storageKey: string 
                             {t(notice)}
                         </p>
                     )}
-                    <h3 className="system-section-label">{t('system.settings.modelSection')}</h3>
+                    <h3 className="font-subheading system-section-label">
+                        {t('system.settings.modelSection')}
+                    </h3>
                     <div className="system-form-grid">
                         <label>
                             {t('system.settings.primaryModel')}
@@ -140,7 +142,9 @@ export default function SystemSettingsForm({ storageKey }: { storageKey: string 
                         </label>
                     </div>
 
-                    <h3 className="system-section-label">{t('system.settings.limitsSection')}</h3>
+                    <h3 className="font-subheading system-section-label">
+                        {t('system.settings.limitsSection')}
+                    </h3>
                     <div className="system-form-grid system-form-grid-three">
                         <label>
                             {t('system.settings.maxTokens')}
@@ -192,7 +196,9 @@ export default function SystemSettingsForm({ storageKey }: { storageKey: string 
                         </label>
                     </div>
 
-                    <h3 className="system-section-label">{t('system.settings.alertsSection')}</h3>
+                    <h3 className="font-subheading system-section-label">
+                        {t('system.settings.alertsSection')}
+                    </h3>
                     <div className="system-form-grid">
                         <label>
                             {t('system.settings.errorThreshold')}

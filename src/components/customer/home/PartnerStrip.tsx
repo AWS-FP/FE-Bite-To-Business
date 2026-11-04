@@ -51,10 +51,10 @@ export default function PartnerStrip() {
         <section
             ref={sectionRef}
             aria-label={t('homePage.partnerTitle', 'Brands in the Bite to Business catalog')}
-            className="overflow-hidden border-y border-[#17133A]/20 bg-[#FAF3E3] py-7 text-[#14132b]"
+            className="overflow-hidden border-y border-store-ink/20 bg-store-cream py-7 text-store-ink"
         >
             <div className="mx-auto grid max-w-[1320px] grid-cols-[330px_minmax(0,1fr)] items-center gap-6 px-5">
-                <h2 className="m-0 max-w-[430px] font-['Times_New_Roman',Georgia,serif] text-2xl font-bold leading-snug text-[#14132b]">
+                <h2 className="m-0 max-w-[430px] font-subheading text-2xl font-bold leading-snug text-store-ink">
                     {t('homePage.partnerTitle', 'Discover brands in the Bite to Business catalog.')}
                 </h2>
 
@@ -76,7 +76,7 @@ export default function PartnerStrip() {
                                         {brands.map((brand) => (
                                             <span
                                                 key={brand}
-                                                className="inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-full border-2 border-[#17133A] bg-[#FFE14D] px-5 text-xs font-extrabold text-[#17133A] transition-colors hover:bg-white"
+                                                className="inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-full border-2 border-store-ink bg-store-yellow px-5 text-xs font-extrabold text-store-ink transition-colors hover:bg-white"
                                             >
                                                 {brand}
                                             </span>

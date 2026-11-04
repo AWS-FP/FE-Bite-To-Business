@@ -16,16 +16,16 @@ export default function LanguageSwitcher() {
 
     return (
         <div className="language-switcher inline-flex shrink-0 px-1 pt-2 pb-1">
-            <div className="relative h-[58px] w-[109px] -rotate-2 border border-solid border-black bg-white px-[5px] pt-[17px] pb-[5px] font-body text-black shadow-[3px_3px_0_#000]">
+            <div className="relative h-[58px] w-[109px] -rotate-2 border border-solid border-black bg-white px-[5px] pt-[17px] pb-[5px] font-body text-black shadow-[3px_3px_0_var(--color-black)]">
                 <span
-                    className="absolute -top-[9px] left-[7px] border border-solid border-black bg-[#ffe14d] px-[5px] py-px font-label text-[9px] leading-[13.5px] font-semibold tracking-[0.6px] whitespace-nowrap uppercase"
+                    className="absolute -top-[9px] left-[7px] border border-solid border-black bg-store-yellow px-[5px] py-px font-label text-[9px] leading-[13.5px] font-semibold tracking-[0.6px] whitespace-nowrap uppercase"
                     id={labelId}
                 >
                     {t('language')}
                 </span>
                 <div className="flex items-center gap-[5px]" role="group" aria-labelledby={labelId}>
                     <button
-                        className="flex h-[34px] w-[45px] cursor-pointer items-center justify-center gap-1 border border-solid border-black bg-white px-[7px] py-1 text-[14px] leading-[21px] font-extrabold text-black hover:bg-[#fff4b8] aria-pressed:bg-[#ffe14d] focus:px-[6px]"
+                        className="flex h-[34px] w-[45px] cursor-pointer items-center justify-center gap-1 border border-solid border-black bg-white px-[7px] py-1 text-[14px] leading-[21px] font-extrabold text-black hover:bg-surface-yellow aria-pressed:bg-store-yellow focus:px-[6px]"
                         type="button"
                         lang="vi"
                         aria-label="Tiếng Việt"
@@ -38,7 +38,7 @@ export default function LanguageSwitcher() {
                         )}
                     </button>
                     <button
-                        className="flex h-[34px] w-[45px] cursor-pointer items-center justify-center gap-1 border border-solid border-black bg-white px-[7px] py-1 text-[14px] leading-[21px] font-extrabold text-black hover:bg-[#fff4b8] aria-pressed:bg-[#ffe14d] focus:px-[6px]"
+                        className="flex h-[34px] w-[45px] cursor-pointer items-center justify-center gap-1 border border-solid border-black bg-white px-[7px] py-1 text-[14px] leading-[21px] font-extrabold text-black hover:bg-surface-yellow aria-pressed:bg-store-yellow focus:px-[6px]"
                         type="button"
                         lang="en"
                         aria-label="English"

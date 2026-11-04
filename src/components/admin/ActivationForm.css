@@ -12,32 +12,32 @@
     min-width: 0;
     height: 48px;
     padding: 0 15px;
-    border: 1px solid #17133a20;
+    border: 1px solid color-mix(in srgb, var(--color-auth-ink) 12.55%, transparent);
     border-radius: 12px;
     background: white;
-    color: #17133a;
+    color: var(--color-auth-ink);
     font: inherit;
     font-size: 14px;
     outline: none;
 }
 
 .activation-input::placeholder {
-    color: #a8a3b4;
+    color: var(--color-store-placeholder);
     opacity: 1;
 }
 .activation-input:focus {
-    border-color: #123b2e;
-    box-shadow: 0 0 0 3px #123b2e18;
+    border-color: var(--color-auth-green);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-auth-green) 9.41%, transparent);
 }
 .activation-input[aria-invalid='true'] {
-    border-color: #e8453c;
+    border-color: var(--color-danger);
 }
 .activation-input:disabled {
     cursor: not-allowed;
-    background: #f1eff8;
+    background: var(--color-surface-muted);
 }
 .activation-otp {
-    font-family: monospace;
+    font-family: var(--font-mono);
     font-size: 22px;
     letter-spacing: 0.2em;
 }
@@ -52,14 +52,14 @@
     padding: 12px 18px;
     border: 1px solid transparent;
     border-radius: 12px;
-    background: #17133a;
+    background: var(--color-auth-ink);
     color: white;
     font: inherit;
     font-size: 14px;
     font-weight: 700;
 }
 .activation-button:hover {
-    background: #123b2e;
+    background: var(--color-auth-green);
 }
 .activation-button:disabled {
     opacity: 0.65;
@@ -68,27 +68,27 @@
 .activation-error,
 .activation-notice {
     padding: 14px 16px;
-    border: 1px solid #f5c2bc;
+    border: 1px solid var(--color-danger-line);
     border-radius: 12px;
-    background: #ffedeb;
-    color: #9b2018;
+    background: var(--color-danger-soft);
+    color: var(--color-danger-strong);
     font-size: 13px;
     line-height: 1.6;
     overflow-wrap: anywhere;
 }
 .activation-notice {
-    border-color: #123b2e26;
-    background: #e8eaff;
-    color: #343282;
+    border-color: color-mix(in srgb, var(--color-auth-green) 14.9%, transparent);
+    background: var(--color-surface-blue);
+    color: var(--color-info);
 }
 .activation-error-code {
     display: block;
     margin-top: 4px;
-    font-family: monospace;
+    font-family: var(--font-mono);
     font-size: 12px;
 }
 .activation-link {
-    color: #123b2e;
+    color: var(--color-auth-green);
     font-size: 13px;
     font-weight: 600;
     text-underline-offset: 4px;
@@ -114,8 +114,8 @@
     border: 0;
     border-radius: 8px;
     background: transparent;
-    color: #123b2e;
+    color: var(--color-auth-green);
 }
 .activation-password button:hover {
-    background: #123b2e0d;
+    background: color-mix(in srgb, var(--color-auth-green) 5.1%, transparent);
 }

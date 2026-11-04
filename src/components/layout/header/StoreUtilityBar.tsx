@@ -63,7 +63,7 @@ export default function StoreUtilityBar() {
                         </button>
 
                         {isAreaOpen && (
-                            <div className="absolute top-[38px] left-0 z-50 min-w-[200px] overflow-hidden rounded-xl border-2 border-solid border-store-ink bg-[#FAF3E3] p-1 text-store-ink shadow-[4px_4px_0_#14132b]">
+                            <div className="absolute top-[38px] left-0 z-50 min-w-[200px] overflow-hidden rounded-xl border-2 border-solid border-store-ink bg-store-cream p-1 text-store-ink shadow-[4px_4px_0_var(--color-store-ink)]">
                                 {areaOptions.map((option) => {
                                     const isSelected = option.value === deliveryArea;
                                     return (
