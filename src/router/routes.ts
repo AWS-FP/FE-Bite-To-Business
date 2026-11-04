@@ -7,6 +7,7 @@ export const ROUTES = {
     LANDING: '/landing',
     WHY_BTB: '/landing/why-btb',
     BTB_MODEL: '/landing/model',
+    DISTRIBUTION_NETWORK: '/distributionNetwork',
     CATALOG: '/products',
     PRODUCT_DETAIL: '/products/:productId',
 

@@ -45,6 +45,11 @@ import BTBModelPage from '@/pages/BTBModelPage';
 
 import BrandsPage from '@/pages/BrandsPage';
 import BrandDetailPage from '@/pages/BrandDetailPage';
+import CheckoutPage from '@/pages/customer/checkout/CheckoutPage';
+
+
+import DistributionNetworkPage from '@/pages/DistributionNetworkPage';
+
 
 export const router = createBrowserRouter([
     // ==========================================
@@ -130,10 +135,7 @@ export const router = createBrowserRouter([
                 path: ROUTES.QUOTE_DETAIL,
                 Component: PendingPage,
             },
-            {
-                path: ROUTES.CHECKOUT,
-                Component: PendingPage,
-            },
+            { path: ROUTES.CHECKOUT, Component: CheckoutPage },
             {
                 path: ROUTES.ORDERS,
                 Component: PendingPage,
