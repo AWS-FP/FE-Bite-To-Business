@@ -18,7 +18,7 @@ export default function LandingCatalog({
 }: CatalogProps) {
     return (
         <section
-            className="section"
+            className="py-[72px]"
             id="categories"
             style={{
                 background: 'var(--bg-cream)',
@@ -26,11 +26,11 @@ export default function LandingCatalog({
                 borderBottom: 'var(--border-subtle)',
             }}
         >
-            <div className="container">
-                <div className="cat-split-head">
+            <div className="mx-auto max-w-[1240px] px-6">
+                <div className="mb-8 grid grid-cols-[5fr_7fr] items-end gap-8">
                     <div>
-                        <span className="section-num-tag">02 • DANH MỤC ĐA DẠNG</span>
-                        <h2 className="font-subheading section-h2" style={{ marginBottom: '0' }}>
+                        <span className="mb-2.5 inline-block rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3.5 py-1 font-label text-[15px] font-normal text-store-ink shadow-[3px_3px_0_var(--color-store-ink)]">02 • DANH MỤC ĐA DẠNG</span>
+                        <h2 className="mb-2.5 font-subheading text-[clamp(28px,3.2vw,40px)] font-normal leading-[1.22] text-store-ink" style={{ marginBottom: '0' }}>
                             Bite to Business — Đáp ứng nhu cầu mua hàng trên một nền tảng
                         </h2>
                     </div>
@@ -42,15 +42,15 @@ export default function LandingCatalog({
                         nhất.
                     </p>
                 </div>
-                <div className="cat-pill-cloud" id="categoryPillCloud">
+                <div className="mb-8 flex flex-wrap gap-3" id="categoryPillCloud">
                     <button
-                        className={'cat-pill-item' + (category === 'all' ? ' active' : '')}
+                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'all' ? ' active' : '')}
                         data-cat="all"
                         type="button"
                         onClick={() => setCategory('all')}
                     >
                         <span style={{ position: 'relative', zIndex: '2' }}>Tất cả nổi bật</span>
-                        <span className="cat-bg-svg">
+                        <span className="pointer-events-none absolute -right-1.5 -bottom-2 z-0 h-12 w-12 -rotate-12 text-store-ink opacity-10 transition-transform group-hover:scale-110 group-hover:opacity-[0.18] [&_svg]:h-full [&_svg]:w-full">
                             <svg
                                 viewBox="0 0 24 24"
                                 fill="none"
@@ -66,7 +66,7 @@ export default function LandingCatalog({
                         </span>
                     </button>
                     <button
-                        className={'cat-pill-item' + (category === 'meat' ? ' active' : '')}
+                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'meat' ? ' active' : '')}
                         data-cat="meat"
                         type="button"
                         onClick={() => setCategory('meat')}
@@ -74,7 +74,7 @@ export default function LandingCatalog({
                         <span style={{ position: 'relative', zIndex: '2' }}>
                             Thịt &amp; Gia cầm
                         </span>
-                        <span className="cat-bg-svg">
+                        <span className="pointer-events-none absolute -right-1.5 -bottom-2 z-0 h-12 w-12 -rotate-12 text-store-ink opacity-10 transition-transform group-hover:scale-110 group-hover:opacity-[0.18] [&_svg]:h-full [&_svg]:w-full">
                             <svg
                                 viewBox="0 0 24 24"
                                 fill="none"
@@ -90,13 +90,13 @@ export default function LandingCatalog({
                         </span>
                     </button>
                     <button
-                        className={'cat-pill-item' + (category === 'seafood' ? ' active' : '')}
+                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'seafood' ? ' active' : '')}
                         data-cat="seafood"
                         type="button"
                         onClick={() => setCategory('seafood')}
                     >
                         <span style={{ position: 'relative', zIndex: '2' }}>Cá &amp; Hải sản</span>
-                        <span className="cat-bg-svg">
+                        <span className="pointer-events-none absolute -right-1.5 -bottom-2 z-0 h-12 w-12 -rotate-12 text-store-ink opacity-10 transition-transform group-hover:scale-110 group-hover:opacity-[0.18] [&_svg]:h-full [&_svg]:w-full">
                             <svg
                                 viewBox="0 0 24 24"
                                 fill="none"
@@ -113,7 +113,7 @@ export default function LandingCatalog({
                         </span>
                     </button>
                     <button
-                        className={'cat-pill-item' + (category === 'prepared' ? ' active' : '')}
+                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'prepared' ? ' active' : '')}
                         data-cat="prepared"
                         type="button"
                         onClick={() => setCategory('prepared')}
@@ -121,7 +121,7 @@ export default function LandingCatalog({
                         <span style={{ position: 'relative', zIndex: '2' }}>
                             Đồ ăn chế biến sẵn
                         </span>
-                        <span className="cat-bg-svg">
+                        <span className="pointer-events-none absolute -right-1.5 -bottom-2 z-0 h-12 w-12 -rotate-12 text-store-ink opacity-10 transition-transform group-hover:scale-110 group-hover:opacity-[0.18] [&_svg]:h-full [&_svg]:w-full">
                             <svg
                                 viewBox="0 0 24 24"
                                 fill="none"
@@ -137,13 +137,13 @@ export default function LandingCatalog({
                         </span>
                     </button>
                     <button
-                        className={'cat-pill-item' + (category === 'veg' ? ' active' : '')}
+                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'veg' ? ' active' : '')}
                         data-cat="veg"
                         type="button"
                         onClick={() => setCategory('veg')}
                     >
                         <span style={{ position: 'relative', zIndex: '2' }}>Rau, Củ &amp; Nấm</span>
-                        <span className="cat-bg-svg">
+                        <span className="pointer-events-none absolute -right-1.5 -bottom-2 z-0 h-12 w-12 -rotate-12 text-store-ink opacity-10 transition-transform group-hover:scale-110 group-hover:opacity-[0.18] [&_svg]:h-full [&_svg]:w-full">
                             <svg
                                 viewBox="0 0 24 24"
                                 fill="none"
@@ -160,7 +160,7 @@ export default function LandingCatalog({
                         </span>
                     </button>
                     <button
-                        className={'cat-pill-item' + (category === 'dairy' ? ' active' : '')}
+                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'dairy' ? ' active' : '')}
                         data-cat="dairy"
                         type="button"
                         onClick={() => setCategory('dairy')}
@@ -168,7 +168,7 @@ export default function LandingCatalog({
                         <span style={{ position: 'relative', zIndex: '2' }}>
                             Sữa, Bơ &amp; Phô mai
                         </span>
-                        <span className="cat-bg-svg">
+                        <span className="pointer-events-none absolute -right-1.5 -bottom-2 z-0 h-12 w-12 -rotate-12 text-store-ink opacity-10 transition-transform group-hover:scale-110 group-hover:opacity-[0.18] [&_svg]:h-full [&_svg]:w-full">
                             <svg
                                 viewBox="0 0 24 24"
                                 fill="none"
@@ -186,7 +186,7 @@ export default function LandingCatalog({
                         </span>
                     </button>
                     <button
-                        className={'cat-pill-item' + (category === 'bakery' ? ' active' : '')}
+                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'bakery' ? ' active' : '')}
                         data-cat="bakery"
                         type="button"
                         onClick={() => setCategory('bakery')}
@@ -194,7 +194,7 @@ export default function LandingCatalog({
                         <span style={{ position: 'relative', zIndex: '2' }}>
                             Bánh &amp; Tráng miệng
                         </span>
-                        <span className="cat-bg-svg">
+                        <span className="pointer-events-none absolute -right-1.5 -bottom-2 z-0 h-12 w-12 -rotate-12 text-store-ink opacity-10 transition-transform group-hover:scale-110 group-hover:opacity-[0.18] [&_svg]:h-full [&_svg]:w-full">
                             <svg
                                 viewBox="0 0 24 24"
                                 fill="none"
@@ -227,7 +227,7 @@ export default function LandingCatalog({
                         <div style={{ display: 'flex', gap: '8px' }}>
                             <button
                                 type="button"
-                                className={view === 'grid' ? 'btn btn-primary' : 'btn btn-outline'}
+                                className={view === 'grid' ? 'inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white' : 'inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-cream text-store-ink hover:bg-store-yellow'}
                                 id="btnModeGrid"
                                 style={{ padding: '7px 16px', fontSize: '12.5px' }}
                                 onClick={() => setView('grid')}
@@ -236,7 +236,7 @@ export default function LandingCatalog({
                             </button>
                             <button
                                 type="button"
-                                className={view === 'table' ? 'btn btn-primary' : 'btn btn-outline'}
+                                className={view === 'table' ? 'inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white' : 'inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-cream text-store-ink hover:bg-store-yellow'}
                                 id="btnModeTable"
                                 style={{ padding: '7px 16px', fontSize: '12.5px' }}
                                 onClick={() => setView('table')}
@@ -246,21 +246,21 @@ export default function LandingCatalog({
                         </div>
                     </div>
                     <div
-                        className="product-4-grid"
+                        className="grid grid-cols-4 gap-5"
                         id="productGridContainer"
                         style={{ display: view === 'grid' ? 'grid' : 'none' }}
                     >
                         <div
-                            className="soft-p-card"
+                            className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream shadow-[5px_5px_0_var(--color-store-ink)] transition-transform hover:-translate-y-1"
                             data-category="meat"
                             style={{
                                 display:
                                     category === 'all' || category === 'meat' ? 'flex' : 'none',
                             }}
                         >
-                            <div className="soft-p-img has-svg-bg">
-                                <div className="soft-badge-top" style={{ zIndex: '3' }}>
-                                    <span className="tag-soft tag-hot">Bán chạy</span>
+                            <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[50px]">
+                                <div className="absolute top-3 left-3 flex gap-1.5" style={{ zIndex: '3' }}>
+                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-coral px-2.5 py-[3px] text-[11px] font-extrabold text-white shadow-[2px_2px_0_var(--color-store-ink)]">Bán chạy</span>
                                 </div>
                                 <div className="svg-bg-watermark watermark-center">
                                     <svg
@@ -277,7 +277,7 @@ export default function LandingCatalog({
                                     </svg>
                                 </div>
                             </div>
-                            <div className="soft-p-body">
+                            <div className="flex flex-1 flex-col gap-2 p-4">
                                 <div
                                     style={{
                                         fontSize: '11px',
@@ -287,22 +287,22 @@ export default function LandingCatalog({
                                 >
                                     MDL-PORK-BELLY-500G
                                 </div>
-                                <div className="soft-p-title">Ba Chỉ Heo Mát Chuẩn Khay 500g</div>
+                                <div className="font-subheading text-[17px] font-normal leading-[1.3] text-store-ink">Ba Chỉ Heo Mát Chuẩn Khay 500g</div>
                                 <div style={{ fontSize: '12px', color: 'var(--text-body)' }}>
                                     Đơn vị: Khay 500g • MOQ: 3 khay
                                 </div>
-                                <div className="soft-p-price-row">
-                                    <span className="soft-price-now">80.000đ/khay</span>
-                                    <span className="soft-price-old">90.000đ</span>
+                                <div className="mt-0.5 flex items-baseline gap-2">
+                                    <span className="font-price text-lg font-extrabold text-store-green tabular-nums">80.000đ/khay</span>
+                                    <span className="font-price text-xs text-[var(--err-4)] line-through tabular-nums">90.000đ</span>
                                 </div>
-                                <div className="soft-tier-note">
+                                <div className="rounded-lg border-[1.5px] border-solid border-store-ink bg-[var(--yellow-tint)] px-2.5 py-1.5 text-[11px] font-bold text-[var(--warn-2)]">
                                     Mua từ 10 khay:
                                     <strong>76.000đ</strong>• 30+:
                                     <strong>72.000đ</strong>
                                 </div>
                                 <button
                                     type="button"
-                                    className="btn btn-primary add-quote-btn"
+                                    className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
                                     data-item="Ba Chỉ Heo Mát 500g"
                                     style={{
                                         width: '100%',
@@ -317,17 +317,17 @@ export default function LandingCatalog({
                             </div>
                         </div>
                         <div
-                            className="soft-p-card"
+                            className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream shadow-[5px_5px_0_var(--color-store-ink)] transition-transform hover:-translate-y-1"
                             data-category="prepared"
                             style={{
                                 display:
                                     category === 'all' || category === 'prepared' ? 'flex' : 'none',
                             }}
                         >
-                            <div className="soft-p-img has-svg-bg">
-                                <div className="soft-badge-top" style={{ zIndex: '3' }}>
-                                    <span className="tag-soft tag-new">Mới</span>
-                                    <span className="tag-soft tag-prep">Chế biến sẵn</span>
+                            <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[50px]">
+                                <div className="absolute top-3 left-3 flex gap-1.5" style={{ zIndex: '3' }}>
+                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-yellow px-2.5 py-[3px] text-[11px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">Mới</span>
+                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-pink px-2.5 py-[3px] text-[11px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">Chế biến sẵn</span>
                                 </div>
                                 <div className="svg-bg-watermark watermark-center">
                                     <svg
@@ -344,7 +344,7 @@ export default function LandingCatalog({
                                     </svg>
                                 </div>
                             </div>
-                            <div className="soft-p-body">
+                            <div className="flex flex-1 flex-col gap-2 p-4">
                                 <div
                                     style={{
                                         fontSize: '11px',
@@ -354,24 +354,24 @@ export default function LandingCatalog({
                                 >
                                     MD-PREP-003
                                 </div>
-                                <div className="soft-p-title">
+                                <div className="font-subheading text-[17px] font-normal leading-[1.3] text-store-ink">
                                     Chả Giò Tôm Thịt Cấp Đông Gói 1kg
                                 </div>
                                 <div style={{ fontSize: '12px', color: 'var(--text-body)' }}>
                                     Đơn vị: Gói 1kg • MOQ: 3 gói
                                 </div>
-                                <div className="soft-p-price-row">
-                                    <span className="soft-price-now">119.000đ/gói</span>
-                                    <span className="soft-price-old">140.000đ</span>
+                                <div className="mt-0.5 flex items-baseline gap-2">
+                                    <span className="font-price text-lg font-extrabold text-store-green tabular-nums">119.000đ/gói</span>
+                                    <span className="font-price text-xs text-[var(--err-4)] line-through tabular-nums">140.000đ</span>
                                 </div>
-                                <div className="soft-tier-note">
+                                <div className="rounded-lg border-[1.5px] border-solid border-store-ink bg-[var(--yellow-tint)] px-2.5 py-1.5 text-[11px] font-bold text-[var(--warn-2)]">
                                     Mua từ 15 gói:
                                     <strong>112.000đ</strong>• 40+:
                                     <strong>105.000đ</strong>
                                 </div>
                                 <button
                                     type="button"
-                                    className="btn btn-primary add-quote-btn"
+                                    className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
                                     data-item="Chả Giò Tôm Thịt 1kg"
                                     style={{
                                         width: '100%',
@@ -386,16 +386,16 @@ export default function LandingCatalog({
                             </div>
                         </div>
                         <div
-                            className="soft-p-card"
+                            className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream shadow-[5px_5px_0_var(--color-store-ink)] transition-transform hover:-translate-y-1"
                             data-category="prepared"
                             style={{
                                 display:
                                     category === 'all' || category === 'prepared' ? 'flex' : 'none',
                             }}
                         >
-                            <div className="soft-p-img has-svg-bg">
-                                <div className="soft-badge-top" style={{ zIndex: '3' }}>
-                                    <span className="tag-soft tag-prep">Chế biến sẵn</span>
+                            <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[50px]">
+                                <div className="absolute top-3 left-3 flex gap-1.5" style={{ zIndex: '3' }}>
+                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-pink px-2.5 py-[3px] text-[11px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">Chế biến sẵn</span>
                                 </div>
                                 <div className="svg-bg-watermark watermark-center">
                                     <svg
@@ -413,7 +413,7 @@ export default function LandingCatalog({
                                     </svg>
                                 </div>
                             </div>
-                            <div className="soft-p-body">
+                            <div className="flex flex-1 flex-col gap-2 p-4">
                                 <div
                                     style={{
                                         fontSize: '11px',
@@ -423,21 +423,21 @@ export default function LandingCatalog({
                                 >
                                     MD-PREP-002
                                 </div>
-                                <div className="soft-p-title">Bò Viên Gân Đặc Biệt Gói 1kg</div>
+                                <div className="font-subheading text-[17px] font-normal leading-[1.3] text-store-ink">Bò Viên Gân Đặc Biệt Gói 1kg</div>
                                 <div style={{ fontSize: '12px', color: 'var(--text-body)' }}>
                                     Đơn vị: Gói 1kg • MOQ: 3 gói
                                 </div>
-                                <div className="soft-p-price-row">
-                                    <span className="soft-price-now">165.000đ/gói</span>
+                                <div className="mt-0.5 flex items-baseline gap-2">
+                                    <span className="font-price text-lg font-extrabold text-store-green tabular-nums">165.000đ/gói</span>
                                 </div>
-                                <div className="soft-tier-note">
+                                <div className="rounded-lg border-[1.5px] border-solid border-store-ink bg-[var(--yellow-tint)] px-2.5 py-1.5 text-[11px] font-bold text-[var(--warn-2)]">
                                     Mua từ 10 gói:
                                     <strong>155.000đ</strong>• 25+:
                                     <strong>148.000đ</strong>
                                 </div>
                                 <button
                                     type="button"
-                                    className="btn btn-primary add-quote-btn"
+                                    className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
                                     data-item="Bò Viên Gân 1kg"
                                     style={{
                                         width: '100%',
@@ -452,14 +452,14 @@ export default function LandingCatalog({
                             </div>
                         </div>
                         <div
-                            className="soft-p-card"
+                            className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream shadow-[5px_5px_0_var(--color-store-ink)] transition-transform hover:-translate-y-1"
                             data-category="bakery"
                             style={{
                                 display:
                                     category === 'all' || category === 'bakery' ? 'flex' : 'none',
                             }}
                         >
-                            <div className="soft-p-img sold-out has-svg-bg">
+                            <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[50px] after:absolute after:inset-0 after:flex after:items-center after:justify-center after:bg-store-ink/72 after:text-[13px] after:font-extrabold after:text-store-yellow after:backdrop-blur-[2px] after:content-['H?t_h?ng_(Available_=_0)']">
                                 <div className="svg-bg-watermark watermark-center">
                                     <svg
                                         viewBox="0 0 24 24"
@@ -475,7 +475,7 @@ export default function LandingCatalog({
                                     </svg>
                                 </div>
                             </div>
-                            <div className="soft-p-body">
+                            <div className="flex flex-1 flex-col gap-2 p-4">
                                 <div
                                     style={{
                                         fontSize: '11px',
@@ -485,22 +485,22 @@ export default function LandingCatalog({
                                 >
                                     MD-BAKE-001
                                 </div>
-                                <div className="soft-p-title">
+                                <div className="font-subheading text-[17px] font-normal leading-[1.3] text-store-ink">
                                     Croissant Bơ Pháp Cấp Đông (10 chiếc)
                                 </div>
                                 <div style={{ fontSize: '12px', color: 'var(--text-body)' }}>
                                     Đơn vị: Gói 10c • MOQ: 2 gói
                                 </div>
-                                <div className="soft-p-price-row">
+                                <div className="mt-0.5 flex items-baseline gap-2">
                                     <span
-                                        className="soft-price-now"
+                                        className="font-price text-lg font-extrabold text-store-green tabular-nums"
                                         style={{ color: 'var(--text-muted)' }}
                                     >
                                         135.000đ/gói
                                     </span>
                                 </div>
                                 <div
-                                    className="soft-tier-note"
+                                    className="rounded-lg border-[1.5px] border-solid border-store-ink bg-[var(--yellow-tint)] px-2.5 py-1.5 text-[11px] font-bold text-[var(--warn-2)]"
                                     style={{
                                         background: 'var(--coral-soft-bg)',
                                         color: 'var(--coral)',
@@ -510,7 +510,7 @@ export default function LandingCatalog({
                                 </div>
                                 <button
                                     type="button"
-                                    className="btn"
+                                    className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)]"
                                     disabled
                                     style={{
                                         width: '100%',
@@ -560,7 +560,7 @@ export default function LandingCatalog({
                         </div>
                         <button
                             type="button"
-                            className="btn btn-outline"
+                            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-cream text-store-ink hover:bg-store-yellow"
                             id="btnRequestNewProduct"
                             style={{ padding: '9px 18px', fontSize: '13px' }}
                             onClick={() =>
@@ -573,11 +573,11 @@ export default function LandingCatalog({
                         </button>
                     </div>
                     <div
-                        className="a2ui-table-box"
+                        className="hidden overflow-x-auto rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream shadow-[5px_5px_0_var(--color-store-ink)]"
                         id="productTableContainer"
                         style={{ display: view === 'table' ? 'block' : 'none' }}
                     >
-                        <table className="a2ui-table">
+                        <table className="w-full border-collapse text-sm [&_td]:border-b-[1.5px] [&_td]:border-solid [&_td]:border-store-ink [&_td]:px-4 [&_td]:py-3.5 [&_td]:text-store-ink [&_th]:border-b-[2.5px] [&_th]:border-solid [&_th]:border-store-ink [&_th]:bg-store-ink [&_th]:px-4 [&_th]:py-3.5 [&_th]:text-left [&_th]:font-heading [&_th]:font-normal [&_th]:text-store-yellow">
                             <thead>
                                 <tr>
                                     <th>Mã SKU &amp; Sản phẩm</th>
@@ -611,7 +611,7 @@ export default function LandingCatalog({
                                     <td>
                                         <button
                                             type="button"
-                                            className="btn btn-primary add-quote-btn"
+                                            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
                                             data-item="Ba Chỉ Heo Mát 500g (10 khay)"
                                             style={{ padding: '6px 14px', fontSize: '12px' }}
                                             onClick={() =>
@@ -643,7 +643,7 @@ export default function LandingCatalog({
                                     <td>
                                         <button
                                             type="button"
-                                            className="btn btn-primary add-quote-btn"
+                                            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
                                             data-item="Chả Giò Tôm Thịt 1kg (15 gói)"
                                             style={{ padding: '6px 14px', fontSize: '12px' }}
                                             onClick={() =>
@@ -675,7 +675,7 @@ export default function LandingCatalog({
                                     <td>
                                         <button
                                             type="button"
-                                            className="btn btn-primary add-quote-btn"
+                                            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
                                             data-item="Bò Viên Gân 1kg (10 gói)"
                                             style={{ padding: '6px 14px', fontSize: '12px' }}
                                             onClick={() => onAddToQuote('Bò Viên Gân 1kg (10 gói)')}

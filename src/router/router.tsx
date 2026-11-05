@@ -34,7 +34,7 @@ import SystemMetricsPage from '@/pages/admin/SystemMetricsPage';
 // Layouts & Shared Components
 import AdminLayout from '@/layouts/admin/AdminLayout';
 import StaffLayout from '@/layouts/StaffLayout';
-import PendingPage from '@/components/PendingPage';
+import PendingPage from '@/components/common/PendingPage';
 
 // Router
 import ProtectedRoute from './ProtectedRoute';

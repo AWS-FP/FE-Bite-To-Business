@@ -1,12 +1,14 @@
-import BTBInfoLayout from '@/components/BTBInfoLayout';
-import BTBWhyChoose from '@/components/BTBWhyChoose';
+import BTBInfoLayout from '@/components/landing/BTBInfoLayout';
+import BTBWhyChoose from '@/components/landing/BTBWhyChoose';
+import { useTranslation } from 'react-i18next';
 
 export default function WhyBTBPage() {
+    const { t } = useTranslation('storefront');
     return (
         <BTBInfoLayout
-            eyebrow="VÌ SAO CHỌN BITE TO BUSINESS?"
-            title="Vì sao chọn BTB?"
-            description="Một nơi để tìm hàng, so sánh thông tin và xây dựng cách mua sắm phù hợp với nhu cầu của từng người dùng."
+            eyebrow={t('introPages.whyEyebrow')}
+            title={t('introPages.whyTitle')}
+            description={t('introPages.whyDescription')}
         >
             <BTBWhyChoose />
         </BTBInfoLayout>

@@ -1,57 +1,55 @@
 import { Link } from 'react-router-dom';
 import type { ReactNode } from 'react';
-import LandingHeader from '@/components/LandingHeader';
+import { useTranslation } from 'react-i18next';
+import LandingHeader from '@/components/landing/LandingHeader';
 import Footer from '@/layouts/Footer';
-import LandingPersonalization from '@/components/LandingPersonalization';
-import '@/components/landing.css';
-import '@/components/landingInfo.css';
+import { ROUTES } from '@/router/routes';
+import LandingPersonalization from '@/components/landing/LandingPersonalization';
+import '@/components/landing/landing.css';
+import '@/components/landing/landingInfo.css';
 
 type Props = { title: string; eyebrow: string; description: string; children: ReactNode };
 export default function BTBInfoLayout({ title, eyebrow, description, children }: Props) {
+    const { t } = useTranslation('storefront');
     return (
         <div className="flex min-h-dvh flex-col bg-store-cream">
             <div className="btb-landing flex-1">
                 <LandingHeader />
                 <main id="main-content" className="btb-info">
                     <section className="btb-info__hero">
-                        <div className="container">
-                            <nav className="btb-info__crumbs" aria-label="Đường dẫn trang">
-                                <Link to="/landing">Landing</Link>
-                                <span aria-hidden="true">/</span>
-                                <span aria-current="page">{title}</span>
-                            </nav>
+                        <div className="mx-auto max-w-[1240px] px-6">
                             <span className="btb-info-eyebrow">{eyebrow}</span>
                             <h1>{title}</h1>
                             <p>{description}</p>
                             <div className="btb-info__hero-actions">
-                                <Link className="btb-info__action" to="/register">
-                                    Bắt đầu với BTB
+                                <Link className="btb-info__action" to={ROUTES.REGISTER}>
+                                    {t('introPages.start')}
                                 </Link>
                                 <Link
                                     className="btb-info__action btb-info__action--outline"
-                                    to="/landing"
+                                    to={ROUTES.LANDING}
                                 >
-                                    Khám phá Landing
+                                    {t('introPages.explore')}
                                 </Link>
                             </div>
                             <div className="btb-info__visual" aria-hidden="true">
                                 <span>BTB</span>
-                                <span>CHO DOANH NGHIỆP</span>
-                                <span>CHO CÁ NHÂN</span>
+                                <span>{t('introPages.visualBusiness')}</span>
+                                <span>{t('introPages.visualPersonal')}</span>
                             </div>
                         </div>
                     </section>
                     {children}
                     <LandingPersonalization />
                     <section className="btb-info__bottom">
-                        <div className="container btb-info__bottom-inner">
+                        <div className="mx-auto max-w-[1240px] px-6 btb-info__bottom-inner">
                             <div>
-                                <span className="btb-info-eyebrow">TÌM HIỂU TIẾP</span>
-                                <h2>Khám phá cách BTB đồng hành với bạn.</h2>
+                                <span className="btb-info-eyebrow">{t('introPages.discover')}</span>
+                                <h2>{t('introPages.discoverTitle')}</h2>
                             </div>
                             <div className="btb-info__bottom-links">
-                                <Link to="/landing/why-btb">Vì sao chọn BTB?</Link>
-                                <Link to="/landing/model">Mô hình BTB</Link>
+                                <Link to={ROUTES.WHY_BTB}>{t('header.whyBtbPage')}</Link>
+                                <Link to={ROUTES.BTB_MODEL}>{t('header.b2bModelPage')}</Link>
                             </div>
                         </div>
                     </section>

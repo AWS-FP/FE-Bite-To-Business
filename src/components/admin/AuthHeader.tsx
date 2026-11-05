@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/router/routes';
-import LanguageSwitcher from '../LanguageSwitcher';
+import LanguageSwitcher from '../common/LanguageSwitcher';
 
 // Header dùng chung cho các trang trong feature auth.
 export default function AuthHeader() {

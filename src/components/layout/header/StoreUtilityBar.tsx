@@ -1,7 +1,7 @@
 import { Check, ChevronDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import LanguageSwitcher from '../../LanguageSwitcher';
+import LanguageSwitcher from '../../common/LanguageSwitcher';
 import AboutBusinessDropdown from './AboutBusinessDropdown';
 
 export default function StoreUtilityBar() {

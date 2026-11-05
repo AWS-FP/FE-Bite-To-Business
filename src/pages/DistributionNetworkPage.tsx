@@ -1,12 +1,12 @@
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/layouts/Header';
 import Footer from '@/layouts/Footer';
-import DistributionHero from '@/components/DistributionHero';
-import DistributionCitySelector from '@/components/DistributionCitySelector';
-import DistributionExplorer from '@/components/DistributionExplorer';
-import { getDistributionCity } from '@/components/distributionData';
-import type { DistributionCityId } from '@/components/distributionData';
-import '@/components/distribution.css';
+import DistributionHero from '@/components/distribution/DistributionHero';
+import DistributionCitySelector from '@/components/distribution/DistributionCitySelector';
+import DistributionExplorer from '@/components/distribution/DistributionExplorer';
+import { getDistributionCity } from '@/components/distribution/distributionData';
+import type { DistributionCityId } from '@/components/distribution/distributionData';
+import '@/components/distribution/distribution.css';
 
 export default function DistributionNetworkPage() {
     const [searchParams, setSearchParams] = useSearchParams();

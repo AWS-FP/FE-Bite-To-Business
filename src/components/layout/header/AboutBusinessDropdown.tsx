@@ -1,4 +1,4 @@
-import { ArrowUpRight, BriefcaseBusiness, ChevronDown, Info } from 'lucide-react';
+import { ArrowUpRight, BriefcaseBusiness, ChevronDown, Info, Network } from 'lucide-react';
 
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -89,12 +89,30 @@ export default function AboutBusinessDropdown() {
                     {/* B2B Business Models */}
                     <Link
                         role="menuitem"
-                        to={`${ROUTES.LANDING}#segments`}
+                        to={ROUTES.BTB_MODEL}
                         onClick={() => setIsOpen(false)}
                         className="flex items-center gap-2 rounded-xl px-3 py-3 text-[12px] font-semibold text-store-green no-underline hover:bg-surface-green"
                     >
-                        <BriefcaseBusiness size={16} aria-hidden="true" />
-                        B2B Business Models
+                        <span className="inline-flex items-center gap-2">
+                            <BriefcaseBusiness size={16} aria-hidden="true" />
+                            {t('header.b2bModelPage')}
+                        </span>
+
+
+                    </Link>
+
+                    <div className="mx-2 border-t border-solid border-store-line" />
+
+                    <Link
+                        role="menuitem"
+                        to={ROUTES.DISTRIBUTION_NETWORK}
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center gap-2 rounded-xl px-3 py-3 text-[12px] font-semibold text-store-green no-underline hover:bg-surface-green"
+                    >
+                        <span className="inline-flex items-center gap-2">
+                            <Network size={16} aria-hidden="true" />
+                            {t('header.distributionPage')}
+                        </span>
                     </Link>
                 </div>
             )}
