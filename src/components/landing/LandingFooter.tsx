@@ -3,7 +3,7 @@
 export default function LandingFooter() {
     return (
         <footer className="footer">
-            <div className="container">
+            <div className="mx-auto max-w-[1240px] px-6">
                 <div className="footer-grid">
                     <div>
                         <div className="brand-logo" style={{ marginBottom: '14px' }}>

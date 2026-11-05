@@ -8,25 +8,20 @@ export default function LandingSegments() {
     const segment = landingSegments[activeSegment];
     return (
         <section
-            className="section"
+            className="py-[72px] border-y-2 border-solid border-store-ink bg-store-cream"
             id="segments"
-            style={{
-                background: 'var(--bg-cream)',
-                borderTop: 'var(--border-subtle)',
-                borderBottom: 'var(--border-subtle)',
-            }}
         >
-            <div className="container">
-                <div className="section-center-head">
-                    <span className="section-num-tag">04 • ĐỐI TƯỢNG PHỤC VỤ</span>
-                    <h2 className="font-subheading section-h2">
+            <div className="mx-auto max-w-[1240px] px-6">
+                <div className="mx-auto mb-11 max-w-[720px] text-center">
+                    <span className="mb-2.5 inline-block rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3.5 py-1 font-label text-[15px] font-normal text-store-ink shadow-[3px_3px_0_var(--color-store-ink)]">04 • ĐỐI TƯỢNG PHỤC VỤ</span>
+                    <h2 className="mb-2.5 font-subheading text-[clamp(28px,3.2vw,40px)] font-normal leading-[1.22] text-store-ink">
                         Phục vụ đa dạng nhu cầu mua thực phẩm
                     </h2>
                 </div>
-                <div className="segment-slider-header">
+                <div className="mb-7 flex flex-wrap items-center justify-center gap-2.5">
                     <button
                         type="button"
-                        className="seg-arrow-btn"
+                        className="inline-flex h-[38px] w-[38px] cursor-pointer items-center justify-center rounded-full border-[2.5px] border-solid border-store-ink bg-store-yellow text-base font-extrabold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] hover:bg-store-coral hover:text-white"
                         id="btnSegPrev"
                         aria-label="Mô hình trước"
                         onClick={() =>
@@ -44,7 +39,10 @@ export default function LandingSegments() {
                     </button>
                     <button
                         type="button"
-                        className={'seg-tab' + (activeSegment === 0 ? ' active' : '')}
+                        className={
+                            'cursor-pointer rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-2.5 font-subheading text-sm font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors [&.active]:bg-store-coral [&.active]:font-extrabold [&.active]:text-white [&.active]:shadow-[4px_4px_0_var(--color-store-ink)]' +
+                            (activeSegment === 0 ? ' active' : '')
+                        }
                         data-seg-idx="0"
                         onClick={() => setActiveSegment(0)}
                     >
@@ -52,7 +50,10 @@ export default function LandingSegments() {
                     </button>
                     <button
                         type="button"
-                        className={'seg-tab' + (activeSegment === 1 ? ' active' : '')}
+                        className={
+                            'cursor-pointer rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-2.5 font-subheading text-sm font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors [&.active]:bg-store-coral [&.active]:font-extrabold [&.active]:text-white [&.active]:shadow-[4px_4px_0_var(--color-store-ink)]' +
+                            (activeSegment === 1 ? ' active' : '')
+                        }
                         data-seg-idx="1"
                         onClick={() => setActiveSegment(1)}
                     >
@@ -60,7 +61,10 @@ export default function LandingSegments() {
                     </button>
                     <button
                         type="button"
-                        className={'seg-tab' + (activeSegment === 2 ? ' active' : '')}
+                        className={
+                            'cursor-pointer rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-2.5 font-subheading text-sm font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors [&.active]:bg-store-coral [&.active]:font-extrabold [&.active]:text-white [&.active]:shadow-[4px_4px_0_var(--color-store-ink)]' +
+                            (activeSegment === 2 ? ' active' : '')
+                        }
                         data-seg-idx="2"
                         onClick={() => setActiveSegment(2)}
                     >
@@ -68,7 +72,10 @@ export default function LandingSegments() {
                     </button>
                     <button
                         type="button"
-                        className={'seg-tab' + (activeSegment === 3 ? ' active' : '')}
+                        className={
+                            'cursor-pointer rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-2.5 font-subheading text-sm font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors [&.active]:bg-store-coral [&.active]:font-extrabold [&.active]:text-white [&.active]:shadow-[4px_4px_0_var(--color-store-ink)]' +
+                            (activeSegment === 3 ? ' active' : '')
+                        }
                         data-seg-idx="3"
                         onClick={() => setActiveSegment(3)}
                     >
@@ -76,7 +83,10 @@ export default function LandingSegments() {
                     </button>
                     <button
                         type="button"
-                        className={'seg-tab' + (activeSegment === 4 ? ' active' : '')}
+                        className={
+                            'cursor-pointer rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-2.5 font-subheading text-sm font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors [&.active]:bg-store-coral [&.active]:font-extrabold [&.active]:text-white [&.active]:shadow-[4px_4px_0_var(--color-store-ink)]' +
+                            (activeSegment === 4 ? ' active' : '')
+                        }
                         data-seg-idx="4"
                         onClick={() => setActiveSegment(4)}
                     >
@@ -84,7 +94,7 @@ export default function LandingSegments() {
                     </button>
                     <button
                         type="button"
-                        className="seg-arrow-btn"
+                        className="inline-flex h-[38px] w-[38px] cursor-pointer items-center justify-center rounded-full border-[2.5px] border-solid border-store-ink bg-store-yellow text-base font-extrabold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] hover:bg-store-coral hover:text-white"
                         id="btnSegNext"
                         aria-label="Mô hình kế tiếp"
                         onClick={() => setActiveSegment((v) => (v + 1) % landingSegments.length)}
@@ -97,7 +107,7 @@ export default function LandingSegments() {
                         />
                     </button>
                 </div>
-                <div className="segment-showcase-card">
+                <div className="grid grid-cols-2 items-center gap-8 rounded-[var(--radius-lg)] border-[2.5px] border-solid border-store-ink bg-store-cream p-9 shadow-[5px_5px_0_var(--color-store-ink)]">
                     <div>
                         <h3
                             style={{
@@ -112,9 +122,9 @@ export default function LandingSegments() {
                         <p style={{ fontSize: '14.5px', color: 'var(--text-body)' }} id="segDesc">
                             {segment.desc}
                         </p>
-                        <ul className="seg-check-list">
+                        <ul className="my-[18px] mb-6 flex list-none flex-col gap-3 text-[15px] text-store-ink [&_li]:flex [&_li]:items-center [&_li]:gap-2.5">
                             <li>
-                                <span className="icon-check">
+                                <span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-solid border-store-ink bg-[var(--green-soft-bg)] text-xs font-extrabold text-[var(--green-ok)]">
                                     <img
                                         className="btb-ui-icon"
                                         src="/images/ui/check.svg"
@@ -125,7 +135,7 @@ export default function LandingSegments() {
                                 <span id="segBullet1">{segment.b1}</span>
                             </li>
                             <li>
-                                <span className="icon-check">
+                                <span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-solid border-store-ink bg-[var(--green-soft-bg)] text-xs font-extrabold text-[var(--green-ok)]">
                                     <img
                                         className="btb-ui-icon"
                                         src="/images/ui/check.svg"
@@ -136,7 +146,7 @@ export default function LandingSegments() {
                                 <span id="segBullet2">{segment.b2}</span>
                             </li>
                             <li>
-                                <span className="icon-check">
+                                <span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-solid border-store-ink bg-[var(--green-soft-bg)] text-xs font-extrabold text-[var(--green-ok)]">
                                     <img
                                         className="btb-ui-icon"
                                         src="/images/ui/check.svg"

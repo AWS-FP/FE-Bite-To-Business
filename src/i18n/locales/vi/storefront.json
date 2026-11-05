@@ -24,6 +24,10 @@
         "invoice": "Xuất hóa đơn VAT tự động",
         "aboutBusiness": "Về Bite to Business",
         "landingPage": "Trang giới thiệu",
+        "introductionNavigation": "Điều hướng trang giới thiệu",
+        "whyBtbPage": "Vì sao chọn BTB?",
+        "b2bModelPage": "Mô hình kinh doanh B2B",
+        "distributionPage": "Trang phân phối",
         "shopHomepage": "Trang mua hàng"
     },
     "search": {
@@ -342,6 +346,77 @@
                 "2": "25 kg gạo ST25 + 5 kg pasta và mì tươi",
                 "3": "10 L dầu ăn và các loại sốt nền cho bếp"
             }
+        }
+    },
+    "introPages": {
+        "whyEyebrow": "VÌ SAO CHỌN BITE TO BUSINESS?",
+        "whyTitle": "Vì sao chọn BTB?",
+        "whyDescription": "Một nơi để tìm hàng, so sánh thông tin và xây dựng cách mua sắm phù hợp với nhu cầu của từng người dùng.",
+        "modelEyebrow": "MÔ HÌNH NỀN TẢNG",
+        "modelTitle": "Mô hình Bite to Business",
+        "modelDescription": "Tìm hiểu các bên tham gia và quy trình của BTB: từ nguồn cung, danh mục và báo giá đến đặt hàng và quản lý tài khoản.",
+        "start": "Bắt đầu với BTB",
+        "explore": "Khám phá trang giới thiệu",
+        "visualBusiness": "CHO DOANH NGHIỆP",
+        "visualPersonal": "CHO CÁ NHÂN",
+        "discover": "TÌM HIỂU TIẾP",
+        "discoverTitle": "Khám phá cách BTB đồng hành với bạn.",
+        "impact": {"eyebrow":"03 • HIỆU QUẢ ĐO LƯỜNG", "title":"Tối ưu vận hành, kinh doanh hiệu quả", "description":"Giúp bộ phận thu mua, bếp trưởng và chủ doanh nghiệp tiết kiệm tối đa thời gian lẫn chi phí", "time":"Thời gian và công sức trong khâu lên báo giá & thu mua", "cost":"Tổng chi phí nguyên liệu hàng tháng nhờ cộng dồn 3 tầng ưu đãi", "delivery":"Tỷ lệ giao đủ 100% mặt hàng đã xác nhận và đúng lộ trình", "finance":"Hiệu suất đối soát tài chính nhờ lưu trữ Order Snapshot chuẩn xác"},
+        "cta": {"eyebrow":"BẮT ĐẦU NGAY HÔM NAY", "title":"Hãy cùng xây dựng", "highlight":"Chuỗi cung ứng tương lai", "suffix":"của bạn", "description":"Đồng hành cùng doanh nghiệp, hợp tác xã, hộ kinh doanh và gia đình trong hành trình tìm kiếm, lựa chọn và quản lý nhu cầu thực phẩm.", "step1":"Gửi thông tin đăng ký", "step1Text":"Điền biểu mẫu trực tuyến nhanh chóng cho Doanh nghiệp/HTX hoặc Cá nhân/Hộ gia đình.", "step2":"Xác minh thông tin & Kích hoạt tài khoản", "step2Text":"Thông tin đăng ký được kiểm tra theo quy trình của hệ thống trước khi kích hoạt tài khoản.", "step3":"Lập Báo giá & Mua hàng dễ dàng", "step3Text":"Khám phá sản phẩm, chọn số lượng, chuẩn bị báo giá và xem thông tin mua sắm từ tài khoản."},
+        "hero": {"eyebrow":"Nền tảng tìm kiếm và mua sắm thực phẩm cho tổ chức & cá nhân", "start":"Bắt đầu nhập hàng", "catalog":"Danh mục sản phẩm", "quantity":"Theo SL", "quantityLabel":"Giá bậc thang từng sản phẩm", "categories":"Danh mục", "categoriesLabel":"Nhiều nhóm thực phẩm", "clear":"Rõ ràng", "clearLabel":"Thông tin và báo giá minh bạch", "groups":"2 nhóm", "groupsLabel":"Doanh nghiệp và cá nhân"},
+        "why": {
+            "eyebrow": "LÝ DO CHỌN BITE TO BUSINESS",
+            "heading": "Không chỉ mua thực phẩm.",
+            "highlight": "Mà còn quản lý việc mua sắm tốt hơn.",
+            "description": "BTB được định hướng là nền tảng cung ứng và mua sắm tập trung, hỗ trợ từ người mua cá nhân đến tổ chức có nhu cầu mua hàng thường xuyên.",
+            "audienceEyebrow": "ĐƯỢC THIẾT KẾ CHO NHU CẦU CỦA BẠN",
+            "businessTitle": "Mua hàng theo quy trình của đơn vị.",
+            "personalTitle": "Tìm thực phẩm theo nhịp sống gia đình.",
+            "businessDescription": "Ưu tiên quy cách, số lượng, báo giá, địa chỉ nhận hàng và khả năng đối soát thông tin mua sắm.",
+            "personalDescription": "Ưu tiên tìm lại mặt hàng quen thuộc, xem thông tin rõ ràng và quản lý nhu cầu mua thường ngày.",
+            "viewModel": "Xem mô hình BTB",
+            "imageLabel": "Khung chờ hình minh họa cách sử dụng BTB",
+            "imagePlaceholder": "Vị trí hình minh họa",
+            "noticeTitle": "Lưu ý giai đoạn phát triển UI:",
+            "notice": "Các bước giao vận, xét duyệt, cá nhân hóa theo lịch sử và dữ liệu tồn kho được mô tả theo định hướng sản phẩm; chưa được xác nhận là tính năng Backend đang hoạt động.",
+            "benefits": [
+                {"title":"Nhiều nhóm thực phẩm, một điểm tìm kiếm","description":"Danh mục tập trung cho nguyên liệu tươi, thực phẩm khô, đồ chế biến và mặt hàng thiết yếu. Dễ tìm, dễ so sánh hơn."},
+                {"title":"Giá theo lượng mua của từng sản phẩm","description":"Mỗi sản phẩm có thể có bậc giá theo số lượng. Không gộp toàn đơn để tính bậc chiết khấu của một mặt hàng."},
+                {"title":"Báo giá và thông tin đơn rõ ràng","description":"Quy trình hướng tới kiểm tra mặt hàng, số lượng, giá, tồn kho và lưu lại thông tin đã xác nhận trước khi đặt hàng."},
+                {"title":"Phù hợp các quy mô mua sắm","description":"Doanh nghiệp, hợp tác xã, cửa hàng, hộ kinh doanh và gia đình có cách tìm kiếm, quy cách và tần suất mua khác nhau."},
+                {"title":"Hành trình sử dụng dễ theo dõi","description":"Giao diện tổ chức theo từng bước: khám phá, lựa chọn, lập yêu cầu, theo dõi và xem lại lịch sử."},
+                {"title":"Hồ sơ cá nhân là trung tâm","description":"Mục tiêu là quản lý thông tin, địa chỉ, báo giá và đơn hàng trong một tài khoản thay vì tìm lại nhiều nơi."}
+            ]
+        },
+        "model": {
+            "eyebrow":"HỆ SINH THÁI BTB", "heading":"Mô hình BTB", "highlight":"hoạt động như thế nào?",
+            "description":"Đây là mô hình vận hành của nền tảng Bite to Business: kết nối nguồn cung, danh mục sản phẩm, quy trình đặt mua và trải nghiệm người dùng.", "clarification":"Không phải “mô hình F&B”.",
+            "suppliers":"Đơn vị cung ứng", "suppliersText":"Thông tin sản phẩm, quy cách, giá và dữ liệu tồn kho theo phạm vi hệ thống.", "platform":"Nền tảng BTB", "platformText":"Tổ chức catalog, lựa chọn hàng, báo giá và quy trình xử lý đơn.", "buyers":"Người mua", "buyersText":"Doanh nghiệp/HTX, hộ kinh doanh và cá nhân/hộ gia đình.",
+            "audienceEyebrow":"CÁCH SỬ DỤNG THEO NHU CẦU", "businessTitle":"Quy trình dành cho doanh nghiệp.", "personalTitle":"Trải nghiệm dành cho cá nhân.", "businessText":"Luồng giới thiệu nhấn mạnh báo giá, giá theo số lượng từng mặt hàng, địa chỉ giao và hồ sơ mua sắm của tổ chức.", "personalText":"Luồng giới thiệu nhấn mạnh tìm kiếm sản phẩm, lựa chọn quy cách, ghi nhớ nhu cầu và truy cập hồ sơ cá nhân.", "note":"Lựa chọn giao diện không tự thay đổi quyền tài khoản, chính sách giá hoặc điều kiện đăng ký.", "imageLabel":"Khung chờ sơ đồ nguồn cung và người mua", "imagePlaceholder":"Khung sơ đồ mô hình BTB",
+            "steps":[
+                {"title":"Khám phá danh mục","text":"Người mua duyệt mặt hàng, thương hiệu, đơn vị tính và quy cách phù hợp."},
+                {"title":"Chọn số lượng và mức giá","text":"Áp dụng bậc giá theo số lượng cho từng sản phẩm, không tính theo tổng số lượng toàn đơn."},
+                {"title":"Lập yêu cầu / báo giá","text":"Danh sách hàng và yêu cầu mua được tập hợp để có thể kiểm tra và xử lý."},
+                {"title":"Kiểm tra và xác nhận","text":"Theo thiết kế nghiệp vụ B2B: kiểm tra thông tin, giá, tồn kho và điều kiện trước khi xác nhận."},
+                {"title":"Đặt hàng và giao nhận","text":"Trạng thái đơn và giao hàng là phần dự kiến kết nối khi tích hợp Backend."},
+                {"title":"Quản lý tại tài khoản","text":"Một nơi để xem lại thông tin tài khoản, địa chỉ và lịch sử mua khi Backend hỗ trợ."}
+            ]
+        },
+        "personal": {
+            "business": "Doanh nghiệp / HTX",
+            "businessSub": "Đặt số lượng lớn, báo giá, chứng từ",
+            "personal": "Cá nhân / Hộ gia đình",
+            "personalSub": "Tìm thực phẩm, quản lý nhu cầu thường ngày",
+            "eyebrow": "TRẢI NGHIỆM DÀNH CHO BẠN",
+            "title": "Một nền tảng,",
+            "highlight": "nhiều cách sử dụng.",
+            "description": "Chọn nhu cầu để nội dung giới thiệu phù hợp hơn. Đây là tùy chọn giao diện, không thay đổi loại tài khoản đã đăng ký.",
+            "label": "Nhu cầu sử dụng",
+            "customer": "Bạn đã đăng nhập. Xem thông tin cá nhân và đơn hàng trong tài khoản.",
+            "guest": "Bạn có thể xem các trang giới thiệu mà không cần đăng nhập.",
+            "profile": "Mở trang cá nhân",
+            "workspace": "Về trang làm việc",
+            "register": "Tạo tài khoản"
         }
     }
 }

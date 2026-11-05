@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../router/routes';
-import CategoryMegaMenu from '../../CategoryMegaMenu';
+import CategoryMegaMenu from '../../category/CategoryMegaMenu';
 
 export default function StoreNavigation() {
     const { t } = useTranslation('storefront');

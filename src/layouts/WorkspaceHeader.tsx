@@ -2,7 +2,7 @@ import { X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { AuthUser } from '@/types/admin/auth';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
+import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 
 interface WorkspaceHeaderProps {
     user: AuthUser | null;

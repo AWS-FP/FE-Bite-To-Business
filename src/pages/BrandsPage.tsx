@@ -1,9 +1,9 @@
 import Header from '@/layouts/Header';
 import Footer from '@/layouts/Footer';
-import BrandHero from '@/components/BrandHero';
-import BrandDirectory from '@/components/BrandDirectory';
-import BrandQuoteCTA from '@/components/BrandQuoteCTA';
-import '@/components/brand.css';
+import BrandHero from '@/components/brand/BrandHero';
+import BrandDirectory from '@/components/brand/BrandDirectory';
+import BrandQuoteCTA from '@/components/brand/BrandQuoteCTA';
+import '@/components/brand/brand.css';
 
 /** Trang thương hiệu public, hoàn toàn là UI demo. */
 export default function BrandsPage() {

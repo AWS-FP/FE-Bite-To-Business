@@ -1,12 +1,14 @@
-import BTBInfoLayout from '@/components/BTBInfoLayout';
-import BTBModelOverview from '@/components/BTBModelOverview';
+import BTBInfoLayout from '@/components/landing/BTBInfoLayout';
+import BTBModelOverview from '@/components/landing/BTBModelOverview';
+import { useTranslation } from 'react-i18next';
 
 export default function BTBModelPage() {
+  const { t } = useTranslation('storefront');
   return (
     <BTBInfoLayout
-      eyebrow="MÔ HÌNH NỀN TẢNG"
-      title="Mô hình Bite to Business"
-      description="Tìm hiểu các bên tham gia và quy trình của BTB: từ nguồn cung, danh mục và báo giá đến đặt hàng và quản lý tài khoản."
+      eyebrow={t('introPages.modelEyebrow')}
+      title={t('introPages.modelTitle')}
+      description={t('introPages.modelDescription')}
     >
       <BTBModelOverview />
     </BTBInfoLayout>

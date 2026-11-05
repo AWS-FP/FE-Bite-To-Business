@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Header from '@/layouts/Header';
 import Footer from '@/layouts/Footer';
-import BrandDetailHero from '@/components/BrandDetailHero';
-import BrandBreadcrumb from '@/components/BrandBreadcrumb';
-import BrandDiscovery from '@/components/BrandDiscovery';
-import BrandRecentSearch from '@/components/BrandRecentSearch';
-import BrandProducts from '@/components/BrandProducts';
-import BrandRelatedProducts from '@/components/BrandRelatedProducts';
-import { getBrandBySlug, getBrandProducts, RELATED_PRODUCTS } from '@/components/brandData';
-import type { BrandProduct } from '@/components/brandData';
-import '@/components/brand.css';
+import BrandDetailHero from '@/components/brand/BrandDetailHero';
+import BrandBreadcrumb from '@/components/brand/BrandBreadcrumb';
+import BrandDiscovery from '@/components/brand/BrandDiscovery';
+import BrandRecentSearch from '@/components/brand/BrandRecentSearch';
+import BrandProducts from '@/components/brand/BrandProducts';
+import BrandRelatedProducts from '@/components/brand/BrandRelatedProducts';
+import { getBrandBySlug, getBrandProducts, RELATED_PRODUCTS } from '@/components/brand/brandData';
+import type { BrandProduct } from '@/components/brand/brandData';
+import '@/components/brand/brand.css';
 
 /** UI public, dữ liệu giả lập, không gọi API từ các section Brand. */
 export default function BrandDetailPage() {

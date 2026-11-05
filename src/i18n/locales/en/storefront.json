@@ -23,7 +23,11 @@
         "combos": "F&B Ingredient Combos",
         "invoice": "Automatic VAT invoices",
         "aboutBusiness": "About Bite to Business",
-        "landingPage": "Our Landing Page",
+        "landingPage": "About Us",
+        "introductionNavigation": "About pages navigation",
+        "whyBtbPage": "Why BTB?",
+        "b2bModelPage": "B2B Business Models",
+        "distributionPage": "Distribution Page",
         "shopHomepage": "Browse products"
     },
     "search": {
@@ -342,6 +346,77 @@
                 "2": "25kg ST25 Rice + 5kg Italian Pasta & Fresh Noodles",
                 "3": "10L Cooking Oil Can + Core kitchen base sauces"
             }
+        }
+    },
+    "introPages": {
+        "whyEyebrow": "WHY CHOOSE BITE TO BUSINESS?",
+        "whyTitle": "Why choose BTB?",
+        "whyDescription": "One place to find products, compare information and build a shopping experience that fits your needs.",
+        "modelEyebrow": "THE PLATFORM MODEL",
+        "modelTitle": "The Bite to Business model",
+        "modelDescription": "Discover who takes part in BTB and how it works, from suppliers, product listings and quotes to ordering and account management.",
+        "start": "Get started with BTB",
+        "explore": "Explore the introduction",
+        "visualBusiness": "FOR BUSINESSES",
+        "visualPersonal": "FOR INDIVIDUALS",
+        "discover": "LEARN MORE",
+        "discoverTitle": "Discover how BTB can support you.",
+        "impact": {"eyebrow":"03 • MEASURABLE IMPACT", "title":"Streamline operations and work efficiently", "description":"Help purchasing teams, chefs and business owners save time and costs", "time":"Time and effort spent preparing quotes and purchasing", "cost":"Total monthly ingredient costs with three levels of offers", "delivery":"Rate of complete deliveries of confirmed items on schedule", "finance":"Financial reconciliation efficiency with accurate order snapshots"},
+        "cta": {"eyebrow":"GET STARTED TODAY", "title":"Let's build", "highlight":"the supply chain of the future", "suffix":"together", "description":"Supporting businesses, cooperatives, household businesses and families as they find, choose and manage their food needs.", "step1":"Submit your registration", "step1Text":"Quickly complete the online form for a business, cooperative, individual or household.", "step2":"Verify details & activate your account", "step2Text":"Registration details are reviewed according to the system's process before your account is activated.", "step3":"Create quotes & shop easily", "step3Text":"Explore products, select quantities, prepare quotes and view shopping information in your account."},
+        "hero": {"eyebrow":"A food sourcing and shopping platform for organizations and individuals", "start":"Start sourcing", "catalog":"Product catalog", "quantity":"By quantity", "quantityLabel":"Tiered pricing for each product", "categories":"Catalog", "categoriesLabel":"A wide range of food categories", "clear":"Clear", "clearLabel":"Transparent information and quotations", "groups":"2 groups", "groupsLabel":"Businesses and individuals"},
+        "why": {
+            "eyebrow": "WHY CHOOSE BITE TO BUSINESS",
+            "heading": "More than buying food.",
+            "highlight": "Manage purchasing better, too.",
+            "description": "BTB is envisioned as a central food sourcing and shopping platform for individuals and organizations that purchase regularly.",
+            "audienceEyebrow": "DESIGNED FOR YOUR NEEDS",
+            "businessTitle": "Buy according to your organization's process.",
+            "personalTitle": "Find food that fits your family's routine.",
+            "businessDescription": "Focus on specifications, quantities, quotations, delivery addresses and purchase reconciliation.",
+            "personalDescription": "Find familiar items, see clear product information and manage everyday shopping needs.",
+            "viewModel": "Explore the BTB model",
+            "imageLabel": "Placeholder for an illustration of how to use BTB",
+            "imagePlaceholder": "Illustration placeholder",
+            "noticeTitle": "UI development note:",
+            "notice": "Delivery, approvals, history-based personalization and inventory data describe the product direction; these have not been confirmed as working backend features.",
+            "benefits": [
+                {"title":"Many food categories, one place to search","description":"A central catalog for fresh ingredients, dry goods, prepared food and essentials makes searching and comparing easier."},
+                {"title":"Pricing by quantity for each product","description":"Each product can have quantity-based pricing. An item's price tier is not calculated from the total order quantity."},
+                {"title":"Clear quotations and order information","description":"The process is intended to check products, quantities, prices and inventory and retain confirmed details before ordering."},
+                {"title":"Suitable for different purchasing needs","description":"Businesses, cooperatives, shops, household businesses and families differ in how they search, what they buy and how often."},
+                {"title":"A clear purchasing journey","description":"The interface follows each step: discovering, choosing, requesting, tracking and reviewing history."},
+                {"title":"Your account at the center","description":"The goal is to manage details, addresses, quotes and orders in one account instead of looking in multiple places."}
+            ]
+        },
+        "model": {
+            "eyebrow":"THE BTB ECOSYSTEM", "heading":"How does the BTB model", "highlight":"work?",
+            "description":"This is how the Bite to Business platform is envisioned: connecting suppliers, a product catalog, the ordering process and the user experience.", "clarification":"It is not an F&B business model.",
+            "suppliers":"Suppliers", "suppliersText":"Product information, specifications, pricing and inventory data within the system.", "platform":"BTB platform", "platformText":"Organizes the catalog, product selection, quotations and order processing.", "buyers":"Buyers", "buyersText":"Businesses, cooperatives, household businesses and individuals or families.",
+            "audienceEyebrow":"TAILORED TO YOUR NEEDS", "businessTitle":"A process for businesses.", "personalTitle":"An experience for individuals.", "businessText":"The business introduction emphasizes quotations, pricing by item quantity, delivery addresses and organizational purchasing details.", "personalText":"The personal introduction emphasizes product search, choosing specifications, remembering needs and accessing a personal profile.", "note":"Changing the interface preference does not change account permissions, pricing policies or registration conditions.", "imageLabel":"Placeholder for a supplier and buyer diagram", "imagePlaceholder":"BTB model diagram placeholder",
+            "steps":[
+                {"title":"Explore the catalog","text":"Buyers browse products, brands, units and suitable specifications."},
+                {"title":"Choose quantities and prices","text":"Quantity price tiers apply to each product, not the total quantity across the order."},
+                {"title":"Create a request or quote","text":"Products and purchase requirements are collected for review and processing."},
+                {"title":"Check and confirm","text":"The B2B design includes checking details, pricing, stock and terms before confirmation."},
+                {"title":"Place and receive orders","text":"Order and delivery status are planned for a future backend integration."},
+                {"title":"Manage your account","text":"Review account details, addresses and purchase history when backend support is available."}
+            ]
+        },
+        "personal": {
+            "business": "Business / Cooperative",
+            "businessSub": "Bulk orders, quotations and documents",
+            "personal": "Individual / Household",
+            "personalSub": "Find food and manage everyday needs",
+            "eyebrow": "AN EXPERIENCE FOR YOU",
+            "title": "One platform,",
+            "highlight": "many ways to use it.",
+            "description": "Choose your needs to tailor the introduction. This display preference does not change your registered account type.",
+            "label": "Your needs",
+            "customer": "You are signed in. View your profile and orders in your account.",
+            "guest": "You can browse the introduction pages without signing in.",
+            "profile": "Open profile",
+            "workspace": "Go to workspace",
+            "register": "Create account"
         }
     }
 }

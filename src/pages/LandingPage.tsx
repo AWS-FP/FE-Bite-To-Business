@@ -2,24 +2,24 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 // Landing Header riêng
-import LandingHeader from '@/components/LandingHeader';
+import LandingHeader from '@/components/landing/LandingHeader';
 
 // Footer dùng chung toàn website
 import Footer from '@/layouts/Footer';
 
 // Landing Sections
-import LandingHero from '@/components/LandingHero';
-import LandingPersonalization from '@/components/LandingPersonalization';
-import LandingPainPoints from '@/components/LandingPainPoints';
-import LandingCatalog from '@/components/LandingCatalog';
-import LandingBusinessSolution from '@/components/LandingBusinessSolution';
-import LandingImpact from '@/components/LandingImpact';
-import LandingSegments from '@/components/LandingSegments';
-import LandingCTA from '@/components/LandingCTA';
+import LandingHero from '@/components/landing/LandingHero';
+import LandingPersonalization from '@/components/landing/LandingPersonalization';
+import LandingPainPoints from '@/components/landing/LandingPainPoints';
+import LandingCatalog from '@/components/landing/LandingCatalog';
+import LandingBusinessSolution from '@/components/landing/LandingBusinessSolution';
+import LandingImpact from '@/components/landing/LandingImpact';
+import LandingSegments from '@/components/landing/LandingSegments';
+import LandingCTA from '@/components/landing/LandingCTA';
 
 // Landing styles
-import '@/components/landing.css';
-import '@/components/landingInfo.css';
+import '@/components/landing/landing.css';
+import '@/components/landing/landingInfo.css';
 
 export default function LandingPage() {
     const { t } = useTranslation('storefront');
