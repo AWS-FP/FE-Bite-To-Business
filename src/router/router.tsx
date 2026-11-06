@@ -1,3 +1,4 @@
+
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import { AUTH_ROLES } from '@/constants/roles';
@@ -10,14 +11,26 @@ import VerifyOtpPage from '@/pages/auth/VerifyOtpPage';
 
 // Public Customer Pages
 import HomePage from '@/pages/HomePage';
+import LandingPage from '@/pages/LandingPage';
+import WhyBTBPage from '@/pages/WhyBTBPage';
+import BTBModelPage from '@/pages/BTBModelPage';
+import DistributionNetworkPage from '@/pages/DistributionNetworkPage';
+import BrandsPage from '@/pages/BrandsPage';
+import BrandDetailPage from '@/pages/BrandDetailPage';
 
 // Customer Pages
 import ProfilePage from '@/pages/customer/ProfilePage';
+import CheckoutPage from '@/pages/customer/checkout/CheckoutPage';
+
+// Orders Pages - NEW
+import OrderHistoryPage from '@/pages/customer/order/OrderHistoryPage';
+import OrderStatusPage from '@/pages/customer/order/OrderStatusPage';
 
 // Delivery Pages
 import DeliveryLayout from '@/layouts/shipper/DeliveryLayout';
 import CurrentTripPage from '@/pages/shipper/CurrentTripPage';
 import DeliveryHistoryPage from '@/pages/shipper/DeliveryHistoryPage';
+
 // Logistics Pages
 import LogisticsLayout from '@/layouts/logistic/LogisticsLayout';
 import InventoryPage from '@/pages/logistic/InventoryPage';
@@ -39,17 +52,6 @@ import PendingPage from '@/components/common/PendingPage';
 // Router
 import ProtectedRoute from './ProtectedRoute';
 import { ROUTES } from './routes';
-import LandingPage from '@/pages/LandingPage';
-import WhyBTBPage from '@/pages/WhyBTBPage';
-import BTBModelPage from '@/pages/BTBModelPage';
-
-import BrandsPage from '@/pages/BrandsPage';
-import BrandDetailPage from '@/pages/BrandDetailPage';
-import CheckoutPage from '@/pages/customer/checkout/CheckoutPage';
-
-
-import DistributionNetworkPage from '@/pages/DistributionNetworkPage';
-
 
 export const router = createBrowserRouter([
     // ==========================================
@@ -104,22 +106,18 @@ export const router = createBrowserRouter([
         path: ROUTES.BRAND_DETAIL,
         Component: BrandDetailPage,
     },
-
     {
         path: ROUTES.CATALOG,
         Component: PendingPage,
     },
-
     {
         path: ROUTES.PRODUCT_DETAIL,
         Component: PendingPage,
     },
-
     {
         path: ROUTES.QUOTES,
         Component: PendingPage,
     },
-
     {
         path: ROUTES.DISTRIBUTION_NETWORK,
         Component: DistributionNetworkPage,
@@ -127,25 +125,39 @@ export const router = createBrowserRouter([
 
     // ==========================================
     // 3. CUSTOMER PROTECTED ROUTES
+    // Cần đăng nhập với role CUSTOMER
     // ==========================================
-
     {
-        element: <ProtectedRoute allowedRoles={[AUTH_ROLES.CUSTOMER]} />,
+        element: (
+            <ProtectedRoute
+                allowedRoles={[AUTH_ROLES.CUSTOMER]}
+            />
+        ),
 
         children: [
             {
                 path: ROUTES.QUOTE_DETAIL,
                 Component: PendingPage,
             },
-            { path: ROUTES.CHECKOUT, Component: CheckoutPage },
+
+            // Checkout
+            {
+                path: ROUTES.CHECKOUT,
+                Component: CheckoutPage,
+            },
+
+            // Lịch sử đơn hàng
             {
                 path: ROUTES.ORDERS,
-                Component: PendingPage,
+                Component: OrderHistoryPage,
             },
+
+            // Trạng thái / Chi tiết đơn hàng
             {
                 path: ROUTES.ORDER_DETAIL,
-                Component: PendingPage,
+                Component: OrderStatusPage,
             },
+
             {
                 path: ROUTES.FAVORITES,
                 Component: PendingPage,
@@ -160,9 +172,12 @@ export const router = createBrowserRouter([
     // ==========================================
     // 4. ADMIN
     // ==========================================
-
     {
-        element: <ProtectedRoute allowedRoles={[AUTH_ROLES.ADMIN]} />,
+        element: (
+            <ProtectedRoute
+                allowedRoles={[AUTH_ROLES.ADMIN]}
+            />
+        ),
 
         children: [
             {
@@ -172,7 +187,12 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         index: true,
-                        element: <Navigate to={ROUTES.ADMIN_REGISTRATIONS} replace />,
+                        element: (
+                            <Navigate
+                                to={ROUTES.ADMIN_REGISTRATIONS}
+                                replace
+                            />
+                        ),
                     },
                     {
                         path: ROUTES.ADMIN_REGISTRATIONS,
@@ -201,19 +221,31 @@ export const router = createBrowserRouter([
     // ==========================================
     // 5. E-COMMERCE EXECUTIVE
     // ==========================================
-
     {
-        element: <ProtectedRoute allowedRoles={[AUTH_ROLES.ECOMMERCE_EXECUTIVE]} />,
+        element: (
+            <ProtectedRoute
+                allowedRoles={[AUTH_ROLES.ECOMMERCE_EXECUTIVE]}
+            />
+        ),
 
         children: [
             {
                 path: ROUTES.ECOMMERCE,
-                element: <StaffLayout role={AUTH_ROLES.ECOMMERCE_EXECUTIVE} />,
+                element: (
+                    <StaffLayout
+                        role={AUTH_ROLES.ECOMMERCE_EXECUTIVE}
+                    />
+                ),
 
                 children: [
                     {
                         index: true,
-                        element: <Navigate to={ROUTES.ECOMMERCE_PRODUCTS} replace />,
+                        element: (
+                            <Navigate
+                                to={ROUTES.ECOMMERCE_PRODUCTS}
+                                replace
+                            />
+                        ),
                     },
                     {
                         path: ROUTES.ECOMMERCE_PRODUCTS,
@@ -235,9 +267,12 @@ export const router = createBrowserRouter([
     // ==========================================
     // 6. LOGISTICS STAFF
     // ==========================================
-
     {
-        element: <ProtectedRoute allowedRoles={[AUTH_ROLES.LOGISTICS_STAFF]} />,
+        element: (
+            <ProtectedRoute
+                allowedRoles={[AUTH_ROLES.LOGISTICS_STAFF]}
+            />
+        ),
 
         children: [
             {
@@ -247,7 +282,12 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         index: true,
-                        element: <Navigate to={ROUTES.LOGISTICS_INVENTORY} replace />,
+                        element: (
+                            <Navigate
+                                to={ROUTES.LOGISTICS_INVENTORY}
+                                replace
+                            />
+                        ),
                     },
                     {
                         path: ROUTES.LOGISTICS_INVENTORY,
@@ -273,9 +313,12 @@ export const router = createBrowserRouter([
     // ==========================================
     // 7. DELIVERY STAFF
     // ==========================================
-
     {
-        element: <ProtectedRoute allowedRoles={[AUTH_ROLES.DELIVERY_STAFF]} />,
+        element: (
+            <ProtectedRoute
+                allowedRoles={[AUTH_ROLES.DELIVERY_STAFF]}
+            />
+        ),
 
         children: [
             {
@@ -285,7 +328,12 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         index: true,
-                        element: <Navigate to={ROUTES.DELIVERY_TRIPS} replace />,
+                        element: (
+                            <Navigate
+                                to={ROUTES.DELIVERY_TRIPS}
+                                replace
+                            />
+                        ),
                     },
                     {
                         path: ROUTES.DELIVERY_TRIPS,
@@ -307,9 +355,13 @@ export const router = createBrowserRouter([
     // ==========================================
     // 8. FALLBACK
     // ==========================================
-
     {
         path: '*',
-        element: <Navigate to={ROUTES.HOME} replace />,
+        element: (
+            <Navigate
+                to={ROUTES.HOME}
+                replace
+            />
+        ),
     },
 ]);
