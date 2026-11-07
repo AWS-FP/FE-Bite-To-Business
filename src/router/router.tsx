@@ -52,6 +52,22 @@ import PendingPage from '@/components/common/PendingPage';
 // Router
 import ProtectedRoute from './ProtectedRoute';
 import { ROUTES } from './routes';
+import LandingPage from '@/pages/LandingPage';
+import WhyBTBPage from '@/pages/WhyBTBPage';
+import BTBModelPage from '@/pages/BTBModelPage';
+
+import BrandsPage from '@/pages/BrandsPage';
+import BrandDetailPage from '@/pages/BrandDetailPage';
+import CheckoutPage from '@/pages/customer/checkout/CheckoutPage';
+
+
+import DistributionNetworkPage from '@/pages/DistributionNetworkPage';
+import EcommerceDashboardPage from '@/pages/e-commerce/EcommerceDashboardPage';
+import EcommerceQuotesPage from '@/pages/e-commerce/EcommerceQuotesPage';
+import EcommerceProductsPage from '@/pages/e-commerce/EcommerceProductsPage';
+import EcommercePromotionsPage from '@/pages/e-commerce/EcommercePromotionsPage';
+import EcommerceCouponsPage from '@/pages/e-commerce/EcommerceCouponsPage';
+import EcommercePosterPage from '@/pages/e-commerce/EcommercePosterPage';
 
 export const router = createBrowserRouter([
     // ==========================================
@@ -240,25 +256,14 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         index: true,
-                        element: (
-                            <Navigate
-                                to={ROUTES.ECOMMERCE_PRODUCTS}
-                                replace
-                            />
-                        ),
+                        element: <Navigate to={ROUTES.ECOMMERCE_DASHBOARD} replace />,
                     },
-                    {
-                        path: ROUTES.ECOMMERCE_PRODUCTS,
-                        Component: PendingPage,
-                    },
-                    {
-                        path: ROUTES.ECOMMERCE_PROMOTIONS,
-                        Component: PendingPage,
-                    },
-                    {
-                        path: ROUTES.ECOMMERCE_COUPONS,
-                        Component: PendingPage,
-                    },
+                    { path: ROUTES.ECOMMERCE_DASHBOARD, Component: EcommerceDashboardPage },
+                    { path: ROUTES.ECOMMERCE_QUOTES, Component: EcommerceQuotesPage },
+                    { path: ROUTES.ECOMMERCE_PRODUCTS, Component: EcommerceProductsPage },
+                    { path: ROUTES.ECOMMERCE_PROMOTIONS, Component: EcommercePromotionsPage },
+                    { path: ROUTES.ECOMMERCE_COUPONS, Component: EcommerceCouponsPage },
+                    { path: ROUTES.ECOMMERCE_POSTER, Component: EcommercePosterPage },
                 ],
             },
         ],
