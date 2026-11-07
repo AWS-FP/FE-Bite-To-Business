@@ -67,7 +67,7 @@ export default function AboutBusinessDropdown() {
                 <div
                     role="menu"
                     aria-label={t('header.aboutBusiness')}
-                    className="absolute right-0 top-[calc(100%+9px)] z-[80] w-[230px] overflow-hidden rounded-2xl border border-solid border-store-line bg-store-cream p-1.5 text-store-green shadow-sm"
+                    className="absolute left-0 top-[calc(100%+9px)] z-[80] w-[230px] overflow-hidden rounded-2xl border border-solid border-store-line bg-store-cream p-1.5 text-store-green shadow-sm"
                 >
                     {/* Landing Page */}
                     <Link

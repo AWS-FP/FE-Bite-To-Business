@@ -40,14 +40,14 @@ export default function Header() {
                     {t('skipToContent')}
                 </a>
                 <StoreUtilityBar />
-                <div className="mx-auto flex min-h-[100px] max-w-[1440px] items-center gap-3 px-5 py-3">
+                <div className="mx-auto flex min-h-[82px] max-w-[1440px] items-center gap-3 px-5 py-1.5">
                     <Link
                         className="flex w-fit shrink-0 items-center gap-2 text-white no-underline"
                         to={ROUTES.HOME}
                         aria-label={t('home')}
                     >
                         <img
-                            className="block h-auto w-[100px] shrink-0 object-contain"
+                            className="block h-auto w-[90px] shrink-0 object-contain"
                             src="/images/storefront/brand-logo.png"
                             alt=""
                             width={100}

@@ -1,31 +1,16 @@
-import { useSearchParams } from 'react-router-dom';
 import Header from '@/layouts/Header';
 import Footer from '@/layouts/Footer';
 import DistributionHero from '@/components/distribution/DistributionHero';
-import DistributionCitySelector from '@/components/distribution/DistributionCitySelector';
 import DistributionExplorer from '@/components/distribution/DistributionExplorer';
-import { getDistributionCity } from '@/components/distribution/distributionData';
-import type { DistributionCityId } from '@/components/distribution/distributionData';
-import '@/components/distribution/distribution.css';
 
 export default function DistributionNetworkPage() {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const city = getDistributionCity(searchParams.get('city'));
-
-    function handleSelectCity(nextCity: DistributionCityId) {
-        const next = new URLSearchParams(searchParams);
-        next.set('city', nextCity);
-        setSearchParams(next, { replace: true });
-    }
-
     return (
-        <div className="btb-dist-page">
+        <div className="min-h-screen bg-store-cream">
             <Header />
-            <main className="btb-dist">
-                <div className="btb-dist__container">
+            <main className="bg-store-cream pt-[18px] pb-[clamp(64px,6vw,100px)] font-body text-store-ink">
+                <div className="mx-auto w-[min(1240px,calc(100%-56px))]">
                     <DistributionHero />
-                    <DistributionCitySelector selectedId={city.id} onSelect={handleSelectCity} />
-                    <DistributionExplorer city={city} />
+                    <DistributionExplorer />
                 </div>
             </main>
             <Footer />

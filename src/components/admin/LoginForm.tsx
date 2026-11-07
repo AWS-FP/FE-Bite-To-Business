@@ -1,4 +1,4 @@
-import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import { useRef, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -80,10 +80,14 @@ export default function LoginForm() {
 
     return (
         <>
+            <Link
+                className="auth-back-home mb-[18px] inline-flex items-center gap-[5px] text-[12px] font-bold text-black no-underline hover:text-auth-green"
+                to={ROUTES.HOME}
+            >
+                <ArrowLeft size={14} aria-hidden="true" />
+                {t('auth.home')}
+            </Link>
             <h1 id="auth-title">{t('login.title')}</h1>
-            <p className="auth-introduction mt-2.5 mb-0 font-subtext text-[16px] leading-[1.6] text-auth-muted">
-                {t('login.description')}
-            </p>
             {location.state?.activationComplete && (
                 <p
                     className="mt-5 mb-0 rounded-xl border border-solid border-auth-green/15 bg-surface-green px-4 py-[14px] text-[13px] leading-[1.6] text-auth-green"

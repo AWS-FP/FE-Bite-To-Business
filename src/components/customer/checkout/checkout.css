@@ -925,16 +925,6 @@
     border: 1px solid var(--co-ink);
 }
 
-.btb-co-payment__brand--momo {
-    background: #a40070;
-    color: white;
-}
-
-.btb-co-payment__brand--card {
-    background: #1e3495;
-    color: white;
-}
-
 .btb-co-payment__brand--bank {
     background: var(--co-yellow);
 }

@@ -52,7 +52,7 @@ export default function StoreSearch() {
     return (
         <div className="min-w-0 flex-1">
             <form
-                className="flex h-[46px] min-w-0 items-center rounded-full border-2 border-solid border-store-ink bg-store-cream shadow-[3px_3px_0_var(--color-store-ink)]"
+                className="focus-border-group flex h-[46px] min-w-0 items-center rounded-full border-2 border-solid border-store-ink bg-store-cream shadow-[3px_3px_0_var(--color-store-ink)] focus-within:border-store-green"
                 role="search"
                 aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.label')}
                 onSubmit={handleSearch}
@@ -66,7 +66,7 @@ export default function StoreSearch() {
                 />
 
                 <input
-                    className="h-9 min-w-0 flex-1 rounded-full border-0 bg-transparent px-2.5 text-[12px] text-store-ink outline-none placeholder:text-store-muted focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-store-green"
+                    className="h-9 min-w-0 flex-1 rounded-full border-0 bg-transparent px-2.5 text-[12px] text-store-ink outline-none placeholder:text-store-muted"
                     type="search"
                     name="q"
                     aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.label')}
@@ -105,7 +105,7 @@ export default function StoreSearch() {
             )}
 
             <div
-                className="mt-2 flex min-h-[20px] items-center gap-1.5 overflow-x-auto px-2 text-[11px] leading-[1.5] [scrollbar-width:thin]"
+                className="mt-1 flex min-h-[18px] items-center gap-1.5 overflow-x-auto px-2 text-[11px] leading-[1.5] [scrollbar-width:thin]"
                 aria-label={t('search.history')}
             >
                 <span className="shrink-0 text-store-cream/75">{t('search.history')}</span>
