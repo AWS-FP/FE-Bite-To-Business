@@ -13,3 +13,16 @@ export async function updateCustomerProfile(request: UpdateCustomerProfile) {
     const response = await http.put<ApiResponse<CustomerProfile>>('/api/customer/profile', request);
     return response.data.data;
 }
+
+export async function uploadCustomerAvatar(file: File) {
+    const data = new FormData();
+    data.append('file', file);
+    const response = await http.post<ApiResponse<CustomerProfile>>(
+        '/api/customer/profile/avatar',
+        data,
+        {
+            timeout: 60_000,
+        },
+    );
+    return response.data.data;
+}

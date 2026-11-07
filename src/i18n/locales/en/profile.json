@@ -1,5 +1,10 @@
 {
     "breadcrumb": "Account profile",
+    "changeAvatar": "Change profile photo",
+    "avatarUploading": "Uploading photo...",
+    "avatarInvalid": "Choose a JPG or PNG image up to 5 MB.",
+    "avatarSaved": "Profile photo updated.",
+    "avatarError": "Could not upload the photo.",
     "eyebrow": "CUSTOMER ACCOUNT",
     "title": "Your profile",
     "description": "Manage your contact information, delivery address and billing details.",
