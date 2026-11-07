@@ -1,12 +1,10 @@
-/** Dữ liệu minh họa để dựng UI theo Figma; không phải sản phẩm/giá từ Backend. */
 export type CheckoutItem = {
     id: string;
     name: string;
-    sku: string;
     pack: string;
     quantity: number;
     price: number; // Giá của cả dòng sản phẩm, VND
-    art: 'meat' | 'tomato' | 'sauce' | 'oil' | 'rice';
+    imageUrl?: string;
 };
 
 export type DeliveryPackage = {
@@ -21,17 +19,6 @@ export type DeliveryPackage = {
 
 export type DeliveryDraft = Omit<DeliveryPackage, 'id'>;
 
-
-export const CHECKOUT_ITEMS: CheckoutItem[] = [
-    { id: 'beef', name: 'Thăn ngoại bò Úc', sku: 'AUS-BEEF-STRIP-1KG', pack: '2 gói 1kg', quantity: 2, price: 916000, art: 'meat' },
-    { id: 'tomato', name: 'Cà chua bi Đà Lạt', sku: 'DALAT-TOMATO-500G', pack: '4 hộp 500g', quantity: 4, price: 296000, art: 'tomato' },
-    { id: 'sauce', name: 'Sốt tiêu đen Maison', sku: 'MDS-SAUCE-BLACKPEPPER', pack: '3 chai 250ml', quantity: 3, price: 387000, art: 'sauce' },
-    { id: 'oil', name: 'Dầu olive Extra Virgin', sku: 'EVOO-ITALY-1L', pack: '2 chai 1L', quantity: 2, price: 638000, art: 'oil' },
-    { id: 'rice', name: 'Gạo Basmati thượng hạng', sku: 'BASMATI-PREMIUM-5KG', pack: '1 bao 5kg', quantity: 1, price: 245000, art: 'rice' },
-];
-
-export const DEMO_COUPON = 'BITE50';
-export const DEMO_DISCOUNT = 50000;
 
 export function formatPrice(price: number) {
     return `${new Intl.NumberFormat('vi-VN').format(price)}đ`;

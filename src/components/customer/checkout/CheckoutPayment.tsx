@@ -1,4 +1,4 @@
-import { Banknote, Check, Smartphone, Truck } from 'lucide-react';
+import { Banknote, Check, Truck } from 'lucide-react';
 import { formatDate } from './checkoutData';
 import type { DeliveryPackage } from './checkoutData';
 
@@ -13,7 +13,7 @@ export default function CheckoutPayment({ packages, onEditDelivery }: Props) {
             <section className="btb-co-panel">
                 <div className="btb-co-panel__head">
                     <div className="btb-co-panel__icon btb-co-panel__icon--pink"><Truck size={22} /></div>
-                    <div><span className="btb-co-overline">ĐỊA ĐIỂM ĐÃ XÁC NHẬN</span><h2>{packages.length} delivery packages sẵn sàng</h2></div>
+                    <div><span className="btb-co-overline">ĐỊA ĐIỂM GIAO HÀNG</span><h2>{packages.length} gói giao hàng</h2></div>
                     <button type="button" className="btb-co-link-button" onClick={onEditDelivery}>Chỉnh sửa</button>
                 </div>
                 <div className="btb-co-stack btb-co-stack--small">
@@ -25,11 +25,11 @@ export default function CheckoutPayment({ packages, onEditDelivery }: Props) {
                 <div className="btb-co-payments">
                     <div className="btb-co-payment is-selected">
                         <span className="btb-co-payment__brand btb-co-payment__brand--bank"><Banknote size={25} /></span>
-                        <span className="btb-co-payment__body"><small>CHUYỂN KHOẢN</small><strong>Ngân hàng</strong><span>Minh họa xác nhận đơn qua chuyển khoản.</span></span>
+                        <span className="btb-co-payment__body"><small>CHUYỂN KHOẢN</small><strong>Ngân hàng</strong></span>
                         <span className="btb-co-payment__radio"><Check size={15} /></span>
                     </div>
                 </div>
-                <div className="btb-co-payment-note"><span className="btb-co-payment-note__icon"><Smartphone size={24} /></span><p><strong>Mô phỏng chuyển khoản ngân hàng</strong><br />Chưa tích hợp cổng thanh toán hoặc xử lý giao dịch. Nhấn “Xác nhận” chỉ hiển thị kết quả demo.</p></div>
+                <p>Thanh toán chưa khả dụng.</p>
             </section>
         </div>
     );

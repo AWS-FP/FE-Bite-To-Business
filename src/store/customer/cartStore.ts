@@ -15,35 +15,8 @@ interface CartStoreState {
     updateQuantity: (id: string, delta: number) => void
 }
 
-const DEFAULT_CART_ITEMS: CartItem[] = [
-    {
-        id: 'cart-salmon-1',
-        name: 'Fresh Norwegian Salmon Fillet (Sashimi Cut)',
-        spec: 'Whole fish 5-6kg',
-        unitPrice: 485000,
-        quantity: 1,
-        imageUrl: '', // <-- Có thể nhét hình thumbnail giỏ hàng vào đây
-    },
-    {
-        id: 'cart-salmon-2',
-        name: 'Fresh Norwegian Salmon Fillet (Sashimi Cut)',
-        spec: 'Whole fish 5-6kg',
-        unitPrice: 485000,
-        quantity: 1,
-        imageUrl: '',
-    },
-    {
-        id: 'cart-salmon-3',
-        name: 'Fresh Norwegian Salmon Fillet (Sashimi Cut)',
-        spec: 'Whole fish 5-6kg',
-        unitPrice: 515000,
-        quantity: 1,
-        imageUrl: '',
-    },
-]
-
 export const useCartStore = create<CartStoreState>((set) => ({
-    items: DEFAULT_CART_ITEMS,
+    items: [],
     addItem: (newItem, quantity) =>
         set((state) => {
             const existing = state.items.find((i) => i.id === newItem.id)
