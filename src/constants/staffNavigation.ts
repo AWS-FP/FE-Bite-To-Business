@@ -1,4 +1,4 @@
-import { ClipboardList, Megaphone, Package, TicketPercent, Truck, Warehouse } from 'lucide-react';
+import { ClipboardList, Megaphone, Package, TicketPercent, Truck, Warehouse, LayoutDashboard, WandSparkles } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { ROUTES } from '@/router/routes';
 import type { StaffRole } from '@/types/admin/staff';
@@ -16,9 +16,12 @@ export const STAFF_WORKSPACES: Record<StaffRole, StaffWorkspace> = {
         title: 'ecommerce.title',
         roleLabel: 'ecommerce.role',
         items: [
+            { path: ROUTES.ECOMMERCE_DASHBOARD, label: 'ecommerceDashboard', icon: LayoutDashboard },
+            { path: ROUTES.ECOMMERCE_QUOTES, label: 'ecommerceQuotes', icon: ClipboardList },
             { path: ROUTES.ECOMMERCE_PRODUCTS, label: 'navigation.products', icon: Package },
             { path: ROUTES.ECOMMERCE_PROMOTIONS, label: 'navigation.promotions', icon: Megaphone },
             { path: ROUTES.ECOMMERCE_COUPONS, label: 'navigation.coupons', icon: TicketPercent },
+            { path: ROUTES.ECOMMERCE_POSTER, label: 'ecommercePoster', icon: WandSparkles },
         ],
     },
     LOGISTICS_STAFF: {

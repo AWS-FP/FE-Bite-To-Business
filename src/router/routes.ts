@@ -35,6 +35,9 @@ export const ROUTES = {
     ADMIN_SYSTEM: '/admin/system',
 
     ECOMMERCE: '/e-commerce',
+    ECOMMERCE_DASHBOARD: '/e-commerce/dashboard',
+    ECOMMERCE_QUOTES: '/e-commerce/quotes',
+    ECOMMERCE_POSTER: '/e-commerce/poster',
     ECOMMERCE_PRODUCTS: '/e-commerce/products',
     ECOMMERCE_PROMOTIONS: '/e-commerce/promotions',
     ECOMMERCE_COUPONS: '/e-commerce/coupons',
@@ -54,7 +57,7 @@ export const ROUTES = {
 const roleHome: Record<UserRole, string> = {
     ADMIN: ROUTES.ADMIN_REGISTRATIONS,
     CUSTOMER: ROUTES.HOME,
-    ECOMMERCE_EXECUTIVE: ROUTES.ECOMMERCE_PRODUCTS,
+    ECOMMERCE_EXECUTIVE: ROUTES.ECOMMERCE_DASHBOARD,
     LOGISTICS_STAFF: ROUTES.LOGISTICS_INVENTORY,
     DELIVERY_STAFF: ROUTES.DELIVERY_TRIPS,
 };
