@@ -52,7 +52,7 @@ export default function StoreSearch() {
     return (
         <div className="min-w-0 flex-1">
             <form
-                className="flex h-[46px] min-w-0 items-center rounded-full border-2 border-solid border-store-ink bg-store-cream shadow-[3px_3px_0_var(--color-store-ink)]"
+                className="focus-border-group flex h-[46px] min-w-0 items-center rounded-full border-2 border-solid border-store-ink bg-store-cream shadow-[3px_3px_0_var(--color-store-ink)] focus-within:border-store-green"
                 role="search"
                 aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.label')}
                 onSubmit={handleSearch}
@@ -66,7 +66,7 @@ export default function StoreSearch() {
                 />
 
                 <input
-                    className="h-9 min-w-0 flex-1 rounded-full border-0 bg-transparent px-2.5 text-[12px] text-store-ink outline-none placeholder:text-store-muted focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-store-green"
+                    className="h-9 min-w-0 flex-1 rounded-full border-0 bg-transparent px-2.5 text-[12px] text-store-ink outline-none placeholder:text-store-muted"
                     type="search"
                     name="q"
                     aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.label')}

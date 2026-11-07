@@ -1,5 +1,10 @@
 {
     "breadcrumb": "Hồ sơ tài khoản",
+    "changeAvatar": "Đổi ảnh đại diện",
+    "avatarUploading": "Đang tải ảnh...",
+    "avatarInvalid": "Chọn ảnh JPG hoặc PNG, tối đa 5 MB.",
+    "avatarSaved": "Đã cập nhật ảnh đại diện.",
+    "avatarError": "Không thể tải ảnh lên.",
     "eyebrow": "TÀI KHOẢN KHÁCH HÀNG",
     "title": "Hồ sơ của bạn",
     "description": "Quản lý thông tin liên hệ, địa chỉ nhận hàng và hóa đơn.",
