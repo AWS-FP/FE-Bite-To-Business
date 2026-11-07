@@ -1,21 +1,13 @@
-import { Banknote, Check, CreditCard, Smartphone, Truck } from 'lucide-react';
+import { Banknote, Check, Smartphone, Truck } from 'lucide-react';
 import { formatDate } from './checkoutData';
-import type { DeliveryPackage, PaymentMethod } from './checkoutData';
+import type { DeliveryPackage } from './checkoutData';
 
 type Props = {
     packages: DeliveryPackage[];
-    method: PaymentMethod;
-    onMethodChange: (method: PaymentMethod) => void;
     onEditDelivery: () => void;
 };
 
-const PAYMENTS: { id: PaymentMethod; eyebrow: string; title: string; description: string }[] = [
-    { id: 'momo', eyebrow: 'VÍ ĐIỆN TỬ', title: 'MoMo', description: 'Minh họa phương thức thanh toán ví điện tử.' },
-    { id: 'card', eyebrow: 'THẺ QUỐC TẾ', title: 'Visa / Mastercard', description: 'Minh họa thanh toán qua thẻ tín dụng hoặc ghi nợ.' },
-    { id: 'bank', eyebrow: 'CHUYỂN KHOẢN', title: 'Ngân hàng', description: 'Minh họa xác nhận đơn qua chuyển khoản.' },
-];
-
-export default function CheckoutPayment({ packages, method, onMethodChange, onEditDelivery }: Props) {
+export default function CheckoutPayment({ packages, onEditDelivery }: Props) {
     return (
         <div className="btb-co-stack">
             <section className="btb-co-panel">
@@ -29,18 +21,15 @@ export default function CheckoutPayment({ packages, method, onMethodChange, onEd
                 </div>
             </section>
             <section className="btb-co-panel">
-                <div className="btb-co-panel__head"><div className="btb-co-panel__icon btb-co-panel__icon--yellow"><CreditCard size={22} /></div><div><span className="btb-co-overline">PHƯƠNG THỨC THANH TOÁN</span><h2>Chọn cách bạn muốn trả</h2></div></div>
-                <div className="btb-co-payments" role="radiogroup" aria-label="Phương thức thanh toán">
-                    {PAYMENTS.map(payment => <label key={payment.id} className={`btb-co-payment ${method === payment.id ? 'is-selected' : ''}`}>
-                        <input type="radio" name="btb-checkout-payment" checked={method === payment.id} onChange={() => onMethodChange(payment.id)} />
-                        <span className={`btb-co-payment__brand btb-co-payment__brand--${payment.id}`}>
-                            {payment.id === 'momo' ? <Smartphone size={25} /> : payment.id === 'card' ? <CreditCard size={25} /> : <Banknote size={25} />}
-                        </span>
-                        <span className="btb-co-payment__body"><small>{payment.eyebrow}</small><strong>{payment.title}</strong><span>{payment.description}</span></span>
-                        <span className="btb-co-payment__radio">{method === payment.id && <Check size={15} />}</span>
-                    </label>)}
+                <div className="btb-co-panel__head"><div className="btb-co-panel__icon btb-co-panel__icon--yellow"><Banknote size={22} /></div><div><span className="btb-co-overline">PHƯƠNG THỨC THANH TOÁN</span><h2>Chuyển khoản ngân hàng</h2></div></div>
+                <div className="btb-co-payments">
+                    <div className="btb-co-payment is-selected">
+                        <span className="btb-co-payment__brand btb-co-payment__brand--bank"><Banknote size={25} /></span>
+                        <span className="btb-co-payment__body"><small>CHUYỂN KHOẢN</small><strong>Ngân hàng</strong><span>Minh họa xác nhận đơn qua chuyển khoản.</span></span>
+                        <span className="btb-co-payment__radio"><Check size={15} /></span>
+                    </div>
                 </div>
-                <div className="btb-co-payment-note"><span className="btb-co-payment-note__icon"><Smartphone size={24} /></span><p><strong>{method === 'momo' ? 'Mô phỏng thanh toán qua MoMo' : method === 'card' ? 'Mô phỏng thanh toán thẻ' : 'Mô phỏng chuyển khoản ngân hàng'}</strong><br />Chưa tích hợp cổng thanh toán hoặc xử lý giao dịch. Nhấn “Xác nhận” chỉ hiển thị kết quả demo.</p></div>
+                <div className="btb-co-payment-note"><span className="btb-co-payment-note__icon"><Smartphone size={24} /></span><p><strong>Mô phỏng chuyển khoản ngân hàng</strong><br />Chưa tích hợp cổng thanh toán hoặc xử lý giao dịch. Nhấn “Xác nhận” chỉ hiển thị kết quả demo.</p></div>
             </section>
         </div>
     );

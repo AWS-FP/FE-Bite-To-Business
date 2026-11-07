@@ -56,7 +56,7 @@ export default function StoreNavigation() {
                 className="border-0 border-t border-solid border-store-cream/10 bg-store-dark/75"
                 aria-label={t('header.navigation')}
             >
-                <div className="mx-auto flex min-h-[48px] max-w-[1440px] items-center gap-4 px-5 py-1.5">
+                <div className="mx-auto flex min-h-[42px] max-w-[1440px] items-center gap-4 px-5 py-1">
                     {/* Nút mở danh mục */}
                     <button
                         ref={categoryButtonRef}

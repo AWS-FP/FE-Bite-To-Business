@@ -27,7 +27,7 @@ export default function RegisterForm() {
     return (
         <>
             <Link
-                className="auth-back-home mb-[18px] inline-flex items-center gap-[5px] text-[12px] font-bold text-auth-ink/60
+                className="auth-back-home mb-[18px] inline-flex items-center gap-[5px] text-[12px] font-bold text-black
  no-underline hover:text-auth-green"
                 to={ROUTES.HOME}
             >

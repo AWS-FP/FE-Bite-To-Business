@@ -21,7 +21,6 @@ export type DeliveryPackage = {
 
 export type DeliveryDraft = Omit<DeliveryPackage, 'id'>;
 
-export type PaymentMethod = 'momo' | 'card' | 'bank';
 
 export const CHECKOUT_ITEMS: CheckoutItem[] = [
     { id: 'beef', name: 'Thăn ngoại bò Úc', sku: 'AUS-BEEF-STRIP-1KG', pack: '2 gói 1kg', quantity: 2, price: 916000, art: 'meat' },
@@ -31,7 +30,6 @@ export const CHECKOUT_ITEMS: CheckoutItem[] = [
     { id: 'rice', name: 'Gạo Basmati thượng hạng', sku: 'BASMATI-PREMIUM-5KG', pack: '1 bao 5kg', quantity: 1, price: 245000, art: 'rice' },
 ];
 
-export const SHIPPING_PER_PACKAGE = 30000;
 export const DEMO_COUPON = 'BITE50';
 export const DEMO_DISCOUNT = 50000;
 

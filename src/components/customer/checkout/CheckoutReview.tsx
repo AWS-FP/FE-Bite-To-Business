@@ -1,5 +1,5 @@
 import { BadgeCheck, MapPin } from 'lucide-react';
-import { CHECKOUT_ITEMS, formatDate, formatPrice, SHIPPING_PER_PACKAGE } from './checkoutData';
+import { CHECKOUT_ITEMS, formatDate, formatPrice } from './checkoutData';
 import type { DeliveryPackage } from './checkoutData';
 
 type Props = { packages: DeliveryPackage[]; assignments: Record<string, string> };
@@ -26,7 +26,7 @@ export default function CheckoutReview({ packages, assignments }: Props) {
                                     {products.map(product => <div key={product.id}><span>{product.quantity} × {product.name}</span><strong>{formatPrice(product.price)}</strong></div>)}
                                 </div>
                             </div>
-                            <aside className="btb-co-quote__aside"><small>Tạm tính</small><strong>{formatPrice(subtotal)}</strong><span>+ {formatPrice(SHIPPING_PER_PACKAGE)} phí giao demo</span></aside>
+                            <aside className="btb-co-quote__aside"><small>Tạm tính</small><strong>{formatPrice(subtotal)}</strong><span>Chưa gồm phí giao hàng</span></aside>
                         </article>
                     );
                 })}

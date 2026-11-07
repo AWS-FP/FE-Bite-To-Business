@@ -6,6 +6,7 @@ import CheckoutProductImage from './CheckoutProductImage';
 import type { DeliveryDraft, DeliveryPackage } from './checkoutData';
 
 export type DeliveryProps = {
+    initialAddress?: string;
     packages: DeliveryPackage[];
     assignments: Record<string, string>;
     onCreatePackage: (draft: DeliveryDraft) => void;
@@ -15,11 +16,18 @@ export type DeliveryProps = {
 };
 
 export default function CheckoutDelivery({
-    packages, assignments, onCreatePackage, onEditPackage, onDeletePackage, onAssign,
+    packages, assignments, onCreatePackage, onEditPackage, onDeletePackage, onAssign, initialAddress = '',
 }: DeliveryProps) {
     const [formOpen, setFormOpen] = useState(true);
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [draft, setDraft] = useState<DeliveryDraft>({ ...EMPTY_DELIVERY });
+    const [draft, setDraft] = useState<DeliveryDraft>(() => {
+        try {
+            const address = initialAddress || sessionStorage.getItem('btb.deliveryAddress') || '';
+            return { ...EMPTY_DELIVERY, address };
+        } catch {
+            return { ...EMPTY_DELIVERY, address: initialAddress };
+        }
+    });
     const [error, setError] = useState('');
     const assigned = CHECKOUT_ITEMS.filter(item => !!assignments[item.id]).length;
     const minDate = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
@@ -40,6 +48,7 @@ export default function CheckoutDelivery({
         event.preventDefault();
         const message = validateDelivery(draft);
         if (message) { setError(message); return; }
+        try { sessionStorage.removeItem('btb.deliveryAddress'); } catch { /* Optional storage. */ }
         if (editingId) onEditPackage(editingId, draft);
         else onCreatePackage(draft);
         resetForm();
