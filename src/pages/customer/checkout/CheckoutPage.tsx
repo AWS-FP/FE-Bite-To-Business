@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { CheckCircle2, CircleAlert, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Header from '@/layouts/Header';
 import Footer from '@/layouts/Footer';
 import CheckoutStepper from '@/components/customer/checkout/CheckoutStepper';
@@ -10,7 +10,7 @@ import CheckoutCoupon from '@/components/customer/checkout/CheckoutCoupon';
 import CheckoutPayment from '@/components/customer/checkout/CheckoutPayment';
 import CheckoutSummary from '@/components/customer/checkout/CheckoutSummary';
 import { CHECKOUT_ITEMS } from '@/components/customer/checkout/checkoutData';
-import type { DeliveryDraft, DeliveryPackage, PaymentMethod } from '@/components/customer/checkout/checkoutData';
+import type { DeliveryDraft, DeliveryPackage } from '@/components/customer/checkout/checkoutData';
 import '@/components/customer/checkout/checkout.css';
 
 const HEADINGS = [
@@ -21,11 +21,12 @@ const HEADINGS = [
 ];
 
 export default function CheckoutPage() {
+    const location = useLocation();
+    const initialAddress = typeof location.state?.deliveryAddress === 'string' ? location.state.deliveryAddress : '';
     const [step, setStep] = useState(0);
     const [packages, setPackages] = useState<DeliveryPackage[]>([]);
     const [assignments, setAssignments] = useState<Record<string, string>>({});
     const [coupon, setCoupon] = useState(false);
-    const [method, setMethod] = useState<PaymentMethod>('momo');
     const [previewConfirmed, setPreviewConfirmed] = useState(false);
 
     const remaining = CHECKOUT_ITEMS.filter(item => !assignments[item.id]);
@@ -86,10 +87,10 @@ export default function CheckoutPage() {
                     <p className="btb-co-demo-banner"><CircleAlert size={17} /> Giao diện mô phỏng theo Figma. Sản phẩm, giá, phí giao, ưu đãi và thanh toán đều là dữ liệu demo.</p>
                     <div className="btb-co-grid">
                         <div className="btb-co-content">
-                            {step === 0 && <CheckoutDelivery packages={packages} assignments={assignments} onCreatePackage={createPackage} onEditPackage={editPackage} onDeletePackage={deletePackage} onAssign={assign} />}
+                            {step === 0 && <CheckoutDelivery packages={packages} assignments={assignments} onCreatePackage={createPackage} onEditPackage={editPackage} onDeletePackage={deletePackage} onAssign={assign} initialAddress={initialAddress} />}
                             {step === 1 && <CheckoutReview packages={packages} assignments={assignments} />}
                             {step === 2 && <CheckoutCoupon applied={coupon} onApply={setCoupon} packages={packages} assignments={assignments} />}
-                            {step === 3 && <CheckoutPayment packages={packages} method={method} onMethodChange={setMethod} onEditDelivery={() => move(0)} />}
+                            {step === 3 && <CheckoutPayment packages={packages} onEditDelivery={() => move(0)} />}
                         </div>
                         <CheckoutSummary step={step} packages={packages} assignments={assignments} coupon={coupon} helper={helper} nextDisabled={step === 0 && !deliveryReady} onNext={next} onBack={() => move(Math.max(0, step - 1))} />
                     </div>

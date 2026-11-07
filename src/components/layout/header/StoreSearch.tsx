@@ -105,7 +105,7 @@ export default function StoreSearch() {
             )}
 
             <div
-                className="mt-2 flex min-h-[20px] items-center gap-1.5 overflow-x-auto px-2 text-[11px] leading-[1.5] [scrollbar-width:thin]"
+                className="mt-1 flex min-h-[18px] items-center gap-1.5 overflow-x-auto px-2 text-[11px] leading-[1.5] [scrollbar-width:thin]"
                 aria-label={t('search.history')}
             >
                 <span className="shrink-0 text-store-cream/75">{t('search.history')}</span>

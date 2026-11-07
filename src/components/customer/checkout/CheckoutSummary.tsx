@@ -1,5 +1,5 @@
 import { ArrowRight, ArrowLeft, LockKeyhole, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { CHECKOUT_ITEMS, DEMO_COUPON, DEMO_DISCOUNT, formatPrice, SHIPPING_PER_PACKAGE } from './checkoutData';
+import { CHECKOUT_ITEMS, DEMO_COUPON, DEMO_DISCOUNT, formatPrice } from './checkoutData';
 import CheckoutProductImage from './CheckoutProductImage';
 import type { DeliveryPackage } from './checkoutData';
 
@@ -18,9 +18,8 @@ const CTA = ['Xem báo giá giao hàng', 'Tiếp tục đến ưu đãi', 'Chọ
 
 export default function CheckoutSummary({ step, packages, assignments, coupon, nextDisabled, helper, onNext, onBack }: Props) {
     const subtotal = CHECKOUT_ITEMS.reduce((sum, item) => sum + item.price, 0);
-    const shipping = packages.length * SHIPPING_PER_PACKAGE;
     const discount = coupon ? DEMO_DISCOUNT : 0;
-    const total = subtotal + shipping - discount;
+    const total = subtotal - discount;
     const assigned = CHECKOUT_ITEMS.filter(item => assignments[item.id]).length;
 
     return (
@@ -38,10 +37,10 @@ export default function CheckoutSummary({ step, packages, assignments, coupon, n
                 </div>
                 <div className="btb-co-summary__math">
                     <div><span>Tạm tính</span><strong>{formatPrice(subtotal)}</strong></div>
-                    <div><span>Phí giao hàng ({packages.length} gói)</span><strong>{formatPrice(shipping)}</strong></div>
+                    <div><span>Phí giao hàng ({packages.length} gói)</span><strong>Chưa tính</strong></div>
                     {coupon && <div className="btb-co-summary__discount"><span>Ưu đãi {DEMO_COUPON}</span><strong>-{formatPrice(discount)}</strong></div>}
                 </div>
-                <div className="btb-co-summary__total"><div><strong>Tổng thanh toán</strong><small>Giá mẫu, chưa phải báo giá chính thức</small></div><b>{formatPrice(total)}</b></div>
+                <div className="btb-co-summary__total"><div><strong>Tạm tính</strong><small>Giá mẫu, chưa gồm phí giao hàng</small></div><b>{formatPrice(total)}</b></div>
                 {step === 0 && <div className={`btb-co-summary__helper ${nextDisabled ? 'is-warning' : 'is-ready'}`}>{nextDisabled ? <AlertCircle size={17} /> : <CheckCircle2 size={17} />}{helper || `${assigned}/${CHECKOUT_ITEMS.length} mặt hàng đã phân gói`}</div>}
                 {step > 0 && <p className="btb-co-summary__demo">Đây là giao diện demo; chưa có thanh toán hay tạo đơn thực tế.</p>}
                 <div className="btb-co-summary__actions">
