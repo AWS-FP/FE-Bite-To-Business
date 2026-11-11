@@ -18,7 +18,7 @@
         "distance": "Quãng đường",
         "estimatedFee": "Phí giao hàng ước tính",
         "free": "Miễn phí",
-        "feePolicy": "Miễn phí 5 km đầu · 5.000đ/km tiếp theo, làm tròn lên.",
+        "feePolicy": "Miễn phí 5 km đầu · 5.000đ/km vượt theo quãng đường thực tế.",
         "useAddress": "Dùng địa chỉ tạo gói giao",
         "mapLabel": "Bản đồ Vietmap",
         "zoomIn": "Phóng to",

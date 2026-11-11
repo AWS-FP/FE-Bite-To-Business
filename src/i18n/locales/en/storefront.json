@@ -18,7 +18,7 @@
         "distance": "Distance",
         "estimatedFee": "Estimated delivery fee",
         "free": "Free",
-        "feePolicy": "First 5 km free · VND 5,000 per additional km, rounded up.",
+        "feePolicy": "First 5 km free · VND 5,000 per additional km based on the actual distance.",
         "useAddress": "Use address for delivery package",
         "mapLabel": "Vietmap map",
         "zoomIn": "Zoom in",
