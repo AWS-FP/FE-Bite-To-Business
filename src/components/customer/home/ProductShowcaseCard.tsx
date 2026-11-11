@@ -32,7 +32,7 @@ export default function ProductShowcaseCard({
                 id: product.id,
                 name: localizedName,
                 spec: localizedSpec,
-                unitPrice: activeUnitPrice,
+                unitPrice: product.listPrice,
                 imageUrl: product.imageUrl,
             },
             quantity,

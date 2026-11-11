@@ -248,7 +248,16 @@ export default function StoreAccountActions() {
                 <div className="absolute top-[54px] right-0 z-50 w-[265px] overflow-hidden rounded-[22px] border border-solid border-store-ink/15 bg-store-cream text-store-ink shadow-[0_20px_50px_color-mix(in_srgb,_var(--color-black)_35%,_transparent)]">
                     <div className="flex items-center gap-3.5 p-4 border-0 border-b border-solid border-store-ink/10">
                         <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border border-solid border-store-ink bg-gradient-to-br from-surface-blue to-info text-sm font-black text-store-ink">
-                            {initials}
+                            {user?.avatarUrl ? (
+                                <img
+                                    className="block size-full object-cover"
+                                    src={user.avatarUrl}
+                                    alt=""
+                                    referrerPolicy="no-referrer"
+                                />
+                            ) : (
+                                initials
+                            )}
                         </div>
                         <div className="min-w-0">
                             <h4 className="font-subheading m-0 truncate text-sm font-bold text-store-ink">

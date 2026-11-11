@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
 export interface CartItem {
     id: string
@@ -15,7 +16,7 @@ interface CartStoreState {
     updateQuantity: (id: string, delta: number) => void
 }
 
-export const useCartStore = create<CartStoreState>((set) => ({
+export const useCartStore = create<CartStoreState>()(persist((set) => ({
     items: [],
     addItem: (newItem, quantity) =>
         set((state) => {
@@ -41,4 +42,8 @@ export const useCartStore = create<CartStoreState>((set) => ({
                 )
                 .filter((item) => item.quantity > 0),
         })),
+}), {
+    name: 'bitetobusiness.guest-cart',
+    storage: createJSONStorage(() => localStorage),
+    partialize: (state) => ({ items: state.items }),
 }))
