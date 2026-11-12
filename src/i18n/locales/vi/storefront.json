@@ -141,6 +141,10 @@
         "signOut": "Đăng xuất"
     },
     "homePage": {
+        "productsLoading": "Đang tải sản phẩm…",
+        "productsError": "Không tải được sản phẩm. Vui lòng thử lại sau.",
+        "flashEmpty": "Chưa có sản phẩm khuyến mãi.",
+        "productsEmpty": "Chưa có sản phẩm để hiển thị.",
         "partnerTitle": "Khám phá các thương hiệu trong danh mục Bite to Business.",
         "ecosystemTag": "HỆ SINH THÁI 14 NGÀNH HÀNG THỰC PHẨM",
         "ecosystemTitle": "Danh Mục Nguyên Liệu Toàn Diện",

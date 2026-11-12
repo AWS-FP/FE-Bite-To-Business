@@ -1,5 +1,4 @@
 import { useHomeModelContext } from './HomeModel.tsx';
-import { FLASH_SALE_PRODUCTS, STANDARD_B2B_PRODUCTS } from '../../../constants/customer/homeData';
 import ProductShowcaseCard from './ProductShowcaseCard.tsx';
 import SectionPaginationBar from './SectionPaginationBar.tsx';
 
@@ -16,9 +15,10 @@ export default function ProductsSection() {
         setStandardPage,
         totalStandardPages,
         visibleStandardProducts,
-        hours,
-        minutes,
-        seconds,
+        flashProductCount,
+        standardProductCount,
+        loadingProducts,
+        productError,
     } = useHomeModelContext();
     return (
         <section className="mx-auto max-w-[1320px] px-5 py-6">
@@ -39,22 +39,11 @@ export default function ProductsSection() {
                             </h2>
                         </div>
 
-                        {/* Countdown + Quick Prev/Next Arrows */}
-                        <div className="flex flex-wrap items-center gap-3">
-                            <div className="flex items-center gap-2 text-xs font-bold text-store-ink">
-                                <span>{t('homePage.batchClosesIn', 'Batch closes in:')}</span>
-                                <span className="rounded-lg bg-store-ink px-2.5 py-1.5 font-mono text-xs font-extrabold text-store-yellow">
-                                    {hours} {t('homePage.hrs', 'hrs')}
-                                </span>
-                                <span className="rounded-lg bg-store-ink px-2.5 py-1.5 font-mono text-xs font-extrabold text-store-yellow">
-                                    {minutes} {t('homePage.min', 'min')}
-                                </span>
-                                <span className="rounded-lg bg-store-ink px-2.5 py-1.5 font-mono text-xs font-extrabold text-store-yellow">
-                                    {seconds} {t('homePage.sec', 'sec')}
-                                </span>
-                            </div>
-                        </div>
                     </div>
+
+                    {loadingProducts && <p>{t('homePage.productsLoading')}</p>}
+                    {productError && <p role="alert">{t('homePage.productsError')}</p>}
+                    {!loadingProducts && !productError && flashProductCount === 0 && <p>{t('homePage.flashEmpty')}</p>}
 
                     <div className="mt-7 grid gap-6 grid-cols-3">
                         {visibleFlashProducts.map((product) => (
@@ -70,7 +59,7 @@ export default function ProductsSection() {
                     <SectionPaginationBar
                         currentPage={flashPage}
                         totalPages={totalFlashPages}
-                        totalItems={FLASH_SALE_PRODUCTS.length}
+                        totalItems={flashProductCount}
                         pageSize={flashPageSize}
                         onPageChange={setFlashPage}
                     />
@@ -92,6 +81,8 @@ export default function ProductsSection() {
                         </div>
                     </div>
 
+                    {!loadingProducts && !productError && standardProductCount === 0 && <p>{t('homePage.productsEmpty')}</p>}
+
                     <div className="mt-7 grid gap-6 grid-cols-3">
                         {visibleStandardProducts.map((product) => (
                             <ProductShowcaseCard
@@ -106,7 +97,7 @@ export default function ProductsSection() {
                     <SectionPaginationBar
                         currentPage={standardPage}
                         totalPages={totalStandardPages}
-                        totalItems={STANDARD_B2B_PRODUCTS.length}
+                        totalItems={standardProductCount}
                         pageSize={standardPageSize}
                         onPageChange={setStandardPage}
                     />

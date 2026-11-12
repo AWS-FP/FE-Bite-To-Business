@@ -141,6 +141,10 @@
         "signOut": "Sign Out"
     },
     "homePage": {
+        "productsLoading": "Loading products…",
+        "productsError": "Could not load products. Please try again later.",
+        "flashEmpty": "No promotional products are available.",
+        "productsEmpty": "No products are available.",
         "partnerTitle": "Discover brands in the Bite to Business catalog.",
         "ecosystemTag": "14-CATEGORY B2B FOOD ECOSYSTEM",
         "ecosystemTitle": "Comprehensive Ingredient Catalog",

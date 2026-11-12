@@ -13,13 +13,15 @@ export default function ProductShowcaseCard({
     product: HomeProductCardItem;
     section?: 'flash' | 'standard';
 }) {
-    const { t } = useTranslation('storefront');
+    const { t, i18n } = useTranslation('storefront');
     const [quantity, setQuantity] = useState(4);
     const addItemToCart = useCartStore((state) => state.addItem);
 
     const productKey = `homeProducts.${section}.${product.id}`;
     const categoryKey = product.categoryLabel.toLowerCase().replace(/[^a-z0-9]+/g, '_');
-    const localizedName = t(`${productKey}.name`, product.name);
+    const localizedName = i18n.resolvedLanguage?.startsWith('en')
+        ? product.nameEn ?? product.name
+        : product.nameVi ?? product.name;
     const localizedSpec = t(`${productKey}.spec`, product.spec);
     const localizedUnit = t(`homePage.units.${product.unit}`, product.unit);
     const localizedCategory = t(`homePage.productCategories.${categoryKey}`, product.categoryLabel);
@@ -76,9 +78,9 @@ export default function ProductShowcaseCard({
                     </span>
                 )}
 
-                <span className="absolute right-3 bottom-3 rounded-md bg-store-green px-2.5 py-1 text-[10px] font-bold text-white">
+                {product.certBadge && <span className="absolute right-3 bottom-3 rounded-md bg-store-green px-2.5 py-1 text-[10px] font-bold text-white">
                     {t(`homePage.productBadges.${product.certBadge}`, product.certBadge)}
-                </span>
+                </span>}
             </Link>
 
             <div className="flex flex-1 flex-col p-4">
@@ -95,14 +97,14 @@ export default function ProductShowcaseCard({
                         {localizedName}
                     </Link>
 
-                    <div className="mt-2 flex items-center gap-1.5">
+                    {product.rating != null && product.reviewCount != null && <div className="mt-2 flex items-center gap-1.5">
                         <div className="flex items-center gap-0.5">
                             {[1, 2, 3, 4, 5].map((star) => (
                                 <Star
                                     key={star}
                                     size={14}
                                     className={
-                                        star <= Math.round(product.rating)
+                                        star <= Math.round(product.rating ?? 0)
                                             ? 'fill-store-yellow text-store-ink'
                                             : 'fill-transparent text-store-ink'
                                     }
@@ -113,7 +115,7 @@ export default function ProductShowcaseCard({
                             {product.rating} (
                             {t('homePage.reviewCount', { count: product.reviewCount })})
                         </span>
-                    </div>
+                    </div>}
 
                     {/* Both discounted and regular products reserve exactly the same price space.
                         The current price sits on one baseline and starts at the same left edge. */}
