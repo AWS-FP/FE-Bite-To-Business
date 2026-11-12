@@ -6,6 +6,7 @@ import { landingSegments } from './landingSegmentsData';
 export default function LandingSegments() {
     const [activeSegment, setActiveSegment] = useState(0);
     const segment = landingSegments[activeSegment];
+    const photoBySegment = ['market', 'vegetables', 'kitchen', 'warehouse', 'produce'] as const;
     return (
         <section
             className="py-[72px] border-y-2 border-solid border-store-ink bg-store-cream"
@@ -176,7 +177,7 @@ export default function LandingSegments() {
                             boxShadow: 'var(--shadow-soft)',
                         }}
                     >
-                        <BtbImagePlaceholder label={`Ảnh mô hình: ${segment.title}`} />
+                        <BtbImagePlaceholder label={`Ảnh minh họa: ${segment.title}`} photo={photoBySegment[activeSegment]} />
                     </div>
                 </div>
             </div>

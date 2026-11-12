@@ -182,7 +182,7 @@ export default function OrderStatusPage() {
                             <dl className="my-5 space-y-3 border-0 border-y border-solid border-white/20 py-4 text-[11px]">
                                 <div className="flex items-center justify-between gap-3"><dt>Tổng mặt hàng</dt><dd className="m-0 font-extrabold">{totalItems}</dd></div>
                                 <div className="flex items-center justify-between gap-3"><dt>Delivery packages</dt><dd className="m-0 font-extrabold">{order.packages.length}</dd></div>
-                                <div className="flex items-center justify-between gap-3"><dt>Phí giao (demo)</dt><dd className="m-0 font-extrabold">{formatVnd(order.shipping)}</dd></div>
+                                <div className="flex items-center justify-between gap-3"><dt>Phí giao (demo)</dt><dd className="m-0 font-extrabold">{order.shipping === 0 ? 'Chưa tính' : formatVnd(order.shipping)}</dd></div>
                                 {order.discount > 0 && <div className="flex items-center justify-between gap-3"><dt>Giảm giá</dt><dd className="m-0 font-extrabold">−{formatVnd(order.discount)}</dd></div>}
                             </dl>
                             <div className="flex flex-wrap items-end justify-between gap-3">

@@ -6,6 +6,7 @@ export default function WhyBTBPage() {
     const { t } = useTranslation('storefront');
     return (
         <BTBInfoLayout
+            variant="why"
             eyebrow={t('introPages.whyEyebrow')}
             title={t('introPages.whyTitle')}
             description={t('introPages.whyDescription')}

@@ -1,11 +1,14 @@
 /** Dữ liệu demo hiển thị Orders; không phải lịch sử giao dịch của Backend. */
+
 import {
     CHECKOUT_ITEMS,
     DEMO_DISCOUNT,
-    SHIPPING_PER_PACKAGE,
     type DeliveryPackage,
-    type PaymentMethod,
 } from '@/components/customer/checkout/checkoutData';
+
+// Checkout hiện tại chỉ mô phỏng chuyển khoản ngân hàng
+type PaymentMethod = 'bank';
+
 
 export type OrderStatus = 'pending' | 'preparing' | 'shipping' | 'delivered' | 'cancelled';
 
@@ -156,7 +159,7 @@ export function saveCheckoutPreview(customerId: string, input: {
         quantity: item.quantity, price: item.price,
     }));
     const subtotal = items.reduce((sum, item) => sum + item.price, 0);
-    const shipping = input.packages.length * SHIPPING_PER_PACKAGE;
+    const shipping = 0; // Phí giao hàng chưa được tính trong checkout demo
     const discount = input.couponApplied ? DEMO_DISCOUNT : 0;
     const order: OrderRecord = {
         id: `UI-${Date.now()}`, createdAt: new Date().toISOString(),
