@@ -13,6 +13,7 @@ interface NavigationItem {
 
 interface WorkspaceSidebarProps {
     workspaceLabel: string;
+    logoSrc?: string;
     groups: { label: string; items: NavigationItem[] }[];
     isCollapsed: boolean;
     onToggleCollapse: () => void;
@@ -20,6 +21,7 @@ interface WorkspaceSidebarProps {
 
 export default function WorkspaceSidebar({
     workspaceLabel,
+    logoSrc = '/images/admin/brand-logo.png',
     groups,
     isCollapsed,
     onToggleCollapse,
@@ -39,7 +41,7 @@ export default function WorkspaceSidebar({
             >
                 <img
                     className="block shrink-0 object-contain [.is-collapsed_&]:h-[38px] [.is-collapsed_&]:w-[48px]"
-                    src="/images/admin/brand-logo.png"
+                    src={logoSrc}
                     alt=""
                     width={88}
                     height={68}

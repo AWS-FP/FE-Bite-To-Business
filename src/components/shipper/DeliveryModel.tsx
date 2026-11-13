@@ -1,6 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { DEMO_HISTORY, DEMO_TRIP } from '../../constants/shipper/deliveryDemo';
 import type { DeliveryHistoryItem, DeliveryLanguage, DeliveryTrip } from '../../types/shipper/delivery';
 
 type DeliveryDemoState = {
@@ -17,35 +16,16 @@ type DeliveryContextValue = DeliveryDemoState & {
     resetDemo: () => void;
 };
 
-const STORAGE_KEY = 'btb.delivery-demo.v1';
 const initialState = (): DeliveryDemoState => ({
-    trip: { ...DEMO_TRIP, packages: DEMO_TRIP.packages.map((pack) => ({ ...pack })) },
-    history: DEMO_HISTORY.map((item) => ({ ...item })),
+    trip: null,
+    history: [],
 });
 const DeliveryContext = createContext<DeliveryContextValue | null>(null);
 
 export function DeliveryProvider({ children }: { children: ReactNode }) {
-    const [state, setState] = useState<DeliveryDemoState>(() => {
-        try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored) {
-                const parsed: unknown = JSON.parse(stored);
-                if (
-                    parsed && typeof parsed === 'object' &&
-                    'history' in parsed && Array.isArray(parsed.history) &&
-                    'trip' in parsed && (parsed.trip === null || typeof parsed.trip === 'object')
-                ) return parsed as DeliveryDemoState;
-            }
-        } catch { /* Storage might be disabled. Demo still works in memory. */ }
-        return initialState();
-    });
+    const [state, setState] = useState<DeliveryDemoState>(initialState);
     const [language, setLanguage] = useState<DeliveryLanguage>('vi');
     const [confirmationOpen, setConfirmationOpen] = useState(false);
-
-    useEffect(() => {
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-        catch { /* No persistent demo data when storage is unavailable. */ }
-    }, [state]);
 
     const completeTrip = useCallback(() => {
         setState((current) => {
@@ -84,6 +64,8 @@ export function DeliveryProvider({ children }: { children: ReactNode }) {
     return <DeliveryContext.Provider value={value}>{children}</DeliveryContext.Provider>;
 }
 
+// Context and hook are kept together for the existing delivery layout.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useDelivery(): DeliveryContextValue {
     const context = useContext(DeliveryContext);
     if (!context) throw new Error('useDelivery must be used inside DeliveryProvider');

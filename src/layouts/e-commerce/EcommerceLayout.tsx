@@ -75,6 +75,7 @@ function EcommerceWorkspace() {
             </a>
             <WorkspaceSidebar
                 workspaceLabel={t(workspace.label)}
+                logoSrc="/images/storefront/brand-logo.png"
                 isCollapsed={isCollapsed}
                 onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
                 groups={[
