@@ -1,7 +1,8 @@
-import { Box, ClipboardList, Mail, Menu, PackagePlus, Truck, X } from 'lucide-react';
+import { Box, ClipboardList, Mail, Menu, PackagePlus, X } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
 import { ROUTES } from '../../router/routes';
 import { useLogistics } from './LogisticsModel.tsx';
+import SidebarCollapseButton from '@/components/common/SidebarCollapseButton';
 
 const menu = [
     { path: ROUTES.LOGISTICS_INVENTORY, vi: 'Sổ cái tồn kho', en: 'Inventory ledger', icon: Box, counter: '06', group: 0 },
@@ -10,11 +11,11 @@ const menu = [
     { path: ROUTES.LOGISTICS_PRODUCT_REQUESTS, vi: 'Yêu cầu thêm SP', en: 'Product requests', icon: Mail, counter: '03', group: 1 },
 ] as const;
 
-export default function LogisticsSidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
+export default function LogisticsSidebar({ open, onClose, isCollapsed, onToggleCollapse }: { open: boolean; onClose: () => void; isCollapsed: boolean; onToggleCollapse: () => void }) {
     const { language, requests, orders } = useLogistics();
     return <>
         {open && <button type="button" className="lg-sidebar-backdrop" aria-label="Đóng menu" onClick={onClose} />}
-        <aside className={`lg-sidebar ${open ? 'lg-sidebar--open' : ''}`}>
+        <aside id="logistics-sidebar" className={`lg-sidebar ${open ? 'lg-sidebar--open' : ''}`}>
             <div className="lg-brand">
                 <Link to={ROUTES.HOME} onClick={onClose} aria-label="Về trang chủ" className="flex min-h-[98px] items-center gap-2 py-3 text-inherit no-underline">
                     <img src="/images/storefront/brand-logo.png" alt="" width={88} height={68} className="block w-[88px] shrink-0 object-contain" />
@@ -22,14 +23,16 @@ export default function LogisticsSidebar({ open, onClose }: { open: boolean; onC
                 </Link>
                 <button className="lg-sidebar-close" type="button" aria-label="Đóng menu" onClick={onClose}><X size={18}/></button>
             </div>
-            <div className="lg-sidebar-caption">● {language === 'vi' ? 'KHÔNG GIAN QUẢN TRỊ' : 'OPERATIONS WORKSPACE'}</div>
+            <div className="lg-sidebar-caption">● {language === 'vi' ? 'KHÔNG GIAN LÀM VIỆC' : 'WORKSPACE'}</div>
             <nav className="lg-nav" aria-label="Logistics navigation">
                 <div className="lg-nav-label">{language === 'vi' ? 'QUẢN LÝ KHO & TỒN KHO' : 'WAREHOUSE & INVENTORY'}</div>
-                {menu.filter(x=>x.group===0).map(item=><NavLink key={item.path} to={item.path} onClick={onClose} className={({isActive})=>`lg-nav-item ${isActive?'lg-nav-item--active':''}`}><item.icon size={16}/><span>{language === 'vi'?item.vi:item.en}</span><b>{item.counter}</b></NavLink>)}
+                {menu.filter(x=>x.group===0).map(item=><NavLink key={item.path} to={item.path} onClick={onClose} title={language === 'vi' ? item.vi : item.en} aria-label={language === 'vi' ? item.vi : item.en} className={({isActive})=>`lg-nav-item ${isActive?'lg-nav-item--active':''}`}><item.icon size={16}/><span>{language === 'vi'?item.vi:item.en}</span><b>{item.counter}</b></NavLink>)}
                 <div className="lg-nav-label lg-nav-label--separate">{language === 'vi' ? 'ĐIỀU PHỐI & YÊU CẦU KHÁCH' : 'DISPATCH & REQUESTS'}</div>
-                {menu.filter(x=>x.group===1).map(item=><NavLink key={item.path} to={item.path} onClick={onClose} className={({isActive})=>`lg-nav-item ${isActive?'lg-nav-item--active':''}`}><item.icon size={16}/><span>{language==='vi'?item.vi:item.en}</span><b>{item.path === ROUTES.LOGISTICS_PACKING ? String(orders.length).padStart(2,'0') : String(requests.length).padStart(2,'0')}</b></NavLink>)}
+                {menu.filter(x=>x.group===1).map(item=><NavLink key={item.path} to={item.path} onClick={onClose} title={language === 'vi' ? item.vi : item.en} aria-label={language === 'vi' ? item.vi : item.en} className={({isActive})=>`lg-nav-item ${isActive?'lg-nav-item--active':''}`}><item.icon size={16}/><span>{language==='vi'?item.vi:item.en}</span><b>{item.path === ROUTES.LOGISTICS_PACKING ? String(orders.length).padStart(2,'0') : String(requests.length).padStart(2,'0')}</b></NavLink>)}
             </nav>
-            <div className="lg-sidebar-bottom"><Truck size={15}/><span>LOGISTICS STAFF · DEMO UI</span></div>
+            <div className="staff-sidebar-bottom mt-auto border-t border-black px-4 py-4">
+                <div className="ml-auto w-fit"><SidebarCollapseButton sidebarId="logistics-sidebar" isCollapsed={isCollapsed} onToggle={onToggleCollapse} /></div>
+            </div>
         </aside>
     </>;
 }

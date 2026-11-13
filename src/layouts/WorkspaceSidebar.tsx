@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink } from 'react-router-dom';
 import { ROUTES } from '@/router/routes';
+import SidebarCollapseButton from '@/components/common/SidebarCollapseButton';
 
 interface NavigationItem {
     path: string;
@@ -97,23 +98,9 @@ export default function WorkspaceSidebar({
             ))}
 
             <div className="admin-sidebar-bottom mt-auto pt-12 before:mb-[15px] before:block before:border-t before:border-black before:content-['']">
-                <button
-                    className="admin-collapse-button admin-icon-button ml-auto grid place-items-center border-0 bg-transparent p-[3px] text-black hover:bg-black/5 [.is-collapsed_&]:mr-auto"
-                    type="button"
-                    title={isCollapsed ? t('sidebar.expand') : t('sidebar.collapse')}
-                    aria-label={isCollapsed ? t('sidebar.expand') : t('sidebar.collapse')}
-                    aria-expanded={!isCollapsed}
-                    aria-controls="workspace-sidebar"
-                    onClick={onToggleCollapse}
-                >
-                    <img
-                        className="block shrink-0 [.is-collapsed_&]:rotate-180"
-                        src="/images/admin/sidebar-collapse.svg"
-                        alt=""
-                        width={19}
-                        height={19}
-                    />
-                </button>
+                <div className="ml-auto w-fit [.is-collapsed_&]:mr-auto">
+                    <SidebarCollapseButton sidebarId="workspace-sidebar" isCollapsed={isCollapsed} onToggle={onToggleCollapse} />
+                </div>
             </div>
         </aside>
     );

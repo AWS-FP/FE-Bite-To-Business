@@ -1,17 +1,17 @@
 {
     "navigationGroup": "WORKSPACE OPERATIONS",
     "ecommerce": {
-        "workspace": "E-COMMERCE WORKSPACE",
+        "workspace": "WORKSPACE",
         "title": "Commerce desk.",
         "role": "E-commerce executive"
     },
     "logistics": {
-        "workspace": "LOGISTICS WORKSPACE",
+        "workspace": "WORKSPACE",
         "title": "Logistics desk.",
         "role": "Logistics staff"
     },
     "delivery": {
-        "workspace": "DELIVERY WORKSPACE",
+        "workspace": "WORKSPACE",
         "title": "Delivery desk.",
         "role": "Shipper"
     },

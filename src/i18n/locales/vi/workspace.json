@@ -1,17 +1,17 @@
 {
     "navigationGroup": "VẬN HÀNH CÔNG VIỆC",
     "ecommerce": {
-        "workspace": "KHÔNG GIAN THƯƠNG MẠI ĐIỆN TỬ",
+        "workspace": "KHÔNG GIAN LÀM VIỆC",
         "title": "Góc kinh doanh.",
         "role": "Nhân viên E-commerce"
     },
     "logistics": {
-        "workspace": "KHÔNG GIAN KHO VẬN",
+        "workspace": "KHÔNG GIAN LÀM VIỆC",
         "title": "Góc kho vận.",
         "role": "Nhân viên Logistics"
     },
     "delivery": {
-        "workspace": "KHÔNG GIAN GIAO HÀNG",
+        "workspace": "KHÔNG GIAN LÀM VIỆC",
         "title": "Góc giao hàng.",
         "role": "Shipper"
     },

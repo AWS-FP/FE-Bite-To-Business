@@ -10,6 +10,7 @@ import '../../components/logistic/logistics.css';
 
 function Workspace() {
     const [open, setOpen] = useState(false);
-    return <div className="lg-workspace"><LogisticsSidebar open={open} onClose={()=>setOpen(false)}/><div className="lg-main-wrapper"><LogisticsTopbar onOpenMenu={()=>setOpen(true)}/><main id="logistics-main" className="lg-main"><div className="lg-demo-note">DEMO FRONTEND · Dữ liệu mẫu, chưa đồng bộ hệ thống kho thực tế</div><Outlet/></main></div><ReceiveDrawer/><DispatchDrawer/><SourcingReplyDrawer/></div>;
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    return <div className={`lg-workspace ${isCollapsed ? 'is-collapsed' : ''}`}><LogisticsSidebar open={open} onClose={()=>setOpen(false)} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed(!isCollapsed)}/><div className="lg-main-wrapper"><LogisticsTopbar onOpenMenu={()=>setOpen(true)}/><main id="logistics-main" className="lg-main"><div className="lg-demo-note">DEMO FRONTEND · Dữ liệu mẫu, chưa đồng bộ hệ thống kho thực tế</div><Outlet/></main></div><ReceiveDrawer/><DispatchDrawer/><SourcingReplyDrawer/></div>;
 }
 export default function LogisticsLayout() { return <LogisticsProvider><Workspace/></LogisticsProvider>; }

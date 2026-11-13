@@ -103,9 +103,6 @@ export default function CurrentTripPage() {
         <div className="space-y-6 text-store-ink">
             <div className="flex items-end justify-between gap-5">
                 <div>
-                    <p className="m-0 font-subheading text-xs font-bold uppercase tracking-widest text-store-green">
-                        Delivery · Bite to Business
-                    </p>
                     <h1 className="mb-2 mt-2 font-display text-4xl font-bold">
                         Đơn hàng giao nhận
                     </h1>

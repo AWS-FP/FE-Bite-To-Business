@@ -8,6 +8,7 @@ import { logout } from '@/services/admin/authService';
 import { useAuthStore } from '@/store/admin/authStore';
 import WorkspaceSidebar from '@/layouts/WorkspaceSidebar';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
+import WorkspaceAccountMenu from '@/components/common/WorkspaceAccountMenu';
 
 export default function EcommerceLayout() {
     const [queryClient] = useState(
@@ -39,7 +40,11 @@ function EcommerceWorkspace() {
     const currentIndex = workspace.items.findIndex(
         (item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`),
     );
-    const ecomLabels: Record<string, string> = { ecommerceDashboard: 'Tổng quan', ecommerceQuotes: 'Duyệt Báo Giá', ecommercePoster: 'AI Poster Studio' };
+    const ecomLabels: Record<string, string> = {
+        ecommerceDashboard: 'Tổng quan',
+        ecommerceQuotes: 'Duyệt Báo Giá',
+        ecommercePoster: 'AI Poster Studio',
+    };
     const displayLabel = (key: string) => ecomLabels[key] ?? t(key);
     const pageLabel = displayLabel(workspace.items[Math.max(0, currentIndex)].label);
 
@@ -90,13 +95,40 @@ function EcommerceWorkspace() {
                 ]}
             />
             <div className="admin-workspace min-w-0">
-                    <header className="flex min-h-[58px] flex-wrap items-center justify-between gap-3 border-b-2 border-store-ink bg-store-cream px-5 py-2">
-                        <div className="flex min-w-0 flex-wrap items-center gap-3">
-                            <input aria-label="Tìm nhanh" className="h-9 w-[min(300px,42vw)] rounded-lg border border-store-ink bg-white px-3 text-xs" placeholder="Tìm quote, SKU, coupon..." value={globalSearch} onChange={e => setGlobalSearch(e.target.value)} onKeyDown={event => { if (event.key === 'Enter') navigate(`${ROUTES.ECOMMERCE_PRODUCTS}?q=${encodeURIComponent(globalSearch)}`); }} />
-                            <small className="hidden font-bold text-emerald-700 lg:inline">{pageLabel}</small>
-                        </div>
-                        <div className="flex items-center gap-2"><LanguageSwitcher /><span className="rounded-lg border border-store-ink bg-white px-2 py-2 text-[10px] font-bold">Điều phối đơn</span><button type="button" className="rounded-lg border border-store-ink bg-white px-3 py-2 text-[11px] font-bold" onClick={handleLogout}>Đăng xuất</button><span className="grid size-9 place-items-center rounded-lg bg-store-pink text-xs font-bold">{user?.email?.slice(0, 2).toUpperCase() ?? 'EC'}</span></div>
-                    </header>
+                <header className="flex min-h-[58px] flex-wrap items-center justify-between gap-3 border-b-2 border-store-ink bg-store-cream px-5 py-2">
+                    <div className="flex min-w-0 flex-wrap items-center gap-3">
+                        <input
+                            aria-label="Tìm nhanh"
+                            className="h-9 w-[min(300px,42vw)] rounded-lg border border-store-ink bg-white px-3 text-xs"
+                            placeholder="Tìm quote, SKU, coupon..."
+                            value={globalSearch}
+                            onChange={(e) => setGlobalSearch(e.target.value)}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter')
+                                    navigate(
+                                        `${ROUTES.ECOMMERCE_PRODUCTS}?q=${encodeURIComponent(globalSearch)}`,
+                                    );
+                            }}
+                        />
+                        <small className="hidden font-bold text-emerald-700 lg:inline">
+                            {pageLabel}
+                        </small>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <LanguageSwitcher />
+                        <span className="rounded-lg border border-store-ink bg-white px-2 py-2 text-[10px] font-bold">
+                            Điều phối đơn
+                        </span>
+                        <WorkspaceAccountMenu user={user} roleLabel={t(workspace.roleLabel)} />
+                        <button
+                            type="button"
+                            className="h-[53px] rounded-lg border border-store-ink bg-danger px-3 py-2 text-[11px] font-bold text-black hover:brightness-95"
+                            onClick={handleLogout}
+                        >
+                            Đăng xuất
+                        </button>
+                    </div>
+                </header>
                 <main
                     className="admin-main-content min-w-0 p-5 focus:outline-none lg:p-7"
                     id="staff-main-content"
@@ -104,7 +136,12 @@ function EcommerceWorkspace() {
                 >
                     <Outlet />
                 </main>
-                <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-store-ink bg-store-cream px-7 py-6 text-[10px] text-store-muted"><strong className="font-display text-sm text-store-ink">Bite to Business</strong><span>Đồng bộ kho: demo · Trạng thái hệ thống: giả lập · v2.4.0</span></footer>
+                <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-store-ink bg-store-cream px-7 py-6 text-[10px] text-store-muted">
+                    <strong className="font-display text-sm text-store-ink">
+                        Bite to Business
+                    </strong>
+                    <span>Đồng bộ kho: demo · Trạng thái hệ thống: giả lập · v2.4.0</span>
+                </footer>
             </div>
         </div>
     );
