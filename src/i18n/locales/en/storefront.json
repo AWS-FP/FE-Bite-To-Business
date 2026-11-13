@@ -18,7 +18,7 @@
         "distance": "Distance",
         "estimatedFee": "Estimated delivery fee",
         "free": "Free",
-        "feePolicy": "First 5 km free · VND 5,000 per additional km, rounded up.",
+        "feePolicy": "First 5 km free · VND 5,000 per additional km based on the actual distance.",
         "useAddress": "Use address for delivery package",
         "mapLabel": "Vietmap map",
         "zoomIn": "Zoom in",
@@ -108,6 +108,24 @@
         "copyright": "© 2026 Bite to Business. All rights reserved.",
         "educationalNote": "Educational B2B E-Commerce Service"
     },
+    "cart": {
+        "title": "Your shopping cart",
+        "description": "Review products and adjust quantities before continuing to your quote.",
+        "items": "Items in your cart",
+        "empty": "Your cart is empty",
+        "browse": "Continue browsing",
+        "quantity": "Quantity",
+        "decrease": "Decrease quantity of {{name}}",
+        "increase": "Increase quantity of {{name}}",
+        "remove": "Remove {{name}} from cart",
+        "summary": "Cart summary",
+        "subtotal": "Estimated subtotal",
+        "estimateNote": "Indicative prices exclude VAT and delivery. Prices and discounts are checked when you create a quote.",
+        "signIn": "Sign in to continue",
+        "continue": "Continue to quote",
+        "customerOnly": "Please sign in with a customer account to continue to your quote.",
+        "quoteUnavailable": "The quote and discount step is still being completed. Your items remain in the cart."
+    },
     "cartDropdown": {
         "title": "Recently Added Items",
         "subtotal": "Estimated Subtotal:",
@@ -123,6 +141,10 @@
         "signOut": "Sign Out"
     },
     "homePage": {
+        "productsLoading": "Loading products…",
+        "productsError": "Could not load products. Please try again later.",
+        "flashEmpty": "No promotional products are available.",
+        "productsEmpty": "No products are available.",
         "partnerTitle": "Discover brands in the Bite to Business catalog.",
         "ecosystemTag": "14-CATEGORY B2B FOOD ECOSYSTEM",
         "ecosystemTitle": "Comprehensive Ingredient Catalog",

@@ -22,7 +22,7 @@ export const ROUTES = {
 
     QUOTES: '/quotes',
     QUOTE_DETAIL: '/quotes/:quoteId',
-    CHECKOUT: '/checkout',
+    CHECKOUT: '/quotes',
     ORDERS: '/orders',
     ORDER_DETAIL: '/orders/:orderId',
     FAVORITES: '/favorites',

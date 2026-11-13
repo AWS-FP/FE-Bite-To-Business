@@ -21,12 +21,14 @@ export interface HomeCategoryItem {
 
 export interface HomeProductCardItem {
     id: string;
+    nameVi?: string;
+    nameEn?: string;
     categoryLabel: string;
     sku: string;
     name: string;
     spec: string;
-    rating: number;
-    reviewCount: number;
+    rating?: number;
+    reviewCount?: number;
     listPrice: number;
     salePrice?: number;
     discountBadge?: string;

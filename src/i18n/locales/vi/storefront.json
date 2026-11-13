@@ -18,7 +18,7 @@
         "distance": "Quãng đường",
         "estimatedFee": "Phí giao hàng ước tính",
         "free": "Miễn phí",
-        "feePolicy": "Miễn phí 5 km đầu · 5.000đ/km tiếp theo, làm tròn lên.",
+        "feePolicy": "Miễn phí 5 km đầu · 5.000đ/km vượt theo quãng đường thực tế.",
         "useAddress": "Dùng địa chỉ tạo gói giao",
         "mapLabel": "Bản đồ Vietmap",
         "zoomIn": "Phóng to",
@@ -108,6 +108,24 @@
         "copyright": "© 2026 Bite to Business. All rights reserved.",
         "educationalNote": "dịch vụ cho mục đích học tập"
     },
+    "cart": {
+        "title": "Giỏ hàng của bạn",
+        "description": "Kiểm tra sản phẩm và điều chỉnh số lượng trước khi tiếp tục báo giá.",
+        "items": "Sản phẩm trong giỏ hàng",
+        "empty": "Giỏ hàng của bạn đang trống",
+        "browse": "Tiếp tục xem sản phẩm",
+        "quantity": "Số lượng",
+        "decrease": "Giảm số lượng {{name}}",
+        "increase": "Tăng số lượng {{name}}",
+        "remove": "Xóa {{name}} khỏi giỏ hàng",
+        "summary": "Tóm tắt giỏ hàng",
+        "subtotal": "Tạm tính",
+        "estimateNote": "Giá tham khảo, chưa gồm VAT và phí giao. Giá, chiết khấu và ưu đãi sẽ được kiểm tra khi tạo báo giá.",
+        "signIn": "Đăng nhập để tiếp tục",
+        "continue": "Tiếp tục báo giá",
+        "customerOnly": "Vui lòng đăng nhập bằng tài khoản khách hàng để tiếp tục báo giá.",
+        "quoteUnavailable": "Bước báo giá và áp ưu đãi đang được hoàn thiện. Sản phẩm vẫn được giữ trong giỏ hàng."
+    },
     "cartDropdown": {
         "title": "Giỏ hàng mới thêm",
         "subtotal": "Tổng tiền tạm tính:",
@@ -123,6 +141,10 @@
         "signOut": "Đăng xuất"
     },
     "homePage": {
+        "productsLoading": "Đang tải sản phẩm…",
+        "productsError": "Không tải được sản phẩm. Vui lòng thử lại sau.",
+        "flashEmpty": "Chưa có sản phẩm khuyến mãi.",
+        "productsEmpty": "Chưa có sản phẩm để hiển thị.",
         "partnerTitle": "Khám phá các thương hiệu trong danh mục Bite to Business.",
         "ecosystemTag": "HỆ SINH THÁI 14 NGÀNH HÀNG THỰC PHẨM",
         "ecosystemTitle": "Danh Mục Nguyên Liệu Toàn Diện",

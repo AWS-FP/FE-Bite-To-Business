@@ -20,7 +20,7 @@ import BrandDetailPage from '@/pages/BrandDetailPage';
 
 // Customer Pages
 import ProfilePage from '@/pages/customer/ProfilePage';
-import CheckoutPage from '@/pages/customer/checkout/CheckoutPage';
+import CartPage from '@/pages/CartPage';
 
 // Orders Pages - NEW
 import OrderHistoryPage from '@/pages/customer/order/OrderHistoryPage';
@@ -46,22 +46,12 @@ import SystemMetricsPage from '@/pages/admin/SystemMetricsPage';
 
 // Layouts & Shared Components
 import AdminLayout from '@/layouts/admin/AdminLayout';
-import StaffLayout from '@/layouts/StaffLayout';
+import EcommerceLayout from '@/layouts/e-commerce/EcommerceLayout';
 import PendingPage from '@/components/common/PendingPage';
 
 // Router
 import ProtectedRoute from './ProtectedRoute';
 import { ROUTES } from './routes';
-import LandingPage from '@/pages/LandingPage';
-import WhyBTBPage from '@/pages/WhyBTBPage';
-import BTBModelPage from '@/pages/BTBModelPage';
-
-import BrandsPage from '@/pages/BrandsPage';
-import BrandDetailPage from '@/pages/BrandDetailPage';
-import CheckoutPage from '@/pages/customer/checkout/CheckoutPage';
-
-
-import DistributionNetworkPage from '@/pages/DistributionNetworkPage';
 import EcommerceDashboardPage from '@/pages/e-commerce/EcommerceDashboardPage';
 import EcommerceQuotesPage from '@/pages/e-commerce/EcommerceQuotesPage';
 import EcommerceProductsPage from '@/pages/e-commerce/EcommerceProductsPage';
@@ -132,11 +122,16 @@ export const router = createBrowserRouter([
     },
     {
         path: ROUTES.QUOTES,
-        Component: PendingPage,
+        Component: CartPage,
     },
     {
-        path: ROUTES.DISTRIBUTION_NETWORK,
-        Component: DistributionNetworkPage,
+        element: <ProtectedRoute allowedRoles={Object.values(AUTH_ROLES)} />,
+        children: [
+            {
+                path: ROUTES.DISTRIBUTION_NETWORK,
+                Component: DistributionNetworkPage,
+            },
+        ],
     },
 
     // ==========================================
@@ -154,12 +149,6 @@ export const router = createBrowserRouter([
             {
                 path: ROUTES.QUOTE_DETAIL,
                 Component: PendingPage,
-            },
-
-            // Checkout
-            {
-                path: ROUTES.CHECKOUT,
-                Component: CheckoutPage,
             },
 
             // Lịch sử đơn hàng
@@ -247,11 +236,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: ROUTES.ECOMMERCE,
-                element: (
-                    <StaffLayout
-                        role={AUTH_ROLES.ECOMMERCE_EXECUTIVE}
-                    />
-                ),
+                element: <EcommerceLayout />,
 
                 children: [
                     {
