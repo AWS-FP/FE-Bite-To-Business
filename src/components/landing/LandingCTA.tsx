@@ -31,7 +31,7 @@ export default function LandingCTA() {
                             {t('header.register')}
                             <span className="inline-flex h-[22px] w-[22px] items-center justify-center rounded-full bg-store-ink text-xs text-store-yellow">
                                 <img
-                                    src="/images/ui/arrow-right.svg"
+                                    src="/icons/arrow-right.svg"
                                     className="btb-ui-icon"
                                     alt=""
                                     aria-hidden="true"

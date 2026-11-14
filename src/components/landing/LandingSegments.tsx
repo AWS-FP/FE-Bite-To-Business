@@ -32,7 +32,7 @@ export default function LandingSegments() {
                         }
                     >
                         <img
-                            src="/images/ui/arrow-left.svg"
+                            src="/icons/arrow-left.svg"
                             className="btb-ui-icon"
                             alt=""
                             aria-hidden="true"
@@ -101,7 +101,7 @@ export default function LandingSegments() {
                         onClick={() => setActiveSegment((v) => (v + 1) % landingSegments.length)}
                     >
                         <img
-                            src="/images/ui/arrow-right.svg"
+                            src="/icons/arrow-right.svg"
                             className="btb-ui-icon"
                             alt=""
                             aria-hidden="true"
@@ -128,7 +128,7 @@ export default function LandingSegments() {
                                 <span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-solid border-store-ink bg-[var(--green-soft-bg)] text-xs font-extrabold text-[var(--green-ok)]">
                                     <img
                                         className="btb-ui-icon"
-                                        src="/images/ui/check.svg"
+                                        src="/icons/check.svg"
                                         alt=""
                                         aria-hidden="true"
                                     />
@@ -139,7 +139,7 @@ export default function LandingSegments() {
                                 <span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-solid border-store-ink bg-[var(--green-soft-bg)] text-xs font-extrabold text-[var(--green-ok)]">
                                     <img
                                         className="btb-ui-icon"
-                                        src="/images/ui/check.svg"
+                                        src="/icons/check.svg"
                                         alt=""
                                         aria-hidden="true"
                                     />
@@ -150,7 +150,7 @@ export default function LandingSegments() {
                                 <span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-solid border-store-ink bg-[var(--green-soft-bg)] text-xs font-extrabold text-[var(--green-ok)]">
                                     <img
                                         className="btb-ui-icon"
-                                        src="/images/ui/check.svg"
+                                        src="/icons/check.svg"
                                         alt=""
                                         aria-hidden="true"
                                     />

@@ -67,7 +67,7 @@ export default function LandingPersonalization() {
                                 : session
                                   ? t('introPages.personal.workspace')
                                   : t('introPages.personal.register')}
-                            <img src="/images/ui/arrow-up-right.svg" alt="" aria-hidden="true" />
+                            <img src="/icons/arrow-up-right.svg" alt="" aria-hidden="true" />
                         </Link>
                     </div>
                 </div>

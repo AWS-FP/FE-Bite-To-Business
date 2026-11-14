@@ -32,7 +32,7 @@ export default function LandingBusinessSolution({
                             Khám phá giải pháp
                             <span className="inline-flex h-[22px] w-[22px] items-center justify-center rounded-full bg-store-ink text-xs text-store-yellow">
                                 <img
-                                    src="/images/ui/arrow-right.svg"
+                                    src="/icons/arrow-right.svg"
                                     className="btb-ui-icon"
                                     alt=""
                                     aria-hidden="true"
@@ -154,7 +154,7 @@ export default function LandingBusinessSolution({
                                     <span>1. Đặt hàng nhanh &amp; Đặt lại đơn cũ chỉ 1 chạm</span>
                                     <span>
                                         <img
-                                            src="/images/ui/chevron-up.svg"
+                                            src="/icons/chevron-up.svg"
                                             className="btb-ui-icon"
                                             alt=""
                                             aria-hidden="true"
@@ -184,7 +184,7 @@ export default function LandingBusinessSolution({
                                     <span>2. Nguồn hàng ổn định, cam kết đủ 100% mới xác nhận</span>
                                     <span>
                                         <img
-                                            src="/images/ui/chevron-down.svg"
+                                            src="/icons/chevron-down.svg"
                                             className="btb-ui-icon"
                                             alt=""
                                             aria-hidden="true"
@@ -215,7 +215,7 @@ export default function LandingBusinessSolution({
                                     </span>
                                     <span>
                                         <img
-                                            src="/images/ui/chevron-down.svg"
+                                            src="/icons/chevron-down.svg"
                                             className="btb-ui-icon"
                                             alt=""
                                             aria-hidden="true"
@@ -246,7 +246,7 @@ export default function LandingBusinessSolution({
                                     </span>
                                     <span>
                                         <img
-                                            src="/images/ui/chevron-down.svg"
+                                            src="/icons/chevron-down.svg"
                                             className="btb-ui-icon"
                                             alt=""
                                             aria-hidden="true"

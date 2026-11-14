@@ -47,7 +47,7 @@ export default function LandingHero() {
                         {t('introPages.hero.start')}
                         <span className="inline-flex h-[22px] w-[22px] items-center justify-center rounded-full bg-store-ink text-xs text-store-yellow">
                             <img
-                                src="/images/ui/arrow-right.svg"
+                                src="/icons/arrow-right.svg"
                                 className="btb-ui-icon"
                                 alt=""
                                 aria-hidden="true"
@@ -76,7 +76,7 @@ export default function LandingHero() {
                             {t('introPages.hero.categoriesLabel')}{' '}
                             <img
                                 className="btb-ui-icon"
-                                src="/images/ui/arrow-up-right.svg"
+                                src="/icons/arrow-up-right.svg"
                                 alt=""
                                 aria-hidden="true"
                             />

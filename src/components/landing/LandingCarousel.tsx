@@ -148,7 +148,7 @@ export default function LandingCarousel() {
                     onClick={() => changeSlide(slide - 1)}
                 >
                     <img
-                        src="/images/ui/chevron-left.svg"
+                        src="/icons/chevron-left.svg"
                         alt=""
                         aria-hidden="true"
                         className="btb-ui-icon"
@@ -162,7 +162,7 @@ export default function LandingCarousel() {
                     onClick={() => changeSlide(slide + 1)}
                 >
                     <img
-                        src="/images/ui/chevron-right.svg"
+                        src="/icons/chevron-right.svg"
                         alt=""
                         aria-hidden="true"
                         className="btb-ui-icon"
@@ -419,7 +419,7 @@ export default function LandingCarousel() {
                                     Mở tài khoản Doanh nghiệp / Hộ gia đình{' '}
                                     <img
                                         className="btb-ui-icon"
-                                        src="/images/ui/arrow-right.svg"
+                                        src="/icons/arrow-right.svg"
                                         alt=""
                                         aria-hidden="true"
                                     />
@@ -435,7 +435,7 @@ export default function LandingCarousel() {
                                 >
                                     <img
                                         className="btb-ui-icon"
-                                        src="/images/ui/rotate-ccw.svg"
+                                        src="/icons/rotate-ccw.svg"
                                         alt=""
                                         aria-hidden="true"
                                     />{' '}
@@ -455,7 +455,7 @@ export default function LandingCarousel() {
                     >
                         <img
                             className="btb-ui-icon"
-                            src={playing ? '/images/ui/pause.svg' : '/images/ui/play.svg'}
+                            src={playing ? '/icons/pause.svg' : '/icons/play.svg'}
                             alt=""
                             aria-hidden="true"
                         />
@@ -468,7 +468,7 @@ export default function LandingCarousel() {
                         title="Không có âm thanh trong bản demo"
                     >
                         <img
-                            src="/images/ui/volume-off.svg"
+                            src="/icons/volume-off.svg"
                             alt=""
                             aria-hidden="true"
                             className="btb-ui-icon"
