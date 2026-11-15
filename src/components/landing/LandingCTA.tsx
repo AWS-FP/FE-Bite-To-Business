@@ -10,10 +10,10 @@ export default function LandingCTA() {
             className="mt-10 border-t-[3px] border-solid border-store-ink bg-store-green py-16 text-store-cream"
             id="onboarding-cta"
         >
-            <div className="mx-auto grid max-w-[1240px] grid-cols-[5fr_7fr] items-center gap-10 px-6">
+            <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-10 px-6 lg:grid-cols-[5fr_7fr]">
                 <div>
                     <span className="showcase-badge">{t('introPages.cta.eyebrow')}</span>
-                    <h2 className="mb-3.5 font-subheading text-4xl font-bold leading-[1.2] text-white">
+                    <h2 className="mb-3.5 font-subheading text-[clamp(2rem,4vw,3rem)] font-bold leading-[1.2] text-white">
                         {t('introPages.cta.title')}
                         <br />
                         <span className="text-store-yellow">{t('introPages.cta.highlight')}</span> {t('introPages.cta.suffix')}
@@ -31,7 +31,7 @@ export default function LandingCTA() {
                             {t('header.register')}
                             <span className="inline-flex h-[22px] w-[22px] items-center justify-center rounded-full bg-store-ink text-xs text-store-yellow">
                                 <img
-                                    src="/images/ui/arrow-right.svg"
+                                    src="/icons/arrow-right.svg"
                                     className="btb-ui-icon"
                                     alt=""
                                     aria-hidden="true"

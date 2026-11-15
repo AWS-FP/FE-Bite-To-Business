@@ -1,26 +1,28 @@
 import type { CSSProperties } from 'react';
+import EditorialPhoto, { type EditorialPhotoKey } from './EditorialPhoto';
 
-type BtbImagePlaceholderProps = {
+type Props = {
     label?: string;
+    photo?: EditorialPhotoKey;
     className?: string;
     style?: CSSProperties;
 };
 
-/** UI-only: hình ảnh sẽ được gắn vào khi hoàn thiện website. */
+/** Giữ API component cũ để LandingCarousel/LandingSegments không đổi logic. */
 export default function BtbImagePlaceholder({
-    label = 'Ảnh sẽ bổ sung',
+    label = 'Ảnh nguyên liệu minh họa',
+    photo = 'market',
     className = '',
     style,
-}: BtbImagePlaceholderProps) {
+}: Props) {
     return (
-        <div
-            className={`btb-image-placeholder ${className}`.trim()}
+        <EditorialPhoto
+            photo={photo}
+            alt={label}
+            loading="lazy"
+            decoding="async"
+            className={`h-full w-full object-cover ${className}`.trim()}
             style={style}
-            role="img"
-            aria-label={label}
-        >
-            <img src="/images/ui/image-placeholder.svg" alt="" aria-hidden="true" />
-            <span>{label}</span>
-        </div>
+        />
     );
 }
