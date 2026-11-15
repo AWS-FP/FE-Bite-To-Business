@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
     ArrowLeft,
     Bell,
@@ -15,6 +16,13 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { INITIAL_NOTIFICATIONS } from '../../constants/customer/homeData';
+import { useAuthStore } from '@/store/admin/authStore';
+import {
+    getCustomerNotifications,
+    markAllNotificationsRead,
+    markNotificationRead,
+} from '@/services/customer/notificationService';
+import type { CustomerNotification } from '@/services/customer/notificationService';
 import type { NotificationItemData } from '../../constants/customer/homeData';
 
 export interface NotificationSystemProps {
@@ -24,6 +32,26 @@ export interface NotificationSystemProps {
 }
 
 type Filter = 'all' | NotificationItemData['category'];
+
+function toNotificationItem(item: CustomerNotification, english: boolean): NotificationItemData {
+    const category =
+        item.notificationType === 'QUOTE'
+            ? 'quote'
+            : item.notificationType === 'DELIVERY' || item.notificationType === 'ORDER'
+              ? 'delivery'
+              : 'system';
+    return {
+        id: item.id,
+        category,
+        badge: item.notificationType,
+        badgeBg: 'bg-surface-yellow',
+        badgeText: 'text-store-ink',
+        title: english ? item.titleEn : item.titleVi,
+        description: english ? item.contentEn : item.contentVi,
+        timeAgo: new Date(item.createdAt).toLocaleString(english ? 'en-US' : 'vi-VN'),
+        unread: !item.isRead,
+    };
+}
 type PreferenceKey = 'quoteApproval' | 'quoteExpiry' | 'deliveryEta' | 'sourcingReply';
 
 type Preferences = Record<PreferenceKey, boolean>;
@@ -36,10 +64,10 @@ const DEFAULT_PREFS: Preferences = {
 };
 
 const FILTERS: { key: Filter; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'system', label: 'Updates' },
-    { key: 'quote', label: 'Quotes' },
-    { key: 'delivery', label: 'Delivery' },
+    { key: 'all', label: 'notifFilterAll' },
+    { key: 'system', label: 'notifFilterUpdates' },
+    { key: 'quote', label: 'notifFilterQuotes' },
+    { key: 'delivery', label: 'notifFilterDelivery' },
 ];
 
 function CategoryIcon({ category }: { category: NotificationItemData['category'] }) {
@@ -84,12 +112,13 @@ function PreferenceRow({
                 aria-checked={checked}
                 aria-label={title}
                 onClick={onToggle}
-                className={`relative h-7 w-12 shrink-0 cursor-pointer rounded-full border-0 p-0.5 transition-colors duration-200 ${
+                className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full !border-0 p-0 !shadow-none transition-colors duration-200 focus:!border-0 focus:!shadow-none focus:!outline-none focus-visible:!outline-2 focus-visible:!outline-offset-2 focus-visible:!outline-store-yellow ${
                     checked ? 'bg-store-green' : 'bg-surface-soft'
                 }`}
             >
                 <span
-                    className={`block h-6 w-6 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                    aria-hidden="true"
+                    className={`pointer-events-none absolute left-1 top-1 block h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
                         checked ? 'translate-x-5' : 'translate-x-0'
                     }`}
                 />
@@ -103,16 +132,40 @@ export default function NotificationSystem({
     onToggle,
     onClose,
 }: NotificationSystemProps) {
+    const { t, i18n } = useTranslation('storefront');
+    const ui = (key: string) => t(`customerUI.${key}`);
+    const english = i18n.resolvedLanguage?.startsWith('en') ?? false;
+    const isCustomer = useAuthStore((state) => state.session?.user.role === 'CUSTOMER');
     const [localIsOpen, setLocalIsOpen] = useState(false);
     const isOpen = controlledIsOpen ?? localIsOpen;
 
-    const [notifications, setNotifications] =
-        useState<NotificationItemData[]>(INITIAL_NOTIFICATIONS);
+    const [notifications, setNotifications] = useState<NotificationItemData[]>(
+        isCustomer ? [] : INITIAL_NOTIFICATIONS,
+    );
+    const [loadError, setLoadError] = useState(false);
 
     const [filter, setFilter] = useState<Filter>('all');
     const [view, setView] = useState<'list' | 'settings'>('list');
     const [selected, setSelected] = useState<NotificationItemData | null>(null);
     const [preferences, setPreferences] = useState<Preferences>(DEFAULT_PREFS);
+
+    useEffect(() => {
+        if (!isCustomer) return;
+        let active = true;
+        getCustomerNotifications(0, 20)
+            .then((page) => {
+                if (active) {
+                    setNotifications(page.content.map((item) => toNotificationItem(item, english)));
+                    setLoadError(false);
+                }
+            })
+            .catch(() => {
+                if (active) setLoadError(true);
+            });
+        return () => {
+            active = false;
+        };
+    }, [isCustomer, isOpen, english]);
 
     const unreadCount = notifications.filter((item) => item.unread).length;
 
@@ -149,6 +202,7 @@ export default function NotificationSystem({
     }
 
     function markRead(id: string) {
+        if (isCustomer) void markNotificationRead(id).catch(() => setLoadError(true));
         setNotifications((current) =>
             current.map((item) => (item.id === id ? { ...item, unread: false } : item)),
         );
@@ -208,7 +262,7 @@ export default function NotificationSystem({
                                             className="mb-2 inline-flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-[11px] font-semibold text-white/75 hover:text-white"
                                         >
                                             <ArrowLeft size={13} />
-                                            Back to notifications
+                                            {ui('notificationBack')}
                                         </button>
                                     )}
 
@@ -218,21 +272,21 @@ export default function NotificationSystem({
 
                                     <h3 className="m-0 mt-1 font-subheading text-[19px] font-bold leading-6">
                                         {view === 'list'
-                                            ? 'Notifications'
-                                            : 'Notification settings'}
+                                            ? ui('notificationTitle')
+                                            : ui('notificationSettings')}
                                     </h3>
 
                                     <p className="m-0 mt-1 text-[11px] leading-4 text-store-muted-light">
                                         {view === 'list'
-                                            ? 'Your purchasing activity, all in one place'
-                                            : 'Demo preferences for this session'}
+                                            ? ui('notificationDesc')
+                                            : ui('notificationSettingsDesc')}
                                     </p>
                                 </div>
 
                                 <div className="flex shrink-0 items-center gap-1.5">
                                     {view === 'list' && unreadCount > 0 && (
                                         <span className="rounded-full bg-store-yellow px-2.5 py-1 text-[11px] font-black text-store-ink">
-                                            {unreadCount} new
+                                            {unreadCount} {ui('notifNew')}
                                         </span>
                                     )}
 
@@ -240,8 +294,8 @@ export default function NotificationSystem({
                                         type="button"
                                         aria-label={
                                             view === 'list'
-                                                ? 'Notification settings'
-                                                : 'Back to notifications'
+                                                ? ui('notificationSettings')
+                                                : ui('notificationBack')
                                         }
                                         onClick={() =>
                                             setView(view === 'list' ? 'settings' : 'list')
@@ -264,7 +318,7 @@ export default function NotificationSystem({
                                 <div className="shrink-0 border-0 border-b border-solid border-store-line bg-white px-4 pb-3 pt-3">
                                     <div className="flex items-center justify-between gap-3">
                                         <span className="text-[11px] font-bold text-store-muted">
-                                            Inbox{' '}
+                                            {ui('notifInbox')}{' '}
                                             <span className="text-store-placeholder">
                                                 · {notifications.length}
                                             </span>
@@ -272,23 +326,24 @@ export default function NotificationSystem({
 
                                         <button
                                             type="button"
-                                            onClick={() =>
+                                            onClick={() => {
+                                                if (isCustomer)
+                                                    void markAllNotificationsRead().catch(() =>
+                                                        setLoadError(true),
+                                                    );
                                                 setNotifications((list) =>
-                                                    list.map((n) => ({
-                                                        ...n,
-                                                        unread: false,
-                                                    })),
-                                                )
-                                            }
+                                                    list.map((n) => ({ ...n, unread: false })),
+                                                );
+                                            }}
                                             disabled={unreadCount === 0}
                                             className="inline-flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-[11px] font-bold text-store-ink hover:underline disabled:cursor-default disabled:opacity-40"
                                         >
                                             <CheckCheck size={14} />
-                                            Mark all read
+                                            {ui('notifMarkAll')}
                                         </button>
                                     </div>
 
-                                    <div className="mt-3 flex flex-nowrap gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none]">
+                                    <div className="mt-3 flex flex-nowrap gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                                         {FILTERS.map((tab) => (
                                             <button
                                                 key={tab.key}
@@ -301,24 +356,26 @@ export default function NotificationSystem({
                                                         : 'border-store-line bg-surface-green text-store-muted hover:border-store-line'
                                                 }`}
                                             >
-                                                {tab.label}
+                                                {ui(tab.label)}
                                             </button>
                                         ))}
                                     </div>
                                 </div>
 
                                 {/* NOTIFICATION LIST */}
-                                <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain bg-surface-green p-3 [scrollbar-width:thin]">
+                                <div className="min-h-0 flex-1 space-y-2 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden overscroll-contain bg-surface-green p-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                                     {visibleNotifications.length === 0 ? (
                                         <div className="flex min-h-[185px] flex-col items-center justify-center px-4 text-center">
                                             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-green text-store-ink">
                                                 <Inbox size={24} />
                                             </div>
                                             <p className="m-0 mt-3 text-sm font-bold">
-                                                Nothing here yet
+                                                {ui('notifEmpty')}
                                             </p>
                                             <p className="m-0 mt-1 text-xs text-store-muted">
-                                                Try another category.
+                                                {loadError
+                                                    ? ui('notifLoadError')
+                                                    : ui('notifNoMatches')}
                                             </p>
                                         </div>
                                     ) : (
@@ -364,7 +421,7 @@ export default function NotificationSystem({
                                                             </span>
 
                                                             <span className="text-[10px] font-extrabold text-store-ink group-hover:underline">
-                                                                View details →
+                                                                {ui('notifDetails')} →
                                                             </span>
                                                         </div>
                                                     </div>
@@ -377,41 +434,43 @@ export default function NotificationSystem({
                                 {/* FOOTER */}
                                 <div className="flex shrink-0 items-center justify-between gap-3 border-0 border-t border-solid border-store-line bg-white px-4 py-3">
                                     <span className="text-[10px] text-store-muted">
-                                        Demo notifications
+                                        {isCustomer ? ui('notifSystem') : ui('notifSystem')}
                                     </span>
 
-                                    <button
-                                        type="button"
-                                        onClick={() => setNotifications([])}
-                                        disabled={notifications.length === 0}
-                                        className="inline-flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-[11px] font-bold text-danger hover:text-danger disabled:opacity-40"
-                                    >
-                                        <Trash2 size={13} />
-                                        Clear all
-                                    </button>
+                                    {!isCustomer && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setNotifications([])}
+                                            disabled={notifications.length === 0}
+                                            className="inline-flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-[11px] font-bold text-danger hover:text-danger disabled:opacity-40"
+                                        >
+                                            <Trash2 size={13} />
+                                            Clear all
+                                        </button>
+                                    )}
                                 </div>
                             </>
                         ) : (
                             <>
                                 {/* NOTIFICATION SETTINGS */}
-                                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-surface-green p-4 [scrollbar-width:thin]">
+                                <div className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden overscroll-contain bg-surface-green p-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                                     <div className="rounded-2xl border border-solid border-store-line bg-white p-4">
                                         <div className="mb-1 flex items-center gap-2 text-xs font-extrabold text-store-ink">
                                             <FileText size={16} />
-                                            QUOTES & ORDERS
+                                            {ui('notificationQuotes')}
                                         </div>
 
                                         <div className="divide-y divide-[var(--color-surface-soft)]">
                                             <PreferenceRow
-                                                title="Quote approval status"
-                                                description="Notifications about approvals and price reviews."
+                                                title={ui('notificationApproval')}
+                                                description={ui('notificationApprovalDesc')}
                                                 checked={preferences.quoteApproval}
                                                 onToggle={() => setPreference('quoteApproval')}
                                             />
 
                                             <PreferenceRow
-                                                title="Quote expiry reminders"
-                                                description="Warnings before an approved quote expires."
+                                                title={ui('notificationExpiry')}
+                                                description={ui('notificationExpiryDesc')}
                                                 checked={preferences.quoteExpiry}
                                                 onToggle={() => setPreference('quoteExpiry')}
                                             />
@@ -421,20 +480,20 @@ export default function NotificationSystem({
                                     <div className="mt-3 rounded-2xl border border-solid border-store-line bg-white p-4">
                                         <div className="mb-1 flex items-center gap-2 text-xs font-extrabold text-store-ink">
                                             <Truck size={16} />
-                                            LOGISTICS
+                                            {ui('notificationLogistics')}
                                         </div>
 
                                         <div className="divide-y divide-[var(--color-surface-soft)]">
                                             <PreferenceRow
-                                                title="Delivery ETA"
-                                                description="Cold-truck departures and delivery updates."
+                                                title={ui('notificationDelivery')}
+                                                description={ui('notificationDeliveryDesc')}
                                                 checked={preferences.deliveryEta}
                                                 onToggle={() => setPreference('deliveryEta')}
                                             />
 
                                             <PreferenceRow
-                                                title="New product sourcing"
-                                                description="Replies to requests for unlisted ingredients."
+                                                title={ui('notificationSourcing')}
+                                                description={ui('notificationSourcingDesc')}
                                                 checked={preferences.sourcingReply}
                                                 onToggle={() => setPreference('sourcingReply')}
                                             />
@@ -442,8 +501,7 @@ export default function NotificationSystem({
                                     </div>
 
                                     <p className="mt-3 text-[11px] leading-5 text-store-muted">
-                                        These switches are frontend-only until notification APIs are
-                                        connected.
+                                        {ui('notificationSessionNote')}
                                     </p>
                                 </div>
 
@@ -453,7 +511,7 @@ export default function NotificationSystem({
                                         onClick={() => setView('list')}
                                         className="w-full cursor-pointer rounded-xl border-0 bg-store-green px-4 py-3 text-[12px] font-bold text-white hover:bg-store-green"
                                     >
-                                        Back to notifications
+                                        {ui('notificationBack')}
                                     </button>
                                 </div>
                             </>
@@ -504,7 +562,7 @@ export default function NotificationSystem({
                             </button>
                         </div>
 
-                        <div className="max-h-[60vh] space-y-4 overflow-y-auto px-6 py-5">
+                        <div className="max-h-[60vh] space-y-4 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden px-6 py-5">
                             <p className="m-0 text-sm leading-7 text-store-muted">
                                 {selected.description}
                             </p>

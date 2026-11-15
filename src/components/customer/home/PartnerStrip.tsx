@@ -1,93 +1,96 @@
-import { useEffect, useRef } from 'react';
-import { useHomeModelContext } from './HomeModel.tsx';
-import { PARTNER_CATALOG_BRANDS } from '../../../constants/customer/partnerBrands';
-
-// All names come from 2_brands(1).csv; each lane displays half the catalog.
-const BRAND_LANES = [PARTNER_CATALOG_BRANDS.slice(0, 54), PARTNER_CATALOG_BRANDS.slice(54)];
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { getCatalogBrands } from '@/services/customer/catalogReadService';
+import type { CatalogBrand } from '@/services/customer/catalogReadService';
 
 export default function PartnerStrip() {
-    const { t } = useHomeModelContext();
-    const sectionRef = useRef<HTMLElement | null>(null);
-    const laneRefs = useRef<(HTMLDivElement | null)[]>([]);
+    const { t } = useTranslation('storefront');
+    const [brands, setBrands] = useState<CatalogBrand[]>([]);
+    const [error, setError] = useState(false);
+    const trackRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        // The Web Animations API keeps the motion on the compositor: no custom CSS
-        // keyframes, animation plugin, or global stylesheet changes are needed.
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-        const animations = laneRefs.current
-            .filter((lane): lane is HTMLDivElement => lane !== null)
-            .map((lane, index) => {
-                // Two identical groups per lane allow a seamless loop.
-                const isReversed = index === 1;
-                return lane.animate(
-                    [
-                        { transform: isReversed ? 'translateX(-50%)' : 'translateX(0)' },
-                        { transform: isReversed ? 'translateX(0)' : 'translateX(-50%)' },
-                    ],
-                    {
-                        duration: index === 0 ? 105000 : 115000,
-                        iterations: Infinity,
-                        easing: 'linear',
-                    },
-                );
+        const controller = new AbortController();
+        getCatalogBrands(controller.signal)
+            .then((items) => {
+                if (!controller.signal.aborted)
+                    setBrands(items.filter((item) => Boolean(item.logoUrl?.trim())));
+            })
+            .catch(() => {
+                if (!controller.signal.aborted) setError(true);
             });
-
-        const container = sectionRef.current;
-        const pause = () => animations.forEach((animation) => animation.pause());
-        const resume = () => animations.forEach((animation) => animation.play());
-
-        container?.addEventListener('mouseenter', pause);
-        container?.addEventListener('mouseleave', resume);
-
-        return () => {
-            container?.removeEventListener('mouseenter', pause);
-            container?.removeEventListener('mouseleave', resume);
-            animations.forEach((animation) => animation.cancel());
-        };
+        return () => controller.abort();
     }, []);
+
+    useEffect(() => {
+        if (
+            !brands.length ||
+            !trackRef.current ||
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        )
+            return;
+        const track = trackRef.current;
+        const animation = track.animate(
+            [{ transform: 'translateX(0)' }, { transform: 'translateX(-50%)' }],
+            {
+                duration: Math.max(22000, brands.length * 3800),
+                iterations: Infinity,
+                easing: 'linear',
+            },
+        );
+        const pause = () => animation.pause();
+        const resume = () => animation.play();
+        track.addEventListener('mouseenter', pause);
+        track.addEventListener('mouseleave', resume);
+        return () => {
+            track.removeEventListener('mouseenter', pause);
+            track.removeEventListener('mouseleave', resume);
+            animation.cancel();
+        };
+    }, [brands]);
 
     return (
         <section
-            ref={sectionRef}
-            aria-label={t('homePage.partnerTitle', 'Brands in the Bite to Business catalog')}
-            className="overflow-hidden border-y border-store-ink/20 bg-store-cream py-7 text-store-ink"
+            className="border-y border-store-ink/15 bg-store-cream py-7 text-store-ink"
+            aria-label={t('homePage.partnerTitle')}
         >
-            <div className="mx-auto grid max-w-[1320px] grid-cols-[330px_minmax(0,1fr)] items-center gap-6 px-5">
-                <h2 className="m-0 max-w-[430px] font-subheading text-2xl font-bold leading-snug text-store-ink">
-                    {t('homePage.partnerTitle', 'Discover brands in the Bite to Business catalog.')}
+            <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
+                <h2 className="mb-5 mt-0 text-center font-subheading text-lg font-bold sm:text-xl">
+                    {t('homePage.partnerTitle')}
                 </h2>
-
-                <div className="min-w-0 space-y-3 overflow-hidden" aria-label="Catalog brands">
-                    {BRAND_LANES.map((brands, index) => (
-                        <div key={index} className="w-full overflow-hidden">
+            </div>
+            {brands.length > 0 ? (
+                <div className="overflow-hidden" aria-label={t('customerUI.brandLogos')}>
+                    <div ref={trackRef} className="flex w-max items-center">
+                        {[0, 1].map((copy) => (
                             <div
-                                ref={(node) => {
-                                    laneRefs.current[index] = node;
-                                }}
-                                className="flex w-max"
+                                key={copy}
+                                aria-hidden={copy === 1}
+                                className="flex shrink-0 items-center gap-5 pr-5"
                             >
-                                {[0, 1].map((copy) => (
+                                {brands.map((brand) => (
                                     <div
-                                        key={copy}
-                                        aria-hidden={copy === 1}
-                                        className="flex shrink-0 items-center gap-3 pr-3"
+                                        key={brand.id}
+                                        className="flex h-20 w-36 shrink-0 items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm"
+                                        title={brand.name}
                                     >
-                                        {brands.map((brand) => (
-                                            <span
-                                                key={brand}
-                                                className="inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-full border-2 border-store-ink bg-store-yellow px-5 text-xs font-extrabold text-store-ink transition-colors hover:bg-white"
-                                            >
-                                                {brand}
-                                            </span>
-                                        ))}
+                                        <img
+                                            src={brand.logoUrl!}
+                                            alt={copy === 0 ? brand.name : ''}
+                                            className="h-full w-full object-contain"
+                                            loading="lazy"
+                                        />
                                     </div>
                                 ))}
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
-            </div>
+            ) : (
+                <p className="m-0 px-4 text-center text-sm text-store-muted">
+                    {t(error ? 'customerUI.brandLoadError' : 'customerUI.brandEmpty')}
+                </p>
+            )}
         </section>
     );
 }

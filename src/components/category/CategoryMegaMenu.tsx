@@ -1,7 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-
-import { CATEGORIES } from './categoryData';
-import type { CategoryId } from './categoryData';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ChevronRight, FolderOpen, RefreshCw, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Link, useNavigate } from 'react-router-dom';
+import { getHomeCategories } from '@/services/customer/homeService';
+import type { HomeCategory } from '@/services/customer/homeService';
+import { ROUTES } from '@/router/routes';
 
 interface CategoryMegaMenuProps {
     open: boolean;
@@ -9,258 +12,236 @@ interface CategoryMegaMenuProps {
     top: number;
 }
 
-const ICON_ROOT = '/images/ui/category';
+function iconForCategory(category: HomeCategory): string | null {
+    // Category visuals come from the Customer API; dessert uses its dedicated cake SVG.
+    const name = `${category.nameEn} ${category.nameVi} ${category.code}`.toLowerCase();
+    if (/bakery|dessert|bánh ngọt|bánh và/.test(name))
+        return '/icons/cake-svgrepo-com.svg';
+    return category.imageSvg?.trim() || null;
+}
 
 export default function CategoryMegaMenu({ open, onClose, top }: CategoryMegaMenuProps) {
-    const [selectedId, setSelectedId] = useState<CategoryId>('meat');
-
-    const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
-
+    const { t, i18n } = useTranslation('storefront');
+    const navigate = useNavigate();
+    const [categories, setCategories] = useState<HomeCategory[]>([]);
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
+    const [reload, setReload] = useState(0);
     const closeButtonRef = useRef<HTMLButtonElement>(null);
-
-    const selected = CATEGORIES.find((item) => item.id === selectedId) ?? CATEGORIES[0];
-
-    function selectCategory(id: CategoryId) {
-        if (id !== selectedId) {
-            setSelectedId(id);
-            setSelectedSubcategory(null);
-        }
-    }
 
     useEffect(() => {
         if (!open) return;
-
         const previousOverflow = document.body.style.overflow;
-
         document.body.style.overflow = 'hidden';
-
         closeButtonRef.current?.focus();
-
-        function handleEscape(event: KeyboardEvent) {
-            if (event.key === 'Escape') {
-                onClose();
-            }
-        }
-
-        document.addEventListener('keydown', handleEscape);
-
+        const escape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') onClose();
+        };
+        document.addEventListener('keydown', escape);
         return () => {
             document.body.style.overflow = previousOverflow;
-            document.removeEventListener('keydown', handleEscape);
+            document.removeEventListener('keydown', escape);
         };
     }, [open, onClose]);
+
+    useEffect(() => {
+        if (!open) return;
+        const controller = new AbortController();
+        getHomeCategories(controller.signal)
+            .then((items) => {
+                if (controller.signal.aborted) return;
+                setCategories(items.filter((cat) => !cat.parentId));
+                setSelectedId((current) =>
+                    items.some((cat) => cat.id === current) ? current : (items[0]?.id ?? null),
+                );
+            })
+            .catch(() => {
+                if (!controller.signal.aborted) setError(true);
+            })
+            .finally(() => {
+                if (!controller.signal.aborted) setLoading(false);
+            });
+        return () => controller.abort();
+    }, [open, reload]);
+
+    const selected = useMemo(
+        () => categories.find((item) => item.id === selectedId) ?? categories[0] ?? null,
+        [categories, selectedId],
+    );
+    const english = i18n.resolvedLanguage?.startsWith('en');
+    const name = useCallback(
+        (item: HomeCategory) => (english ? item.nameEn : item.nameVi),
+        [english],
+    );
+    function goToCategory(id: string) {
+        onClose();
+        navigate(`${ROUTES.CATALOG}?category=${encodeURIComponent(id)}`);
+    }
 
     if (!open) return null;
 
     return (
         <div
-            className="fixed inset-x-0 bottom-0 z-[100] flex box-border font-body text-store-ink [&_*]:box-border"
             id="btb-category-mega-menu"
+            className="fixed inset-x-0 bottom-0 z-[100] flex font-body text-store-ink"
             style={{ top: `${Math.max(0, top)}px` }}
         >
-            {/* Nền tối bên ngoài menu */}
             <div
-                className="absolute inset-0 bg-store-dark/66 backdrop-blur-[2px]"
-                aria-hidden="true"
+                className="absolute inset-0 bg-store-dark/70 backdrop-blur-[3px]"
                 onClick={onClose}
+                aria-hidden="true"
             />
-
             <section
-                className="relative flex h-full w-[min(1120px,96vw)] flex-col overflow-hidden border-r-[3px] border-solid border-store-ink bg-store-cream shadow-[9px_0_0_var(--color-store-ink)]"
                 role="dialog"
                 aria-modal="true"
-                aria-labelledby="btb-cmega-title"
+                aria-labelledby="btb-category-title"
+                className="relative flex h-full w-[min(1050px,100vw)] flex-col overflow-hidden rounded-tr-3xl bg-store-cream shadow-2xl"
             >
-                {/* Thanh tiêu đề */}
-                <div className="flex shrink-0 items-center justify-between gap-4 border-b-2 border-solid border-store-ink bg-store-green px-[26px] py-[17px]">
-                    <div className="min-w-0">
-                        <span className="block font-label text-[11px] font-semibold tracking-[1.3px] uppercase text-store-coral">
-                            KHÁM PHÁ SẢN PHẨM
-                        </span>
-
+                <div className="flex shrink-0 items-center justify-between gap-4 bg-store-green px-5 py-5 text-white sm:px-8">
+                    <div>
+                        <p className="m-0 text-[11px] font-bold uppercase tracking-widest text-store-yellow">
+                            {t('customerUI.categoriesTag')}
+                        </p>
                         <h2
-                            className="mt-1 font-subheading text-[clamp(20px,2vw,27px)] font-normal leading-[1.15] text-store-cream"
-                            id="btb-cmega-title"
+                            id="btb-category-title"
+                            className="m-0 mt-1 font-subheading text-2xl font-bold"
                         >
-                            Danh mục ngành hàng
+                            {t('customerUI.categoryTitle')}
                         </h2>
                     </div>
-
-                    <div className="flex items-center gap-2.5">
-                        <span className="inline-flex items-center rounded-[7px] border-2 border-solid border-store-ink bg-store-yellow px-3 py-[9px] text-xs font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)]">
-                            Tất cả {CATEGORIES.length} nhóm
-                        </span>
-
+                    <button
+                        ref={closeButtonRef}
+                        type="button"
+                        onClick={onClose}
+                        aria-label={t('customerUI.categoryClose')}
+                        className="grid h-10 w-10 cursor-pointer place-items-center rounded-xl bg-white/15 text-white transition hover:bg-white/30"
+                    >
+                        <X size={23} />
+                    </button>
+                </div>
+                {loading ? (
+                    <div role="status" className="p-8 text-sm">
+                        {t('customerUI.categoryLoading')}
+                    </div>
+                ) : error ? (
+                    <div className="p-8">
+                        <p role="alert">{t('customerUI.categoryError')}</p>
                         <button
-                            ref={closeButtonRef}
                             type="button"
-                            className="grid h-[38px] w-[38px] shrink-0 cursor-pointer place-items-center rounded-[7px] border-2 border-solid border-store-ink bg-store-cream shadow-[3px_3px_0_var(--color-store-ink)] hover:bg-store-yellow focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-store-coral"
-                            aria-label="Đóng danh mục"
-                            onClick={onClose}
+                            onClick={() => {
+                                setError(false);
+                                setLoading(true);
+                                setReload((v) => v + 1);
+                            }}
+                            className="mt-3 inline-flex items-center gap-2 rounded-xl bg-store-yellow px-4 py-2 text-sm font-bold"
                         >
-                            <img src={`${ICON_ROOT}/close.svg`} width={19} height={19} alt="" />
+                            <RefreshCw size={16} />
+                            {t('customerUI.categoryRetry')}
                         </button>
                     </div>
-                </div>
-
-                {/* Nội dung 2 cột */}
-                <div className="grid min-h-0 flex-1 grid-cols-[265px_minmax(0,1fr)]">
-                    {/* Cột trái: 14 nhóm ngành hàng */}
-                    <aside
-                        className="overflow-y-auto border-r-2 border-solid border-store-ink bg-store-cream px-2 py-3 [scrollbar-width:thin]"
-                        aria-label="Danh sách nhóm ngành hàng"
-                    >
-                        {CATEGORIES.map((category, index) => (
-                            <button
-                                key={category.id}
-                                type="button"
-                                className={`my-px flex min-h-11 w-full cursor-pointer items-center gap-[9px] rounded-[7px] border border-solid border-transparent bg-transparent px-2.5 py-[9px] text-left font-body text-xs font-semibold text-store-ink transition-colors hover:border-store-ink hover:bg-store-yellow focus-visible:border-store-ink focus-visible:bg-store-yellow focus-visible:outline-none${
-                                    selectedId === category.id
-                                        ? ' !border-store-ink !bg-store-yellow shadow-[2px_2px_0_var(--color-store-ink)]'
-                                        : ''
-                                }`}
-                                aria-pressed={selectedId === category.id}
-                                onMouseEnter={() => selectCategory(category.id)}
-                                onFocus={() => selectCategory(category.id)}
-                                onClick={() => selectCategory(category.id)}
-                            >
-                                <img
-                                    className="block shrink-0 object-contain"
-                                    src={`${ICON_ROOT}/${category.id}.svg`}
-                                    width={23}
-                                    height={23}
-                                    alt=""
-                                />
-
-                                <span className="min-w-0 flex-1 leading-[1.3]">
-                                    {category.name}
-                                </span>
-
-                                <span className="font-price text-[10px] font-semibold text-store-muted">
-                                    {String(index + 1).padStart(2, '0')}
-                                </span>
-
-                                <img
-                                    className="h-3 w-3 shrink-0"
-                                    src={`${ICON_ROOT}/chevron-right.svg`}
-                                    width={12}
-                                    height={12}
-                                    alt=""
-                                />
-                            </button>
-                        ))}
-                    </aside>
-
-                    {/* Cột phải: Nội dung nhóm đang chọn */}
-                    <div className="min-w-0 overflow-y-auto px-7 pt-[25px] pb-[30px] [scrollbar-width:thin]">
-                        <div className="flex items-end justify-between gap-[18px] border-b border-dashed border-store-ink/25 pb-[17px] [&_h3]:mt-1 [&_h3]:mb-[5px] [&_h3]:font-subheading [&_h3]:text-[clamp(25px,3vw,35px)] [&_h3]:font-normal [&_h3]:leading-[1.15] [&_p]:m-0 [&_p]:font-subtext [&_p]:text-xs [&_p]:font-medium [&_p]:leading-[1.6] [&_p]:text-store-muted">
-                            <div>
-                                <span className="block font-label text-[11px] font-semibold tracking-[1.3px] uppercase text-store-coral">
-                                    ĐANG XEM NHÓM HÀNG
-                                </span>
-
-                                <h3>{selected.name}</h3>
-
-                                <p>{selected.caption}</p>
-                            </div>
-
-                            <span className="shrink-0 rounded-md border-2 border-solid border-store-ink bg-store-coral px-[13px] py-2.5 font-price text-xs font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)]">
-                                {selected.count} sản phẩm mẫu
-                            </span>
-                        </div>
-
-                        <h4 className="mt-[23px] mb-[13px] font-subheading text-base font-bold leading-[1.4]">
-                            Nhóm sản phẩm
-                        </h4>
-
-                        {/* Danh mục con */}
-                        <div className="grid grid-cols-4 gap-[13px]">
-                            {selected.subcategories.map((subcategory, index) => (
+                ) : (
+                    <div className="grid min-h-0 flex-1 grid-cols-1 sm:grid-cols-[270px_minmax(0,1fr)]">
+                        <nav
+                            aria-label={t('customerUI.categorySelect')}
+                            className="max-h-[190px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden border-b border-store-line bg-white p-3 sm:max-h-none sm:border-b-0 sm:border-r"
+                        >
+                            {categories.map((category) => (
                                 <button
+                                    key={category.id}
                                     type="button"
-                                    key={`${selected.id}-${subcategory}`}
-                                    className={`relative flex min-w-0 cursor-pointer flex-col items-center gap-2 rounded-[9px] border-2 border-solid border-store-ink bg-store-cream px-[7px] pt-3 pb-[11px] font-body text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-store-coral${
-                                        selectedSubcategory === subcategory
-                                            ? ' !bg-store-yellow'
-                                            : ''
-                                    }`}
-                                    aria-pressed={selectedSubcategory === subcategory}
-                                    onClick={() => setSelectedSubcategory(subcategory)}
+                                    onClick={() => setSelectedId(category.id)}
+                                    aria-current={selected?.id === category.id ? 'true' : undefined}
+                                    className={`my-1 flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-3 text-left text-xs font-bold transition ${selected?.id === category.id ? 'bg-store-yellow text-store-ink' : 'bg-transparent text-store-ink hover:bg-surface-green'}`}
                                 >
-                                    <span
-                                        className="flex aspect-square w-[min(100%,90px)] flex-col items-center justify-center gap-1 rounded-[7px] border-[1.5px] border-dashed border-store-line bg-store-cream font-label text-[10px] text-store-muted"
-                                        aria-hidden="true"
-                                    >
+                                    {iconForCategory(category) ? (
                                         <img
-                                            src={`${ICON_ROOT}/image-placeholder.svg`}
+                                            src={iconForCategory(category)!}
                                             width={27}
                                             height={27}
                                             alt=""
+                                            className="h-7 w-7 shrink-0 object-contain"
                                         />
-                                        <span>Ảnh</span>
-                                    </span>
-
-                                    <span className="text-center font-subheading text-xs font-semibold leading-[1.35]">
-                                        {subcategory}
-                                    </span>
-
-                                    <span className="absolute top-[5px] left-1.5 font-price text-[10px] text-store-muted">
-                                        {String(index + 1).padStart(2, '0')}
-                                    </span>
+                                    ) : (
+                                        <FolderOpen
+                                            size={23}
+                                            className="shrink-0 text-store-green"
+                                        />
+                                    )}
+                                    <span className="min-w-0 flex-1">{name(category)}</span>
+                                    <ChevronRight size={15} className="shrink-0 opacity-50" />
                                 </button>
                             ))}
-                        </div>
-
-                        {/* Trạng thái chọn danh mục con */}
-                        {selectedSubcategory && (
-                            <p
-                                className="mt-4 rounded border-l-[3px] border-solid border-store-coral bg-store-cream px-3 py-2.5 font-body text-xs leading-[1.6] text-store-green"
-                                role="status"
-                            >
-                                Đang chọn: <strong>{selectedSubcategory}</strong> — giao diện demo,
-                                chưa lọc bằng API.
-                            </p>
-                        )}
-
-                        {/* Khung chờ thương hiệu */}
-                        <div className="flex items-end gap-[15px] [&_p]:mt-[-8px] [&_p]:mb-[13px] [&_p]:text-[11px] [&_p]:text-store-muted">
-                            <div>
-                                <h4 className="mt-[23px] mb-[13px] font-subheading text-base font-bold leading-[1.4]">
-                                    Thương hiệu nổi bật
-                                </h4>
-
-                                <p>Vị trí dành cho logo thương hiệu khi hoàn thiện website.</p>
-                            </div>
-                        </div>
-
-                        <div
-                            className="grid grid-cols-4 gap-[13px]"
-                            aria-label="Khung chờ logo thương hiệu"
-                        >
-                            {[1, 2, 3, 4].map((number) => (
-                                <div
-                                    className="flex min-h-[75px] flex-col items-center justify-center gap-[5px] rounded-lg border border-dashed border-store-line bg-store-cream text-[10px] text-store-muted"
-                                    key={number}
-                                >
-                                    <img
-                                        src={`${ICON_ROOT}/image-placeholder.svg`}
-                                        width={22}
-                                        height={22}
-                                        alt=""
-                                    />
-
-                                    <span>Logo {String(number).padStart(2, '0')}</span>
-                                </div>
-                            ))}
+                        </nav>
+                        <div className="min-h-0 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden p-5 sm:p-8">
+                            {selected && (
+                                <>
+                                    <p className="m-0 text-[11px] font-extrabold uppercase tracking-wider text-store-muted">
+                                        {t('customerUI.categoryBrowsing')}
+                                    </p>
+                                    <h3 className="m-0 mt-2 font-subheading text-3xl font-bold">
+                                        {name(selected)}
+                                    </h3>
+                                    <p className="mt-2 text-sm text-store-muted">
+                                        {english ? selected.descriptionEn : selected.descriptionVi}
+                                    </p>
+                                    <div className="my-5 flex flex-wrap items-center gap-3">
+                                        <span className="rounded-full bg-surface-green px-4 py-2 text-xs font-bold text-store-green">
+                                            {t('customerUI.categoryProducts', {
+                                                count: selected.productCount,
+                                            })}
+                                        </span>
+                                        <button
+                                            onClick={() => goToCategory(selected.id)}
+                                            type="button"
+                                            className="inline-flex items-center gap-2 rounded-xl bg-store-green px-4 py-2 text-xs font-bold text-white hover:bg-store-dark"
+                                        >
+                                            {t('customerUI.categorySearch')}
+                                            <ChevronRight size={15} />
+                                        </button>
+                                    </div>
+                                    <h4 className="mb-4 font-subheading text-base font-bold">
+                                        {t('customerUI.categoryChildren')}
+                                    </h4>
+                                    {selected.children?.length ? (
+                                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                            {selected.children.map((child) => (
+                                                <button
+                                                    type="button"
+                                                    key={child.id}
+                                                    onClick={() => goToCategory(child.id)}
+                                                    className="flex min-h-[88px] cursor-pointer items-center gap-3 rounded-2xl border border-store-line bg-white p-4 text-left text-sm font-semibold transition hover:border-store-green hover:bg-surface-green"
+                                                >
+                                                    <FolderOpen
+                                                        size={23}
+                                                        className="shrink-0 text-store-green"
+                                                    />
+                                                    <span>{name(child)}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-sm text-store-muted">
+                                            {t('customerUI.categoryEmptyChildren')}
+                                        </p>
+                                    )}
+                                </>
+                            )}
+                            {categories.length === 0 && (
+                                <p className="text-sm">{t('customerUI.emptyCategories')}</p>
+                            )}
                         </div>
                     </div>
-                </div>
-
-                {/* Chân Mega Menu */}
-                <div className="flex shrink-0 items-center justify-between gap-4 border-t-2 border-solid border-store-ink bg-surface-green px-[26px] py-[13px] text-[11px] font-semibold text-store-green [&_strong]:font-subheading [&_strong]:text-store-ink">
-                    <span>14 nhóm nguyên liệu — mua hàng theo nhu cầu bếp</span>
-
-                    <strong>Đang xem: {selected.name}</strong>
+                )}
+                <div className="flex shrink-0 items-center justify-between bg-surface-green px-5 py-3 text-xs text-store-green sm:px-8">
+                    <span>{t('customerUI.categoryCount', { count: categories.length })}</span>
+                    <Link
+                        onClick={onClose}
+                        to={ROUTES.CATALOG}
+                        className="font-bold text-store-green"
+                    >
+                        {t('customerUI.showAllProducts')}
+                    </Link>
                 </div>
             </section>
         </div>
