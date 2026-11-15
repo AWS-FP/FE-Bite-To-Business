@@ -1,40 +1,96 @@
-import { Minus, Plus, Star } from 'lucide-react';
-import { useState } from 'react';
+import { Heart, Minus, Plus, Star } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/admin/authStore';
+import {
+    addFavorite,
+    getFavoriteStatus,
+    removeFavorite,
+} from '@/services/customer/favoriteService';
 import { formatCurrencyVnd } from '../../../constants/customer/homeData';
 import type { HomeProductCardItem } from '../../../constants/customer/homeData';
 import { useCartStore } from '../../../store/customer/cartStore';
 
+/** Only the customer API supplies product, price and promotion values. */
 export default function ProductShowcaseCard({
     product,
-    section = 'flash',
 }: {
     product: HomeProductCardItem;
     section?: 'flash' | 'standard';
 }) {
     const { t, i18n } = useTranslation('storefront');
-    const [quantity, setQuantity] = useState(4);
+    const navigate = useNavigate();
+    const session = useAuthStore((state) => state.session);
+    const isCustomer = session?.user.role === 'CUSTOMER';
     const addItemToCart = useCartStore((state) => state.addItem);
 
-    const productKey = `homeProducts.${section}.${product.id}`;
-    const categoryKey = product.categoryLabel.toLowerCase().replace(/[^a-z0-9]+/g, '_');
-    const localizedName = i18n.resolvedLanguage?.startsWith('en')
-        ? product.nameEn ?? product.name
-        : product.nameVi ?? product.name;
-    const localizedSpec = t(`${productKey}.spec`, product.spec);
-    const localizedUnit = t(`homePage.units.${product.unit}`, product.unit);
-    const localizedCategory = t(`homePage.productCategories.${categoryKey}`, product.categoryLabel);
-    const activeUnitPrice = product.salePrice ?? product.listPrice;
-    const totalPrice = activeUnitPrice * quantity;
+    const [quantity, setQuantity] = useState(product.minOrderQuantity ?? 1);
+    const [favorite, setFavorite] = useState(false);
+    const [savingFavorite, setSavingFavorite] = useState(false);
+
+    useEffect(() => {
+        if (!isCustomer) return;
+        let mounted = true;
+        getFavoriteStatus(product.id)
+            .then((result) => {
+                if (mounted) setFavorite(result.favorite);
+            })
+            .catch(() => {});
+        return () => {
+            mounted = false;
+        };
+    }, [isCustomer, product.id]);
+
+    const toggleFavorite = async () => {
+        if (!isCustomer) {
+            navigate('/login');
+            return;
+        }
+        if (savingFavorite) return;
+        setSavingFavorite(true);
+        try {
+            if (favorite) await removeFavorite(product.id);
+            else await addFavorite(product.id);
+            setFavorite((current) => !current);
+        } catch {
+            // The server owns the favorite state. Do not show a false success.
+        } finally {
+            setSavingFavorite(false);
+        }
+    };
+
+    const minQuantity = product.minOrderQuantity ?? 1;
+    const step = product.quantityStep ?? 1;
+    const inStock = product.availableQuantity == null || product.availableQuantity > 0;
+    const available = product.availableQuantity;
+    const validSale =
+        product.salePrice != null &&
+        product.salePrice >= 0 &&
+        product.listPrice > 0 &&
+        product.salePrice < product.listPrice;
+    const unitPrice = validSale ? product.salePrice! : product.listPrice;
+    const discountPercent = validSale
+        ? Math.round(((product.listPrice - unitPrice) / product.listPrice) * 100)
+        : 0;
+
+    const english = i18n.resolvedLanguage?.startsWith('en');
+    const name = english ? (product.nameEn ?? product.name) : (product.nameVi ?? product.name);
+    const category = english
+        ? (product.categoryLabelEn ?? product.categoryLabel)
+        : product.categoryLabel;
+    const unit = t(`homePage.units.${product.unit.toLowerCase()}`, product.unit);
+    const image = product.imageUrl?.trim();
+    const totalPrice = unitPrice * quantity;
 
     function handleAddToOrder() {
+        if (!inStock || (available != null && quantity > available)) return;
         addItemToCart(
             {
                 id: product.id,
-                name: localizedName,
-                spec: localizedSpec,
-                unitPrice: product.listPrice,
+                name,
+                spec: product.spec,
+                unitPrice,
                 imageUrl: product.imageUrl,
             },
             quantity,
@@ -42,147 +98,151 @@ export default function ProductShowcaseCard({
     }
 
     return (
-        <article className="group flex flex-col overflow-hidden rounded-xl border border-solid border-store-line bg-white shadow-[0_3px_10px_color-mix(in_srgb,_var(--color-black)_6%,_transparent)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_24px_color-mix(in_srgb,_var(--color-black)_12%,_transparent)]">
-            <Link
-                to={`/products/${product.id}`}
-                className="relative block h-[200px] w-full overflow-hidden bg-surface-yellow no-underline"
-            >
-                {product.imageUrl ? (
-                    <img
-                        src={product.imageUrl}
-                        alt={localizedName}
-                        className="block h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                ) : (
-                    <div className="flex h-full w-full flex-col items-center justify-center px-4 text-center">
-                        <span className="text-xs font-extrabold uppercase tracking-wider text-store-ink">
-                            {t('homePage.foodImage', { sku: product.sku })}
-                        </span>
-                        <span className="mt-1 text-[11px] text-store-muted">
-                            {t('homePage.viewProductDetails')}
-                        </span>
-                    </div>
-                )}
+        <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-[18px] border border-store-line/90 bg-white shadow-[0_3px_12px_rgba(7,46,32,0.07)] transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1.5 hover:border-store-sage hover:shadow-[0_14px_30px_rgba(7,46,32,0.16)]">
+            <div className="relative border-b border-store-line/60 bg-[#fbfaf5]">
+                <Link
+                    to={`/products/${encodeURIComponent(product.id)}`}
+                    className="flex h-[150px] items-center justify-center overflow-hidden p-3 no-underline sm:h-[158px]"
+                    aria-label={name}
+                >
+                    {image ? (
+                        <img
+                            src={image}
+                            alt={name}
+                            loading="lazy"
+                            className="h-full w-full max-w-full object-contain transition-transform duration-500 ease-out group-hover:scale-[1.07]"
+                        />
+                    ) : (
+                        <div className="flex h-full items-center justify-center px-4 text-center text-xs font-medium text-store-muted">
+                            {t('customerUI.priceUnavailable', 'Product image unavailable')}
+                        </div>
+                    )}
+                </Link>
 
-                {product.topLeftBadge && (
-                    <span className="absolute top-3 left-3 rounded-full border border-solid border-store-ink bg-store-yellow px-3 py-1 text-[11px] font-extrabold text-store-ink shadow-[1px_1px_0_var(--color-store-ink)]">
-                        {t(`homePage.productBadges.${product.topLeftBadge}`, product.topLeftBadge)}
+                {validSale && (
+                    <span className="absolute left-2.5 top-2.5 rounded-md bg-[#e4483d] px-2 py-1 text-[11px] font-extrabold text-white shadow-sm">
+                        -{discountPercent}%
                     </span>
                 )}
 
-                {product.discountBadge && (
-                    <span className="absolute top-3 right-3 rounded-full border border-solid border-store-ink bg-surface-pink px-3 py-1 text-[11px] font-extrabold text-store-ink">
-                        {t('homePage.discountBadge', {
-                            percent: product.discountBadge.match(/\d+/)?.[0] ?? '0',
-                        })}
+                <button
+                    type="button"
+                    onClick={toggleFavorite}
+                    disabled={savingFavorite}
+                    aria-label={t(
+                        favorite ? 'customerUI.removeFavorite' : 'customerUI.addFavorite',
+                    )}
+                    aria-pressed={favorite}
+                    className="absolute right-2.5 top-2.5 z-10 grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-store-line bg-white/95 text-store-green shadow-sm transition hover:scale-110 hover:bg-store-yellow disabled:opacity-60"
+                >
+                    <Heart size={18} fill={favorite ? 'currentColor' : 'none'} />
+                </button>
+            </div>
+
+            <div className="flex min-w-0 flex-1 flex-col px-3.5 pb-3 pt-3">
+                <p className="m-0 flex min-w-0 items-center justify-between gap-2 text-[10px] font-semibold text-store-muted">
+                    <span className="min-w-0 truncate uppercase" title={category}>
+                        {category}
                     </span>
-                )}
+                    <span className="max-w-[47%] shrink-0 truncate" title={product.sku}>
+                        SKU: {product.sku}
+                    </span>
+                </p>
 
-                {product.certBadge && <span className="absolute right-3 bottom-3 rounded-md bg-store-green px-2.5 py-1 text-[10px] font-bold text-white">
-                    {t(`homePage.productBadges.${product.certBadge}`, product.certBadge)}
-                </span>}
-            </Link>
+                <Link
+                    to={`/products/${encodeURIComponent(product.id)}`}
+                    className="mt-1.5 line-clamp-2 min-h-[40px] text-[13px] font-extrabold leading-5 text-store-ink no-underline hover:text-store-green"
+                >
+                    {name}
+                </Link>
 
-            <div className="flex flex-1 flex-col p-4">
-                <div className="flex flex-1 flex-col">
-                    <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-store-muted">
-                        <span>{localizedCategory}</span>
-                        <span>SKU: {product.sku}</span>
+                <div className="mt-1.5 flex h-5 items-center gap-1.5">
+                    {product.rating != null && product.reviewCount != null ? (
+                        <>
+                            <div className="flex shrink-0 items-center gap-px" aria-hidden="true">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star
+                                        key={star}
+                                        size={12}
+                                        className={
+                                            star <= Math.round(product.rating ?? 0)
+                                                ? 'fill-store-yellow text-store-ink'
+                                                : 'fill-transparent text-store-ink/45'
+                                        }
+                                    />
+                                ))}
+                            </div>
+                            <span className="truncate text-[10px] text-store-muted">
+                                {product.rating} (
+                                {t('homePage.reviewCount', { count: product.reviewCount })})
+                            </span>
+                        </>
+                    ) : null}
+                </div>
+
+                <div className="mt-auto pt-2.5">
+                    <div className="flex min-h-[16px] items-center gap-2">
+                        {validSale && (
+                            <span className="text-[11px] leading-4 text-store-muted line-through tabular-nums">
+                                {formatCurrencyVnd(product.listPrice)}
+                            </span>
+                        )}
                     </div>
-
-                    <Link
-                        to={`/products/${product.id}`}
-                        className="mt-1.5 block font-subheading lining-nums text-lg font-bold leading-snug text-store-ink no-underline hover:text-store-ink"
-                    >
-                        {localizedName}
-                    </Link>
-
-                    {product.rating != null && product.reviewCount != null && <div className="mt-2 flex items-center gap-1.5">
-                        <div className="flex items-center gap-0.5">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <Star
-                                    key={star}
-                                    size={14}
-                                    className={
-                                        star <= Math.round(product.rating ?? 0)
-                                            ? 'fill-store-yellow text-store-ink'
-                                            : 'fill-transparent text-store-ink'
-                                    }
-                                />
-                            ))}
-                        </div>
-                        <span className="text-[11px] text-store-muted">
-                            {product.rating} (
-                            {t('homePage.reviewCount', { count: product.reviewCount })})
+                    <div className="flex flex-wrap items-end gap-1">
+                        <span
+                            className={`font-price text-[20px] font-black leading-6 tabular-nums ${validSale ? 'text-[#d73a30]' : 'text-store-green'}`}
+                        >
+                            {formatCurrencyVnd(unitPrice)}
                         </span>
-                    </div>}
-
-                    {/* Both discounted and regular products reserve exactly the same price space.
-                        The current price sits on one baseline and starts at the same left edge. */}
-                    <div className="mt-auto flex min-h-[82px] flex-col justify-end pt-3">
-                        <div className="flex h-5 items-end">
-                            {product.salePrice != null ? (
-                                <span className="font-price text-sm leading-5 text-store-ink line-through tabular-nums">
-                                    {formatCurrencyVnd(product.listPrice)} / {localizedUnit}
-                                </span>
-                            ) : (
-                                <span aria-hidden="true" className="invisible text-sm">
-                                    –
-                                </span>
-                            )}
-                        </div>
-                        <div className="flex h-9 items-end gap-1 whitespace-nowrap">
-                            <span
-                                className={`font-price text-[24px] font-black leading-none lining-nums tabular-nums ${product.salePrice != null ? 'text-danger' : 'text-store-ink'}`}
-                            >
-                                {formatCurrencyVnd(activeUnitPrice)}
-                            </span>
-                            <span
-                                className={`font-price pb-0.5 text-sm font-bold leading-none ${product.salePrice != null ? 'text-danger' : 'text-store-ink'}`}
-                            >
-                                / {localizedUnit}
-                            </span>
-                        </div>
+                        <span className="pb-0.5 text-xs font-bold text-store-muted">/ {unit}</span>
                     </div>
                 </div>
 
-                <div className="mt-4 border-0 border-t border-solid border-store-ink/15 pt-3">
-                    <div className="flex items-center justify-between text-xs font-extrabold text-store-ink">
+                <div className="mt-2.5 border-t border-store-line/70 pt-2.5">
+                    <div className="flex items-center justify-between gap-2 text-[11px] font-semibold text-store-ink">
                         <span>{t('homePage.totalPrice', 'Total Price:')}</span>
-                        <span>
-                            {formatCurrencyVnd(totalPrice)} (x{quantity})
+                        <span
+                            className="truncate font-bold tabular-nums"
+                            title={formatCurrencyVnd(totalPrice)}
+                        >
+                            {formatCurrencyVnd(totalPrice)} (×{quantity})
                         </span>
                     </div>
-
-                    <div className="mt-2.5 flex items-center gap-2.5">
-                        <div className="flex h-9 items-center rounded-lg border border-solid border-store-ink bg-white px-2">
+                    <div className="mt-2 flex items-center gap-2">
+                        <div className="flex h-9 shrink-0 items-center rounded-lg border border-store-line bg-white px-1">
                             <button
                                 type="button"
-                                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                                onClick={() => setQuantity((q) => Math.max(minQuantity, q - step))}
+                                disabled={quantity <= minQuantity || !inStock}
                                 aria-label={t('homePage.decreaseQuantity')}
-                                className="flex h-6 w-6 cursor-pointer items-center justify-center border-0 bg-transparent text-store-ink hover:text-danger"
+                                className="grid h-7 w-6 cursor-pointer place-items-center rounded-md border-0 bg-transparent text-store-ink hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-40"
                             >
                                 <Minus size={13} strokeWidth={2.5} />
                             </button>
-                            <span className="font-price min-w-[26px] text-center text-xs font-extrabold text-store-ink">
+                            <span className="min-w-[23px] text-center text-xs font-bold tabular-nums text-store-ink">
                                 {quantity}
                             </span>
                             <button
                                 type="button"
-                                onClick={() => setQuantity((q) => q + 1)}
+                                onClick={() => setQuantity((q) => q + step)}
+                                disabled={
+                                    !inStock || (available != null && quantity + step > available)
+                                }
                                 aria-label={t('homePage.increaseQuantity')}
-                                className="flex h-6 w-6 cursor-pointer items-center justify-center border-0 bg-transparent text-store-ink hover:text-success"
+                                className="grid h-7 w-6 cursor-pointer place-items-center rounded-md border-0 bg-transparent text-store-ink hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-40"
                             >
                                 <Plus size={13} strokeWidth={2.5} />
                             </button>
                         </div>
-
                         <button
                             type="button"
                             onClick={handleAddToOrder}
-                            className="h-9 flex-1 cursor-pointer rounded-lg border-0 bg-store-green px-4 text-xs font-bold text-white transition-colors hover:bg-store-green"
+                            disabled={!inStock || (available != null && quantity > available)}
+                            className="h-9 min-w-0 flex-1 cursor-pointer rounded-lg border-0 bg-store-green px-2 text-[11px] font-bold text-white transition hover:bg-store-dark disabled:cursor-not-allowed disabled:bg-[#91a59d]"
                         >
-                            {t('homePage.addToOrder', 'Add to Order')}
+                            {inStock
+                                ? t('homePage.addToOrder', 'Add to Order')
+                                : t('customerUI.outOfStock')}
                         </button>
                     </div>
                 </div>

@@ -152,7 +152,7 @@ export default function StoreAccountActions() {
                         </h3>
                     </div>
 
-                    <div className="max-h-[320px] divide-y divide-gray-100 overflow-y-auto">
+                    <div className="max-h-[320px] divide-y divide-gray-100 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                         {cartItems.map((item) => (
                             <div key={item.id} className="flex items-start gap-3.5 py-3.5">
                                 <Link

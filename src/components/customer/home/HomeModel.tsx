@@ -1,47 +1,38 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getHomeProducts } from '@/services/customer/homeService';
-import type { HomeProduct } from '@/services/customer/homeService';
+import { getHomeProducts, getHomeCategories } from '@/services/customer/homeService';
+import type {
+    HomeProduct,
+    HomeBanner,
+    HomeCategory,
+    HomeCombo,
+} from '@/services/customer/homeService';
 import type { HomeProductCardItem } from '@/constants/customer/homeData';
-
-function toCard(product: HomeProduct): HomeProductCardItem | null {
-    if (product.listPrice == null || !Number.isFinite(product.listPrice)) return null;
-    return {
-        id: product.productId,
-        sku: product.sku,
-        name: product.nameVi,
-        nameVi: product.nameVi,
-        nameEn: product.nameEn,
-        categoryLabel: '',
-        spec: product.unitCode,
-        unit: product.unitCode,
-        listPrice: product.listPrice,
-        salePrice: product.salePrice ?? undefined,
-        certBadge: '',
-        imageUrl: product.imageUrl ?? '',
-    };
-}
+import { toCard } from './homeProductMapper';
 
 function useHomePageState() {
     const { t } = useTranslation('storefront');
     const [flashProducts, setFlashProducts] = useState<HomeProductCardItem[]>([]);
     const [standardProducts, setStandardProducts] = useState<HomeProductCardItem[]>([]);
+    const [bestSellingProducts, setBestSellingProducts] = useState<HomeProductCardItem[]>([]);
+    const [deepDiscountProducts, setDeepDiscountProducts] = useState<HomeProductCardItem[]>([]);
+    const [topRatedProducts, setTopRatedProducts] = useState<HomeProductCardItem[]>([]);
+    const [banners, setBanners] = useState<HomeBanner[]>([]);
+    const [combos, setCombos] = useState<HomeCombo[]>([]);
+    const [categories, setCategories] = useState<HomeCategory[]>([]);
     const [loadingProducts, setLoadingProducts] = useState(true);
     const [productError, setProductError] = useState(false);
-
-    // State phân trang cho 2 khu vực sản phẩm
     const [flashPage, setFlashPage] = useState(1);
+    const [standardPage, setStandardPage] = useState(1);
     const flashPageSize = 3;
+    const standardPageSize = 6;
     const totalFlashPages = Math.ceil(flashProducts.length / flashPageSize);
+    const totalStandardPages = Math.ceil(standardProducts.length / standardPageSize);
     const visibleFlashProducts = flashProducts.slice(
         (flashPage - 1) * flashPageSize,
         flashPage * flashPageSize,
     );
-
-    const [standardPage, setStandardPage] = useState(1);
-    const standardPageSize = 6;
-    const totalStandardPages = Math.ceil(standardProducts.length / standardPageSize);
     const visibleStandardProducts = standardProducts.slice(
         (standardPage - 1) * standardPageSize,
         standardPage * standardPageSize,
@@ -49,10 +40,21 @@ function useHomePageState() {
 
     useEffect(() => {
         const controller = new AbortController();
+        // Categories are a separate Customer endpoint; failure should not hide products.
+        getHomeCategories(controller.signal)
+            .then(setCategories)
+            .catch(() => {});
         getHomeProducts(controller.signal)
             .then((data) => {
-                setFlashProducts(data.flashSaleProducts.map(toCard).filter((item): item is HomeProductCardItem => item !== null));
-                setStandardProducts(data.featuredProducts.map(toCard).filter((item): item is HomeProductCardItem => item !== null));
+                const convert = (items: HomeProduct[]) =>
+                    items.map(toCard).filter((item): item is HomeProductCardItem => item !== null);
+                setFlashProducts(convert(data.flashSaleProducts));
+                setStandardProducts(convert(data.featuredProducts));
+                setBestSellingProducts(convert(data.bestSellingProducts));
+                setDeepDiscountProducts(convert(data.deepDiscountProducts));
+                setTopRatedProducts(convert(data.topRatedProducts));
+                setBanners(data.banners);
+                setCombos(data.combos);
                 setProductError(false);
             })
             .catch(() => {
@@ -65,19 +67,27 @@ function useHomePageState() {
     }, []);
 
     return {
-        flashPageSize,
-        standardPageSize,
         t,
         flashPage,
         setFlashPage,
-        totalFlashPages,
-        visibleFlashProducts,
         standardPage,
         setStandardPage,
+        flashPageSize,
+        standardPageSize,
+        totalFlashPages,
         totalStandardPages,
+        visibleFlashProducts,
         visibleStandardProducts,
+        flashProducts,
+        standardProducts,
         flashProductCount: flashProducts.length,
         standardProductCount: standardProducts.length,
+        bestSellingProducts,
+        deepDiscountProducts,
+        topRatedProducts,
+        categories,
+        banners,
+        combos,
         loadingProducts,
         productError,
     };

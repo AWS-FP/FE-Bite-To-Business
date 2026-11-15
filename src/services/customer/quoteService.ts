@@ -113,3 +113,85 @@ export async function addQuotePackage(
 export async function deleteQuotePackage(id: string, packageId: string) {
     await http.delete(`/api/customer/quotes/${id}/packages/${packageId}`);
 }
+
+/** Additional endpoints in BE features/customer/controller/CustomerQuoteController. */
+export interface QuoteSummary {
+    id: string;
+    quoteNumber: string;
+    status: string;
+    revision: number;
+    reviewNote: string | null;
+    createdAt: string;
+    submittedAt: string | null;
+    updatedAt: string;
+}
+export interface CustomerQuotePage {
+    content: QuoteSummary[];
+    page: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
+}
+export interface QuoteAvailability {
+    available: boolean;
+    items: {
+        productId: string;
+        sku: string;
+        requestedQuantity: number;
+        availableQuantity: number;
+        available: boolean;
+    }[];
+}
+export interface CreatedOrder {
+    orderId: string;
+    orderNumber: string;
+    status: string;
+    totalAmount: number;
+    reservationExpiresAt: string | null;
+}
+export async function getMyQuotes(page = 0, size = 10) {
+    const { data } = await http.get<ApiResponse<CustomerQuotePage>>('/api/customer/quotes', {
+        params: { page, size },
+    });
+    return data.data;
+}
+export async function getQuoteAvailability(quoteId: string) {
+    const { data } = await http.get<ApiResponse<QuoteAvailability>>(
+        `/api/customer/quotes/${encodeURIComponent(quoteId)}/availability`,
+    );
+    return data.data;
+}
+export async function validateQuotePricing(quoteId: string, revision: number) {
+    const { data } = await http.post<ApiResponse<Quote>>(
+        `/api/customer/quotes/${encodeURIComponent(quoteId)}/validate-pricing`,
+        { revision },
+    );
+    return data.data;
+}
+export async function placeOrderFromQuote(quoteId: string, revision: number) {
+    const { data } = await http.post<ApiResponse<CreatedOrder>>(
+        `/api/customer/quotes/${encodeURIComponent(quoteId)}/orders`,
+        { revision },
+    );
+    return data.data;
+}
+export async function removeQuoteItem(quoteId: string, itemId: string) {
+    const { data } = await http.delete<ApiResponse<Quote>>(
+        `/api/customer/quotes/${encodeURIComponent(quoteId)}/items/${encodeURIComponent(itemId)}`,
+    );
+    return data.data;
+}
+export async function updateQuotePackage(
+    quoteId: string,
+    packageId: string,
+    parcel: Omit<QuotePackage, 'id' | 'shippingFee' | 'distanceMetres'> & {
+        latitude: number;
+        longitude: number;
+    },
+) {
+    const { data } = await http.put<ApiResponse<QuotePackage>>(
+        `/api/customer/quotes/${encodeURIComponent(quoteId)}/packages/${encodeURIComponent(packageId)}`,
+        parcel,
+    );
+    return data.data;
+}
