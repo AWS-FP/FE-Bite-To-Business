@@ -1,55 +1,95 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FLASH_SALE_PRODUCTS, STANDARD_B2B_PRODUCTS } from '../../../constants/customer/homeData';
+import { getHomeProducts, getHomeCategories } from '@/services/customer/homeService';
+import type {
+    HomeProduct,
+    HomeBanner,
+    HomeCategory,
+    HomeCombo,
+} from '@/services/customer/homeService';
+import type { HomeProductCardItem } from '@/constants/customer/homeData';
+import { toCard } from './homeProductMapper';
 
 function useHomePageState() {
     const { t } = useTranslation('storefront');
-    const [secondsLeft, setSecondsLeft] = useState(4 * 3600 + 38 * 60 + 19);
-
-    // State phân trang cho 2 khu vực sản phẩm
+    const [flashProducts, setFlashProducts] = useState<HomeProductCardItem[]>([]);
+    const [standardProducts, setStandardProducts] = useState<HomeProductCardItem[]>([]);
+    const [bestSellingProducts, setBestSellingProducts] = useState<HomeProductCardItem[]>([]);
+    const [deepDiscountProducts, setDeepDiscountProducts] = useState<HomeProductCardItem[]>([]);
+    const [topRatedProducts, setTopRatedProducts] = useState<HomeProductCardItem[]>([]);
+    const [banners, setBanners] = useState<HomeBanner[]>([]);
+    const [combos, setCombos] = useState<HomeCombo[]>([]);
+    const [categories, setCategories] = useState<HomeCategory[]>([]);
+    const [loadingProducts, setLoadingProducts] = useState(true);
+    const [productError, setProductError] = useState(false);
     const [flashPage, setFlashPage] = useState(1);
+    const [standardPage, setStandardPage] = useState(1);
     const flashPageSize = 3;
-    const totalFlashPages = Math.ceil(FLASH_SALE_PRODUCTS.length / flashPageSize);
-    const visibleFlashProducts = FLASH_SALE_PRODUCTS.slice(
+    const standardPageSize = 6;
+    const totalFlashPages = Math.ceil(flashProducts.length / flashPageSize);
+    const totalStandardPages = Math.ceil(standardProducts.length / standardPageSize);
+    const visibleFlashProducts = flashProducts.slice(
         (flashPage - 1) * flashPageSize,
         flashPage * flashPageSize,
     );
-
-    const [standardPage, setStandardPage] = useState(1);
-    const standardPageSize = 6;
-    const totalStandardPages = Math.ceil(STANDARD_B2B_PRODUCTS.length / standardPageSize);
-    const visibleStandardProducts = STANDARD_B2B_PRODUCTS.slice(
+    const visibleStandardProducts = standardProducts.slice(
         (standardPage - 1) * standardPageSize,
         standardPage * standardPageSize,
     );
 
     useEffect(() => {
-        const timer = setInterval(() => {
-            setSecondsLeft((prev) => (prev > 0 ? prev - 1 : 4 * 3600 + 38 * 60 + 19));
-        }, 1000);
-        return () => clearInterval(timer);
+        const controller = new AbortController();
+        // Categories are a separate Customer endpoint; failure should not hide products.
+        getHomeCategories(controller.signal)
+            .then(setCategories)
+            .catch(() => {});
+        getHomeProducts(controller.signal)
+            .then((data) => {
+                const convert = (items: HomeProduct[]) =>
+                    items.map(toCard).filter((item): item is HomeProductCardItem => item !== null);
+                setFlashProducts(convert(data.flashSaleProducts));
+                setStandardProducts(convert(data.featuredProducts));
+                setBestSellingProducts(convert(data.bestSellingProducts));
+                setDeepDiscountProducts(convert(data.deepDiscountProducts));
+                setTopRatedProducts(convert(data.topRatedProducts));
+                setBanners(data.banners);
+                setCombos(data.combos);
+                setProductError(false);
+            })
+            .catch(() => {
+                if (!controller.signal.aborted) setProductError(true);
+            })
+            .finally(() => {
+                if (!controller.signal.aborted) setLoadingProducts(false);
+            });
+        return () => controller.abort();
     }, []);
 
-    const hours = String(Math.floor(secondsLeft / 3600)).padStart(2, '0');
-    const minutes = String(Math.floor((secondsLeft % 3600) / 60)).padStart(2, '0');
-    const seconds = String(secondsLeft % 60).padStart(2, '0');
-
     return {
-        flashPageSize,
-        standardPageSize,
         t,
         flashPage,
         setFlashPage,
-        totalFlashPages,
-        visibleFlashProducts,
         standardPage,
         setStandardPage,
+        flashPageSize,
+        standardPageSize,
+        totalFlashPages,
         totalStandardPages,
+        visibleFlashProducts,
         visibleStandardProducts,
-        hours,
-        minutes,
-        seconds,
+        flashProducts,
+        standardProducts,
+        flashProductCount: flashProducts.length,
+        standardProductCount: standardProducts.length,
+        bestSellingProducts,
+        deepDiscountProducts,
+        topRatedProducts,
+        categories,
+        banners,
+        combos,
+        loadingProducts,
+        productError,
     };
 }
 
@@ -59,6 +99,7 @@ export function HomeModelProvider({ children }: { children: ReactNode }) {
     const model = useHomePageState();
     return <HomeContext.Provider value={model}>{children}</HomeContext.Provider>;
 }
+// eslint-disable-next-line react-refresh/only-export-components
 export function useHomeModelContext() {
     const context = useContext(HomeContext);
     if (!context) throw new Error('Home components require HomeModelProvider');

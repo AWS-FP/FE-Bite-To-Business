@@ -1,65 +1,66 @@
-import { ROUTES } from '../../../router/routes';
-import { useHomeModelContext } from './HomeModel.tsx';
+import { useTranslation } from 'react-i18next';
+import { ROUTES } from '@/router/routes';
+import { useHomeModelContext } from './HomeModel';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { HOME_CATEGORIES } from '../../../constants/customer/homeData';
-import { getCatalogSearchPath } from '../../../constants/catalogNavigation';
-import CategoryArtwork from '../CategoryArtwork.tsx';
+import CategoryArtwork from '../CategoryArtwork';
 
 export default function CategorySection() {
-    const { t } = useHomeModelContext();
+    const { t, categories } = useHomeModelContext();
+    const { i18n } = useTranslation('storefront');
     return (
-        <section className="mx-auto max-w-[1320px] px-5 pt-14 pb-12">
+        <section
+            id="catalog-categories"
+            className="mx-auto max-w-[1320px] scroll-mt-32 px-4 pb-10 pt-12 sm:px-6"
+        >
             <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
                     <span className="block text-xs font-extrabold uppercase tracking-wider text-store-yellow">
-                        {t('homePage.ecosystemTag', '14-CATEGORY B2B FOOD ECOSYSTEM')}
+                        {t('customerUI.categoriesTag')}
                     </span>
-                    <h2 className="m-0 mt-1 font-subheading lining-nums text-4xl font-bold text-store-cream">
+                    <h2 className="m-0 mt-1 font-subheading text-4xl font-bold text-store-cream">
                         {t('homePage.ecosystemTitle', 'Comprehensive Ingredient Catalog')}
                     </h2>
                 </div>
-
                 <Link
                     to={ROUTES.CATALOG}
-                    className="inline-flex items-center gap-2 rounded-xl border-2 border-solid border-store-ink bg-store-cream px-5 py-3 text-xs font-extrabold text-store-ink no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-y-0.5 hover:bg-white"
+                    className="inline-flex items-center gap-2 rounded-xl border-2 border-store-ink bg-store-cream px-5 py-3 text-xs font-extrabold text-store-ink no-underline"
                 >
-                    <span>
-                        {t('homePage.downloadCatalogBtn', 'Download 850+ SKU Catalog (Excel)')}
-                    </span>
-                    <ArrowRight size={15} />
+                    {t('customerUI.showAllProducts')} <ArrowRight size={15} />
                 </Link>
             </div>
-
-            <div className="mt-8 grid gap-4 grid-cols-7">
-                {HOME_CATEGORIES.map((cat) => (
+            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-7">
+                {categories.map((cat) => (
                     <Link
-                        key={cat.key}
-                        to={getCatalogSearchPath(cat.searchKeyword)}
-                        className="group relative flex min-h-[222px] flex-col overflow-hidden rounded-2xl border-2 border-solid border-store-ink bg-white p-3.5 text-store-ink no-underline shadow-sm transition-colors duration-200 hover:bg-surface-yellow"
+                        key={cat.id}
+                        to={`${ROUTES.CATALOG}?category=${encodeURIComponent(cat.id)}`}
+                        className="group relative flex min-h-[206px] flex-col overflow-hidden rounded-2xl border border-store-line bg-white p-4 text-store-ink no-underline shadow-sm transition hover:-translate-y-1 hover:bg-surface-yellow hover:shadow-lg"
                     >
-                        <div className="pointer-events-none absolute right-1 bottom-2 transition-transform duration-300 group-hover:scale-110">
-                            <CategoryArtwork categoryKey={cat.key} iconUrl={cat.iconUrl} />
+                        <div className="pointer-events-none absolute bottom-2 right-1 group-hover:scale-110">
+                            <CategoryArtwork
+                                categoryKey={`${cat.code} ${cat.nameEn} ${cat.nameVi}`}
+                                iconUrl={cat.imageSvg ?? ''}
+                            />
                         </div>
-
-                        <div className="relative z-10">
-                            <span className="inline-block rounded-full border border-solid border-store-ink bg-surface-green px-2.5 py-0.5 text-[10px] font-extrabold text-store-ink">
-                                {cat.skuCount} SKU
-                            </span>
-                        </div>
-
-                        {/* Fixed title and description rows: all 14 titles start at the same height. */}
-                        <div className="relative z-10 mt-auto flex h-[124px] min-w-0 flex-col">
-                            <h3 className="m-0 h-[82px] overflow-hidden font-subheading text-[19px] font-bold leading-[1.08] text-store-ink [font-variant-numeric:lining-nums]">
-                                {t(`categories.${cat.key}`, cat.title)}
+                        <span className="relative z-10 self-start rounded-full border border-store-ink bg-surface-green px-2 py-0.5 text-[10px] font-extrabold">
+                            {cat.productCount} SKU
+                        </span>
+                        <div className="relative z-10 mt-auto min-w-0">
+                            <h3 className="m-0 font-subheading text-[19px] font-bold leading-tight">
+                                {i18n.resolvedLanguage?.startsWith('en') ? cat.nameEn : cat.nameVi}
                             </h3>
-                            <p className="m-0 mt-1 line-clamp-2 min-h-[30px] overflow-hidden text-[11px] leading-[15px] text-store-muted">
-                                {t(`homeCategories.subtitles.${cat.key}`, cat.subtitle)}
+                            <p className="m-0 mt-1 line-clamp-2 text-[11px] text-store-muted">
+                                {(i18n.resolvedLanguage?.startsWith('en')
+                                    ? cat.descriptionEn
+                                    : cat.descriptionVi) ?? ''}
                             </p>
                         </div>
                     </Link>
                 ))}
             </div>
+            {categories.length === 0 && (
+                <p className="text-sm text-white/80">{t('customerUI.emptyCategories')}</p>
+            )}
         </section>
     );
 }

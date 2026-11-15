@@ -1,20 +1,19 @@
 import { BadgeCheck, MapPin } from 'lucide-react';
-import { CHECKOUT_ITEMS, formatDate, formatPrice } from './checkoutData';
-import type { DeliveryPackage } from './checkoutData';
+import { formatDate, formatPrice } from './checkoutData';
+import type { CheckoutItem, DeliveryPackage } from './checkoutData';
 
-type Props = { packages: DeliveryPackage[]; assignments: Record<string, string> };
+type Props = { items: CheckoutItem[]; packages: DeliveryPackage[]; assignments: Record<string, string> };
 
-export default function CheckoutReview({ packages, assignments }: Props) {
+export default function CheckoutReview({ items, packages, assignments }: Props) {
     return (
         <section className="btb-co-panel">
             <div className="btb-co-panel__head">
                 <div className="btb-co-panel__icon btb-co-panel__icon--yellow"><BadgeCheck size={23} /></div>
-                <div><span className="btb-co-overline">BÁO GIÁ DỰ KIẾN · UI DEMO</span><h2>Kiểm tra theo từng điểm giao</h2></div>
+                <div><span className="btb-co-overline">BÁO GIÁ DỰ KIẾN</span><h2>Kiểm tra theo từng điểm giao</h2></div>
             </div>
-            <p className="btb-co-panel__lead">Các món đã được nhóm theo chi nhánh. Giá và phí giao ở đây chỉ để minh họa giao diện, không phải báo giá do hệ thống phát hành.</p>
             <div className="btb-co-stack btb-co-stack--small">
                 {packages.map(delivery => {
-                    const products = CHECKOUT_ITEMS.filter(product => assignments[product.id] === delivery.id);
+                    const products = items.filter(product => assignments[product.id] === delivery.id);
                     const subtotal = products.reduce((sum, product) => sum + product.price, 0);
                     return (
                         <article className="btb-co-quote" key={delivery.id}>

@@ -1,5 +1,5 @@
 import { Box, ClipboardList, Mail, Menu, PackagePlus, Truck, X } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { ROUTES } from '../../router/routes';
 import { useLogistics } from './LogisticsModel.tsx';
 
@@ -15,7 +15,13 @@ export default function LogisticsSidebar({ open, onClose }: { open: boolean; onC
     return <>
         {open && <button type="button" className="lg-sidebar-backdrop" aria-label="Đóng menu" onClick={onClose} />}
         <aside className={`lg-sidebar ${open ? 'lg-sidebar--open' : ''}`}>
-            <div className="lg-brand"><div className="lg-brand-stamp">BTB</div><div><strong>Bite to<br />Business</strong></div><button className="lg-sidebar-close" type="button" aria-label="Đóng menu" onClick={onClose}><X size={18}/></button></div>
+            <div className="lg-brand">
+                <Link to={ROUTES.HOME} onClick={onClose} aria-label="Về trang chủ" className="flex min-h-[98px] items-center gap-2 py-3 text-inherit no-underline">
+                    <img src="/images/storefront/brand-logo.png" alt="" width={88} height={68} className="block w-[88px] shrink-0 object-contain" />
+                    <span className="brand-name flex flex-col text-[24px] leading-[28.8px] tracking-[-0.3px]"><span>Bite to</span><span>Business</span></span>
+                </Link>
+                <button className="lg-sidebar-close" type="button" aria-label="Đóng menu" onClick={onClose}><X size={18}/></button>
+            </div>
             <div className="lg-sidebar-caption">● {language === 'vi' ? 'KHÔNG GIAN QUẢN TRỊ' : 'OPERATIONS WORKSPACE'}</div>
             <nav className="lg-nav" aria-label="Logistics navigation">
                 <div className="lg-nav-label">{language === 'vi' ? 'QUẢN LÝ KHO & TỒN KHO' : 'WAREHOUSE & INVENTORY'}</div>

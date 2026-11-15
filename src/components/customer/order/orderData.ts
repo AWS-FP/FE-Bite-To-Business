@@ -27,7 +27,7 @@ export type OrderRecord = {
     items: OrderLine[];
     packages: DeliveryPackage[];
     assignments: Record<string, string>;
-    paymentMethod: PaymentMethod;
+    paymentMethod: string;
     subtotal: number;
     shipping: number;
     discount: number;
