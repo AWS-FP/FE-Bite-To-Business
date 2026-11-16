@@ -38,7 +38,7 @@ export default function DeliveryTopbar({ onOpenMenu }: { onOpenMenu: () => void 
                 <LanguageSwitcher />
                 <WorkspaceAccountMenu
                     user={session?.user ?? null}
-                    roleLabel={language === 'vi' ? 'Shipper' : 'Delivery Staff'}
+                    roleLabel="Delivery Staff"
                 />
                 <button type="button" className="dl-signout" onClick={signOut}>
                     <LogOut size={16} />

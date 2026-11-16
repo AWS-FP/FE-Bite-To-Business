@@ -18,6 +18,9 @@ interface WorkspaceSidebarProps {
     groups: { label: string; items: NavigationItem[] }[];
     isCollapsed: boolean;
     onToggleCollapse: () => void;
+    sidebarId?: string;
+    className?: string;
+    onNavigate?: () => void;
 }
 
 export default function WorkspaceSidebar({
@@ -26,18 +29,22 @@ export default function WorkspaceSidebar({
     groups,
     isCollapsed,
     onToggleCollapse,
+    sidebarId = 'workspace-sidebar',
+    className = '',
+    onNavigate,
 }: WorkspaceSidebarProps) {
     const { t } = useTranslation('admin');
 
     return (
         <aside
-            className="admin-sidebar sticky top-0 flex h-dvh min-h-[450px] flex-col overflow-y-auto border-r-2 border-black bg-store-cream px-4 pt-[25px] pb-4 [scrollbar-width:thin]"
-            id="workspace-sidebar"
+            className={`admin-sidebar sticky top-0 flex h-dvh min-h-[450px] flex-col overflow-y-auto border-r-2 border-black bg-store-cream px-4 pt-[25px] pb-4 text-black [scrollbar-width:thin] ${className}`}
+            id={sidebarId}
             aria-label={workspaceLabel}
         >
             <Link
                 className="admin-brand flex min-h-[98px] items-center gap-2 px-1 py-3 no-underline [.is-collapsed_&]:justify-center [.is-collapsed_&]:px-0"
                 to={ROUTES.HOME}
+                onClick={onNavigate}
                 aria-label={t('common:home')}
             >
                 <img
@@ -74,6 +81,7 @@ export default function WorkspaceSidebar({
                                 key={item.path}
                                 className="admin-navigation-link relative flex min-h-[51px] items-center gap-[9px] rounded-[3px] border border-black bg-white px-[11px] py-[9px] text-[13px] leading-[18.2px] font-normal no-underline hover:bg-surface-yellow aria-[current=page]:bg-store-yellow aria-[current=page]:font-bold aria-[current=page]:shadow-[3px_3px_0_var(--color-black)] hover:aria-[current=page]:bg-store-yellow [.is-collapsed_&]:justify-center [.is-collapsed_&]:px-2"
                                 to={item.path}
+                                onClick={onNavigate}
                                 title={item.label}
                                 aria-label={item.ariaLabel || item.label}
                             >
@@ -99,7 +107,7 @@ export default function WorkspaceSidebar({
 
             <div className="admin-sidebar-bottom mt-auto pt-12 before:mb-[15px] before:block before:border-t before:border-black before:content-['']">
                 <div className="ml-auto w-fit [.is-collapsed_&]:mr-auto">
-                    <SidebarCollapseButton sidebarId="workspace-sidebar" isCollapsed={isCollapsed} onToggle={onToggleCollapse} />
+                    <SidebarCollapseButton sidebarId={sidebarId} isCollapsed={isCollapsed} onToggle={onToggleCollapse} />
                 </div>
             </div>
         </aside>

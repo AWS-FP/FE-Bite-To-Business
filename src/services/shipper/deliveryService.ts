@@ -60,3 +60,8 @@ export async function claimPackage(packageId: string) {
     );
     return response.data.data;
 }
+
+export async function getPackageDetail(packageId: string) {
+    const response = await http.get<ApiResponse<ClaimedPackage>>(`/api/delivery/packages/${encodeURIComponent(packageId)}`);
+    return response.data.data;
+}

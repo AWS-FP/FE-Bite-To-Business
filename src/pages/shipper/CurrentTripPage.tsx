@@ -1,7 +1,11 @@
 import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import { Package, RefreshCw, Truck } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { routePaths } from '@/router/routes';
 import DeliveryPagination from '@/components/shipper/DeliveryPagination';
+import { SectionHeading } from '@/components/shipper/DeliveryUI';
+import { useDelivery } from '@/components/shipper/DeliveryModel';
 import { claimPackage, getMyPackages, getReadyOrders } from '@/services/shipper/deliveryService';
 import type { ClaimedPackage, Page, ReadyOrder } from '@/services/shipper/deliveryService';
 
@@ -25,6 +29,7 @@ function groupPackages(packages: ClaimedPackage[]) {
 }
 
 export default function CurrentTripPage() {
+    const { language } = useDelivery();
     const [ready, setReady] = useState<Page<ReadyOrder> | null>(null);
     const [mine, setMine] = useState<Page<ClaimedPackage> | null>(null);
     const [readyPage, setReadyPage] = useState(0);
@@ -101,15 +106,12 @@ export default function CurrentTripPage() {
 
     return (
         <div className="space-y-6 text-store-ink">
-            <div className="flex items-end justify-between gap-5">
-                <div>
-                    <h1 className="mb-2 mt-2 font-display text-4xl font-bold">
-                        Đơn hàng giao nhận
-                    </h1>
-                    <p className="m-0 text-sm text-store-muted">
-                        Chọn từng package trong các đơn hàng đã thanh toán.
-                    </p>
-                </div>
+            <SectionHeading
+                number="01"
+                eyebrow={language === 'vi' ? 'QUẢN LÝ GIAO NHẬN' : 'DELIVERY MANAGEMENT'}
+                title={language === 'vi' ? 'Đơn hàng giao nhận' : 'Delivery orders'}
+                description={language === 'vi' ? 'Chọn từng package trong các đơn hàng đã thanh toán.' : 'Choose packages from paid orders.'}
+                action={
                 <button
                     type="button"
                     className="dl-btn"
@@ -120,9 +122,10 @@ export default function CurrentTripPage() {
                         void load();
                     }}
                 >
-                    <RefreshCw size={15} /> Làm mới
+                    <RefreshCw size={15} /> {language === 'vi' ? 'Làm mới' : 'Refresh'}
                 </button>
-            </div>
+                }
+            />
             {error && (
                 <p
                     role="alert"
@@ -197,9 +200,7 @@ export default function CurrentTripPage() {
                                                 </p>
                                             )}
                                         </div>
-                                        <span className="rounded-lg bg-store-cream px-3 py-1 text-xs font-bold">
-                                            {parcel.cancelled ? 'Đã hủy' : 'Đã nhận'}
-                                        </span>
+                                        <Link className="dl-btn" to={routePaths.deliveryTripDetail(parcel.packageId)}>Xem chi tiết</Link>
                                     </div>
                                 ))}
                             </div>

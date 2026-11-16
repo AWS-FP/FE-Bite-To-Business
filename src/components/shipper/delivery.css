@@ -38,3 +38,12 @@
 .dl-workspace .dl-signout{height:53px;background:var(--color-danger);color:var(--color-black);box-shadow:none}
 .dl-workspace .dl-signout:hover{filter:brightness(.95)}
 
+@media (min-width: 761px) {
+  .dl-workspace { grid-template-columns: 272px minmax(0, 1fr); }
+  .dl-workspace.is-collapsed { grid-template-columns: 84px minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .dl-shared-sidebar { position: fixed; left: 0; top: 0; z-index: 100; width: min(272px, 85vw); transform: translateX(-105%); transition: transform .2s; }
+  .dl-shared-sidebar--open { transform: translateX(0); }
+}
+

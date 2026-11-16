@@ -24,7 +24,7 @@
         "departments": {
             "ECOMMERCE_EXECUTIVE": "E-commerce",
             "LOGISTICS_STAFF": "Logistic",
-            "DELIVERY_STAFF": "Shipper"
+            "DELIVERY_STAFF": "Delivery Staff"
         },
         "listTitle": "Danh sách nhân viên",
         "tableLabel": "Danh sách tài khoản Staff",
@@ -67,7 +67,7 @@
         "roles": {
             "ECOMMERCE_EXECUTIVE": "Nhân viên E-commerce",
             "LOGISTICS_STAFF": "Nhân viên Logistic",
-            "DELIVERY_STAFF": "Nhân viên giao hàng (Shipper)"
+            "DELIVERY_STAFF": "Delivery Staff"
         }
     }
 }

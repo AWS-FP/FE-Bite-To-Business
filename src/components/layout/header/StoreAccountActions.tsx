@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import NotificationSystem from '../../customer/NotificationSystem';
 import { formatCurrencyVnd } from '../../../constants/customer/homeData';
-import { getRoleHome, getWorkspaceHome, ROUTES } from '../../../router/routes';
+import { getWorkspaceHome, ROUTES } from '../../../router/routes';
 import { useAuthStore } from '../../../store/admin/authStore';
 import { useCartStore } from '../../../store/customer/cartStore';
 import GuestHeaderActions from './GuestHeaderActions';
@@ -36,7 +36,6 @@ export default function StoreAccountActions() {
     const totalItemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
     const subtotalAmount = cartItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
-    let accountPath: string = ROUTES.LOGIN;
     let displayName = '';
     let subLabel = '';
     let accountLabel = t('header.login');
@@ -46,8 +45,6 @@ export default function StoreAccountActions() {
         displayName = `${user.lastName} ${user.firstName}`.trim() || user.email;
         subLabel = user.email;
         accountLabel = t('header.account', { name: displayName });
-        accountPath = getRoleHome(user.role);
-        if (user.role === 'CUSTOMER') accountPath = ROUTES.PROFILE;
         initials = `${user.lastName.charAt(0)}${user.firstName.charAt(0)}`.toUpperCase();
         if (!initials) initials = user.email.charAt(0).toUpperCase();
     }
@@ -73,9 +70,9 @@ export default function StoreAccountActions() {
         <div ref={dropdownRef} className="relative flex shrink-0 items-center gap-2.5">
             <Link
                 className="hidden min-h-[40px] items-center justify-center rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3.5 text-[12px] font-bold text-store-ink no-underline shadow-[2px_2px_0_var(--color-store-ink)] hover:bg-store-yellow min-[1280px]:flex"
-                to={isLoggedIn ? accountPath : ROUTES.REGISTER}
+                to={ROUTES.CATALOG}
             >
-                {t('header.wholesale')}
+                {t('header.quickOrder')}
             </Link>
 
             {!isLoggedIn && <GuestHeaderActions t={t} />}

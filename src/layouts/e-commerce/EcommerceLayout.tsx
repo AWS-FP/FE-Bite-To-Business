@@ -68,7 +68,7 @@ function EcommerceWorkspace() {
 
     return (
         <div
-            className={`admin-layout grid min-h-dvh bg-surface-soft font-body text-black [&_button]:cursor-pointer [&_a]:text-inherit [&_p]:m-0 [&_h1]:m-0 [&_h2]:m-0 [&_button:focus-visible]:outline-[3px_solid_var(--color-status-active)] [&_button:focus-visible]:outline-offset-4 [&_a:focus-visible]:outline-[3px_solid_var(--color-status-active)] [&_a:focus-visible]:outline-offset-4 ${isCollapsed ? 'is-collapsed grid-cols-[84px_minmax(0,1fr)]' : 'grid-cols-[195px_minmax(0,1fr)]'}`}
+            className={`admin-layout grid min-h-dvh bg-surface-soft font-body text-black [&_button]:cursor-pointer [&_a]:text-inherit [&_p]:m-0 [&_h1]:m-0 [&_h2]:m-0 [&_button:focus-visible]:outline-[3px_solid_var(--color-status-active)] [&_button:focus-visible]:outline-offset-4 [&_a:focus-visible]:outline-[3px_solid_var(--color-status-active)] [&_a:focus-visible]:outline-offset-4 ${isCollapsed ? 'is-collapsed grid-cols-[84px_minmax(0,1fr)]' : 'grid-cols-[272px_minmax(0,1fr)]'}`}
             data-layout="staff"
             data-role="ECOMMERCE_EXECUTIVE"
         >
