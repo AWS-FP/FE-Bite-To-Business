@@ -1,5 +1,6 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DEMO_INVENTORY, DEMO_MOVEMENTS, DEMO_ORDERS, DEMO_REQUESTS } from '../../constants/logistic/demoData';
 import type { DeliveryOrder, InventoryItem, ProductRequest, ReceiveInput, StockMovement } from '../../types/logistic/logistics.ts';
 
@@ -10,7 +11,6 @@ interface LogisticsContextValue {
     orders: DeliveryOrder[];
     requests: ProductRequest[];
     language: Language;
-    setLanguage: (language: Language) => void;
     receiveOpen: boolean;
     setReceiveOpen: (open: boolean) => void;
     receiveSku: string;
@@ -32,7 +32,8 @@ export function LogisticsProvider({ children }: { children: ReactNode }) {
     const [movements, setMovements] = useState<StockMovement[]>(() => DEMO_MOVEMENTS.map(x => ({ ...x })));
     const [orders, setOrders] = useState<DeliveryOrder[]>(() => DEMO_ORDERS.map(x => ({ ...x })));
     const [requests, setRequests] = useState<ProductRequest[]>(() => DEMO_REQUESTS.map(x => ({ ...x })));
-    const [language, setLanguage] = useState<Language>('vi');
+    const { i18n } = useTranslation();
+    const language: Language = i18n.resolvedLanguage === 'vi' ? 'vi' : 'en';
     const [receiveOpen, setReceiveOpen] = useState(false);
     const [receiveSku, setReceiveSku] = useState(DEMO_INVENTORY[0].sku);
     const [dispatchId, setDispatchId] = useState<string | null>(null);
@@ -64,9 +65,10 @@ export function LogisticsProvider({ children }: { children: ReactNode }) {
         setOrders(DEMO_ORDERS.map(x => ({ ...x })));
         setRequests(DEMO_REQUESTS.map(x => ({ ...x })));
     }
-    const value = useMemo(() => ({ inventory, movements, orders, requests, language, setLanguage, receiveOpen, setReceiveOpen, receiveSku, openReceive, dispatchId, setDispatchId, replyId, setReplyId, receiveStock, assignDispatch, sendReply, resetDemo }), [inventory, movements, orders, requests, language, receiveOpen, receiveSku, dispatchId, replyId]);
+    const value = { inventory, movements, orders, requests, language, receiveOpen, setReceiveOpen, receiveSku, openReceive, dispatchId, setDispatchId, replyId, setReplyId, receiveStock, assignDispatch, sendReply, resetDemo };
     return <LogisticsContext.Provider value={value}>{children}</LogisticsContext.Provider>;
 }
+// eslint-disable-next-line react-refresh/only-export-components
 export function useLogistics() {
     const value = useContext(LogisticsContext);
     if (!value) throw new Error('useLogistics must be used inside LogisticsProvider');

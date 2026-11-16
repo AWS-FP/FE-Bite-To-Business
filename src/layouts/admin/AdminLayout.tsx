@@ -47,14 +47,11 @@ function AdminWorkspace() {
     const statsQuery = useRegistrationStats();
     const queryClient = useQueryClient();
     const loggingOut = useRef(false);
-    let pageLabel = t('navigation.registrations');
     let sectionNumber = '01';
     if (location.pathname.startsWith(ROUTES.ADMIN_STAFF)) {
-        pageLabel = t('navigation.staff');
         sectionNumber = '02';
     }
     if (location.pathname.startsWith(ROUTES.ADMIN_SYSTEM)) {
-        pageLabel = t('navigation.system');
         sectionNumber = '03';
     }
 
@@ -97,7 +94,6 @@ function AdminWorkspace() {
                 <AdminHeader
                     user={user}
                     sectionNumber={sectionNumber}
-                    pageLabel={pageLabel}
                     onLogout={handleLogout}
                 />
                 <main

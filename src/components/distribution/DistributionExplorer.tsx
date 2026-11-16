@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowRight, MapPin, Navigation, Search, Truck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import type { LngLatBoundsLike, Map, Marker } from '@vietmap/vietmap-gl-js/dist/vietmap-gl';
+import type { Map, Marker } from '@vietmap/vietmap-gl-js/dist/vietmap-gl';
+import { deliveryMapCities } from '@/utils/deliveryMapCities';
 import { ROUTES } from '@/router/routes';
 import { publicHttp } from '@/services/axiosClient';
 import { addressToCoordinates, coordinatesToAddress } from '@/services/geocodingService';
@@ -21,19 +22,11 @@ type Estimate = {
 const branches = {
     hcm: {
         name: 'Bitexco Financial Tower',
-        origin: [106.70418, 10.77172] as [number, number],
-        bounds: [
-            [106 + 22 / 60, 10 + 38 / 60],
-            [106 + 56 / 60, 11 + 10 / 60],
-        ] as LngLatBoundsLike,
+        ...deliveryMapCities.hcm,
     },
     hanoi: {
         name: 'Grand Terra',
-        origin: [105.8295441, 21.0292789] as [number, number],
-        bounds: [
-            [105 + 44 / 60, 20 + 53 / 60],
-            [106 + 2 / 60, 21 + 23 / 60],
-        ] as LngLatBoundsLike,
+        ...deliveryMapCities.hanoi,
     },
 };
 const tileKey = import.meta.env.VITE_VIETMAP_TILEMAP_KEY?.trim() ?? '';

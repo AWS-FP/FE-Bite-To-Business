@@ -31,6 +31,7 @@ import OrderStatusPage from '@/pages/customer/order/OrderStatusPage';
 import DeliveryLayout from '@/layouts/shipper/DeliveryLayout';
 import CurrentTripPage from '@/pages/shipper/CurrentTripPage';
 import DeliveryHistoryPage from '@/pages/shipper/DeliveryHistoryPage';
+import DeliveryPackagePage from '@/pages/shipper/DeliveryPackagePage';
 
 // Logistics Pages
 import LogisticsLayout from '@/layouts/logistic/LogisticsLayout';
@@ -311,7 +312,7 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: ROUTES.DELIVERY_TRIP_DETAIL,
-                        Component: CurrentTripPage,
+                        Component: DeliveryPackagePage,
                     },
                 ],
             },

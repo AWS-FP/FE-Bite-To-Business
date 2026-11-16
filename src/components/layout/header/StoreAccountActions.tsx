@@ -2,8 +2,6 @@ import {
     History,
     LayoutDashboard,
     LogOut,
-    Minus,
-    Plus,
     ReceiptText,
     Settings,
     ShoppingCart,
@@ -14,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import NotificationSystem from '../../customer/NotificationSystem';
 import { formatCurrencyVnd } from '../../../constants/customer/homeData';
-import { getRoleHome, getWorkspaceHome, ROUTES } from '../../../router/routes';
+import { getWorkspaceHome, ROUTES } from '../../../router/routes';
 import { useAuthStore } from '../../../store/admin/authStore';
 import { useCartStore } from '../../../store/customer/cartStore';
 import GuestHeaderActions from './GuestHeaderActions';
@@ -26,21 +24,18 @@ export default function StoreAccountActions() {
     const user = session?.user;
     const workspacePath = user ? getWorkspaceHome(user.role) : null;
 
-    // Dùng chung 1 state duy nhất cho cả 3 dropdown để không bao giờ bị đè lên nhau
-    const [openDropdown, setOpenDropdown] = useState<'cart' | 'notifications' | 'profile' | null>(
+    const [openDropdown, setOpenDropdown] = useState<'notifications' | 'profile' | null>(
         null,
     );
 
     const dropdownRef = useRef<HTMLDivElement>(null);
     const cartItems = useCartStore((state) => state.items);
-    const updateCartQuantity = useCartStore((state) => state.updateQuantity);
 
     const isLoggedIn = Boolean(user);
 
     const totalItemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
     const subtotalAmount = cartItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
-    let accountPath: string = ROUTES.LOGIN;
     let displayName = '';
     let subLabel = '';
     let accountLabel = t('header.login');
@@ -50,8 +45,6 @@ export default function StoreAccountActions() {
         displayName = `${user.lastName} ${user.firstName}`.trim() || user.email;
         subLabel = user.email;
         accountLabel = t('header.account', { name: displayName });
-        accountPath = getRoleHome(user.role);
-        if (user.role === 'CUSTOMER') accountPath = ROUTES.PROFILE;
         initials = `${user.lastName.charAt(0)}${user.firstName.charAt(0)}`.toUpperCase();
         if (!initials) initials = user.email.charAt(0).toUpperCase();
     }
@@ -77,37 +70,38 @@ export default function StoreAccountActions() {
         <div ref={dropdownRef} className="relative flex shrink-0 items-center gap-2.5">
             <Link
                 className="hidden min-h-[40px] items-center justify-center rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3.5 text-[12px] font-bold text-store-ink no-underline shadow-[2px_2px_0_var(--color-store-ink)] hover:bg-store-yellow min-[1280px]:flex"
-                to={isLoggedIn ? accountPath : ROUTES.REGISTER}
+                to={ROUTES.CATALOG}
             >
-                {t('header.wholesale')}
+                {t('header.quickOrder')}
             </Link>
 
             {!isLoggedIn && <GuestHeaderActions t={t} />}
 
             {isLoggedIn && (
                 <>
-                    {/* 1. Cart Button */}
-                    <button
-                        type="button"
-                        onClick={() => setOpenDropdown((prev) => (prev === 'cart' ? null : 'cart'))}
+                    <Link
+                        to={ROUTES.QUOTES}
+                        onClick={() => setOpenDropdown(null)}
                         aria-label={t('header.quote')}
-                        className="flex min-h-[42px] cursor-pointer items-center justify-center gap-2.5 rounded-full border-2 border-solid border-store-ink bg-store-cream px-3.5 py-1 text-left text-store-ink shadow-[2px_2px_0_var(--color-store-ink)] hover:bg-white"
+                        className="relative flex min-h-[42px] cursor-pointer items-center justify-center gap-2.5 rounded-full border-2 border-solid border-store-ink bg-store-cream px-3.5 py-1 text-left text-store-ink no-underline shadow-[2px_2px_0_var(--color-store-ink)] hover:bg-white"
                     >
-                        <div className="relative flex items-center pr-2 border-0 border-r border-solid border-store-ink/25">
+                        <div className="flex items-center pr-2 border-0 border-r border-solid border-store-ink/25">
                             <ShoppingCart size={18} className="text-store-ink" />
-                            <span className="absolute -top-2 -right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full border border-solid border-store-ink bg-danger px-1 text-[10px] font-extrabold text-white">
-                                {totalItemsCount}
-                            </span>
                         </div>
                         <div className="leading-tight">
                             <span className="block text-[10px] font-medium text-store-muted">
-                                Estimated Order
+                                {t('header.estimatedOrder')}
                             </span>
                             <span className="block text-xs font-black text-store-ink">
                                 {formatCurrencyVnd(subtotalAmount)}
                             </span>
                         </div>
-                    </button>
+                        {totalItemsCount > 0 && (
+                            <span className="absolute -top-1.5 -right-1.5 flex h-[19px] min-w-[19px] items-center justify-center rounded-full border-2 border-solid border-store-green bg-danger px-1 text-[10px] leading-none font-black text-white">
+                                {totalItemsCount > 9 ? '9+' : totalItemsCount}
+                            </span>
+                        )}
+                    </Link>
 
                     {/* 2. Notification Bell (Chia sẻ chung state openDropdown) */}
                     <NotificationSystem
@@ -281,6 +275,7 @@ export default function StoreAccountActions() {
                                 <span>{t('profileDropdown.workspace')}</span>
                             </Link>
                         )}
+                        {user?.role === 'CUSTOMER' && <>
                         <Link
                             to={ROUTES.QUOTES}
                             onClick={() => setOpenDropdown(null)}
@@ -305,11 +300,13 @@ export default function StoreAccountActions() {
                             <Users size={15} className="text-store-ink" />
                             <span>{t('profileDropdown.customQuotes')}</span>
                         </Link>
+                        </>}
                     </div>
 
                     <div className="py-1.5">
                         <Link
-                            to={ROUTES.PROFILE}
+                            to={workspacePath || ROUTES.PROFILE}
+                            state={workspacePath ? { openAccountSettings: true } : undefined}
                             onClick={() => setOpenDropdown(null)}
                             className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-store-ink no-underline transition-colors hover:bg-store-ink/10"
                         >

@@ -5,7 +5,6 @@ import WorkspaceHeader from '../WorkspaceHeader';
 interface AdminHeaderProps {
     user: AuthUser | null;
     sectionNumber: string;
-    pageLabel: string;
     onLogout: () => void;
 }
 
