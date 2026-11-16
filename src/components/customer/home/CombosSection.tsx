@@ -1,87 +1,77 @@
-import { useHomeModelContext } from './HomeModel.tsx';
-import { Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { HOME_COMBO_PLANS } from '../../../constants/customer/homeData';
+import { useTranslation } from 'react-i18next';
+import { useHomeModelContext } from './HomeModel';
+import { formatCurrencyVnd } from '@/constants/customer/homeData';
 
 export default function CombosSection() {
-    const { t } = useHomeModelContext();
+    const { combos } = useHomeModelContext();
+    const { t, i18n } = useTranslation('storefront');
+    const english = i18n.resolvedLanguage?.startsWith('en');
     return (
         <section id="fb-combo-packages" className="mx-auto max-w-[1320px] px-5 pt-12 pb-8">
-            <div>
-                <span className="block text-xs font-extrabold uppercase tracking-wider text-store-yellow">
-                    {t('homePage.comboTag', 'SAVE UP TO 20% WITH BUNDLED PACKAGES')}
-                </span>
-                <h2 className="m-0 mt-1 font-subheading lining-nums text-4xl font-bold text-store-cream">
-                    {t('homePage.comboTitle', 'Home Kitchen & F&B Ingredient Combos')}
-                </h2>
-            </div>
-
-            <div className="mt-7 grid grid-cols-3 gap-6">
-                {HOME_COMBO_PLANS.map((combo) => (
-                    <div
-                        key={combo.id}
-                        className={`flex h-full flex-col rounded-[22px] border-2 border-solid border-store-ink ${combo.cardBg} p-6 text-store-ink shadow-[6px_6px_0_var(--color-store-ink)]`}
+            <h2 className="m-0 font-subheading text-4xl font-bold text-store-cream">
+                {t('customerUI.comboTitle')}
+            </h2>
+            <div className="mt-7 grid gap-6 md:grid-cols-3">
+                {combos.map((combo) => (
+                    <article
+                        key={combo.productId}
+                        className="flex flex-col overflow-hidden rounded-[22px] bg-white text-store-ink shadow-[0_12px_24px_rgba(0,0,0,.13)]"
                     >
-                        <div>
-                            <div className="flex items-center justify-between gap-2">
-                                <span
-                                    className={`rounded-full border border-solid border-store-ink ${combo.audienceBadgeBg} px-3 py-1 text-[10px] font-extrabold uppercase`}
-                                >
-                                    {t(`homeCombos.${combo.id}.audienceBadge`, combo.audienceBadge)}
-                                </span>
-                                <span className="text-xs font-extrabold text-danger">
-                                    {t(`homeCombos.${combo.id}.highlightText`, combo.highlightText)}
-                                </span>
-                            </div>
-
-                            <h3 className="m-0 mt-4 font-subheading lining-nums text-xl font-bold">
-                                {t(`homeCombos.${combo.id}.title`, combo.title)}
+                        <div className="h-48 bg-store-cream">
+                            {combo.imageUrl ? (
+                                <img
+                                    src={combo.imageUrl}
+                                    alt={english ? combo.nameEn : combo.nameVi}
+                                    className="h-full w-full object-cover"
+                                />
+                            ) : null}
+                        </div>
+                        <div className="flex flex-1 flex-col gap-3 p-5">
+                            <span className="text-[11px] font-bold text-store-muted">
+                                {t('customerUI.comboServings', {
+                                    count: combo.servingCount ?? 0,
+                                    ingredients: combo.items.length,
+                                })}
+                            </span>
+                            <h3 className="m-0 font-subheading text-xl font-bold">
+                                {english ? combo.nameEn : combo.nameVi}
                             </h3>
-                            <p className="m-0 mt-1.5 text-xs leading-relaxed text-store-muted">
-                                {t(`homeCombos.${combo.id}.description`, combo.description)}
-                            </p>
-
-                            <ul className="mt-4 list-none space-y-2 rounded-xl border border-solid border-store-ink/20 bg-white/80 p-4 text-xs">
-                                {combo.features.map((feat, index) => (
-                                    <li key={feat} className="flex items-start gap-2">
-                                        <Check size={14} className="mt-0.5 shrink-0 text-success" />
-                                        <span>
-                                            {t(`homeCombos.${combo.id}.features.${index}`, feat)}
-                                        </span>
+                            <ul className="m-0 list-disc pl-5 text-xs text-store-muted">
+                                {combo.items.slice(0, 4).map((item) => (
+                                    <li key={item.productId}>
+                                        {english ? item.nameEn?.trim() || item.sku : item.nameVi} ×{' '}
+                                        {item.quantity}
                                     </li>
                                 ))}
                             </ul>
-                        </div>
-
-                        {/* Fixed footer rows: notes, then price and CTA. */}
-                        <div className="mt-auto grid grid-rows-[24px_56px] border-0 border-t border-solid border-store-ink/15 pt-4">
-                            <p
-                                className={`font-price m-0 flex h-6 items-center text-[11px] leading-5 text-store-muted ${combo.oldPrice ? 'line-through' : ''}`}
-                            >
-                                {t(`homeCombos.${combo.id}.priceNote`, combo.priceNote)}
-                            </p>
-
-                            <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
-                                <div className="flex min-w-0 items-baseline gap-1 whitespace-nowrap">
-                                    {/* Use Inter (font-price), NOT font-['Times_New_Roman',Georgia,serif] lining-nums: lining digits share one baseline. */}
-                                    <span className="font-price text-[24px] font-extrabold leading-none lining-nums tabular-nums tracking-tight text-store-ink">
-                                        {combo.price}
-                                    </span>
-                                    <span className="text-xs leading-none text-store-muted">
-                                        {t(`homeCombos.${combo.id}.unit`, combo.unit)}
-                                    </span>
+                            <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-3">
+                                <div>
+                                    <strong className="font-price text-2xl">
+                                        {formatCurrencyVnd(combo.salePrice ?? combo.listPrice ?? 0)}
+                                    </strong>
+                                    <p className="m-0 text-[11px] text-store-muted">
+                                        {combo.availableQuantity > 0
+                                            ? t('customerUI.comboAvailable', {
+                                                  count: combo.availableQuantity,
+                                              })
+                                            : t('customerUI.comboSoldOut')}
+                                    </p>
                                 </div>
                                 <Link
-                                    to={combo.ctaLink}
-                                    className="inline-flex min-h-10 shrink-0 items-center justify-center whitespace-nowrap rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3 py-2 text-[11px] font-extrabold text-store-ink no-underline transition-colors hover:bg-store-yellow"
+                                    to={`/products/${combo.productId}`}
+                                    className="rounded-full bg-store-yellow px-4 py-2 text-xs font-bold text-store-ink no-underline"
                                 >
-                                    {t(`homeCombos.${combo.id}.ctaLabel`, combo.ctaLabel)}
+                                    {t('customerUI.comboDetails')}
                                 </Link>
                             </div>
                         </div>
-                    </div>
+                    </article>
                 ))}
             </div>
+            {combos.length === 0 && (
+                <p className="text-sm text-white/80">{t('customerUI.comboEmpty')}</p>
+            )}
         </section>
     );
 }

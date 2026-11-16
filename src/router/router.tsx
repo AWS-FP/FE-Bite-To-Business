@@ -1,4 +1,3 @@
-
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import { AUTH_ROLES } from '@/constants/roles';
@@ -20,6 +19,8 @@ import BrandDetailPage from '@/pages/BrandDetailPage';
 
 // Customer Pages
 import ProfilePage from '@/pages/customer/ProfilePage';
+import CustomerCatalogPage from '@/pages/customer/CustomerCatalogPage';
+import CustomerCollectionPage from '@/pages/customer/CustomerCollectionPage';
 import CartPage from '@/pages/CartPage';
 
 // Orders Pages - NEW
@@ -115,7 +116,11 @@ export const router = createBrowserRouter([
     },
     {
         path: ROUTES.CATALOG,
-        Component: PendingPage,
+        Component: CustomerCatalogPage,
+    },
+    {
+        path: ROUTES.CUSTOMER_COLLECTION,
+        Component: CustomerCollectionPage,
     },
     {
         path: ROUTES.PRODUCT_DETAIL,
@@ -140,11 +145,7 @@ export const router = createBrowserRouter([
     // Cần đăng nhập với role CUSTOMER
     // ==========================================
     {
-        element: (
-            <ProtectedRoute
-                allowedRoles={[AUTH_ROLES.CUSTOMER]}
-            />
-        ),
+        element: <ProtectedRoute allowedRoles={[AUTH_ROLES.CUSTOMER]} />,
 
         children: [
             {
@@ -179,11 +180,7 @@ export const router = createBrowserRouter([
     // 4. ADMIN
     // ==========================================
     {
-        element: (
-            <ProtectedRoute
-                allowedRoles={[AUTH_ROLES.ADMIN]}
-            />
-        ),
+        element: <ProtectedRoute allowedRoles={[AUTH_ROLES.ADMIN]} />,
 
         children: [
             {
@@ -193,12 +190,7 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         index: true,
-                        element: (
-                            <Navigate
-                                to={ROUTES.ADMIN_REGISTRATIONS}
-                                replace
-                            />
-                        ),
+                        element: <Navigate to={ROUTES.ADMIN_REGISTRATIONS} replace />,
                     },
                     {
                         path: ROUTES.ADMIN_REGISTRATIONS,
@@ -228,11 +220,7 @@ export const router = createBrowserRouter([
     // 5. E-COMMERCE EXECUTIVE
     // ==========================================
     {
-        element: (
-            <ProtectedRoute
-                allowedRoles={[AUTH_ROLES.ECOMMERCE_EXECUTIVE]}
-            />
-        ),
+        element: <ProtectedRoute allowedRoles={[AUTH_ROLES.ECOMMERCE_EXECUTIVE]} />,
 
         children: [
             {
@@ -244,10 +232,16 @@ export const router = createBrowserRouter([
                         index: true,
                         element: <Navigate to={ROUTES.ECOMMERCE_DASHBOARD} replace />,
                     },
-                    { path: ROUTES.ECOMMERCE_DASHBOARD, Component: EcommerceDashboardPage },
+                    {
+                        path: ROUTES.ECOMMERCE_DASHBOARD,
+                        Component: EcommerceDashboardPage,
+                    },
                     { path: ROUTES.ECOMMERCE_QUOTES, Component: EcommerceQuotesPage },
                     { path: ROUTES.ECOMMERCE_PRODUCTS, Component: EcommerceProductsPage },
-                    { path: ROUTES.ECOMMERCE_PROMOTIONS, Component: EcommercePromotionsPage },
+                    {
+                        path: ROUTES.ECOMMERCE_PROMOTIONS,
+                        Component: EcommercePromotionsPage,
+                    },
                     { path: ROUTES.ECOMMERCE_COUPONS, Component: EcommerceCouponsPage },
                     { path: ROUTES.ECOMMERCE_POSTER, Component: EcommercePosterPage },
                 ],
@@ -259,11 +253,7 @@ export const router = createBrowserRouter([
     // 6. LOGISTICS STAFF
     // ==========================================
     {
-        element: (
-            <ProtectedRoute
-                allowedRoles={[AUTH_ROLES.LOGISTICS_STAFF]}
-            />
-        ),
+        element: <ProtectedRoute allowedRoles={[AUTH_ROLES.LOGISTICS_STAFF]} />,
 
         children: [
             {
@@ -273,12 +263,7 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         index: true,
-                        element: (
-                            <Navigate
-                                to={ROUTES.LOGISTICS_INVENTORY}
-                                replace
-                            />
-                        ),
+                        element: <Navigate to={ROUTES.LOGISTICS_INVENTORY} replace />,
                     },
                     {
                         path: ROUTES.LOGISTICS_INVENTORY,
@@ -305,11 +290,7 @@ export const router = createBrowserRouter([
     // 7. DELIVERY STAFF
     // ==========================================
     {
-        element: (
-            <ProtectedRoute
-                allowedRoles={[AUTH_ROLES.DELIVERY_STAFF]}
-            />
-        ),
+        element: <ProtectedRoute allowedRoles={[AUTH_ROLES.DELIVERY_STAFF]} />,
 
         children: [
             {
@@ -319,12 +300,7 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         index: true,
-                        element: (
-                            <Navigate
-                                to={ROUTES.DELIVERY_TRIPS}
-                                replace
-                            />
-                        ),
+                        element: <Navigate to={ROUTES.DELIVERY_TRIPS} replace />,
                     },
                     {
                         path: ROUTES.DELIVERY_TRIPS,
@@ -348,11 +324,6 @@ export const router = createBrowserRouter([
     // ==========================================
     {
         path: '*',
-        element: (
-            <Navigate
-                to={ROUTES.HOME}
-                replace
-            />
-        ),
+        element: <Navigate to={ROUTES.HOME} replace />,
     },
 ]);

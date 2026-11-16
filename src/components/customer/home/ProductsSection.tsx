@@ -1,108 +1,153 @@
-import { useHomeModelContext } from './HomeModel.tsx';
-import ProductShowcaseCard from './ProductShowcaseCard.tsx';
-import SectionPaginationBar from './SectionPaginationBar.tsx';
+import { ArrowRight, Clock3, Sparkles, TrendingUp, BadgePercent, Star } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useHomeModelContext } from './HomeModel';
+import ProductCarousel from './ProductCarousel';
 
 export default function ProductsSection() {
     const {
-        flashPageSize,
-        standardPageSize,
         t,
-        flashPage,
-        setFlashPage,
-        totalFlashPages,
-        visibleFlashProducts,
-        standardPage,
-        setStandardPage,
-        totalStandardPages,
-        visibleStandardProducts,
-        flashProductCount,
-        standardProductCount,
         loadingProducts,
         productError,
+        flashProducts,
+        standardProducts,
+        bestSellingProducts,
+        deepDiscountProducts,
+        topRatedProducts,
     } = useHomeModelContext();
+    const groups = [
+        {
+            id: 'best-selling-products',
+            title: t('customerUI.bestSelling'),
+            hint: t('customerUI.bestSellingHint'),
+            products: bestSellingProducts,
+            icon: TrendingUp,
+            url: '/collections/best-selling',
+        },
+        {
+            id: 'deep-discount-products',
+            title: t('customerUI.deepDiscount'),
+            hint: t('customerUI.deepDiscountHint'),
+            products: deepDiscountProducts,
+            icon: BadgePercent,
+            url: '/collections/deep-discount',
+        },
+        {
+            id: 'top-rated-products',
+            title: t('customerUI.topRated'),
+            hint: t('customerUI.topRatedHint'),
+            products: topRatedProducts,
+            icon: Star,
+            url: '/collections/top-rated',
+        },
+    ];
     return (
-        <section className="mx-auto max-w-[1320px] px-5 py-6">
-            <div className="rounded-[28px] border-2 border-solid border-store-ink bg-store-cream p-10 text-store-ink shadow-[8px_8px_0_var(--color-store-ink)]">
-                {/* 4A: EARLY MARKET FLASH DEALS */}
-                <div id="early-market-deals">
-                    <div className="flex flex-wrap items-end justify-between gap-4">
-                        <div>
-                            <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-store-ink bg-danger px-3 py-1 text-[10px] font-extrabold uppercase text-white shadow-[2px_2px_0_var(--color-store-ink)]">
-                                <span className="h-2 w-2 rounded-full bg-white" />
-                                <span>{t('homePage.clearanceBadge', 'WHOLESALE CLEARANCE')}</span>
-                            </span>
-                            <h2 className="m-0 mt-2 font-subheading lining-nums text-3xl font-bold text-store-ink">
-                                {t(
-                                    'homePage.flashDealsTitle',
-                                    'Early Market Flash Deals — Daily Specials',
-                                )}
-                            </h2>
-                        </div>
-
-                    </div>
-
-                    {loadingProducts && <p>{t('homePage.productsLoading')}</p>}
-                    {productError && <p role="alert">{t('homePage.productsError')}</p>}
-                    {!loadingProducts && !productError && flashProductCount === 0 && <p>{t('homePage.flashEmpty')}</p>}
-
-                    <div className="mt-7 grid gap-6 grid-cols-3">
-                        {visibleFlashProducts.map((product) => (
-                            <ProductShowcaseCard
-                                key={product.id}
-                                product={product}
-                                section="flash"
-                            />
-                        ))}
-                    </div>
-
-                    {/* Pagination Bar for Flash Deals */}
-                    <SectionPaginationBar
-                        currentPage={flashPage}
-                        totalPages={totalFlashPages}
-                        totalItems={flashProductCount}
-                        pageSize={flashPageSize}
-                        onPageChange={setFlashPage}
-                    />
+        <section className="mx-auto max-w-[1320px] space-y-8 px-4 py-9 sm:px-6">
+            <div
+                id="early-market-deals"
+                className="rounded-[24px] bg-store-cream px-4 py-6 text-store-ink shadow-lg sm:px-6"
+            >
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h2 className="m-0 inline-flex items-center gap-2 font-subheading text-xl font-extrabold sm:text-2xl">
+                        <BadgePercent className="text-store-green" />
+                        {t('homePage.flashDealsTitle')}
+                    </h2>
+                    <Link
+                        to="/collections/deals"
+                        className="inline-flex items-center gap-1 text-sm font-bold text-store-green no-underline hover:underline"
+                    >
+                        {t('customerUI.viewAll')}
+                        <ArrowRight size={16} />
+                    </Link>
                 </div>
-
-                <hr className="my-12 border-0 border-t border-dashed border-store-ink/35" />
-
-                {/* 4B: B2B STANDARD FOOD SUPPLY */}
-                <div id="b2b-standard-supply">
-                    <div className="flex flex-wrap items-end justify-between gap-4">
-                        <div>
-                            <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-store-ink bg-success px-3 py-1 text-[10px] font-extrabold uppercase text-white shadow-[2px_2px_0_var(--color-store-ink)]">
-                                <span className="h-2 w-2 rounded-full bg-white" />
-                                <span>{t('homePage.freshBatchBadge', 'FRESH BATCH ARRIVED')}</span>
-                            </span>
-                            <h2 className="m-0 mt-2 font-subheading lining-nums text-3xl font-bold text-store-ink">
-                                {t('homePage.standardSupplyTitle', 'B2B Standard Food Supply')}
-                            </h2>
-                        </div>
+                {loadingProducts ? (
+                    <p role="status" className="mt-5 text-sm">
+                        {t('homePage.productsLoading')}
+                    </p>
+                ) : productError ? (
+                    <p role="alert" className="mt-5 text-sm text-danger">
+                        {t('homePage.productsError')}
+                    </p>
+                ) : flashProducts.length ? (
+                    <div className="mt-5">
+                        <ProductCarousel
+                            products={flashProducts}
+                            label={t('homePage.flashDealsTitle')}
+                        />
                     </div>
-
-                    {!loadingProducts && !productError && standardProductCount === 0 && <p>{t('homePage.productsEmpty')}</p>}
-
-                    <div className="mt-7 grid gap-6 grid-cols-3">
-                        {visibleStandardProducts.map((product) => (
-                            <ProductShowcaseCard
-                                key={product.id}
-                                product={product}
-                                section="standard"
-                            />
-                        ))}
-                    </div>
-
-                    {/* Pagination Bar for B2B Standard Supply */}
-                    <SectionPaginationBar
-                        currentPage={standardPage}
-                        totalPages={totalStandardPages}
-                        totalItems={standardProductCount}
-                        pageSize={standardPageSize}
-                        onPageChange={setStandardPage}
-                    />
-                </div>
+                ) : (
+                    <p className="mt-5 flex items-center gap-2 rounded-xl bg-white/75 p-4 text-sm text-store-muted">
+                        <Clock3 size={18} />
+                        {t('customerUI.flashEmptyHint')}
+                    </p>
+                )}
             </div>
+            <div
+                id="b2b-standard-supply"
+                className="rounded-[24px] bg-store-cream px-4 py-6 text-store-ink shadow-lg sm:px-6"
+            >
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h2 className="m-0 inline-flex items-center gap-2 font-subheading text-xl font-extrabold sm:text-2xl">
+                        <Sparkles className="text-store-green" />
+                        {t('homePage.standardSupplyTitle')}
+                    </h2>
+                    <Link
+                        to="/products"
+                        className="inline-flex items-center gap-1 text-sm font-bold text-store-green no-underline hover:underline"
+                    >
+                        {t('customerUI.viewAll')}
+                        <ArrowRight size={16} />
+                    </Link>
+                </div>
+                {standardProducts.length ? (
+                    <div className="mt-5">
+                        <ProductCarousel
+                            products={standardProducts}
+                            label={t('homePage.standardSupplyTitle')}
+                        />
+                    </div>
+                ) : (
+                    !loadingProducts && (
+                        <p className="mt-5 text-sm text-store-muted">
+                            {t('homePage.productsEmpty')}
+                        </p>
+                    )
+                )}
+            </div>
+            {groups.map((group) => {
+                const Icon = group.icon;
+                return (
+                    <div
+                        key={group.id}
+                        id={group.id}
+                        className="rounded-[24px] bg-store-cream px-4 py-6 text-store-ink shadow-lg sm:px-6"
+                    >
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                                <h2 className="m-0 inline-flex items-center gap-2 font-subheading text-xl font-extrabold sm:text-2xl">
+                                    <Icon className="text-store-green" size={21} />
+                                    {group.title}
+                                </h2>
+                                <p className="mt-1 text-xs text-store-muted">{group.hint}</p>
+                            </div>
+                            <Link
+                                to={group.url}
+                                className="inline-flex items-center gap-1 text-sm font-bold text-store-green no-underline hover:underline"
+                            >
+                                {t('customerUI.viewAll')}
+                                <ArrowRight size={16} />
+                            </Link>
+                        </div>
+                        {group.products.length ? (
+                            <ProductCarousel products={group.products} label={group.title} />
+                        ) : !loadingProducts && !productError ? (
+                            <p className="mt-3 flex items-center gap-2 rounded-xl bg-white/70 p-4 text-sm text-store-muted">
+                                <Clock3 size={18} />
+                                {t('customerUI.groupEmpty')}
+                            </p>
+                        ) : null}
+                    </div>
+                );
+            })}
         </section>
     );
 }

@@ -25,7 +25,8 @@ export default function LandingCarousel() {
     }, [playing]);
     return (
         <div className="mb-8 text-left">
-            <div className="relative h-[500px] w-full overflow-hidden rounded-[var(--radius-lg)] border-[3px] border-solid border-store-ink bg-store-ink shadow-[8px_8px_0_var(--color-store-ink)]" id="heroCarouselViewport">
+            <div className="relative h-[570px] w-full overflow-hidden sm:h-[520px] lg:h-[500px] rounded-[var(--radius-lg)] border-[3px] border-solid border-store-ink bg-store-ink shadow-[8px_8px_0_var(--color-store-ink)]" id="heroCarouselViewport">
+                <span className="pointer-events-none absolute top-9 right-5 z-[25] rounded-full bg-black/45 px-3 py-1 text-[10px] font-semibold tracking-wide text-white/85 backdrop-blur-sm">Ảnh minh họa</span>
                 <div className="absolute top-4 right-5 left-5 z-20 grid grid-cols-5 gap-2">
                     <div
                         className="h-[5px] cursor-pointer overflow-hidden rounded-full bg-store-cream/35"
@@ -147,7 +148,7 @@ export default function LandingCarousel() {
                     onClick={() => changeSlide(slide - 1)}
                 >
                     <img
-                        src="/images/ui/chevron-left.svg"
+                        src="/icons/chevron-left.svg"
                         alt=""
                         aria-hidden="true"
                         className="btb-ui-icon"
@@ -161,7 +162,7 @@ export default function LandingCarousel() {
                     onClick={() => changeSlide(slide + 1)}
                 >
                     <img
-                        src="/images/ui/chevron-right.svg"
+                        src="/icons/chevron-right.svg"
                         alt=""
                         aria-hidden="true"
                         className="btb-ui-icon"
@@ -173,9 +174,9 @@ export default function LandingCarousel() {
                     style={{ transform: `translateX(-${slide * 20}%)` }}
                 >
                     <div className={'group relative flex h-full w-1/5 items-end overflow-hidden' + (slide === 0 ? ' active' : '')}>
-                        <BtbImagePlaceholder className="absolute inset-0 h-full w-full scale-[1.02] object-cover transition-transform duration-[5000ms] ease-out group-[.active]:scale-[1.11]" label="Ảnh kho vận" />
+                        <BtbImagePlaceholder className="absolute inset-0 h-full w-full scale-[1.02] object-cover transition-transform duration-[5000ms] ease-out group-[.active]:scale-[1.11]" label="Ảnh kho vận minh họa" photo="warehouse" />
                         <div className="absolute inset-0 z-[2] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-store-ink)_30%,transparent)_0%,color-mix(in_srgb,var(--color-store-ink)_15%,transparent)_40%,color-mix(in_srgb,var(--color-store-green)_88%,transparent)_85%,color-mix(in_srgb,var(--color-store-ink)_96%,transparent)_100%)]"></div>
-                        <div className="relative z-[5] flex w-full flex-wrap items-end justify-between gap-7 pt-9 pr-[76px] pb-9 pl-10 text-white">
+                        <div className="relative z-[5] flex w-full flex-wrap items-end justify-between gap-7 pt-12 pr-6 pb-7 pl-6 sm:pr-[76px] sm:pb-9 sm:pl-10 text-white">
                             <div className="max-w-[640px]">
                                 <span className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3 py-1 font-label text-xs font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">
                                     CẢNH 01 • HỆ THỐNG KHO VẬN TRUNG TÂM
@@ -219,9 +220,9 @@ export default function LandingCarousel() {
                         </div>
                     </div>
                     <div className={'group relative flex h-full w-1/5 items-end overflow-hidden' + (slide === 1 ? ' active' : '')}>
-                        <BtbImagePlaceholder className="absolute inset-0 h-full w-full scale-[1.02] object-cover transition-transform duration-[5000ms] ease-out group-[.active]:scale-[1.11]" label="Ảnh kho lạnh" />
+                        <BtbImagePlaceholder className="absolute inset-0 h-full w-full scale-[1.02] object-cover transition-transform duration-[5000ms] ease-out group-[.active]:scale-[1.11]" label="Ảnh kho lạnh minh họa" photo="seafood" />
                         <div className="absolute inset-0 z-[2] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-store-ink)_30%,transparent)_0%,color-mix(in_srgb,var(--color-store-ink)_15%,transparent)_40%,color-mix(in_srgb,var(--color-store-green)_88%,transparent)_85%,color-mix(in_srgb,var(--color-store-ink)_96%,transparent)_100%)]"></div>
-                        <div className="relative z-[5] flex w-full flex-wrap items-end justify-between gap-7 pt-9 pr-[76px] pb-9 pl-10 text-white">
+                        <div className="relative z-[5] flex w-full flex-wrap items-end justify-between gap-7 pt-12 pr-6 pb-7 pl-6 sm:pr-[76px] sm:pb-9 sm:pl-10 text-white">
                             <div className="max-w-[640px]">
                                 <span className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3 py-1 font-label text-xs font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">
                                     CẢNH 02 • KIỂM ĐỊNH KHO MÁT &amp; ĐÓNG KIỆN
@@ -271,9 +272,9 @@ export default function LandingCarousel() {
                         </div>
                     </div>
                     <div className={'group relative flex h-full w-1/5 items-end overflow-hidden' + (slide === 2 ? ' active' : '')}>
-                        <BtbImagePlaceholder className="absolute inset-0 h-full w-full scale-[1.02] object-cover transition-transform duration-[5000ms] ease-out group-[.active]:scale-[1.11]" label="Ảnh nguyên liệu" />
+                        <BtbImagePlaceholder className="absolute inset-0 h-full w-full scale-[1.02] object-cover transition-transform duration-[5000ms] ease-out group-[.active]:scale-[1.11]" label="Ảnh nguyên liệu minh họa" photo="market" />
                         <div className="absolute inset-0 z-[2] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-store-ink)_30%,transparent)_0%,color-mix(in_srgb,var(--color-store-ink)_15%,transparent)_40%,color-mix(in_srgb,var(--color-store-green)_88%,transparent)_85%,color-mix(in_srgb,var(--color-store-ink)_96%,transparent)_100%)]"></div>
-                        <div className="relative z-[5] flex w-full flex-wrap items-end justify-between gap-7 pt-9 pr-[76px] pb-9 pl-10 text-white">
+                        <div className="relative z-[5] flex w-full flex-wrap items-end justify-between gap-7 pt-12 pr-6 pb-7 pl-6 sm:pr-[76px] sm:pb-9 sm:pl-10 text-white">
                             <div className="max-w-[640px]">
                                 <span className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3 py-1 font-label text-xs font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">
                                     CẢNH 03 • NGUYÊN LIỆU TƯƠI &amp; ĐỒ CHẾ BIẾN SẴN
@@ -317,9 +318,9 @@ export default function LandingCarousel() {
                         </div>
                     </div>
                     <div className={'group relative flex h-full w-1/5 items-end overflow-hidden' + (slide === 3 ? ' active' : '')}>
-                        <BtbImagePlaceholder className="absolute inset-0 h-full w-full scale-[1.02] object-cover transition-transform duration-[5000ms] ease-out group-[.active]:scale-[1.11]" label="Ảnh giao nhận" />
+                        <BtbImagePlaceholder className="absolute inset-0 h-full w-full scale-[1.02] object-cover transition-transform duration-[5000ms] ease-out group-[.active]:scale-[1.11]" label="Ảnh giao nhận minh họa" photo="warehouse" />
                         <div className="absolute inset-0 z-[2] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-store-ink)_30%,transparent)_0%,color-mix(in_srgb,var(--color-store-ink)_15%,transparent)_40%,color-mix(in_srgb,var(--color-store-green)_88%,transparent)_85%,color-mix(in_srgb,var(--color-store-ink)_96%,transparent)_100%)]"></div>
-                        <div className="relative z-[5] flex w-full flex-wrap items-end justify-between gap-7 pt-9 pr-[76px] pb-9 pl-10 text-white">
+                        <div className="relative z-[5] flex w-full flex-wrap items-end justify-between gap-7 pt-12 pr-6 pb-7 pl-6 sm:pr-[76px] sm:pb-9 sm:pl-10 text-white">
                             <div className="max-w-[640px]">
                                 <span className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3 py-1 font-label text-xs font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">
                                     CẢNH 04 • GIAO HÀNG ĐÚNG HẸN TOÀN TP.HCM
@@ -418,7 +419,7 @@ export default function LandingCarousel() {
                                     Mở tài khoản Doanh nghiệp / Hộ gia đình{' '}
                                     <img
                                         className="btb-ui-icon"
-                                        src="/images/ui/arrow-right.svg"
+                                        src="/icons/arrow-right.svg"
                                         alt=""
                                         aria-hidden="true"
                                     />
@@ -434,7 +435,7 @@ export default function LandingCarousel() {
                                 >
                                     <img
                                         className="btb-ui-icon"
-                                        src="/images/ui/rotate-ccw.svg"
+                                        src="/icons/rotate-ccw.svg"
                                         alt=""
                                         aria-hidden="true"
                                     />{' '}
@@ -454,7 +455,7 @@ export default function LandingCarousel() {
                     >
                         <img
                             className="btb-ui-icon"
-                            src={playing ? '/images/ui/pause.svg' : '/images/ui/play.svg'}
+                            src={playing ? '/icons/pause.svg' : '/icons/play.svg'}
                             alt=""
                             aria-hidden="true"
                         />
@@ -467,7 +468,7 @@ export default function LandingCarousel() {
                         title="Không có âm thanh trong bản demo"
                     >
                         <img
-                            src="/images/ui/volume-off.svg"
+                            src="/icons/volume-off.svg"
                             alt=""
                             aria-hidden="true"
                             className="btb-ui-icon"

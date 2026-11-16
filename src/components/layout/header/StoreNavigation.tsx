@@ -79,10 +79,10 @@ export default function StoreNavigation() {
                     </button>
 
                     {/* Các liên kết Header giữ nguyên */}
-                    <div className="flex min-w-0 flex-1 items-center gap-4 overflow-x-auto py-1.5 text-[12px] leading-[1.5] whitespace-nowrap [scrollbar-width:thin]">
+                    <div className="flex min-w-0 flex-1 items-center gap-4 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1.5 text-[12px] leading-[1.5] whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                         <Link
                             className="text-store-cream no-underline hover:text-store-yellow"
-                            to={`${ROUTES.CATALOG}?sale=true`}
+                            to="/collections/deals"
                         >
                             {t('header.deals')}
                         </Link>
@@ -96,22 +96,25 @@ export default function StoreNavigation() {
 
                         <Link
                             className="text-store-cream no-underline hover:text-store-yellow"
-                            to={`${ROUTES.CATALOG}?type=combo`}
+                            to="/collections/combos"
                         >
                             {t('header.combos')}
                         </Link>
                     </div>
 
                     {/* Thông điệp VAT */}
-                    <span className="ml-auto hidden shrink-0 items-center gap-1.5 text-[12px] font-semibold text-store-pink min-[1440px]:flex">
+                    <Link
+                        to={ROUTES.ORDERS}
+                        className="ml-auto hidden shrink-0 items-center gap-1.5 text-[12px] font-semibold text-store-pink no-underline hover:text-store-yellow min-[1440px]:flex"
+                        title={t('customerUI.navVat')}
+                    >
                         {t('header.invoice')}
-
                         <img
                             className="block shrink-0"
                             src="/images/storefront/arrow-right.svg"
                             alt=""
                         />
-                    </span>
+                    </Link>
                 </div>
             </nav>
 

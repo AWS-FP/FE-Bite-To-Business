@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Check, Grip, Minus, Plus, RotateCcw, ZoomIn } from 'lucide-react';
 
 import { useEffect, useId, useRef, useState } from 'react';
@@ -28,6 +29,7 @@ const OUTPUT_SIZE = 320;
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperProps) {
+    const { t } = useTranslation('storefront');
     const maskId = useId().replace(/:/g, '');
 
     const stageRef = useRef<HTMLDivElement>(null);
@@ -80,6 +82,10 @@ export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperPro
     const maxX = Math.max(0, (photoWidth - circleSize) / 2);
 
     const maxY = Math.max(0, (photoHeight - circleSize) / 2);
+    const visibleOffset = {
+        x: clamp(offset.x, -maxX, maxX),
+        y: clamp(offset.y, -maxY, maxY),
+    };
 
     // ==========================================
     // RESPONSIVE STAGE
@@ -117,11 +123,6 @@ export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperPro
 
         originalImageRef.current = null;
 
-        setNatural(null);
-        setLoadError(false);
-        setZoom(MIN_ZOOM);
-        setOffset({ x: 0, y: 0 });
-
         image.onload = () => {
             if (cancelled) return;
 
@@ -149,13 +150,6 @@ export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperPro
     // ==========================================
     // KEEP PHOTO WITHIN CROP CIRCLE
     // ==========================================
-
-    useEffect(() => {
-        setOffset((previous) => ({
-            x: clamp(previous.x, -maxX, maxX),
-            y: clamp(previous.y, -maxY, maxY),
-        }));
-    }, [maxX, maxY]);
 
     // ==========================================
     // MOUSE WHEEL ZOOM
@@ -202,7 +196,7 @@ export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperPro
             pointerId: event.pointerId,
             startX: event.clientX,
             startY: event.clientY,
-            offset: { ...offset },
+            offset: { ...visibleOffset },
         };
 
         setDragging(true);
@@ -275,9 +269,9 @@ export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperPro
 
         context.drawImage(
             image,
-            (OUTPUT_SIZE - photoWidth * scale) / 2 + offset.x * scale,
+            (OUTPUT_SIZE - photoWidth * scale) / 2 + visibleOffset.x * scale,
 
-            (OUTPUT_SIZE - photoHeight * scale) / 2 + offset.y * scale,
+            (OUTPUT_SIZE - photoHeight * scale) / 2 + visibleOffset.y * scale,
 
             photoWidth * scale,
             photoHeight * scale,
@@ -296,7 +290,7 @@ export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperPro
             <div
                 ref={stageRef}
                 role="img"
-                aria-label="Drag the uploaded photo to choose the area inside the circle"
+                aria-label={t('customerUI.avatarCropHint')}
                 tabIndex={0}
                 onPointerDown={beginDrag}
                 onPointerMove={moveDrag}
@@ -343,9 +337,9 @@ export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperPro
                                 width: photoWidth,
                                 height: photoHeight,
 
-                                left: (stage.width - photoWidth) / 2 + offset.x,
+                                left: (stage.width - photoWidth) / 2 + visibleOffset.x,
 
-                                top: (stage.height - photoHeight) / 2 + offset.y,
+                                top: (stage.height - photoHeight) / 2 + visibleOffset.y,
                             }}
                         />
 
@@ -390,13 +384,13 @@ export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperPro
                     </>
                 ) : (
                     <div className="absolute inset-0 flex items-center justify-center text-sm text-white/75">
-                        {loadError ? 'Cannot load this image' : 'Loading image…'}
+                        {loadError ? t('customerUI.avatarError') : t('customerUI.avatarLoading')}
                     </div>
                 )}
 
                 <div className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-store-dark/80 px-3 py-1.5 text-[11px] text-surface-yellow">
                     <Grip size={13} />
-                    Drag photo to reposition
+                    {t('customerUI.avatarCropHint')}
                 </div>
             </div>
 
@@ -405,7 +399,7 @@ export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperPro
                 <div className="mb-3 flex items-center justify-between">
                     <span className="inline-flex items-center gap-2 text-sm font-semibold text-surface-yellow">
                         <ZoomIn size={17} />
-                        Zoom
+                        {t('customerUI.avatarZoom')}
                     </span>
 
                     <span className="text-xs font-bold tabular-nums text-store-yellow">
@@ -416,7 +410,7 @@ export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperPro
                 <div className="flex items-center gap-3">
                     <button
                         type="button"
-                        aria-label="Zoom out"
+                        aria-label={t('customerUI.avatarZoomOut')}
                         disabled={zoom <= MIN_ZOOM}
                         onClick={() => changeZoom(zoom - 0.1)}
                         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white disabled:opacity-35"
@@ -431,13 +425,13 @@ export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperPro
                         step={0.05}
                         value={zoom}
                         onChange={(event) => changeZoom(Number(event.target.value))}
-                        aria-label="Avatar zoom"
+                        aria-label={t('customerUI.avatarZoom')}
                         className="min-w-0 flex-1 cursor-pointer accent-store-yellow"
                     />
 
                     <button
                         type="button"
-                        aria-label="Zoom in"
+                        aria-label={t('customerUI.avatarZoomIn')}
                         disabled={zoom >= MAX_ZOOM}
                         onClick={() => changeZoom(zoom + 0.1)}
                         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white disabled:opacity-35"
@@ -447,7 +441,7 @@ export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperPro
                 </div>
 
                 <p className="mb-0 mt-3 text-center text-[11px] text-white/55">
-                    Drag the photo or scroll to zoom. Use arrow keys to move it.
+                    {t('customerUI.avatarCropHint')}
                 </p>
             </div>
 
@@ -459,7 +453,7 @@ export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperPro
                     className="inline-flex items-center gap-2 border-0 bg-transparent text-sm font-semibold text-white/75 hover:text-white"
                 >
                     <RotateCcw size={16} />
-                    Reset
+                    {t('customerUI.avatarReset')}
                 </button>
 
                 <div className="flex gap-2">
@@ -468,7 +462,7 @@ export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperPro
                         onClick={onBack}
                         className="rounded-xl border border-store-yellow/60 bg-transparent px-4 py-2.5 text-sm font-semibold text-surface-yellow hover:bg-white/10"
                     >
-                        Back
+                        {t('customerUI.avatarBack')}
                     </button>
 
                     <button
@@ -478,7 +472,7 @@ export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperPro
                         className="inline-flex items-center gap-2 rounded-xl border-0 bg-store-yellow px-5 py-2.5 text-sm font-black text-store-ink hover:bg-store-yellow disabled:opacity-40"
                     >
                         <Check size={17} />
-                        Apply
+                        {t('customerUI.avatarApply')}
                     </button>
                 </div>
             </div>

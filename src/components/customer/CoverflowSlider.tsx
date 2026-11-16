@@ -1,158 +1,161 @@
-import { ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { COVERFLOW_SLIDES } from '../../constants/customer/homeData';
+import { ChevronLeft, ChevronRight, Megaphone } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { useHomeModelContext } from './home/HomeModel';
 
+/** All slides are published banner images returned by Customer Homepage API. */
 export default function CoverflowSlider() {
-    const navigate = useNavigate();
-    const [activeIndex, setActiveIndex] = useState(1);
-    const [isPaused, setIsPaused] = useState(false);
-    const total = COVERFLOW_SLIDES.length;
-
-    const handleNext = useCallback(() => {
-        setActiveIndex((prev) => (prev + 1) % total);
-    }, [total]);
-
-    const handlePrev = useCallback(() => {
-        setActiveIndex((prev) => (prev - 1 + total) % total);
-    }, [total]);
+    const { t, i18n } = useTranslation('storefront');
+    const { banners } = useHomeModelContext();
+    const slides = banners.filter((item) => Boolean(item.imageUrl?.trim()));
+    const [active, setActive] = useState(0);
+    const [paused, setPaused] = useState(false);
+    const current = slides.length ? active % slides.length : 0;
 
     useEffect(() => {
-        if (isPaused) return;
-        const timer = setInterval(handleNext, 5000);
-        return () => clearInterval(timer);
-    }, [isPaused, handleNext]);
+        if (slides.length < 2 || paused) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const timer = window.setInterval(
+            () => setActive((previous) => (previous + 1) % slides.length),
+            4500,
+        );
+        return () => window.clearInterval(timer);
+    }, [slides.length, paused]);
 
-    const getRelativeOffset = (index: number) => {
-        let diff = index - activeIndex;
-        if (diff > total / 2) diff -= total;
-        if (diff < -total / 2) diff += total;
-        return diff;
+    const go = (direction: number) => {
+        if (slides.length > 1)
+            setActive((previous) => (previous + direction + slides.length) % slides.length);
     };
 
     return (
         <section
-            className="relative overflow-hidden bg-store-green pt-8 pb-11 select-none"
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
-            aria-label="Promotional Coverflow Slider"
+            aria-label={t('homePage.sliderLabel')}
+            className="overflow-hidden bg-store-green px-4 py-8 sm:px-6"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+            onFocusCapture={() => setPaused(true)}
+            onBlurCapture={() => setPaused(false)}
+            onKeyDown={(event) => {
+                if (event.key === 'ArrowLeft') go(-1);
+                if (event.key === 'ArrowRight') go(1);
+            }}
         >
-            <div className="mx-auto max-w-[1360px] px-8">
-                <div
-                    className="relative mx-auto flex h-[430px] items-center justify-center"
-                    style={{ perspective: '1400px' }}
-                >
-                    {COVERFLOW_SLIDES.map((slide, index) => {
-                        const offset = getRelativeOffset(index);
-                        const isCenter = offset === 0;
-                        const isLeft = offset === -1;
-                        const isRight = offset === 1;
-                        const isVisible = Math.abs(offset) <= 1;
-
-                        let transformStyle = 'translate3d(0px, 0px, -400px) scale(0.7)';
-                        let zIndex = 5;
-                        let opacity = 0;
-
-                        if (isCenter) {
-                            transformStyle = 'translate3d(0px, 0px, 0px) rotateY(0deg) scale(1)';
-                            zIndex = 30;
-                            opacity = 1;
-                        } else if (isLeft) {
-                            transformStyle =
-                                'translate3d(-92%, 12px, -140px) rotateY(28deg) scale(0.88)';
-                            zIndex = 20;
-                            opacity = 0.92;
-                        } else if (isRight) {
-                            transformStyle =
-                                'translate3d(92%, 12px, -140px) rotateY(-28deg) scale(0.88)';
-                            zIndex = 20;
-                            opacity = 0.92;
-                        }
-
-                        return (
-                            <div
-                                key={slide.id}
-                                onClick={() => {
-                                    if (!isCenter && isVisible) {
-                                        setActiveIndex(index);
-                                    } else if (isCenter) {
-                                        navigate(slide.targetLink);
-                                    }
-                                }}
-                                style={{
-                                    transform: transformStyle,
-                                    zIndex,
-                                    opacity,
-                                    transition:
-                                        'transform 650ms cubic-bezier(0.22, 1, 0.36, 1), opacity 500ms ease',
-                                    transformStyle: 'preserve-3d',
-                                    pointerEvents: isVisible ? 'auto' : 'none',
-                                }}
-                                className="absolute h-[415px] w-[405px] cursor-pointer overflow-hidden rounded-[24px] border-2 border-solid border-store-dark bg-store-green shadow-[0_24px_48px_color-mix(in_srgb,_var(--color-black)_45%,_transparent)]"
-                            >
-                                {slide.imageUrl ? (
-                                    <img
-                                        src={slide.imageUrl}
-                                        alt={slide.alt}
-                                        className="block h-full w-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-store-green to-store-dark p-6 text-center text-white">
-                                        <ImageIcon size={40} className="mb-3 text-store-yellow" />
-                                        <span className="text-sm font-extrabold uppercase tracking-wider text-store-yellow">
-                                            [ Full Poster Image #{index + 1} ]
-                                        </span>
-                                        <span className="mt-1.5 max-w-[240px] text-xs leading-relaxed text-white/70">
-                                            Put your designed poster image path in{' '}
-                                            <code className="text-surface-green">
-                                                COVERFLOW_SLIDES[{index}].imageUrl
-                                            </code>{' '}
-                                            inside{' '}
-                                            <code className="text-surface-green">homeData.ts</code>
-                                        </span>
+            <div className="relative mx-auto max-w-[1320px] rounded-[28px] bg-store-dark/70 px-3 pb-16 pt-6 sm:px-14 sm:pt-9">
+                {slides.length === 0 ? (
+                    <div className="flex min-h-[290px] flex-col items-center justify-center rounded-2xl border border-dashed border-white/35 bg-white/5 px-6 text-center text-store-cream sm:min-h-[390px]">
+                        <Megaphone size={34} className="mb-4 text-store-yellow" />
+                        <h2 className="m-0 font-subheading text-xl font-bold">
+                            {t('customerUI.bannerEmptyTitle')}
+                        </h2>
+                        <p className="mt-2 max-w-md text-sm text-white/70">
+                            {t('customerUI.bannerEmptyDescription')}
+                        </p>
+                    </div>
+                ) : (
+                    <>
+                        <div
+                            className="relative h-[290px] overflow-hidden sm:h-[390px]"
+                            aria-live="off"
+                        >
+                            {slides.map((slide, index) => {
+                                const clockwise = (index - current + slides.length) % slides.length;
+                                const offset =
+                                    clockwise > slides.length / 2
+                                        ? clockwise - slides.length
+                                        : clockwise;
+                                const visible = Math.abs(offset) <= 2;
+                                const heading = i18n.resolvedLanguage?.startsWith('en')
+                                    ? slide.titleEn
+                                    : slide.titleVi;
+                                const target =
+                                    slide.targetUrl?.startsWith('/') &&
+                                    !slide.targetUrl.startsWith('//')
+                                        ? slide.targetUrl
+                                        : null;
+                                const content = (
+                                    <>
+                                        <img
+                                            src={slide.imageUrl!}
+                                            alt={heading}
+                                            className="h-full w-full object-cover"
+                                        />
+                                        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-store-dark/90 via-store-dark/30 to-transparent px-5 pb-5 pt-14 text-center text-sm font-bold text-white sm:text-lg">
+                                            {heading}
+                                        </div>
+                                    </>
+                                );
+                                return (
+                                    <div
+                                        key={slide.id}
+                                        aria-hidden={!visible}
+                                        className="absolute left-1/2 top-0 h-[95%] w-[75%] overflow-hidden rounded-2xl border border-white/20 bg-white shadow-2xl transition-[transform,opacity] duration-700 ease-out sm:w-[58%]"
+                                        style={{
+                                            transform: `translateX(calc(-50% + ${offset * 55}%)) perspective(950px) rotateY(${-offset * 25}deg) scale(${offset === 0 ? 1 : 0.82})`,
+                                            opacity: visible
+                                                ? Math.abs(offset) === 2
+                                                    ? 0.35
+                                                    : 1
+                                                : 0,
+                                            zIndex: 10 - Math.abs(offset),
+                                            pointerEvents: offset === 0 ? 'auto' : 'none',
+                                        }}
+                                    >
+                                        {target && offset === 0 ? (
+                                            <Link
+                                                to={target}
+                                                className="relative block h-full w-full"
+                                                tabIndex={0}
+                                            >
+                                                {content}
+                                            </Link>
+                                        ) : (
+                                            <div className="relative h-full w-full">{content}</div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-                        );
-                    })}
-
-                    <button
-                        type="button"
-                        onClick={handlePrev}
-                        aria-label="Previous slide"
-                        className="absolute left-2 z-40 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-solid border-white/25 bg-store-dark/85 text-white shadow-lg transition-all hover:scale-105 hover:border-store-yellow hover:text-store-yellow"
-                    >
-                        <ChevronLeft size={20} />
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={handleNext}
-                        aria-label="Next slide"
-                        className="absolute right-2 z-40 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-solid border-white/25 bg-store-dark/85 text-white shadow-lg transition-all hover:scale-105 hover:border-store-yellow hover:text-store-yellow"
-                    >
-                        <ChevronRight size={20} />
-                    </button>
-                </div>
-
-                <div className="mt-6 flex items-center justify-center gap-2.5">
-                    {COVERFLOW_SLIDES.map((slide, idx) => {
-                        const isActive = idx === activeIndex;
-                        return (
-                            <button
-                                key={slide.id}
-                                type="button"
-                                onClick={() => setActiveIndex(idx)}
-                                aria-label={`Go to slide ${idx + 1}`}
-                                className={`h-4 cursor-pointer rounded-full border-0 transition-all duration-300 ${
-                                    isActive
-                                        ? 'w-5 scale-110 bg-store-yellow'
-                                        : 'w-4 bg-surface-soft/60 hover:bg-surface-soft'
-                                }`}
-                            />
-                        );
-                    })}
-                </div>
+                                );
+                            })}
+                        </div>
+                        {slides.length > 1 && (
+                            <>
+                                <button
+                                    type="button"
+                                    onClick={() => go(-1)}
+                                    aria-label={t('homePage.previousSlide')}
+                                    className="absolute left-2 top-[45%] z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/95 text-store-green shadow-lg transition hover:bg-store-yellow sm:left-3"
+                                >
+                                    <ChevronLeft size={22} />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => go(1)}
+                                    aria-label={t('homePage.nextSlide')}
+                                    className="absolute right-2 top-[45%] z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/95 text-store-green shadow-lg transition hover:bg-store-yellow sm:right-3"
+                                >
+                                    <ChevronRight size={22} />
+                                </button>
+                                <div
+                                    className="absolute inset-x-0 bottom-5 z-20 flex items-center justify-center gap-2"
+                                    role="group"
+                                    aria-label={t('customerUI.bannerSlides')}
+                                >
+                                    {slides.map((item, index) => (
+                                        <button
+                                            key={item.id}
+                                            type="button"
+                                            onClick={() => setActive(index)}
+                                            aria-label={t('customerUI.bannerSlideNumber', {
+                                                count: index + 1,
+                                            })}
+                                            aria-current={index === current ? 'true' : undefined}
+                                            className={`h-3 w-3 cursor-pointer rounded-full border border-white/60 transition-colors ${index === current ? 'bg-store-yellow' : 'bg-white/50 hover:bg-white'}`}
+                                        />
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </>
+                )}
             </div>
         </section>
     );

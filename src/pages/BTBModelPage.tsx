@@ -6,6 +6,7 @@ export default function BTBModelPage() {
   const { t } = useTranslation('storefront');
   return (
     <BTBInfoLayout
+      variant="model"
       eyebrow={t('introPages.modelEyebrow')}
       title={t('introPages.modelTitle')}
       description={t('introPages.modelDescription')}
