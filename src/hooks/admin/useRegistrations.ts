@@ -33,6 +33,7 @@ export function useRegistrations(params: RegistrationListParams) {
         queryKey: ['admin', session?.user.id, sessionVersion, 'list', params],
         queryFn: ({ signal }) => getRegistrations(params, signal),
         enabled: session !== null,
+        refetchInterval: (query) => query.state.data?.content.some((item) => item.otpDeliveryState === 'QUEUED') ? 3000 : false,
     });
 }
 
@@ -44,6 +45,7 @@ export function useRegistration(id: string) {
         queryKey: ['admin', session?.user.id, sessionVersion, 'detail', id],
         queryFn: ({ signal }) => getRegistration(id, signal),
         enabled: session !== null && id !== '',
+        refetchInterval: (query) => query.state.data?.otpDeliveryState === 'QUEUED' ? 3000 : false,
     });
 }
 

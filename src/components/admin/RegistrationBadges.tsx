@@ -6,11 +6,11 @@ import AdminIcon from './AdminIcon';
 export function ReviewBadge({ status }: { status: RegistrationStatus }) {
     const { t } = useTranslation('admin');
 
-    if (status === 'PENDING') {
+    if (status === 'PENDING' || status === 'AWAITING_ACTIVATION') {
         return (
             <span className="inline-flex items-center gap-[5px] rounded-[3px] border border-black bg-store-cream px-[7px] py-[5px] text-[11px] leading-[15px] font-semibold whitespace-nowrap">
                 <span className="size-[4px] rounded-full bg-black" aria-hidden="true" />
-                {t('status.PENDING')}
+                {t(`status.${status}`)}
             </span>
         );
     }
@@ -44,12 +44,16 @@ export function ActivationBadge({ registration }: { registration: RegistrationRe
         );
     }
 
-    if (registration.status !== 'APPROVED') {
+    if (registration.status !== 'AWAITING_ACTIVATION') {
         return (
             <span className="inline-flex items-center gap-1 text-[11px] leading-[16.5px] whitespace-nowrap">
                 {t('activation.inactive')}
             </span>
         );
+    }
+
+    if (registration.otpDeliveryState === 'QUEUED') {
+        return <span className="text-[11px]">{t('activation.otpSending')}</span>;
     }
 
     if (registration.otpSentAt) {

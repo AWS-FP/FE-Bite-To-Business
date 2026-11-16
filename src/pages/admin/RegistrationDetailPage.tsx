@@ -72,8 +72,6 @@ export default function RegistrationDetailPage() {
             setSuccessMessage(
                 result.rejectionEmailSent ? 'notices.rejected' : 'notices.rejectionEmailFailed',
             );
-        } else if (result.otpSent) {
-            setSuccessMessage('notices.approved');
         } else {
             setSuccessMessage('');
         }
@@ -90,7 +88,6 @@ export default function RegistrationDetailPage() {
         try {
             await resendMutation.mutateAsync();
             setCurrentTime(Date.now());
-            setSuccessMessage('notices.otpSent');
         } catch {
             // Lỗi từ API được hiển thị bên trong hồ sơ.
         } finally {
@@ -146,10 +143,14 @@ export default function RegistrationDetailPage() {
 
                     {registration && (
                         <RegistrationDetails registration={registration}>
-                            {/* Đã duyệt nhưng chưa gửi được OTP: giữ trạng thái duyệt và cho phép gửi lại. */}
-                            {registration.status === 'APPROVED' &&
-                                !registration.activatedAt &&
-                                !registration.otpSentAt && (
+                            {registration.status === 'AWAITING_ACTIVATION' &&
+                                registration.otpDeliveryState === 'QUEUED' && (
+                                    <p role="status" className="mt-[22px] rounded-[3px] border border-black bg-surface-green p-[14px] text-[13px] leading-6">
+                                        {t('notices.otpSent')}
+                                    </p>
+                                )}
+                            {registration.status === 'AWAITING_ACTIVATION' &&
+                                registration.otpDeliveryState === 'FAILED' && (
                                     <div
                                         className="mt-[22px] flex items-start gap-[9px] rounded-[3px] border border-black bg-store-cream p-[14px]"
                                         role="status"
@@ -232,15 +233,15 @@ export default function RegistrationDetailPage() {
                             <AdminButton onClick={handleClose} disabled={isProcessing}>
                                 {t('actions.closeProfile')}
                             </AdminButton>
-                            {registration?.status === 'APPROVED' && !registration.activatedAt && (
+                            {registration?.status === 'AWAITING_ACTIVATION' && !registration.activatedAt && (
                                 <AdminButton
                                     tone="primary"
                                     icon="send"
                                     busy={resendMutation.isPending}
-                                    disabled={isProcessing || secondsUntilResend > 0}
+                                    disabled={isProcessing || secondsUntilResend > 0 || registration.otpDeliveryState === 'QUEUED'}
                                     onClick={handleResendOtp}
                                 >
-                                    {secondsUntilResend > 0
+                                    {registration.otpDeliveryState === 'QUEUED' ? t('activation.otpSending') : secondsUntilResend > 0
                                         ? t('actions.resendCooldown', {
                                               seconds: secondsUntilResend,
                                           })
