@@ -56,6 +56,14 @@ export function ActivationBadge({ registration }: { registration: RegistrationRe
         return <span className="text-[11px]">{t('activation.otpSending')}</span>;
     }
 
+    if (registration.otpDeliveryState === 'UNCONFIRMED') {
+        return <span className="text-[11px]">{t('activation.otpUnconfirmed')}</span>;
+    }
+
+    if (registration.otpDeliveryState === 'VERIFIED') {
+        return <span className="text-[11px]">{t('activation.otpVerified')}</span>;
+    }
+
     if (registration.otpSentAt) {
         return (
             <span className="inline-flex items-center gap-1 text-[11px] leading-[16.5px] whitespace-nowrap">

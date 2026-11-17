@@ -150,6 +150,13 @@ export default function RegistrationDetailPage() {
                                     </p>
                                 )}
                             {registration.status === 'AWAITING_ACTIVATION' &&
+                                registration.otpDeliveryState === 'UNCONFIRMED' && (
+                                    <div role="status" className="mt-[22px] rounded-[3px] border border-black bg-store-cream p-[14px] text-[13px] leading-6">
+                                        <strong>{t('notices.otpUnconfirmedTitle')}</strong>
+                                        <p className="pt-1">{t('notices.otpUnconfirmedDescription')}</p>
+                                    </div>
+                                )}
+                            {registration.status === 'AWAITING_ACTIVATION' &&
                                 registration.otpDeliveryState === 'FAILED' && (
                                     <div
                                         className="mt-[22px] flex items-start gap-[9px] rounded-[3px] border border-black bg-store-cream p-[14px]"

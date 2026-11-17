@@ -29,7 +29,9 @@
         "inactive": "Chưa kích hoạt",
         "waiting": "Chờ kích hoạt",
         "otpSending": "Đang gửi OTP",
-        "otpFailed": "Gửi OTP lỗi"
+        "otpFailed": "Gửi OTP gặp lỗi",
+        "otpUnconfirmed": "Chưa xác nhận gửi OTP",
+        "otpVerified": "Đã xác minh OTP"
     },
     "customerType": {
         "HOUSEHOLD_INDIVIDUAL_BUSINESS": "Cá nhân / Hộ gia đình",
@@ -130,8 +132,10 @@
         "rejected": "Đã từ chối hồ sơ và gửi email thông báo kèm lý do đến Gmail đăng ký.",
         "rejectionEmailFailed": "Đã từ chối hồ sơ và lưu lý do, nhưng chưa gửi được email thông báo. Vui lòng kiểm tra dịch vụ email của hệ thống.",
         "otpSent": "Đã đưa yêu cầu gửi OTP vào hàng đợi.",
-        "otpFailedTitle": "Chờ kích hoạt · Gửi OTP chưa thành công",
-        "otpFailedDescription": "Hồ sơ chưa được tính là đã duyệt. Hãy gửi lại OTP để Customer kích hoạt tài khoản."
+        "otpFailedTitle": "Chờ kích hoạt · Gửi OTP gặp lỗi",
+        "otpFailedDescription": "Hãy gửi lại OTP để khách hàng kích hoạt tài khoản.",
+        "otpUnconfirmedTitle": "Chưa xác nhận được email OTP",
+        "otpUnconfirmedDescription": "Khách vẫn có thể nhập mã nếu đã nhận được email. Nếu chưa nhận, hãy gửi lại mã."
     },
     "errors": {
         "unknown": "Không thể xử lý yêu cầu. Vui lòng thử lại.",
