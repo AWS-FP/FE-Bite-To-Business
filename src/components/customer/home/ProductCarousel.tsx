@@ -46,7 +46,7 @@ export default function ProductCarousel({
                 ref={track}
                 aria-label={label}
                 tabIndex={0}
-                className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth px-2 pb-6 pt-2 scroll-px-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             >
                 {products.map((product) => (
                     <div

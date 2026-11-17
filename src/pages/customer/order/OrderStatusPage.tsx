@@ -111,31 +111,9 @@ export default function OrderStatusPage() {
                                             <div>
                                                 <strong>{item.nameVi}</strong>
                                                 <p className="m-0 text-xs text-store-muted">
-                                                    {item.sku} · {item.quantity} {item.unitCode} ·
-                                                    VAT {item.vatRate}%
+                                                    {item.sku} · {item.quantity} {item.unitCode} · VAT {item.vatRate ?? '—'}%
                                                 </p>
                                             </div>
-                                        </article>
-                                    );
-                                })}
-                            </div>
-                        </section>
-                    </div>
-                    <aside className="grid min-w-0 gap-6">
-                        <section className="relative border-[1.5px] border-solid border-store-ink bg-store-ink p-5 text-white shadow-[5px_5px_0_#ff5a4e] sm:p-6">
-                            <span className="absolute -top-3 left-10 -rotate-3 bg-store-yellow px-3 py-1.5 text-[9px] font-black text-store-ink">MÃ THEO DÕI</span>
-                            <p className="m-0 mt-1 text-[9px] font-extrabold tracking-wider text-store-pink">TRACKING CODE</p>
-                            <h2 className="m-0 mt-2 break-all font-heading text-[24px] font-bold text-store-yellow">{order.id}</h2>
-                            <p className="m-0 mt-2 text-[10px] text-[#c9c6d7]">Tạo lúc {formatOrderTime(order.createdAt)}</p>
-                            <dl className="my-5 space-y-3 border-0 border-y border-solid border-white/20 py-4 text-[11px]">
-                                <div className="flex items-center justify-between gap-3"><dt>Tổng mặt hàng</dt><dd className="m-0 font-extrabold">{totalItems}</dd></div>
-                                <div className="flex items-center justify-between gap-3"><dt>Delivery packages</dt><dd className="m-0 font-extrabold">{order.packages.length}</dd></div>
-                                <div className="flex items-center justify-between gap-3"><dt>Phí giao (demo)</dt><dd className="m-0 font-extrabold">{order.shipping === 0 ? 'Chưa tính' : formatVnd(order.shipping)}</dd></div>
-                                {order.discount > 0 && <div className="flex items-center justify-between gap-3"><dt>Giảm giá</dt><dd className="m-0 font-extrabold">−{formatVnd(order.discount)}</dd></div>}
-                            </dl>
-                            <div className="flex flex-wrap items-end justify-between gap-3">
-                                <strong className="text-[10px]">Tổng thanh toán (demo)</strong>
-                                <strong className="font-heading text-[24px] text-store-yellow">{formatVnd(order.total)}</strong>
                                             <strong className="whitespace-nowrap">
                                                 {money(item.lineTotal)}
                                             </strong>

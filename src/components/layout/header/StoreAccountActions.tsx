@@ -1,10 +1,13 @@
 import {
     History,
+    Heart,
     LayoutDashboard,
     LogOut,
     ReceiptText,
     Settings,
     ShoppingCart,
+    Minus,
+    Plus,
     Users,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -24,12 +27,13 @@ export default function StoreAccountActions() {
     const user = session?.user;
     const workspacePath = user ? getWorkspaceHome(user.role) : null;
 
-    const [openDropdown, setOpenDropdown] = useState<'notifications' | 'profile' | null>(
+    const [openDropdown, setOpenDropdown] = useState<'notifications' | 'profile' | 'cart' | null>(
         null,
     );
 
     const dropdownRef = useRef<HTMLDivElement>(null);
     const cartItems = useCartStore((state) => state.items);
+    const updateCartQuantity = useCartStore((state) => state.updateQuantity);
 
     const isLoggedIn = Boolean(user);
 
@@ -275,32 +279,42 @@ export default function StoreAccountActions() {
                                 <span>{t('profileDropdown.workspace')}</span>
                             </Link>
                         )}
-                        {user?.role === 'CUSTOMER' && <>
-                        <Link
-                            to={ROUTES.QUOTES}
-                            onClick={() => setOpenDropdown(null)}
-                            className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-store-ink no-underline transition-colors hover:bg-store-ink/10"
-                        >
-                            <History size={15} className="text-store-ink" />
-                            <span>{t('profileDropdown.orderHistory')}</span>
-                        </Link>
-                        <Link
-                            to={ROUTES.QUOTES}
-                            onClick={() => setOpenDropdown(null)}
-                            className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-store-ink no-underline transition-colors hover:bg-store-ink/10"
-                        >
-                            <ReceiptText size={15} className="text-store-ink" />
-                            <span>{t('profileDropdown.recurringLists')}</span>
-                        </Link>
-                        <Link
-                            to={ROUTES.QUOTES}
-                            onClick={() => setOpenDropdown(null)}
-                            className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-store-ink no-underline transition-colors hover:bg-store-ink/10"
-                        >
-                            <Users size={15} className="text-store-ink" />
-                            <span>{t('profileDropdown.customQuotes')}</span>
-                        </Link>
-                        </>}
+                        {user?.role === 'CUSTOMER' && (
+                            <>
+                                <Link
+                                    to={ROUTES.QUOTES}
+                                    onClick={() => setOpenDropdown(null)}
+                                    className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-store-ink no-underline transition-colors hover:bg-store-ink/10"
+                                >
+                                    <History size={15} className="text-store-ink" />
+                                    <span>{t('profileDropdown.orderHistory')}</span>
+                                </Link>
+                                <Link
+                                    to={ROUTES.FAVORITES}
+                                    onClick={() => setOpenDropdown(null)}
+                                    className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-store-ink no-underline transition-colors hover:bg-store-ink/10"
+                                >
+                                    <Heart size={15} className="text-store-ink" />
+                                    <span>{t('profileDropdown.favorites')}</span>
+                                </Link>
+                                <Link
+                                    to={ROUTES.QUOTES}
+                                    onClick={() => setOpenDropdown(null)}
+                                    className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-store-ink no-underline transition-colors hover:bg-store-ink/10"
+                                >
+                                    <ReceiptText size={15} className="text-store-ink" />
+                                    <span>{t('profileDropdown.recurringLists')}</span>
+                                </Link>
+                                <Link
+                                    to={ROUTES.QUOTES}
+                                    onClick={() => setOpenDropdown(null)}
+                                    className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-store-ink no-underline transition-colors hover:bg-store-ink/10"
+                                >
+                                    <Users size={15} className="text-store-ink" />
+                                    <span>{t('profileDropdown.customQuotes')}</span>
+                                </Link>
+                            </>
+                        )}
                     </div>
 
                     <div className="py-1.5">
