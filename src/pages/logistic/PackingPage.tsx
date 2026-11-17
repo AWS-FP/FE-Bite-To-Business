@@ -1,3 +1,10 @@
-import ShipmentTable from '../../components/logistic/ShipmentTable.tsx';
-import { LogPageTitle } from '../../components/logistic/LogisticsUI.tsx';
-export default function PackingPage(){return <><LogPageTitle code="03" eyebrow="CHUẨN BỊ KIỆN & GIAO HÀNG (MỤC 13.1 & 13.2)" title="Đóng kiện & Phân công Chuyến" description="Mỗi Order tương ứng một chuyến giao. Một Order có thể chia thành nhiều Package với nhiều điểm đến và gán cho một Delivery Staff." action={<span className="lg-warehouse">1 ORDER = 1 CHUYẾN GIAO</span>}/><ShipmentTable/></>}
+import LogisticsPageShell, { ListStatus, Pagination } from '@/components/logistic/LogisticsPageShell';
+import { useLogisticsList, type CancelledPackage } from '@/hooks/logistic/useLogisticsData';
+export default function PackingPage() {
+    const data = useLogisticsList<CancelledPackage>('/api/logistics/cancelled-packages');
+    return <LogisticsPageShell title="Package đã hủy" description="Theo dõi các package đã được ghi nhận hủy."><section className="rounded-xl border border-store-line bg-white p-5">
+        <ListStatus loading={data.loading} error={data.error} empty={data.items.length === 0} />
+        {data.items.map(item => <article key={item.packageId} className="border-b py-4"><strong>{item.packageName}</strong><p className="mt-1 text-sm text-store-muted">{item.packageNumber} · Đơn {item.orderId}</p><p className="text-sm">Hủy lúc {new Date(item.cancelledAt).toLocaleString('vi-VN')}</p></article>)}
+        <Pagination {...data} />
+    </section></LogisticsPageShell>;
+}
