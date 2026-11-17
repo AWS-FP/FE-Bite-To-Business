@@ -21,6 +21,8 @@ import BrandDetailPage from '@/pages/BrandDetailPage';
 import ProfilePage from '@/pages/customer/ProfilePage';
 import CustomerCatalogPage from '@/pages/customer/CustomerCatalogPage';
 import CustomerCollectionPage from '@/pages/customer/CustomerCollectionPage';
+import CustomerProductDetailPage from '@/pages/customer/CustomerProductDetailPage';
+import CustomerFavoritesPage from '@/pages/customer/CustomerFavoritesPage';
 import CartPage from '@/pages/CartPage';
 
 // Orders Pages - NEW
@@ -124,7 +126,7 @@ export const router = createBrowserRouter([
     },
     {
         path: ROUTES.PRODUCT_DETAIL,
-        Component: PendingPage,
+        Component: CustomerProductDetailPage,
     },
     {
         path: ROUTES.QUOTES,
@@ -167,7 +169,7 @@ export const router = createBrowserRouter([
 
             {
                 path: ROUTES.FAVORITES,
-                Component: PendingPage,
+                Component: CustomerFavoritesPage,
             },
             {
                 path: ROUTES.PROFILE,

@@ -48,7 +48,7 @@ function ProfileContent() {
                     </h1>
                     <p className="m-0 text-sm text-store-muted">{t('description')}</p>
                 </div>
-                {query.data && <ProfileAccountCard profile={query.data} />}
+                {query.data && <ProfileAccountCard key={query.data.user.id} profile={query.data} />}
             </div>
             {query.isPending && (
                 <p role="status" className="rounded-2xl border border-store-line bg-white p-6">
