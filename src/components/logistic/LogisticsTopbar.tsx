@@ -4,11 +4,12 @@ import WorkspaceAccountMenu from '@/components/common/WorkspaceAccountMenu';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../router/routes';
 import { useAuthStore } from '../../store/admin/authStore';
-import { useLogistics } from './LogisticsModel.tsx';
+import { useTranslation } from 'react-i18next';
 import { LogisticsMenuButton } from './LogisticsSidebar.tsx';
 
 export default function LogisticsTopbar({ onOpenMenu }: { onOpenMenu: () => void }) {
-    const { language } = useLogistics();
+    const { i18n } = useTranslation();
+    const language = i18n.resolvedLanguage === 'en' ? 'en' : 'vi';
     const navigate = useNavigate();
     const clearSession = useAuthStore((x) => x.clearSession);
     const session = useAuthStore((x) => x.session);

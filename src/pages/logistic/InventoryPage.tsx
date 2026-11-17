@@ -1,9 +1,10 @@
-import { PackagePlus } from 'lucide-react';
-import InventoryStats from '../../components/logistic/InventoryStats.tsx';
-import InventoryTable from '../../components/logistic/InventoryTable.tsx';
-import { useLogistics } from '../../components/logistic/LogisticsModel.tsx';
-import { LogPageTitle } from '../../components/logistic/LogisticsUI.tsx';
+import LogisticsPageShell, { ListStatus, Pagination } from '@/components/logistic/LogisticsPageShell';
+import { useLogisticsList, type Stock } from '@/hooks/logistic/useLogisticsData';
 export default function InventoryPage() {
-    const { openReceive }=useLogistics();
-    return <><LogPageTitle code="01" eyebrow="QUẢN LÝ KHO & TỒN KHO" title="Sổ cái tồn kho thời gian thực" description="Theo dõi lượng hàng thực tế trong kho (On Hand), lượng đang giữ cho đơn (Reserved) và lượng còn có thể bán (Available = On Hand − Reserved)." action={<><span className="lg-warehouse">KHO TÂN THUẬN / LANDMARK 81</span><button type="button" className="lg-btn lg-btn--primary" onClick={()=>openReceive()}><PackagePlus size={16}/> + Nhập hàng mới (RECEIVE)</button></>}/><InventoryStats/><InventoryTable/></>;
+    const data = useLogisticsList<Stock>('/api/logistics/inventory');
+    return <LogisticsPageShell title="Quản lý tồn kho" description="Theo dõi hàng trong kho, hàng đã giữ và hàng có thể bán."><section className="overflow-x-auto rounded-xl border border-store-line bg-white p-5">
+        <ListStatus loading={data.loading} error={data.error} empty={data.items.length === 0} />
+        {data.items.length > 0 && <table className="w-full text-left text-sm"><thead><tr className="border-b"><th className="p-3">Sản phẩm</th><th>Mã SKU</th><th>Trong kho</th><th>Đã giữ</th><th>Có thể bán</th></tr></thead><tbody>{data.items.map(item => <tr key={item.productId} className="border-b"><td className="p-3 font-bold">{item.name}</td><td>{item.sku}</td><td>{item.onHand} {item.unit}</td><td>{item.reserved}</td><td>{item.available}</td></tr>)}</tbody></table>}
+        <Pagination {...data} />
+    </section></LogisticsPageShell>;
 }

@@ -1,7 +1,7 @@
 import { Box, ClipboardList, Mail, Menu, PackagePlus } from 'lucide-react';
 import WorkspaceSidebar from '@/layouts/WorkspaceSidebar';
 import { ROUTES } from '@/router/routes';
-import { useLogistics } from './LogisticsModel';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
     open: boolean;
@@ -11,8 +11,8 @@ interface Props {
 }
 
 export default function LogisticsSidebar({ open, onClose, isCollapsed, onToggleCollapse }: Props) {
-    const { language, requests, orders } = useLogistics();
-    const vietnamese = language === 'vi';
+    const { i18n } = useTranslation();
+    const vietnamese = i18n.resolvedLanguage !== 'en';
 
     return (
         <>
@@ -36,8 +36,8 @@ export default function LogisticsSidebar({ open, onClose, isCollapsed, onToggleC
                     {
                         label: vietnamese ? 'ĐIỀU PHỐI & YÊU CẦU KHÁCH' : 'DISPATCH & REQUESTS',
                         items: [
-                            { path: ROUTES.LOGISTICS_PACKING, label: vietnamese ? 'Đóng kiện & Chuyến' : 'Packing & Dispatch', icon: <ClipboardList size={18} />, count: orders.length },
-                            { path: ROUTES.LOGISTICS_PRODUCT_REQUESTS, label: vietnamese ? 'Yêu cầu thêm SP' : 'Product requests', icon: <Mail size={18} />, count: requests.length },
+                            { path: ROUTES.LOGISTICS_PACKING, label: vietnamese ? 'Package đã hủy' : 'Cancelled packages', icon: <ClipboardList size={18} /> },
+                            { path: ROUTES.LOGISTICS_PRODUCT_REQUESTS, label: vietnamese ? 'Yêu cầu thêm SP' : 'Product requests', icon: <Mail size={18} /> },
                         ],
                     },
                 ]}
