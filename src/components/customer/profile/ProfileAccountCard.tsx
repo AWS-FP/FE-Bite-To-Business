@@ -9,6 +9,29 @@ import { useAuthStore } from '@/store/admin/authStore';
 import { getAuthError } from '@/utils/admin/authError';
 import AvatarCropper from './AvatarCropper';
 
+const avatarHistoryKey = (userId: string) => `btb:customer-avatar-history:${userId}`;
+function readAvatarHistory(userId: string): string[] {
+    try {
+        const value: unknown = JSON.parse(localStorage.getItem(avatarHistoryKey(userId)) || '[]');
+        return Array.isArray(value)
+            ? value
+                  .filter(
+                      (url): url is string => typeof url === 'string' && url.startsWith('https://'),
+                  )
+                  .slice(0, 6)
+            : [];
+    } catch {
+        return [];
+    }
+}
+function saveAvatarHistory(userId: string, urls: string[]) {
+    try {
+        localStorage.setItem(avatarHistoryKey(userId), JSON.stringify(urls));
+    } catch {
+        /* Storage may be unavailable. */
+    }
+}
+
 export default function ProfileAccountCard({ profile }: { profile: CustomerProfile }) {
     const { t, i18n } = useTranslation(['profile', 'storefront']);
     const ui = (key: string) => t(`storefront:customerUI.${key}`);
@@ -19,6 +42,10 @@ export default function ProfileAccountCard({ profile }: { profile: CustomerProfi
     const [uploading, setUploading] = useState(false);
     const [message, setMessage] = useState('');
     const [error, setError] = useState(false);
+    // FE-only history for this browser. Durable multi-device history needs a BE API/table.
+    const [recentAvatars, setRecentAvatars] = useState<string[]>(() =>
+        readAvatarHistory(profile.user.id),
+    );
 
     useEffect(
         () => () => {
@@ -67,6 +94,18 @@ export default function ProfileAccountCard({ profile }: { profile: CustomerProfi
                 type: 'image/jpeg',
             });
             const updated = await uploadCustomerAvatar(file);
+            // A new URL is returned only after the backend accepts the upload.
+            const previousUrl = profile.user.avatarUrl;
+            if (previousUrl && previousUrl !== updated.user.avatarUrl) {
+                const history = [previousUrl, ...readAvatarHistory(profile.user.id)]
+                    .filter(
+                        (url, index, all) =>
+                            url !== updated.user.avatarUrl && all.indexOf(url) === index,
+                    )
+                    .slice(0, 6);
+                saveAvatarHistory(profile.user.id, history);
+                setRecentAvatars(history);
+            }
             const state = useAuthStore.getState();
             if (
                 state.session &&
@@ -216,16 +255,41 @@ export default function ProfileAccountCard({ profile }: { profile: CustomerProfi
                                             {ui('avatarHint')}
                                         </span>
                                     </button>
-                                    {profile.user.avatarUrl && (
+                                    {(profile.user.avatarUrl || recentAvatars.length > 0) && (
                                         <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-5">
                                             <h3 className="m-0 text-sm font-bold text-store-yellow">
                                                 {ui('avatarRecent')}
                                             </h3>
-                                            <img
-                                                src={profile.user.avatarUrl}
-                                                alt=""
-                                                className="mt-4 h-16 w-16 rounded-full border-2 border-store-yellow object-cover"
-                                            />
+                                            <div className="mt-4 flex flex-wrap items-center gap-3">
+                                                {[profile.user.avatarUrl, ...recentAvatars]
+                                                    .filter((url): url is string => Boolean(url))
+                                                    .filter(
+                                                        (url, index, list) =>
+                                                            list.indexOf(url) === index,
+                                                    )
+                                                    .map((url, index) => (
+                                                        <div
+                                                            key={url}
+                                                            className="flex flex-col items-center gap-1.5"
+                                                        >
+                                                            <img
+                                                                src={url}
+                                                                alt={
+                                                                    index === 0
+                                                                        ? ui('avatarCurrent')
+                                                                        : ui('avatarPrevious')
+                                                                }
+                                                                className={`h-16 w-16 rounded-full border-2 object-cover ${index === 0 ? 'border-store-yellow' : 'border-white/30'}`}
+                                                                loading="lazy"
+                                                            />
+                                                            <span className="text-[10px] text-white/75">
+                                                                {index === 0
+                                                                    ? ui('avatarCurrent')
+                                                                    : ui('avatarPrevious')}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                            </div>
                                         </div>
                                     )}
                                     {error && (

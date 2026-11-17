@@ -262,7 +262,7 @@ export default function CustomerCatalogPage() {
                                     {pageData.items.map((product) => (
                                         <article
                                             key={product.id}
-                                            className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-store-line bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                                            className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-none border border-store-line bg-white shadow-[0_6px_0_-2px_rgba(9,51,36,0.26),0_10px_17px_rgba(9,51,36,0.12)] transition-[box-shadow,border-color] duration-300 hover:border-store-sage hover:shadow-[0_7px_0_-2px_rgba(9,51,36,0.34),0_13px_22px_rgba(9,51,36,0.18)]"
                                         >
                                             <Link
                                                 to={`/products/${encodeURIComponent(product.id)}`}

@@ -98,7 +98,7 @@ export default function ProductShowcaseCard({
     }
 
     return (
-        <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-[18px] border border-store-line/90 bg-white shadow-[0_3px_12px_rgba(7,46,32,0.07)] transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1.5 hover:border-store-sage hover:shadow-[0_14px_30px_rgba(7,46,32,0.16)]">
+        <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-none border border-store-line/90 bg-white shadow-[0_6px_0_-2px_rgba(9,51,36,0.26),0_10px_17px_rgba(9,51,36,0.12)] transition-[box-shadow,border-color] duration-300 hover:border-store-sage hover:shadow-[0_7px_0_-2px_rgba(9,51,36,0.34),0_13px_22px_rgba(9,51,36,0.18)]">
             <div className="relative border-b border-store-line/60 bg-[#fbfaf5]">
                 <Link
                     to={`/products/${encodeURIComponent(product.id)}`}

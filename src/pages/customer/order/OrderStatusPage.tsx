@@ -111,8 +111,7 @@ export default function OrderStatusPage() {
                                             <div>
                                                 <strong>{item.nameVi}</strong>
                                                 <p className="m-0 text-xs text-store-muted">
-                                                    {item.sku} · {item.quantity} {item.unitCode} ·
-                                                    VAT {item.vatRate}%
+                                                    {item.sku} · {item.quantity} {item.unitCode} · VAT {item.vatRate ?? '—'}%
                                                 </p>
                                             </div>
                                             <strong className="whitespace-nowrap">
