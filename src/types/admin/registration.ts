@@ -30,7 +30,7 @@ export interface RegistrationResponse {
     submittedAt: string;
     reviewedAt: string | null;
     otpSentAt: string | null;
-    otpDeliveryState: 'QUEUED' | 'SENT' | 'FAILED' | null;
+    otpDeliveryState: 'QUEUED' | 'SENT' | 'FAILED' | 'UNCONFIRMED' | 'VERIFIED' | null;
     otpResendAvailableAt: string | null;
     activatedAt: string | null;
 }

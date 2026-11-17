@@ -29,7 +29,9 @@
         "inactive": "Not activated",
         "waiting": "Awaiting activation",
         "otpSending": "Sending OTP",
-        "otpFailed": "OTP delivery failed"
+        "otpFailed": "OTP processing failed",
+        "otpUnconfirmed": "OTP delivery unconfirmed",
+        "otpVerified": "OTP verified"
     },
     "customerType": {
         "HOUSEHOLD_INDIVIDUAL_BUSINESS": "Individual / Household",
@@ -131,8 +133,10 @@
         "rejected": "Application rejected and a notification email with the reason sent to the registered Gmail address.",
         "rejectionEmailFailed": "Application rejected and the reason saved, but the notification email could not be sent. Please check the system email service.",
         "otpSent": "OTP delivery has been queued.",
-        "otpFailedTitle": "Awaiting activation · OTP delivery failed",
-        "otpFailedDescription": "This application is not yet approved. Resend the OTP so the customer can activate their account."
+        "otpFailedTitle": "Awaiting activation · OTP processing failed",
+        "otpFailedDescription": "Resend the OTP so the customer can activate their account.",
+        "otpUnconfirmedTitle": "OTP email delivery unconfirmed",
+        "otpUnconfirmedDescription": "The customer can enter the code if it arrived. Otherwise, resend it."
     },
     "errors": {
         "unknown": "We could not process this request. Please try again.",
