@@ -1,0 +1,43 @@
+name: Deploy frontend
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: btb-frontend-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ap-southeast-1
+      VITE_API_BASE_URL: https://api.bite2business.cloud
+      VITE_VIETMAP_TILEMAP_KEY: ${{ secrets.VITE_VIETMAP_TILEMAP_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check production prerequisites
+        run: |
+          test -n "$VITE_VIETMAP_TILEMAP_KEY" || { echo 'Configure the VITE_VIETMAP_TILEMAP_KEY repository secret.'; exit 1; }
+          grep -q UNCONFIRMED src/types/admin/registration.ts || { echo 'Merge the production OTP changes before deploying.'; exit 1; }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::357646930356:role/btb-github-frontend-deploy
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Upload assets and entrypoint
+        run: |
+          aws s3 sync dist/ s3://btb-frontend-357646930356/ --exclude index.html --only-show-errors
+          aws s3 cp dist/index.html s3://btb-frontend-357646930356/index.html --cache-control no-cache --content-type 'text/html; charset=utf-8' --only-show-errors
+      - name: Refresh CloudFront cache
+        run: aws cloudfront create-invalidation --distribution-id E25S0WFMJSV8J --paths '/*' > /dev/null
