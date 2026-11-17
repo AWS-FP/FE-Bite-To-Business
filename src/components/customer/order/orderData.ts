@@ -1,10 +1,11 @@
-/** Dữ liệu demo hiển thị Orders; không phải lịch sử giao dịch của Backend. */
+
 
 import { type DeliveryPackage } from '@/components/customer/checkout/checkoutData';
 import { useCartStore } from '@/store/customer/cartStore';
 
 // Checkout hiện tại chỉ mô phỏng chuyển khoản ngân hàng
 type PaymentMethod = 'bank';
+
 
 export type OrderStatus = 'pending' | 'preparing' | 'shipping' | 'delivered' | 'cancelled';
 
@@ -110,7 +111,6 @@ export function getOrders(customerId: string): OrderRecord[] {
     );
 }
 
-/** Chỉ lưu bản xem trước UI trong sessionStorage, KHÔNG đặt hàng/thu tiền. */
 export function saveCheckoutPreview(
     customerId: string,
     input: {

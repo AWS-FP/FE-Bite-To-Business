@@ -5,12 +5,12 @@
             "description": "All applications in the system"
         },
         "pending": {
-            "title": "Pending",
-            "description": "Applications awaiting your review"
+            "title": "Incomplete",
+            "description": "Awaiting review or customer activation"
         },
         "approved": {
             "title": "Approved",
-            "description": "Eligible to set up an account"
+            "description": "Password created and account activated"
         },
         "rejected": {
             "title": "Rejected",
@@ -19,7 +19,8 @@
     },
     "status": {
         "ALL": "All",
-        "PENDING": "Pending",
+        "PENDING": "Incomplete",
+        "AWAITING_ACTIVATION": "Awaiting activation",
         "APPROVED": "Approved",
         "REJECTED": "Rejected"
     },
@@ -27,6 +28,7 @@
         "active": "Activated",
         "inactive": "Not activated",
         "waiting": "Awaiting activation",
+        "otpSending": "Sending OTP",
         "otpFailed": "OTP delivery failed"
     },
     "customerType": {
@@ -114,9 +116,9 @@
     },
     "review": {
         "approveTitle": "Approve and send OTP?",
-        "approveDescription": "This application will be approved. A verification code will be sent to the registered Gmail below.",
+        "approveDescription": "An OTP will be sent to the registered Gmail. The application awaits activation until the customer creates a password.",
         "recipient": "OTP recipient",
-        "activationNote": "The Customer verifies the OTP and creates and confirms their own password. Admins do not enter passwords or OTPs for Customers. Approval does not activate the account.",
+        "activationNote": "The customer verifies the OTP and creates a password. The application is approved after successful activation.",
         "rejectTitle": "Reject this application?",
         "rejectDescription": "Please explain why you are rejecting the application from {{name}}. This reason will be emailed to the registered Gmail address.",
         "reason": "Rejection reason",
@@ -125,12 +127,12 @@
         "reasonTooLong": "The rejection reason must not exceed 2,000 characters."
     },
     "notices": {
-        "approved": "Application approved and OTP sent to the registered Gmail. The Customer must verify the code and create a password to activate their account.",
+        "approved": "Review received. The OTP is being sent and the application awaits activation.",
         "rejected": "Application rejected and a notification email with the reason sent to the registered Gmail address.",
         "rejectionEmailFailed": "Application rejected and the reason saved, but the notification email could not be sent. Please check the system email service.",
-        "otpSent": "OTP resent to the registered Gmail.",
-        "otpFailedTitle": "Approved · OTP delivery failed",
-        "otpFailedDescription": "This application remains approved. Resend the OTP so the Customer can activate their account."
+        "otpSent": "OTP delivery has been queued.",
+        "otpFailedTitle": "Awaiting activation · OTP delivery failed",
+        "otpFailedDescription": "This application is not yet approved. Resend the OTP so the customer can activate their account."
     },
     "errors": {
         "unknown": "We could not process this request. Please try again.",
@@ -143,7 +145,7 @@
         "alreadyActivated": "The Customer has already activated their account. An OTP is no longer needed.",
         "reasonRequired": "Please enter a rejection reason.",
         "cooldown": "Requests were sent too quickly. Please wait and try again.",
-        "mail": "OTP delivery failed. The application remains approved; you can resend the code.",
+        "mail": "OTP delivery failed. The application is awaiting activation; you can resend the code.",
         "validation": "Some information is invalid. Please check and try again."
     },
     "footer": {
