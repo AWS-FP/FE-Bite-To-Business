@@ -4,7 +4,7 @@ export type UserRole =
 // Giá trị enum giữ nguyên tên như BE; nhãn hiển thị VI/EN sẽ lấy từ i18n.
 export type CustomerType = 'HOUSEHOLD_INDIVIDUAL_BUSINESS' | 'BUSINESS_COOPERATIVE';
 
-export type RegistrationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+export type RegistrationStatus = 'PENDING' | 'AWAITING_ACTIVATION' | 'APPROVED' | 'REJECTED';
 
 // POST /api/auth/register: chưa nhận password, confirmPassword hoặc role.
 export interface RegisterRequest {

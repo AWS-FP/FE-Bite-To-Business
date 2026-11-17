@@ -1,14 +1,6 @@
 /** Dữ liệu demo hiển thị Orders; không phải lịch sử giao dịch của Backend. */
 
-import {
-    CHECKOUT_ITEMS,
-    DEMO_DISCOUNT,
-    type DeliveryPackage,
-} from '@/components/customer/checkout/checkoutData';
-
-// Checkout hiện tại chỉ mô phỏng chuyển khoản ngân hàng
-type PaymentMethod = 'bank';
-
+import { type DeliveryPackage } from '@/components/customer/checkout/checkoutData';
 
 export type OrderStatus = 'pending' | 'preparing' | 'shipping' | 'delivered' | 'cancelled';
 
@@ -145,33 +137,4 @@ export function getOrders(customerId: string): OrderRecord[] {
     return [...readPreviewOrders(customerId), ...SAMPLE_ORDERS].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
-}
-
-/** Chỉ lưu bản xem trước UI trong sessionStorage, KHÔNG đặt hàng/thu tiền. */
-export function saveCheckoutPreview(customerId: string, input: {
-    packages: DeliveryPackage[];
-    assignments: Record<string, string>;
-    paymentMethod: PaymentMethod;
-    couponApplied: boolean;
-}): OrderRecord {
-    const items: OrderLine[] = CHECKOUT_ITEMS.map(item => ({
-        id: item.id, name: item.name, description: item.pack,
-        quantity: item.quantity, price: item.price,
-    }));
-    const subtotal = items.reduce((sum, item) => sum + item.price, 0);
-    const shipping = 0; // Phí giao hàng chưa được tính trong checkout demo
-    const discount = input.couponApplied ? DEMO_DISCOUNT : 0;
-    const order: OrderRecord = {
-        id: `UI-${Date.now()}`, createdAt: new Date().toISOString(),
-        status: 'pending', items, packages: input.packages.map(p => ({ ...p })),
-        assignments: { ...input.assignments }, paymentMethod: input.paymentMethod,
-        subtotal, shipping, discount, total: subtotal + shipping - discount,
-        preview: true,
-    };
-    // Ném lỗi cho caller để không báo 'đã lưu' khi storage bị chặn.
-    sessionStorage.setItem(
-        storageKey(customerId),
-        JSON.stringify([order, ...readPreviewOrders(customerId)].slice(0, 25)),
-    );
-    return order;
 }

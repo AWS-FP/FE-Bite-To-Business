@@ -30,13 +30,14 @@ export interface RegistrationResponse {
     submittedAt: string;
     reviewedAt: string | null;
     otpSentAt: string | null;
+    otpDeliveryState: 'QUEUED' | 'SENT' | 'FAILED' | null;
     otpResendAvailableAt: string | null;
     activatedAt: string | null;
 }
 
 export interface RegistrationReviewResponse {
     registration: RegistrationResponse;
-    // false có thể là đã từ chối hoặc đã duyệt nhưng gửi OTP lỗi; đọc thêm status.
+    // OTP được gửi nền; đọc otpDeliveryState để biết trạng thái thực tế.
     otpSent: boolean;
     rejectionEmailSent: boolean;
 }
