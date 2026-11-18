@@ -14,7 +14,7 @@ export default function StoreSearch() {
     const [searchMode, setSearchMode] = useState<'products' | 'ai'>('products');
     const [showAINotice, setShowAINotice] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
-    const { history, isLoadingHistory, isHistoryUnavailable, recordSearch } = useSearchHistory();
+    const { history, recordSearch } = useSearchHistory();
 
     async function handleSearch(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -104,37 +104,24 @@ export default function StoreSearch() {
                 </p>
             )}
 
-            <div
-                className="mt-1 flex min-h-[18px] items-center gap-1.5 overflow-x-auto px-2 text-[11px] leading-[1.5] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-                aria-label={t('search.history')}
-            >
-                <span className="shrink-0 text-store-cream/75">{t('search.history')}</span>
-                {isLoadingHistory && (
-                    <span className="shrink-0 text-store-cream/60" role="status">
-                        · {t('search.loadingHistory')}
-                    </span>
-                )}
-                {isHistoryUnavailable && (
-                    <span className="shrink-0 text-store-cream/60" role="status">
-                        · {t('search.historyUnavailable')}
-                    </span>
-                )}
-                {!isLoadingHistory && !isHistoryUnavailable && history.length === 0 && (
-                    <span className="shrink-0 text-store-cream/60">
-                        · {t('search.emptyHistory')}
-                    </span>
-                )}
-                {history.map((searchText) => (
-                    <Link
-                        className="shrink-0 rounded-full border border-solid border-white/15 bg-white/10 px-2 py-0.5 text-store-cream no-underline hover:bg-white/20"
-                        key={searchText}
-                        to={getCatalogSearchPath(searchText)}
-                        onClick={(event) => handleHistoryClick(event, searchText)}
-                    >
-                        {searchText}
-                    </Link>
-                ))}
-            </div>
+            {/* Only show actual past searches. No empty/loading/unavailable debug-like status line. */}
+            {history.length > 0 && (
+                <nav
+                    className="mt-2 flex flex-wrap items-center gap-1.5 px-2"
+                    aria-label={t('search.history')}
+                >
+                    {history.map((searchText) => (
+                        <Link
+                            key={searchText}
+                            to={getCatalogSearchPath(searchText)}
+                            onClick={(event) => handleHistoryClick(event, searchText)}
+                            className="shrink-0 rounded-full border border-solid border-white/15 bg-white/10 px-2.5 py-1 text-[11px] text-store-cream no-underline hover:bg-white/20"
+                        >
+                            {searchText}
+                        </Link>
+                    ))}
+                </nav>
+            )}
         </div>
     );
 }

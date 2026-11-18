@@ -37,6 +37,14 @@ export default function VerifyOtpPage() {
                                 {t('register.submitted')}
                             </p>
                         )}
+                        {location.state?.newsletterSubscriptionFailed && (
+                            <p
+                                role="alert"
+                                className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900"
+                            >
+                                {t('register.newsletterSubscribeFailed')}
+                            </p>
+                        )}
                         <VerifyOtpForm initialEmail={email} />
                     </AuthCard>
                 </main>

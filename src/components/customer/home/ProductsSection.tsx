@@ -17,6 +17,7 @@ export default function ProductsSection() {
     const groups = [
         {
             id: 'best-selling-products',
+            emptyText: t('customerUI.bestSellingEmpty'),
             title: t('customerUI.bestSelling'),
             hint: t('customerUI.bestSellingHint'),
             products: bestSellingProducts,
@@ -25,6 +26,7 @@ export default function ProductsSection() {
         },
         {
             id: 'deep-discount-products',
+            emptyText: t('customerUI.deepDiscountEmpty'),
             title: t('customerUI.deepDiscount'),
             hint: t('customerUI.deepDiscountHint'),
             products: deepDiscountProducts,
@@ -33,6 +35,7 @@ export default function ProductsSection() {
         },
         {
             id: 'top-rated-products',
+            emptyText: t('customerUI.topRatedEmpty'),
             title: t('customerUI.topRated'),
             hint: t('customerUI.topRatedHint'),
             products: topRatedProducts,
@@ -142,7 +145,7 @@ export default function ProductsSection() {
                         ) : !loadingProducts && !productError ? (
                             <p className="mt-3 flex items-center gap-2 rounded-xl bg-white/70 p-4 text-sm text-store-muted">
                                 <Clock3 size={18} />
-                                {t('customerUI.groupEmpty')}
+                                {group.emptyText}
                             </p>
                         ) : null}
                     </div>

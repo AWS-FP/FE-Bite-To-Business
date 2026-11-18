@@ -163,8 +163,8 @@ export default function CustomerProductInfo({
 
     return (
         <div className="min-w-0 space-y-5">
-            <article className="overflow-hidden rounded-[28px] border border-[#dfebdc] bg-[#fffdf7] text-[#14382c] shadow-[0_14px_34px_rgba(4,32,22,0.12)]">
-                <div className="p-5 sm:p-7">
+            <article className="overflow-hidden rounded-[20px] border border-[#dfebdc] bg-[#fffdf7] text-[#14382c] shadow-[0_14px_34px_rgba(4,32,22,0.12)]">
+                <div className="p-5 sm:p-6">
                     <div className="flex flex-wrap items-center gap-2 text-xs font-bold">
                         {category && (
                             <span className="rounded-full bg-[#e6f0e7] px-3 py-1.5 text-[#245e45]">
@@ -177,7 +177,7 @@ export default function CustomerProductInfo({
                             </span>
                         )}
                     </div>
-                    <h1 className="mb-0 mt-4 max-w-3xl break-words font-subheading text-[clamp(30px,3.4vw,48px)] font-extrabold leading-[1.12] tracking-[-0.045em]">
+                    <h1 className="mb-0 mt-4 max-w-3xl break-words font-subheading text-[clamp(27px,3vw,39px)] font-extrabold leading-[1.12] tracking-[-0.045em]">
                         {name}
                     </h1>
                     <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-[#597367]">
@@ -197,12 +197,12 @@ export default function CustomerProductInfo({
                             </span>
                         )}
                     </div>
-                    <div className="group relative isolate mt-6 flex h-[300px] items-center justify-center overflow-hidden rounded-[22px] border border-[#e6eadc] bg-[radial-gradient(ellipse_at_center,#fff_10%,#f2f4e9_75%)] sm:h-[430px] before:pointer-events-none before:absolute before:z-0 before:h-[260px] before:w-[260px] before:rounded-full before:border before:border-[#dce4d3] before:shadow-[0_0_0_34px_#e5eada55,0_0_0_68px_#e5eada33] sm:before:h-[330px] sm:before:w-[330px]">
+                    <div className="group relative isolate mt-5 flex h-[290px] items-center justify-center overflow-hidden rounded-[16px] border border-[#e6eadc] bg-white sm:h-[380px]">
                         {product.imageUrl ? (
                             <img
                                 src={product.imageUrl}
                                 alt={name}
-                                className="relative z-10 h-full w-full max-h-[280px] object-contain p-6 mix-blend-multiply drop-shadow-[0_22px_16px_#234e3018] transition-transform duration-700 ease-out group-hover:-translate-y-2 group-hover:-rotate-2 group-hover:scale-[1.04] motion-reduce:transform-none motion-reduce:transition-none sm:max-h-[380px] sm:p-8"
+                                className="relative z-10 h-full w-full max-h-[290px] object-contain p-5 transition-transform duration-500 ease-out group-hover:scale-[1.04] motion-reduce:transform-none sm:max-h-[380px] sm:p-7"
                             />
                         ) : (
                             <div className="flex flex-col items-center gap-3 text-sm text-[#789084]">
@@ -212,16 +212,38 @@ export default function CustomerProductInfo({
                         )}
                         <CustomerFavoriteButton productId={product.id} />
                     </div>
-                    <div className="mt-5 grid gap-2 sm:grid-cols-2">
-                        <div className="flex items-center gap-2 rounded-lg bg-[#edf5ed] px-4 py-3 text-sm font-semibold text-[#214d39]">
-                            <Package size={18} /> {product.unitCode}
-                        </div>
-                        {product.minOrderQuantity != null && (
-                            <div className="flex items-center gap-2 rounded-lg bg-[#edf5ed] px-4 py-3 text-sm font-semibold text-[#214d39]">
-                                <Scale size={18} /> {tr('moq')}: {product.minOrderQuantity}
+                    {/* Selling unit and net weight are distinct properties: no implicit KG conversion. */}
+                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-xl border border-[#dce8dc] bg-[#edf5ed] px-4 py-3 text-[#214d39]">
+                            <div className="flex items-center gap-2 text-xs font-semibold">
+                                <Package size={17} />
+                                {tr('sellingUnit')}
                             </div>
-                        )}
+                            <strong className="mt-1 block text-lg">{product.unitCode}</strong>
+                            {packageSpec && (
+                                <span className="mt-1 block text-xs text-[#476858]">
+                                    {tr('package')}: {packageSpec}
+                                </span>
+                            )}
+                        </div>
+                        <div className="rounded-xl border border-[#dce8dc] bg-[#edf5ed] px-4 py-3 text-[#214d39]">
+                            <div className="flex items-center gap-2 text-xs font-semibold">
+                                <Scale size={17} />
+                                {tr('moq')}
+                            </div>
+                            <strong className="mt-1 block text-lg">
+                                {product.minOrderQuantity ?? '—'} {product.unitCode}
+                            </strong>
+                            {details?.netWeightKg != null && (
+                                <span className="mt-1 block text-xs text-[#476858]">
+                                    {tr('netWeight')}: {valueWithUnit(details.netWeightKg, 'kg')}
+                                </span>
+                            )}
+                        </div>
                     </div>
+                    <p className="mb-0 mt-3 text-xs leading-5 text-[#617969]">
+                        {tr('unitClarification')}
+                    </p>
                     <div className="mt-6 border-t border-[#e1ebe0] pt-5">
                         <h2 className="mb-3 flex items-center gap-2 text-lg font-bold">
                             <FileText size={19} />
