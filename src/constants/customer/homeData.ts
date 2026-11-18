@@ -27,7 +27,7 @@ export interface HomeProductCardItem {
     spec: string;
     rating?: number;
     reviewCount?: number;
-    listPrice: number;
+    listPrice: number | null;
     salePrice?: number;
     discountBadge?: string;
     topLeftBadge?: string;

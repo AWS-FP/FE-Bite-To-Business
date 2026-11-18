@@ -14,6 +14,7 @@ import { getAuthError, type AuthError } from '@/utils/admin/authError';
 import type { DeliveryCity } from '@/types/location';
 import { createRegistrationSchema } from '@/validations/admin/registrationSchema';
 import { clearActivationSession } from '@/utils/admin/activationSession';
+import { subscribeNewsletter } from '@/services/customer/newsletterService';
 
 export default function useRegisterForm() {
     const navigate = useNavigate();
@@ -32,6 +33,7 @@ export default function useRegisterForm() {
     });
     const [step, setStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [newsletterConsent, setNewsletterConsent] = useState(false);
     const [serverError, setServerError] = useState<AuthError | null>(null);
     const submittingRef = useRef(false);
 
@@ -69,10 +71,21 @@ export default function useRegisterForm() {
                 async (request) => {
                     setIsSubmitting(true);
                     await sendRegistration(request);
+                    // Newsletter is an optional, explicit consent; registration remains successful
+                    // even if the separate subscription endpoint is unavailable.
+                    const newsletterSubscriptionFailed = newsletterConsent
+                        ? await subscribeNewsletter(request.email)
+                              .then(() => false)
+                              .catch(() => true)
+                        : false;
                     clearActivationSession();
                     navigate(ROUTES.VERIFY_OTP, {
                         replace: true,
-                        state: { email: request.email, registrationSubmitted: true },
+                        state: {
+                            email: request.email,
+                            registrationSubmitted: true,
+                            newsletterSubscriptionFailed,
+                        },
                     });
                 },
                 () => {
@@ -123,5 +136,15 @@ export default function useRegisterForm() {
         }
     }
 
-    return { form, step, goBack, editStep, handleSubmit, isSubmitting, serverError };
+    return {
+        form,
+        step,
+        goBack,
+        editStep,
+        handleSubmit,
+        isSubmitting,
+        serverError,
+        newsletterConsent,
+        setNewsletterConsent,
+    };
 }

@@ -268,26 +268,22 @@ export default function ProfileAccountCard({ profile }: { profile: CustomerProfi
                                                             list.indexOf(url) === index,
                                                     )
                                                     .map((url, index) => (
-                                                        <div
+                                                        <img
                                                             key={url}
-                                                            className="flex flex-col items-center gap-1.5"
-                                                        >
-                                                            <img
-                                                                src={url}
-                                                                alt={
-                                                                    index === 0
-                                                                        ? ui('avatarCurrent')
-                                                                        : ui('avatarPrevious')
-                                                                }
-                                                                className={`h-16 w-16 rounded-full border-2 object-cover ${index === 0 ? 'border-store-yellow' : 'border-white/30'}`}
-                                                                loading="lazy"
-                                                            />
-                                                            <span className="text-[10px] text-white/75">
-                                                                {index === 0
+                                                            src={url}
+                                                            alt={
+                                                                index === 0
                                                                     ? ui('avatarCurrent')
-                                                                    : ui('avatarPrevious')}
-                                                            </span>
-                                                        </div>
+                                                                    : ui('avatarPrevious')
+                                                            }
+                                                            title={
+                                                                index === 0
+                                                                    ? ui('avatarCurrent')
+                                                                    : ui('avatarPrevious')
+                                                            }
+                                                            className={`h-16 w-16 rounded-full border-2 object-cover ${index === 0 ? 'border-store-yellow' : 'border-white/30'}`}
+                                                            loading="lazy"
+                                                        />
                                                     ))}
                                             </div>
                                         </div>

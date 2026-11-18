@@ -1,19 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, ChevronDown, Folder, PackageSearch, Search } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronRight, PackageSearch } from 'lucide-react';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
-import { getHomeCategories } from '@/services/customer/homeService';
-import type { HomeCategory } from '@/services/customer/homeService';
-import { getCatalogProducts } from '@/services/customer/catalogReadService';
-import type { CatalogProductPage } from '@/services/customer/catalogReadService';
+import { getHomeCategories, type HomeCategory } from '@/services/customer/homeService';
+import {
+    getCatalogProducts,
+    type CatalogProductPage,
+} from '@/services/customer/catalogReadService';
 import SectionPaginationBar from '@/components/customer/home/SectionPaginationBar';
-import CustomerFavoriteButton from '@/components/customer/CustomerFavoriteButton';
+import CatalogShowcaseCard from '@/components/customer/CatalogShowcaseCard';
+import CategoryIcon from '@/components/customer/CategoryIcon';
 import { ROUTES } from '@/router/routes';
 
 export default function CustomerCatalogPage() {
     const { t, i18n } = useTranslation('storefront');
-    const en = i18n.resolvedLanguage?.startsWith('en');
+    const english = i18n.resolvedLanguage?.startsWith('en') ?? false;
     const [params, setParams] = useSearchParams();
     const [categories, setCategories] = useState<HomeCategory[]>([]);
     const [categoryError, setCategoryError] = useState(false);
@@ -21,22 +23,27 @@ export default function CustomerCatalogPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [expanded, setExpanded] = useState<string | null>(null);
-    const [draftSearch, setDraftSearch] = useState(params.get('q') ?? '');
+
     const categoryId = params.get('category');
+    // Search still works when the header passes ?q=, without an extra search bar here.
     const query = params.get('q') ?? '';
     const page = Math.max(1, Number(params.get('page') || 1) || 1);
     const size = 12;
-    const title = (item: HomeCategory) => (en ? item.nameEn : item.nameVi);
+    const title = (item: HomeCategory) => (english ? item.nameEn : item.nameVi);
 
     useEffect(() => {
         const controller = new AbortController();
         getHomeCategories(controller.signal)
-            .then(setCategories)
+            .then((data) => {
+                setCategories(data);
+                setCategoryError(false);
+            })
             .catch(() => {
                 if (!controller.signal.aborted) setCategoryError(true);
             });
         return () => controller.abort();
     }, []);
+
     useEffect(() => {
         const controller = new AbortController();
         getCatalogProducts({
@@ -47,10 +54,9 @@ export default function CustomerCatalogPage() {
             signal: controller.signal,
         })
             .then((result) => {
-                if (!controller.signal.aborted) {
-                    setPageData(result);
-                    setError(false);
-                }
+                if (controller.signal.aborted) return;
+                setPageData(result);
+                setError(false);
             })
             .catch(() => {
                 if (!controller.signal.aborted) setError(true);
@@ -60,10 +66,15 @@ export default function CustomerCatalogPage() {
             });
         return () => controller.abort();
     }, [page, query, categoryId]);
-    const selected = categories
-        .flatMap((item) => [item, ...item.children])
-        .find((item) => item.id === categoryId);
-    const setFilter = (key: 'category' | 'q' | 'page', value?: string) => {
+
+    const categoryLookup = new Map(
+        categories
+            .flatMap((parent) => [parent, ...parent.children])
+            .map((category) => [category.id, category]),
+    );
+    const selected = categoryId ? categoryLookup.get(categoryId) : undefined;
+
+    function setFilter(key: 'category' | 'page', value?: string) {
         setLoading(true);
         setParams((previous) => {
             const next = new URLSearchParams(previous);
@@ -72,25 +83,31 @@ export default function CustomerCatalogPage() {
             if (key !== 'page') next.delete('page');
             return next;
         });
-    };
+    }
+
     return (
         <StorefrontLayout rootClassName="min-h-screen bg-store-cream text-store-ink">
-            <main className="mx-auto max-w-[1320px] px-4 py-9 sm:px-6">
+            {/* Same 1440px + 20px gutters as the main navigation above. */}
+            <div className="mx-auto w-full max-w-[1440px] px-5 pb-16 pt-7 sm:pt-9">
                 <Link
                     to={ROUTES.HOME}
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-store-green no-underline"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-store-green no-underline hover:underline"
                 >
                     <ArrowLeft size={17} />
                     {t('home')}
                 </Link>
-                <div className="mt-5 rounded-[24px] bg-store-green p-7 text-white sm:p-9">
-                    <h1 className="m-0 font-subheading text-3xl font-bold">
+
+                <header className="mt-5 rounded-[22px] bg-store-green px-6 py-7 text-white sm:px-9 sm:py-9">
+                    <h1 className="m-0 font-subheading text-3xl font-bold sm:text-4xl">
                         {t('customerUI.catalogTitle')}
                     </h1>
-                    <p className="mt-2 text-sm text-white/80">{t('customerUI.catalogIntro')}</p>
-                </div>
-                <div className="mt-6 grid gap-6 lg:grid-cols-[270px_minmax(0,1fr)]">
-                    <aside className="self-start rounded-2xl bg-white p-4 shadow-sm lg:sticky lg:top-4">
+                    <p className="mb-0 mt-2 text-sm text-white/80">
+                        {t('customerUI.catalogIntro')}
+                    </p>
+                </header>
+
+                <div className="mt-7 grid items-start gap-6 lg:grid-cols-[270px_minmax(0,1fr)] xl:gap-8">
+                    <aside className="min-w-0 rounded-2xl bg-white p-4 shadow-sm lg:sticky lg:top-[230px]">
                         <h2 className="mb-3 mt-0 font-subheading text-base font-bold">
                             {t('customerUI.categoryTitle')}
                         </h2>
@@ -100,54 +117,54 @@ export default function CustomerCatalogPage() {
                         <button
                             type="button"
                             onClick={() => setFilter('category')}
-                            className={`mb-2 w-full rounded-lg p-3 text-left text-sm font-bold ${!categoryId ? 'bg-store-yellow' : 'bg-surface-soft hover:bg-surface-green'}`}
+                            aria-current={!categoryId ? 'page' : undefined}
+                            className={`mb-2 w-full rounded-lg px-3 py-3 text-left text-sm font-bold transition-colors ${
+                                !categoryId
+                                    ? 'bg-store-yellow text-store-ink'
+                                    : 'bg-surface-soft hover:bg-surface-green'
+                            }`}
                         >
                             {t('customerUI.catalogAll')}
                         </button>
+
                         <nav
                             aria-label={t('customerUI.categorySelect')}
-                            className="max-h-[65vh] overflow-y-auto pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                            className="max-h-[62vh] overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-store-green"
+                            tabIndex={0}
                         >
                             {categories.map((parent) => {
                                 const selectedParent =
                                     categoryId === parent.id ||
-                                    parent.children.some((item) => item.id === categoryId);
-                                // null means automatic expansion of the selected branch.
-                                // An empty string means the user explicitly collapsed it.
+                                    parent.children.some((child) => child.id === categoryId);
                                 const open =
                                     expanded === parent.id || (expanded === null && selectedParent);
-                                const selectedDirectly = categoryId === parent.id;
+
                                 return (
                                     <div
                                         key={parent.id}
-                                        className="border-b border-store-line/60 last:border-b-0"
+                                        className="border-b border-store-line/60 py-1 last:border-b-0"
                                     >
-                                        <div className="flex min-h-12 items-center gap-1 py-1">
+                                        <div className="flex items-center gap-1">
                                             <button
                                                 type="button"
+                                                aria-current={
+                                                    categoryId === parent.id ? 'page' : undefined
+                                                }
                                                 onClick={() => {
                                                     setExpanded(parent.id);
                                                     setFilter('category', parent.id);
                                                 }}
-                                                aria-current={selectedDirectly ? 'page' : undefined}
-                                                className={`group relative flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-lg py-2 pl-3 pr-1 text-left text-sm font-semibold transition-colors hover:text-store-green ${
+                                                className={`flex min-w-0 flex-1 items-center gap-2.5 rounded-xl px-2.5 py-3 text-left text-sm font-semibold transition-colors ${
                                                     selectedParent
-                                                        ? 'text-store-green'
-                                                        : 'text-store-ink'
+                                                        ? 'bg-surface-green text-store-green'
+                                                        : 'text-store-ink hover:bg-surface-soft'
                                                 }`}
                                             >
-                                                {selectedParent && (
-                                                    <span
-                                                        aria-hidden="true"
-                                                        className="absolute bottom-2 left-0 top-2 w-[3px] rounded-full bg-store-green"
-                                                    />
-                                                )}
-                                                <Folder
-                                                    size={17}
-                                                    strokeWidth={1.8}
-                                                    className="shrink-0 text-store-green"
+                                                <CategoryIcon
+                                                    category={parent}
+                                                    className="h-7 w-7 shrink-0"
                                                 />
-                                                <span className="min-w-0 flex-1">
+                                                <span className="min-w-0 flex-1 break-words leading-5">
                                                     {title(parent)}
                                                 </span>
                                             </button>
@@ -161,44 +178,58 @@ export default function CustomerCatalogPage() {
                                                         name: title(parent),
                                                     })}
                                                     aria-expanded={open}
-                                                    className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-full text-store-muted transition-colors hover:bg-surface-green hover:text-store-green"
+                                                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-store-line text-store-green transition hover:bg-surface-green"
                                                 >
                                                     <ChevronDown
-                                                        size={16}
+                                                        size={17}
                                                         className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
                                                     />
                                                 </button>
                                             )}
                                         </div>
+
+                                        {/* A genuine tree: one vertical stem, branches with arrowheads, no child boxes. */}
                                         {open && parent.children.length > 0 && (
-                                            <div className="mb-2 ml-5 space-y-0.5 border-l border-store-line pl-3">
-                                                {parent.children.map((child) => (
-                                                    <button
-                                                        key={child.id}
-                                                        type="button"
-                                                        onClick={() =>
-                                                            setFilter('category', child.id)
-                                                        }
-                                                        aria-current={
-                                                            categoryId === child.id
-                                                                ? 'page'
-                                                                : undefined
-                                                        }
-                                                        className={`flex w-full cursor-pointer items-start gap-2 rounded-lg px-2 py-2 text-left text-xs leading-5 transition-colors ${
-                                                            categoryId === child.id
-                                                                ? 'bg-surface-green font-bold text-store-green'
-                                                                : 'text-store-muted hover:bg-surface-soft hover:text-store-ink'
-                                                        }`}
-                                                    >
-                                                        <span
-                                                            aria-hidden="true"
-                                                            className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-current opacity-60"
-                                                        />
-                                                        <span className="min-w-0 flex-1">
-                                                            {title(child)}
-                                                        </span>
-                                                    </button>
-                                                ))}
+                                            <div className="relative mb-2 ml-4 mt-1 pl-6">
+                                                <span
+                                                    aria-hidden="true"
+                                                    className="pointer-events-none absolute bottom-4 left-[7px] top-0 w-px bg-store-green/35"
+                                                />
+                                                <div className="space-y-0.5">
+                                                    {parent.children.map((child) => (
+                                                        <button
+                                                            key={child.id}
+                                                            type="button"
+                                                            onClick={() =>
+                                                                setFilter('category', child.id)
+                                                            }
+                                                            aria-current={
+                                                                categoryId === child.id
+                                                                    ? 'page'
+                                                                    : undefined
+                                                            }
+                                                            className={`group relative flex w-full min-w-0 items-center rounded-lg py-2.5 pl-2 pr-1 text-left text-xs leading-5 transition-colors ${
+                                                                categoryId === child.id
+                                                                    ? 'bg-surface-green font-bold text-store-green'
+                                                                    : 'text-store-muted hover:bg-surface-soft hover:text-store-green'
+                                                            }`}
+                                                        >
+                                                            <span
+                                                                aria-hidden="true"
+                                                                className="pointer-events-none absolute -left-[17px] top-1/2 h-px w-[15px] -translate-y-1/2 bg-store-green/35"
+                                                            />
+                                                            <ChevronRight
+                                                                aria-hidden="true"
+                                                                size={15}
+                                                                strokeWidth={2.5}
+                                                                className="pointer-events-none absolute -left-[4px] top-1/2 -translate-y-1/2 text-store-green/80"
+                                                            />
+                                                            <span className="min-w-0 flex-1 break-words pl-2">
+                                                                {title(child)}
+                                                            </span>
+                                                        </button>
+                                                    ))}
+                                                </div>
                                             </div>
                                         )}
                                     </div>
@@ -206,38 +237,11 @@ export default function CustomerCatalogPage() {
                             })}
                         </nav>
                     </aside>
-                    <div className="min-w-0">
-                        <form
-                            className="flex gap-2 rounded-xl bg-white p-3 shadow-sm"
-                            onSubmit={(event) => {
-                                event.preventDefault();
-                                setFilter('q', draftSearch.trim());
-                            }}
-                        >
-                            <label htmlFor="catalog-search" className="sr-only">
-                                {t('customerUI.catalogSearchLabel')}
-                            </label>
-                            <input
-                                id="catalog-search"
-                                value={draftSearch}
-                                onChange={(e) => setDraftSearch(e.target.value)}
-                                placeholder={t('customerUI.catalogSearchPlaceholder')}
-                                className="min-w-0 flex-1 rounded-lg border border-store-line px-4 py-2 text-sm"
-                            />
-                            <button
-                                type="submit"
-                                className="grid h-10 w-10 cursor-pointer place-items-center rounded-lg bg-store-yellow"
-                                aria-label={t('search.submit')}
-                            >
-                                <Search size={18} />
-                            </button>
-                        </form>
-                        <h2 className="mb-2 mt-6 font-subheading text-xl font-bold">
+
+                    <section className="min-w-0">
+                        <h2 className="m-0 mt-2 font-subheading text-xl font-bold">
                             {selected ? title(selected) : t('customerUI.catalogShowing')}
                         </h2>
-                        <p className="mt-0 text-xs text-store-muted">
-                            {t('customerUI.catalogInfo')}
-                        </p>
                         {loading && (
                             <p role="status" className="mt-6">
                                 {t('homePage.productsLoading')}
@@ -260,52 +264,16 @@ export default function CustomerCatalogPage() {
                             <>
                                 <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                                     {pageData.items.map((product) => (
-                                        <article
+                                        <CatalogShowcaseCard
                                             key={product.id}
-                                            className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-none border border-store-line bg-white shadow-[0_6px_0_-2px_rgba(9,51,36,0.26),0_10px_17px_rgba(9,51,36,0.12)] transition-[box-shadow,border-color] duration-300 hover:border-store-sage hover:shadow-[0_7px_0_-2px_rgba(9,51,36,0.34),0_13px_22px_rgba(9,51,36,0.18)]"
-                                        >
-                                            <Link
-                                                to={`/products/${encodeURIComponent(product.id)}`}
-                                                className="block h-40 overflow-hidden bg-surface-soft p-3"
-                                            >
-                                                {product.imageUrl ? (
-                                                    <img
-                                                        src={product.imageUrl}
-                                                        alt={en ? product.nameEn : product.nameVi}
-                                                        className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.07]"
-                                                        loading="lazy"
-                                                    />
-                                                ) : (
-                                                    <div className="grid h-full place-items-center">
-                                                        <PackageSearch
-                                                            size={26}
-                                                            className="text-store-sage"
-                                                        />
-                                                    </div>
-                                                )}
-                                            </Link>
-                                            <CustomerFavoriteButton productId={product.id} />
-                                            <div className="flex flex-1 flex-col gap-2 p-3.5">
-                                                <p className="m-0 truncate text-[10px] text-store-muted">
-                                                    SKU: {product.sku}
-                                                </p>
-                                                <Link
-                                                    to={`/products/${encodeURIComponent(product.id)}`}
-                                                    className="line-clamp-2 min-h-12 text-sm font-bold text-store-ink no-underline hover:text-store-green"
-                                                >
-                                                    {en ? product.nameEn : product.nameVi}
-                                                </Link>
-                                                <p className="mt-auto text-xs text-store-muted">
-                                                    {(en
-                                                        ? product.packageSpecEn
-                                                        : product.packageSpecVi) ||
-                                                        product.unitCode}
-                                                </p>
-                                                <p className="m-0 text-xs text-store-muted">
-                                                    {t('customerUI.priceUnavailable')}
-                                                </p>
-                                            </div>
-                                        </article>
+                                            product={product}
+                                            categoryNameVi={
+                                                categoryLookup.get(product.categoryId)?.nameVi ?? ''
+                                            }
+                                            categoryNameEn={
+                                                categoryLookup.get(product.categoryId)?.nameEn ?? ''
+                                            }
+                                        />
                                     ))}
                                 </div>
                                 <SectionPaginationBar
@@ -319,9 +287,9 @@ export default function CustomerCatalogPage() {
                                 />
                             </>
                         )}
-                    </div>
+                    </section>
                 </div>
-            </main>
+            </div>
         </StorefrontLayout>
     );
 }

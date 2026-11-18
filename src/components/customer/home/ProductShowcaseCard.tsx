@@ -25,7 +25,7 @@ export default function ProductShowcaseCard({
     const isCustomer = session?.user.role === 'CUSTOMER';
     const addItemToCart = useCartStore((state) => state.addItem);
 
-    const [quantity, setQuantity] = useState(product.minOrderQuantity ?? 1);
+    const [requestedQuantity, setQuantity] = useState(product.minOrderQuantity ?? 1);
     const [favorite, setFavorite] = useState(false);
     const [savingFavorite, setSavingFavorite] = useState(false);
 
@@ -61,17 +61,19 @@ export default function ProductShowcaseCard({
     };
 
     const minQuantity = product.minOrderQuantity ?? 1;
+    const quantity = Math.max(minQuantity, requestedQuantity);
     const step = product.quantityStep ?? 1;
     const inStock = product.availableQuantity == null || product.availableQuantity > 0;
     const available = product.availableQuantity;
     const validSale =
         product.salePrice != null &&
         product.salePrice >= 0 &&
+        product.listPrice != null &&
         product.listPrice > 0 &&
         product.salePrice < product.listPrice;
     const unitPrice = validSale ? product.salePrice! : product.listPrice;
     const discountPercent = validSale
-        ? Math.round(((product.listPrice - unitPrice) / product.listPrice) * 100)
+        ? Math.round(((product.listPrice! - unitPrice!) / product.listPrice!) * 100)
         : 0;
 
     const english = i18n.resolvedLanguage?.startsWith('en');
@@ -81,10 +83,10 @@ export default function ProductShowcaseCard({
         : product.categoryLabel;
     const unit = t(`homePage.units.${product.unit.toLowerCase()}`, product.unit);
     const image = product.imageUrl?.trim();
-    const totalPrice = unitPrice * quantity;
+    const totalPrice = unitPrice == null ? null : unitPrice * quantity;
 
     function handleAddToOrder() {
-        if (!inStock || (available != null && quantity > available)) return;
+        if (!inStock || unitPrice == null || (available != null && quantity > available)) return;
         addItemToCart(
             {
                 id: product.id,
@@ -133,7 +135,7 @@ export default function ProductShowcaseCard({
                         favorite ? 'customerUI.removeFavorite' : 'customerUI.addFavorite',
                     )}
                     aria-pressed={favorite}
-                    className="absolute right-2.5 top-2.5 z-10 grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-store-line bg-white/95 text-store-green shadow-sm transition hover:scale-110 hover:bg-store-yellow disabled:opacity-60"
+                    className={`absolute right-2.5 top-2.5 z-10 grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-store-line bg-white/95 shadow-sm transition hover:scale-110 hover:bg-store-yellow disabled:opacity-60 ${favorite ? 'text-red-500' : 'text-store-green'}`}
                 >
                     <Heart size={18} fill={favorite ? 'currentColor' : 'none'} />
                 </button>
@@ -184,7 +186,7 @@ export default function ProductShowcaseCard({
                     <div className="flex min-h-[16px] items-center gap-2">
                         {validSale && (
                             <span className="text-[11px] leading-4 text-store-muted line-through tabular-nums">
-                                {formatCurrencyVnd(product.listPrice)}
+                                {formatCurrencyVnd(product.listPrice!)}
                             </span>
                         )}
                     </div>
@@ -192,7 +194,9 @@ export default function ProductShowcaseCard({
                         <span
                             className={`font-price text-[20px] font-black leading-6 tabular-nums ${validSale ? 'text-[#d73a30]' : 'text-store-green'}`}
                         >
-                            {formatCurrencyVnd(unitPrice)}
+                            {unitPrice == null
+                                ? t('customerUI.priceUnavailable')
+                                : formatCurrencyVnd(unitPrice)}
                         </span>
                         <span className="pb-0.5 text-xs font-bold text-store-muted">/ {unit}</span>
                     </div>
@@ -203,16 +207,18 @@ export default function ProductShowcaseCard({
                         <span>{t('homePage.totalPrice', 'Total Price:')}</span>
                         <span
                             className="truncate font-bold tabular-nums"
-                            title={formatCurrencyVnd(totalPrice)}
+                            title={totalPrice == null ? undefined : formatCurrencyVnd(totalPrice)}
                         >
-                            {formatCurrencyVnd(totalPrice)} (×{quantity})
+                            {totalPrice == null
+                                ? '—'
+                                : `${formatCurrencyVnd(totalPrice)} (×${quantity})`}
                         </span>
                     </div>
                     <div className="mt-2 flex items-center gap-2">
                         <div className="flex h-9 shrink-0 items-center rounded-lg border border-store-line bg-white px-1">
                             <button
                                 type="button"
-                                onClick={() => setQuantity((q) => Math.max(minQuantity, q - step))}
+                                onClick={() => setQuantity(Math.max(minQuantity, quantity - step))}
                                 disabled={quantity <= minQuantity || !inStock}
                                 aria-label={t('homePage.decreaseQuantity')}
                                 className="grid h-7 w-6 cursor-pointer place-items-center rounded-md border-0 bg-transparent text-store-ink hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-40"
@@ -224,7 +230,7 @@ export default function ProductShowcaseCard({
                             </span>
                             <button
                                 type="button"
-                                onClick={() => setQuantity((q) => q + step)}
+                                onClick={() => setQuantity(quantity + step)}
                                 disabled={
                                     !inStock || (available != null && quantity + step > available)
                                 }
@@ -237,12 +243,18 @@ export default function ProductShowcaseCard({
                         <button
                             type="button"
                             onClick={handleAddToOrder}
-                            disabled={!inStock || (available != null && quantity > available)}
+                            disabled={
+                                !inStock ||
+                                unitPrice == null ||
+                                (available != null && quantity > available)
+                            }
                             className="h-9 min-w-0 flex-1 cursor-pointer rounded-lg border-0 bg-store-green px-2 text-[11px] font-bold text-white transition hover:bg-store-dark disabled:cursor-not-allowed disabled:bg-[#91a59d]"
                         >
-                            {inStock
-                                ? t('homePage.addToOrder', 'Add to Order')
-                                : t('customerUI.outOfStock')}
+                            {unitPrice == null
+                                ? t('customerUI.priceUnavailable')
+                                : inStock
+                                  ? t('homePage.addToOrder', 'Add to Order')
+                                  : t('customerUI.outOfStock')}
                         </button>
                     </div>
                 </div>

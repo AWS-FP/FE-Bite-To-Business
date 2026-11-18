@@ -10,8 +10,17 @@ import InvoiceInformationStep from './InvoiceInformationStep';
 
 export default function RegisterForm() {
     const { t } = useTranslation();
-    const { form, step, goBack, editStep, handleSubmit, isSubmitting, serverError } =
-        useRegisterForm();
+    const {
+        form,
+        step,
+        goBack,
+        editStep,
+        handleSubmit,
+        isSubmitting,
+        serverError,
+        newsletterConsent,
+        setNewsletterConsent,
+    } = useRegisterForm();
     const titleRef = useRef<HTMLHeadingElement>(null);
     const previousStepRef = useRef(step);
 
@@ -112,6 +121,23 @@ export default function RegisterForm() {
                     {step === 2 && <DeliveryAddressStep form={form} />}
                     {step === 3 && <InvoiceInformationStep form={form} onEdit={editStep} />}
                 </fieldset>
+                {step === 3 && (
+                    <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl border border-solid border-auth-ink/15 bg-white p-4 text-sm text-auth-ink">
+                        <input
+                            type="checkbox"
+                            checked={newsletterConsent}
+                            onChange={(event) => setNewsletterConsent(event.target.checked)}
+                            disabled={isSubmitting}
+                            className="mt-1 h-4 w-4 shrink-0 accent-auth-green"
+                        />
+                        <span>
+                            <strong className="block">{t('register.newsletterOptInTitle')}</strong>
+                            <span className="mt-1 block text-xs leading-5 text-auth-muted">
+                                {t('register.newsletterOptInHelp')}
+                            </span>
+                        </span>
+                    </label>
+                )}
 
                 <div className="auth-form-actions mt-6 flex gap-3">
                     {step > 1 && (
