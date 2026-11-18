@@ -50,9 +50,9 @@ export default function StoreSearch() {
     }
 
     return (
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 max-w-[720px] flex-1">
             <form
-                className="focus-border-group flex h-[46px] min-w-0 items-center rounded-full border-2 border-solid border-store-ink bg-store-cream shadow-[3px_3px_0_var(--color-store-ink)] focus-within:border-store-green"
+                className="focus-border-group flex h-[52px] min-w-0 items-center rounded-full border-2 border-solid border-store-ink bg-store-cream shadow-[3px_3px_0_var(--color-store-ink)] focus-within:border-store-green"
                 role="search"
                 aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.label')}
                 onSubmit={handleSearch}
@@ -79,7 +79,7 @@ export default function StoreSearch() {
                 />
 
                 <button
-                    className="flex h-full shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-r-full border-0 border-l-2 border-solid border-store-ink bg-store-yellow px-3.5 text-[12px] font-extrabold text-store-ink transition-colors hover:bg-store-yellow focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white disabled:cursor-wait disabled:opacity-70"
+                    className="flex h-full shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-r-full border-0 border-l-2 border-solid border-store-ink bg-store-yellow px-3.5 text-[12px] font-extrabold text-store-ink transition-colors hover:bg-[#ffe97b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white disabled:cursor-wait disabled:opacity-70"
                     type="submit"
                     aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.submit')}
                     disabled={isSearching}

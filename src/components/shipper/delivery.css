@@ -16,6 +16,13 @@
 .dl-workspace{--dl-ink:var(--color-store-ink);--dl-line:var(--color-store-line);--dl-yellow:var(--color-store-yellow);--dl-cream:var(--color-store-cream);--dl-muted:var(--color-store-muted);min-height:100dvh;background:var(--dl-cream);color:var(--dl-ink);display:grid;grid-template-columns:248px minmax(0,1fr);font-family:var(--font-body);font-size:12px}
 .dl-workspace *,.dl-workspace *:before,.dl-workspace *:after{box-sizing:border-box}
 .dl-workspace button,.dl-workspace input{font:inherit}.dl-workspace button{cursor:pointer}.dl-workspace button:disabled{opacity:.45;cursor:not-allowed}
+.dl-workspace label,.dl-workspace small{font-family:var(--font-body)}
+.dl-workspace .dl-stamp small{font:600 11px/1.5 var(--font-label)}
+.dl-workspace .dl-stamp strong{font:800 33px/1.2 var(--font-display)}
+.dl-workspace .dl-eyebrow{font:600 10px/1.5 var(--font-label);letter-spacing:1.5px}
+.dl-workspace .dl-script{font:400 34px/44px var(--font-heading);letter-spacing:normal;margin-top:8px}
+.dl-workspace .dl-topbar-identity{gap:28px}
+.dl-workspace .dl-stamp{width:58px;height:76px}
 .dl-workspace .language-switcher button{font:800 14px/21px var(--font-body)}
 .dl-workspace a{color:inherit;text-decoration:none}.dl-workspace h1,.dl-workspace h2,.dl-workspace h3,.dl-workspace p{margin:0}
 .dl-workspace button:focus-visible,.dl-workspace a:focus-visible,.dl-workspace input:focus-visible{outline:3px solid var(--color-store-green);outline-offset:3px}

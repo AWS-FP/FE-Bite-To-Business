@@ -1,4 +1,6 @@
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
+import LogoutConfirmation from '@/components/common/LogoutConfirmation';
 import type { AuthUser } from '@/types/admin/auth';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 import WorkspaceAccountMenu from '@/components/common/WorkspaceAccountMenu';
@@ -21,9 +23,10 @@ export default function WorkspaceHeader({
     roleLabel,
 }: WorkspaceHeaderProps) {
     const { t } = useTranslation('admin');
+    const [confirmLogout, setConfirmLogout] = useState(false);
     return (
         <header className="admin-header relative z-10 flex min-h-[142px] items-center justify-between gap-6 border-b-[5px] border-black bg-store-cream px-8 py-6 max-[1151px]:flex-wrap max-[1151px]:gap-[22px]">
-            <div className="admin-header-heading flex min-w-0 items-center gap-5">
+            <div className="admin-header-heading flex min-w-0 items-center gap-7">
                 <div
                     className="admin-section-stamp flex h-[76px] w-[58px] shrink-0 -rotate-5 flex-col items-center justify-center border border-black bg-store-yellow p-[7px] shadow-[3px_3px_0_var(--color-black)]"
                     aria-hidden="true"
@@ -40,7 +43,7 @@ export default function WorkspaceHeader({
                     <p className="admin-eyebrow font-label text-[10px] leading-[15px] font-semibold tracking-[1.5px]">
                         {workspaceLabel}
                     </p>
-                    <p className="admin-header-title pt-[3px] font-heading text-[34px] leading-[40.8px] tracking-[-0.8px]">
+                    <p className="admin-header-title pt-2 font-heading text-[34px] leading-[44px] tracking-normal">
                         {title}
                     </p>
                 </div>
@@ -54,7 +57,7 @@ export default function WorkspaceHeader({
                 <button
                     className="admin-logout-button flex h-[53px] items-center justify-center gap-2 border border-black bg-danger px-[13px] py-[10px] text-[12px] leading-[18px] whitespace-nowrap text-black hover:brightness-95"
                     type="button"
-                    onClick={onLogout}
+                    onClick={() => setConfirmLogout(true)}
                 >
                     <img
                         className="block shrink-0"
@@ -66,6 +69,7 @@ export default function WorkspaceHeader({
                     <span>{t('header.logout')}</span>
                 </button>
             </div>
+            <LogoutConfirmation open={confirmLogout} onCancel={() => setConfirmLogout(false)} onConfirm={() => { setConfirmLogout(false); onLogout(); }} />
         </header>
     );
 }

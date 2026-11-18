@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../router/routes';
+import ProductRequestSection from '@/components/customer/home/ProductRequestSection';
+import AboutBusinessDropdown from './AboutBusinessDropdown';
 
 export default function StoreNavigation() {
     const { t } = useTranslation('storefront');
@@ -17,7 +19,7 @@ export default function StoreNavigation() {
                     <img src="/images/storefront/menu.svg" width={16} height={16} alt="" />
                     {t('header.categories')}
                 </Link>
-                <div className="flex min-w-0 flex-1 items-center gap-4 overflow-x-auto py-1.5 text-[12px] leading-[1.5] whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div className="flex min-w-0 flex-1 items-center gap-4 py-1.5 text-[12px] leading-[1.5] whitespace-nowrap">
                     <Link
                         className="text-store-cream no-underline hover:text-store-yellow"
                         to="/collections/deals"
@@ -36,10 +38,12 @@ export default function StoreNavigation() {
                     >
                         {t('header.combos')}
                     </Link>
+                    <ProductRequestSection />
                 </div>
+                <AboutBusinessDropdown />
                 <Link
                     to={ROUTES.ORDERS}
-                    className="ml-auto hidden shrink-0 items-center gap-1.5 text-[12px] font-semibold text-store-pink no-underline hover:text-store-yellow min-[1440px]:flex"
+                    className="hidden shrink-0 items-center gap-1.5 text-[12px] font-semibold text-store-pink no-underline hover:text-store-yellow min-[1440px]:flex"
                     title={t('customerUI.navVat')}
                 >
                     {t('header.invoice')}

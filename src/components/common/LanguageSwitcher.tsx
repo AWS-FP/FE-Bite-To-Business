@@ -1,55 +1,41 @@
-import { Check } from 'lucide-react';
-import { useId } from 'react';
-import { useTranslation } from 'react-i18next';
+﻿import { useTranslation } from 'react-i18next';
 
-// Dùng chung ở Header, auth và các màn hình quản lý.
-export default function LanguageSwitcher() {
-    const { t, i18n } = useTranslation('common');
-    const labelId = useId();
-    const isVietnamese = i18n.resolvedLanguage === 'vi';
+// Dùng chung ở header, trang xác thực và các màn hình quản lý.
+export default function LanguageSwitcher({ vertical = false }: { vertical?: boolean }) {
+    const { i18n } = useTranslation();
     const isEnglish = i18n.resolvedLanguage === 'en';
 
-    function changeLanguage(language: string) {
-        // i18n đổi nội dung và lưu lựa chọn; không tải lại trang hay xóa form.
-        void i18n.changeLanguage(language);
+    function toggleLanguage() {
+        void i18n.changeLanguage(isEnglish ? 'vi' : 'en');
     }
 
     return (
-        <div className="language-switcher inline-flex shrink-0 px-1 pt-2 pb-1">
-            <div className="relative h-[58px] w-[109px] -rotate-2 border border-solid border-black bg-white px-[5px] pt-[17px] pb-[5px] font-body text-black shadow-[3px_3px_0_var(--color-black)]">
-                <span
-                    className="absolute -top-[9px] left-[7px] border border-solid border-black bg-store-yellow px-[5px] py-px font-label text-[9px] leading-[13.5px] font-semibold tracking-[0.6px] whitespace-nowrap uppercase"
-                    id={labelId}
-                >
-                    {t('language')}
+        <div className="language-switcher inline-flex shrink-0 items-center">
+            <button
+                type="button"
+                role="switch"
+                aria-checked={isEnglish}
+                aria-label={isEnglish ? 'Language: English. Switch to Vietnamese' : 'Ngôn ngữ: Tiếng Việt. Chuyển sang tiếng Anh'}
+                title={isEnglish ? 'Chuyển sang tiếng Việt' : 'Switch to English'}
+                onClick={toggleLanguage}
+                className={`relative cursor-pointer overflow-hidden rounded-full border-2 border-black bg-[#c8102e] p-0 transition-[filter] hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-store-yellow ${vertical ? 'h-[62px] w-8' : 'h-8 w-[62px]'}`}
+            >
+                <span aria-hidden="true" className={`absolute bg-[#1e3a8a] ${vertical ? 'inset-x-0 bottom-0 h-1/2' : 'inset-y-0 right-0 w-1/2'}`} />
+                <span aria-hidden="true" className={`absolute top-0.5 left-0.5 grid size-6 place-items-center rounded-full border border-black bg-white transition-transform duration-300 ease-in-out motion-reduce:transition-none ${isEnglish ? (vertical ? 'translate-y-[30px]' : 'translate-x-[30px]') : ''}`}>
+                    {isEnglish ? (
+                        <svg viewBox="0 0 24 24" className="size-5 rounded-full" aria-hidden="true">
+                            <circle cx="12" cy="12" r="12" fill="#1e3a8a" />
+                            <path d="M0 12h24M12 0v24" stroke="white" strokeWidth="5" />
+                            <path d="M0 12h24M12 0v24" stroke="#c8102e" strokeWidth="2.5" />
+                        </svg>
+                    ) : (
+                        <svg viewBox="0 0 24 24" className="size-5 rounded-full" aria-hidden="true">
+                            <circle cx="12" cy="12" r="12" fill="#c8102e" />
+                            <path d="m12 4 1.9 5.8H20l-4.9 3.6 1.9 5.8-5-3.6-5 3.6 1.9-5.8L4 9.8h6.1z" fill="#ffde00" />
+                        </svg>
+                    )}
                 </span>
-                <div className="flex items-center gap-[5px]" role="group" aria-labelledby={labelId}>
-                    <button
-                        className="flex h-[34px] w-[45px] cursor-pointer items-center justify-center gap-1 border border-solid border-black bg-white px-[7px] py-1 text-[14px] leading-[21px] font-extrabold text-black hover:bg-surface-yellow aria-pressed:bg-store-yellow focus:px-[6px]"
-                        type="button"
-                        lang="vi"
-                        aria-label="Tiếng Việt"
-                        aria-pressed={isVietnamese}
-                        onClick={() => changeLanguage('vi')}
-                    >
-                        VI
-                        {isVietnamese && (
-                            <Check className="shrink-0" size={12} aria-hidden="true" />
-                        )}
-                    </button>
-                    <button
-                        className="flex h-[34px] w-[45px] cursor-pointer items-center justify-center gap-1 border border-solid border-black bg-white px-[7px] py-1 text-[14px] leading-[21px] font-extrabold text-black hover:bg-surface-yellow aria-pressed:bg-store-yellow focus:px-[6px]"
-                        type="button"
-                        lang="en"
-                        aria-label="English"
-                        aria-pressed={isEnglish}
-                        onClick={() => changeLanguage('en')}
-                    >
-                        EN
-                        {isEnglish && <Check className="shrink-0" size={12} aria-hidden="true" />}
-                    </button>
-                </div>
-            </div>
+            </button>
         </div>
     );
 }

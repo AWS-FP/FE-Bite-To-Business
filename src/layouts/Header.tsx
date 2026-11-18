@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useLayoutEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../router/routes';
-import StoreUtilityBar from '../components/layout/header/StoreUtilityBar';
+import LanguageSwitcher from '../components/common/LanguageSwitcher';
 import StoreSearch from '../components/layout/header/StoreSearch';
 import StoreAccountActions from '../components/layout/header/StoreAccountActions';
 import StoreNavigation from '../components/layout/header/StoreNavigation';
@@ -39,27 +39,29 @@ export default function Header() {
                 >
                     {t('skipToContent')}
                 </a>
-                <StoreUtilityBar />
-                <div className="mx-auto flex min-h-[82px] max-w-[1440px] items-center gap-3 px-5 py-1.5">
+                <div className="mx-auto flex min-h-[100px] max-w-[1440px] items-center gap-4 px-5 py-3">
                     <Link
                         className="flex w-fit shrink-0 items-center gap-2 text-white no-underline"
                         to={ROUTES.HOME}
                         aria-label={t('home')}
                     >
                         <img
-                            className="block h-auto w-[90px] shrink-0 object-contain"
+                            className="block h-auto w-[100px] shrink-0 object-contain"
                             src="/images/storefront/brand-logo.png"
                             alt=""
                             width={100}
                             height={67}
                         />
-                        <span className="brand-name flex flex-col text-[20px] leading-[1.1] tracking-[-0.5px]">
+                        <span className="brand-name flex flex-col text-[22px] leading-[1.1] tracking-[-0.5px]">
                             <span>Bite to</span>
                             <span>Business</span>
                         </span>
                     </Link>
                     <StoreSearch />
-                    <StoreAccountActions />
+                    <div className="ml-auto flex shrink-0 items-center gap-4">
+                        <StoreAccountActions />
+                        <LanguageSwitcher />
+                    </div>
                 </div>
                 <StoreNavigation />
             </header>
