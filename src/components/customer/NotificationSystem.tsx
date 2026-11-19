@@ -491,25 +491,21 @@ export default function NotificationSystem({
                                                 onToggle={() => setPreference('deliveryEta')}
                                             />
 
-                                            <PreferenceRow
-                                                title={ui('notificationSourcing')}
-                                                description={ui('notificationSourcingDesc')}
-                                                checked={preferences.sourcingReply}
-                                                onToggle={() => setPreference('sourcingReply')}
-                                            />
                                         </div>
                                     </div>
 
-                                </div>
-
-                                <div className="shrink-0 border-t border-store-line bg-white p-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => setView('list')}
-                                        className="w-full cursor-pointer rounded-xl border-0 bg-store-green px-4 py-3 text-[12px] font-bold text-white hover:bg-store-green"
-                                    >
-                                        {ui('notificationBack')}
-                                    </button>
+                                    <div className="mt-3 rounded-2xl border border-solid border-store-line bg-white p-4">
+                                        <div className="mb-1 flex items-center gap-2 text-xs font-extrabold text-store-ink">
+                                            <FileText size={16} />
+                                            {ui('notificationProductRequests')}
+                                        </div>
+                                        <PreferenceRow
+                                            title={ui('notificationSourcing')}
+                                            description={ui('notificationSourcingDesc')}
+                                            checked={preferences.sourcingReply}
+                                            onToggle={() => setPreference('sourcingReply')}
+                                        />
+                                    </div>
                                 </div>
                             </>
                         )}

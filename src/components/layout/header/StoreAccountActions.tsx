@@ -85,7 +85,7 @@ export default function StoreAccountActions() {
     }
 
     return (
-        <div ref={dropdownRef} className="relative flex shrink-0 items-center gap-2.5">
+        <div ref={dropdownRef} className="relative flex flex-1 items-center gap-2.5">
             {/* Guest Actions */}
             {!isLoggedIn && <GuestHeaderActions t={t} />}
 
@@ -96,7 +96,7 @@ export default function StoreAccountActions() {
                         to={ROUTES.QUOTES}
                         onClick={() => setOpenDropdown(null)}
                         aria-label={t('header.quote')}
-                        className="relative flex min-h-[52px] cursor-pointer items-center justify-center gap-3 rounded-full border-2 border-solid border-store-ink bg-store-cream px-5 py-1 text-left text-store-ink no-underline shadow-[2px_2px_0_var(--color-store-ink)] hover:bg-white"
+                        className="relative mx-auto flex min-h-[52px] shrink-0 cursor-pointer items-center justify-center gap-3 rounded-full border-2 border-solid border-store-ink bg-store-cream px-5 py-1 text-left text-store-ink no-underline shadow-[2px_2px_0_var(--color-store-ink)] hover:bg-white"
                     >
                         <div className="flex items-center border-0 border-r border-solid border-store-ink/25 pr-2">
                             <ShoppingCart size={18} className="text-store-ink" />

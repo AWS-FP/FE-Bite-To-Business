@@ -50,7 +50,7 @@ export default function StoreSearch() {
     }
 
     return (
-        <div className="min-w-0 max-w-[720px] flex-1">
+        <div className="min-w-0 max-w-[720px] flex-[1_1_720px]">
             <form
                 className="focus-border-group flex h-[52px] min-w-0 items-center rounded-full border-2 border-solid border-store-ink bg-store-cream shadow-[3px_3px_0_var(--color-store-ink)] focus-within:border-store-green"
                 role="search"

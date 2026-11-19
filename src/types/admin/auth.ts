@@ -26,6 +26,7 @@ export interface RegisterRequest {
     invoiceTaxCode?: string | null;
     invoiceEmail?: string | null;
     invoiceAddress?: string | null;
+    newsletterConsent?: boolean;
 }
 
 // UUID và Instant trong JSON được đọc thành string ở FE.

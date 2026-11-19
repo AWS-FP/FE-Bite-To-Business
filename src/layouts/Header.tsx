@@ -58,7 +58,7 @@ export default function Header() {
                         </span>
                     </Link>
                     <StoreSearch />
-                    <div className="ml-auto flex shrink-0 items-center gap-4">
+                    <div className="flex flex-[1_0_auto] items-center gap-4">
                         <StoreAccountActions />
                         <LanguageSwitcher />
                     </div>

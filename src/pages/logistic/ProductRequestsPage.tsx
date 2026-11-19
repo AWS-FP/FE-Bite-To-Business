@@ -1,26 +1,97 @@
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Pagination from '@/components/common/Pagination';
-import { useState } from 'react';
 import LogisticsPageShell, { ListStatus } from '@/components/logistic/LogisticsPageShell';
-import { useLogisticsActions, useLogisticsList, type ProductRequest, type Stock } from '@/hooks/logistic/useLogisticsData';
 import ProductCreateWizard from '@/components/logistic/ProductCreateWizard';
+import { useLogisticsList, type ProductRequest } from '@/hooks/logistic/useLogisticsData';
+import { getCatalogProducts, type CatalogProduct } from '@/services/customer/catalogReadService';
+import { http } from '@/services/axiosClient';
+
+type ResponseStep = 'choice' | 'reject' | 'confirm';
+
 export default function ProductRequestsPage() {
     const data = useLogisticsList<ProductRequest>('/api/logistics/product-requests');
-    const products = useLogisticsList<Stock>('/api/logistics/inventory');
-    const action = useLogisticsActions(data.refresh);
-    const [selected, setSelected] = useState('');
-    const [decision, setDecision] = useState('REJECTED');
-    const [note, setNote] = useState('');
-    const [productId, setProductId] = useState('');
+    const [selected, setSelected] = useState<ProductRequest | null>(null);
     const [creating, setCreating] = useState<ProductRequest | null>(null);
-    async function respond() {
-        if (!selected || !note.trim() || (decision === 'ADDED' && !productId.trim())) return;
-        const ok = await action.submit(`/api/logistics/product-requests/${selected}/response`, { decision, note, productId: decision === 'ADDED' ? productId.trim() : null });
-        if (ok) { setSelected(''); setNote(''); setProductId(''); }
+    const [step, setStep] = useState<ResponseStep>('choice');
+    const [note, setNote] = useState('');
+    const [keyword, setKeyword] = useState('');
+    const [search, setSearch] = useState('');
+    const [products, setProducts] = useState<CatalogProduct[]>([]);
+    const [productId, setProductId] = useState('');
+    const [productPage, setProductPage] = useState(0);
+    const [productPages, setProductPages] = useState(0);
+    const [loadingProducts, setLoadingProducts] = useState(false);
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState('');
+    const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        if (!selected || step !== 'confirm') return;
+        const controller = new AbortController();
+        setLoadingProducts(true);
+        getCatalogProducts({ page: productPage, size: 10, q: search || undefined, signal: controller.signal })
+            .then(result => { setProducts(result.items); setProductPages(result.totalPages); })
+            .catch(() => { if (!controller.signal.aborted) setError('Không tải được danh sách sản phẩm.'); })
+            .finally(() => { if (!controller.signal.aborted) setLoadingProducts(false); });
+        return () => controller.abort();
+    }, [selected, step, search, productPage]);
+
+    function openResponse(item: ProductRequest) {
+        setSelected(item);
+        setStep('choice');
+        setNote('');
+        setKeyword('');
+        setSearch('');
+        setProductId('');
+        setProductPage(0);
+        setError('');
+        setMessage('');
     }
+
+    async function respond(decision: 'ADDED' | 'REJECTED') {
+        if (!selected || busy || (decision === 'REJECTED' && !note.trim()) || (decision === 'ADDED' && !productId)) return;
+        setBusy(true);
+        setError('');
+        try {
+            await http.post(`/api/logistics/product-requests/${selected.id}/response`, {
+                decision,
+                note: decision === 'REJECTED' ? note.trim() : 'Sản phẩm bạn yêu cầu đã được bổ sung.',
+                productId: decision === 'ADDED' ? productId : null,
+            });
+            setSelected(null);
+            setMessage('Đã lưu phản hồi. Email sẽ được gửi nếu khách đã chọn nhận thông báo.');
+            void data.refresh();
+        } catch {
+            setError('Không thể lưu phản hồi. Hãy kiểm tra sản phẩm đã được đăng bán và thử lại.');
+        } finally {
+            setBusy(false);
+        }
+    }
+
     if (creating) return <ProductCreateWizard request={creating} onClose={() => setCreating(null)} />;
-    return <LogisticsPageShell number="04" label="Yêu cầu khách hàng" title="Yêu cầu sản phẩm" description="Tiếp nhận và phản hồi yêu cầu từ khách hàng."><section className="rounded-xl border border-store-line bg-white p-5">
-        <ListStatus loading={data.loading} error={data.error} empty={data.items.length === 0} />
-        {data.items.map(item => <article key={item.id} className="space-y-2 border-b py-4"><div className="flex justify-between gap-4"><strong>{item.productName}</strong><span>{item.status}</span></div>{item.customerNote && <p className="text-sm">{item.customerNote}</p>}{['PENDING', 'REVIEWING'].includes(item.status) && <div className="flex gap-2"><button type="button" disabled={action.busy} onClick={() => void action.submit(`/api/logistics/product-requests/${item.id}/start-review`)} className="rounded border px-3 py-2">Nhận xử lý</button><button type="button" onClick={() => setSelected(item.id)} className="rounded bg-store-green px-3 py-2 text-white">Phản hồi</button><button type="button" onClick={() => setCreating(item)} className="rounded border border-black bg-store-yellow px-3 py-2 font-semibold">Tạo sản phẩm</button></div>}</article>)}
-        <Pagination page={data.page} totalPages={data.totalPages} loading={data.loading} onPageChange={data.setPage} />
-    </section>{selected && <section className="max-w-2xl space-y-4 rounded-xl border border-store-line bg-white p-6"><h2 className="text-xl font-bold">Phản hồi yêu cầu</h2><label className="block">Kết quả<select value={decision} onChange={e => setDecision(e.target.value)} className="mt-2 w-full rounded border p-3"><option value="REJECTED">Từ chối</option><option value="ADDED">Đã thêm sản phẩm</option></select></label>{decision === 'ADDED' && <><label className="block">Sản phẩm<select value={productId} onChange={e => setProductId(e.target.value)} className="mt-2 w-full rounded border p-3"><option value="">Chọn sản phẩm</option>{products.items.map(item => <option key={item.productId} value={item.productId}>{item.name} · {item.sku}</option>)}</select></label><ListStatus loading={products.loading} error={products.error} empty={products.items.length === 0} /><Pagination page={products.page} totalPages={products.totalPages} loading={products.loading} onPageChange={products.setPage} /></>}<label className="block">Nội dung<textarea value={note} maxLength={2000} onChange={e => setNote(e.target.value)} className="mt-2 w-full rounded border p-3" /></label><div className="flex gap-2"><button type="button" onClick={() => void respond()} disabled={action.busy || !note.trim()} className="rounded bg-store-green px-4 py-2 text-white disabled:opacity-50">Lưu phản hồi</button><button type="button" onClick={() => setSelected('')} className="rounded border px-4 py-2">Đóng</button></div></section>}{action.error && <p role="alert" className="text-red-700">{action.error}</p>}</LogisticsPageShell>;
+    return <LogisticsPageShell number="04" label="Yêu cầu khách hàng" title="Yêu cầu sản phẩm" description="Tiếp nhận và phản hồi yêu cầu từ khách hàng.">
+        <section className="rounded-xl border border-store-line bg-white p-5">
+            {message && <p role="status" className="mb-4 rounded-lg bg-green-50 p-3 text-green-800">{message}</p>}
+            <ListStatus loading={data.loading} error={data.error} empty={data.items.length === 0} />
+            {data.items.map(item => <article key={item.id} className="space-y-2 border-b py-4">
+                <div className="flex justify-between gap-4"><strong>{item.productName}</strong><span>{item.status}</span></div>
+                {item.customerNote && <p className="text-sm">{item.customerNote}</p>}
+                {['PENDING', 'REVIEWING'].includes(item.status) && <div className="flex gap-2">
+                    <button type="button" onClick={() => openResponse(item)} className="rounded bg-store-green px-3 py-2 text-white hover:opacity-90">Phản hồi</button>
+                    <button type="button" onClick={() => setCreating(item)} className="rounded border border-black bg-store-yellow px-3 py-2 font-semibold hover:opacity-90">Tạo sản phẩm</button>
+                </div>}
+            </article>)}
+            <Pagination page={data.page} totalPages={data.totalPages} loading={data.loading} onPageChange={data.setPage} />
+        </section>
+        {selected && createPortal(<div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-5" onClick={() => { if (!busy) setSelected(null); }}>
+            <section role="dialog" aria-modal="true" aria-labelledby="response-title" className="max-h-[85vh] w-full max-w-xl overflow-y-auto rounded-xl border-2 border-black bg-white p-6" onClick={event => event.stopPropagation()}>
+                <div className="flex items-start justify-between gap-4"><div><h2 id="response-title" className="text-xl font-bold">{step === 'choice' ? 'Phản hồi yêu cầu' : step === 'reject' ? 'Lý do từ chối' : 'Xác nhận sản phẩm'}</h2><p className="mt-2 text-sm text-gray-600">{selected.productName}</p></div><button type="button" aria-label="Đóng" disabled={busy} onClick={() => setSelected(null)} className="rounded border border-black px-3 py-1 hover:bg-gray-100">✕</button></div>
+                {step === 'choice' && <div className="mt-6 flex justify-end gap-3"><button type="button" onClick={() => setStep('reject')} className="rounded border border-red-700 px-4 py-2 text-red-700 hover:bg-red-50">Từ chối</button><button type="button" onClick={() => setStep('confirm')} className="rounded bg-store-green px-4 py-2 text-white hover:opacity-90">Xác nhận</button></div>}
+                {step === 'reject' && <form onSubmit={event => { event.preventDefault(); void respond('REJECTED'); }}><label className="mt-5 block font-semibold" htmlFor="rejection-reason">Lý do từ chối *</label><textarea id="rejection-reason" required maxLength={2000} value={note} onChange={event => setNote(event.target.value)} className="mt-2 min-h-28 w-full resize-none rounded border border-gray-400 p-3" /><div className="mt-5 flex justify-end gap-3"><button type="button" onClick={() => setStep('choice')} disabled={busy} className="rounded border px-4 py-2">Quay lại</button><button type="submit" disabled={busy || !note.trim()} className="rounded bg-red-700 px-4 py-2 text-white disabled:opacity-50">{busy ? 'Đang lưu...' : 'Xác nhận từ chối'}</button></div></form>}
+                {step === 'confirm' && <div className="mt-5"><p className="text-sm text-gray-600">Chọn sản phẩm đã đăng bán để gửi đúng đường dẫn cho khách hàng.</p><form className="mt-4 flex gap-2" onSubmit={event => { event.preventDefault(); setProductPage(0); setSearch(keyword.trim()); }}><input aria-label="Tìm sản phẩm theo tên hoặc SKU" placeholder="Tìm tên hoặc mã SKU" value={keyword} onChange={event => setKeyword(event.target.value)} className="min-w-0 flex-1 rounded border border-gray-400 p-2" /><button className="rounded border border-black px-4 py-2" type="submit">Tìm</button></form><div className="mt-3 max-h-56 overflow-y-auto">{loadingProducts ? <p>Đang tải sản phẩm...</p> : products.length === 0 ? <p>Không tìm thấy sản phẩm.</p> : products.map(product => <label key={product.id} className="flex cursor-pointer items-center gap-3 border-b py-3"><input type="radio" name="product" checked={productId === product.id} onChange={() => setProductId(product.id)} /><span>{product.nameVi} <span className="text-sm text-gray-500">· {product.sku}</span></span></label>)}</div><Pagination page={productPage} totalPages={productPages} loading={loadingProducts} onPageChange={setProductPage} /><div className="mt-5 flex justify-end gap-3"><button type="button" onClick={() => setStep('choice')} disabled={busy} className="rounded border px-4 py-2">Quay lại</button><button type="button" onClick={() => void respond('ADDED')} disabled={busy || !productId} className="rounded bg-store-green px-4 py-2 text-white disabled:opacity-50">{busy ? 'Đang lưu...' : 'Xác nhận'}</button></div></div>}
+                {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}
+            </section>
+        </div>, document.body)}
+    </LogisticsPageShell>;
 }

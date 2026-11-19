@@ -129,7 +129,7 @@ export default function Footer() {
                     </div>
                 </div>
 
-                <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-0 border-t border-solid border-white/10 pt-6 text-[11px] text-store-muted">
+                <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-0 border-t border-solid border-white/10 pt-6 text-[11px] text-white/75">
                     <span>{t('footer.copyright')}</span>
                     <span>{t('footer.educationalNote')}</span>
                 </div>
