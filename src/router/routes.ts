@@ -13,7 +13,8 @@ export const ROUTES = {
     PRODUCT_DETAIL: '/products/:productId',
 
     BRANDS: '/brands',
-    BRAND_DETAIL: '/brands/:brandSlug',
+    BRAND_DETAIL: '/brand/:brandSlug',
+    BRAND_DETAIL_LEGACY: '/brands/:brandSlug',
 
     LOGIN: '/login',
     REGISTER: '/register',

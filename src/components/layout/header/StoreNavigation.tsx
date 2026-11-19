@@ -32,6 +32,12 @@ export default function StoreNavigation() {
                     </Link>
                     <Link
                         className="text-store-cream no-underline hover:text-store-yellow"
+                        to={ROUTES.BRANDS}
+                    >
+                        {t('brandPage.brands')}
+                    </Link>
+                    <Link
+                        className="text-store-cream no-underline hover:text-store-yellow"
                         to="/collections/combos"
                     >
                         {t('header.combos')}

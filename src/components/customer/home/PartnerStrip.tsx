@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
+import { ROUTES } from '@/router/routes';
 import { getCatalogBrands } from '@/services/customer/catalogReadService';
 import type { CatalogBrand } from '@/services/customer/catalogReadService';
 
@@ -55,9 +58,17 @@ export default function PartnerStrip() {
             aria-label={t('homePage.partnerTitle')}
         >
             <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
-                <h2 className="mb-5 mt-0 text-center font-subheading text-lg font-bold sm:text-xl">
-                    {t('homePage.partnerTitle')}
-                </h2>
+                <div className="mb-5 flex flex-wrap items-center justify-center gap-4 sm:justify-between">
+                    <h2 className="m-0 font-subheading text-lg font-bold sm:text-xl">
+                        {t('homePage.partnerTitle')}
+                    </h2>
+                    <Link
+                        to={ROUTES.BRANDS}
+                        className="inline-flex items-center gap-2 text-sm font-extrabold text-store-green no-underline hover:underline"
+                    >
+                        {t('brandPage.allBrands')} <ArrowRight size={16} />
+                    </Link>
+                </div>
             </div>
             {brands.length > 0 ? (
                 <div className="overflow-hidden" aria-label={t('customerUI.brandLogos')}>
