@@ -12,6 +12,7 @@ import {
 import StorefrontLayout from '@/layouts/StorefrontLayout';
 import CatalogShowcaseCard from '@/components/customer/CatalogShowcaseCard';
 import CustomerBrandTile from '@/components/brand/CustomerBrandTile';
+import BrandSortDropdown from '@/components/brand/BrandSortDropdown';
 import { getHomeCategories, type HomeCategory } from '@/services/customer/homeService';
 import type { CatalogBrand, CatalogProduct } from '@/services/customer/catalogReadService';
 import {
@@ -334,21 +335,18 @@ export default function BrandDetailPage() {
                                         </p>
                                     )}
                                 </div>
-                                <label className="flex items-center gap-2 text-xs font-bold text-store-muted">
-                                    {t('brandPage.sortLabel')}
-                                    <select
-                                        value={sort}
-                                        onChange={(event) => {
-                                            setSort(event.target.value as 'name_asc' | 'name_desc');
-                                            if (brandId)
-                                                setProductLimit({ brandId, count: PRODUCT_BATCH });
-                                        }}
-                                        className="h-10 rounded-xl border border-[#d6e0d6] bg-[#fafbf6] px-3 text-sm font-bold text-store-green outline-none focus:ring-2 focus:ring-store-green/20"
-                                    >
-                                        <option value="name_asc">{t('brandPage.nameAsc')}</option>
-                                        <option value="name_desc">{t('brandPage.nameDesc')}</option>
-                                    </select>
-                                </label>
+                                <BrandSortDropdown
+                                    value={sort}
+                                    onChange={(nextSort) => {
+                                        setSort(nextSort);
+                                        if (brandId) {
+                                            setProductLimit({
+                                                brandId,
+                                                count: PRODUCT_BATCH,
+                                            });
+                                        }
+                                    }}
+                                />
                             </div>
                             {productsLoading && (
                                 <p
