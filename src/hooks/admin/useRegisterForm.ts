@@ -14,7 +14,6 @@ import { getAuthError, type AuthError } from '@/utils/admin/authError';
 import type { DeliveryCity } from '@/types/location';
 import { createRegistrationSchema } from '@/validations/admin/registrationSchema';
 import { clearActivationSession } from '@/utils/admin/activationSession';
-import { subscribeNewsletter } from '@/services/customer/newsletterService';
 
 export default function useRegisterForm() {
     const navigate = useNavigate();
@@ -70,21 +69,13 @@ export default function useRegisterForm() {
             await form.handleSubmit(
                 async (request) => {
                     setIsSubmitting(true);
-                    await sendRegistration(request);
-                    // Newsletter is an optional, explicit consent; registration remains successful
-                    // even if the separate subscription endpoint is unavailable.
-                    const newsletterSubscriptionFailed = newsletterConsent
-                        ? await subscribeNewsletter(request.email)
-                              .then(() => false)
-                              .catch(() => true)
-                        : false;
+                    await sendRegistration({ ...request, newsletterConsent });
                     clearActivationSession();
                     navigate(ROUTES.VERIFY_OTP, {
                         replace: true,
                         state: {
                             email: request.email,
                             registrationSubmitted: true,
-                            newsletterSubscriptionFailed,
                         },
                     });
                 },

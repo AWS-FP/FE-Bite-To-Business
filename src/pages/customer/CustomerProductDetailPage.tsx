@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, ChevronRight, PackageX } from 'lucide-react';
+import { ChevronRight, PackageX } from 'lucide-react';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
 import CustomerProductInfo from '@/components/customer/product-detail/CustomerProductInfo';
 import CustomerProductPurchase from '@/components/customer/product-detail/CustomerProductPurchase';
@@ -145,12 +145,6 @@ function CustomerProductDetailContent({ productId }: { productId?: string }) {
                         </>
                     )}
                 </nav>
-                <Link
-                    to={ROUTES.CATALOG}
-                    className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-[#f5db7a] no-underline hover:text-white"
-                >
-                    <ArrowLeft size={16} /> {tr('back')}
-                </Link>
             </div>
 
             <div className="mx-auto w-full max-w-[1440px] px-5">

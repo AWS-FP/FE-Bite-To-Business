@@ -5,7 +5,7 @@ import AdminIcon from '@/components/admin/AdminIcon';
 import AdminButton from '@/components/admin/AdminButton';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { RegistrationError, RegistrationLoading } from '@/components/admin/RegistrationFeedback';
-import RegistrationPagination from '@/components/admin/RegistrationPagination';
+import Pagination from '@/components/common/Pagination';
 import RegistrationStats from '@/components/admin/RegistrationStats';
 import RegistrationTable from '@/components/admin/RegistrationTable';
 import { useRegistrations, useRegistrationStats } from '@/hooks/admin/useRegistrations';
@@ -28,7 +28,7 @@ export default function RegistrationsPage() {
         allStatuses: status === 'ALL',
         status: status === 'ALL' ? undefined : status,
         page,
-        size: 6,
+        size: 10,
         keyword: keyword || undefined,
         customerType,
         direction,
@@ -260,12 +260,10 @@ export default function RegistrationsPage() {
                 )}
 
                 {registrationQuery.isSuccess && (
-                    <RegistrationPagination
+                    <Pagination
                         page={page}
-                        size={6}
-                        total={registrationQuery.data.totalElements}
                         totalPages={registrationQuery.data.totalPages}
-                        onPage={(nextPage) => handleFilterChange('page', String(nextPage))}
+                        onPageChange={(nextPage) => handleFilterChange('page', String(nextPage))}
                     />
                 )}
             </section>

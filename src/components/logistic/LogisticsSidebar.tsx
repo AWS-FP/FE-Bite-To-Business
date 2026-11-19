@@ -21,7 +21,6 @@ export default function LogisticsSidebar({ open, onClose, isCollapsed, onToggleC
                 sidebarId="logistics-sidebar"
                 className={`lg-shared-sidebar ${open ? 'lg-shared-sidebar--open' : ''}`}
                 workspaceLabel={vietnamese ? 'KHÔNG GIAN LÀM VIỆC' : 'WORKSPACE'}
-                logoSrc="/images/storefront/brand-logo.png"
                 isCollapsed={isCollapsed}
                 onToggleCollapse={onToggleCollapse}
                 onNavigate={onClose}

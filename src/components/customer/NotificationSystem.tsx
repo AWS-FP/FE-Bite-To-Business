@@ -231,7 +231,7 @@ export default function NotificationSystem({
                     aria-label="Notifications"
                     aria-expanded={isOpen}
                     aria-haspopup="dialog"
-                    className={`relative flex size-[42px] cursor-pointer items-center justify-center rounded-full border-2 border-solid border-store-ink text-store-ink shadow-[2px_2px_0_var(--color-store-ink)] transition-colors ${
+                    className={`relative flex size-[52px] cursor-pointer items-center justify-center rounded-full border-2 border-solid border-store-ink text-store-ink shadow-[2px_2px_0_var(--color-store-ink)] transition-colors ${
                         isOpen ? 'bg-store-yellow' : 'bg-store-cream hover:bg-store-yellow'
                     }`}
                 >
@@ -249,7 +249,7 @@ export default function NotificationSystem({
                     <div
                         role="dialog"
                         aria-label="Purchasing notifications"
-                        className="absolute right-0 top-[54px] z-[80] flex w-[min(420px,calc(100vw-24px))] max-h-[min(78vh,640px)] flex-col overflow-hidden rounded-[24px] border border-solid border-store-line bg-surface-green text-store-ink shadow-[0_20px_60px_color-mix(in_srgb,_var(--color-store-dark)_28%,_transparent)]"
+                        className="absolute right-0 top-[60px] z-[80] flex w-[min(420px,calc(100vw-24px))] max-h-[min(78vh,640px)] flex-col overflow-hidden rounded-[24px] border border-solid border-store-line bg-surface-green text-store-ink shadow-[0_20px_60px_color-mix(in_srgb,_var(--color-store-dark)_28%,_transparent)]"
                     >
                         {/* HEADER - Một lớp bo góc duy nhất */}
                         <div className="shrink-0 bg-store-green px-5 pb-4 pt-4 text-white">
@@ -491,28 +491,21 @@ export default function NotificationSystem({
                                                 onToggle={() => setPreference('deliveryEta')}
                                             />
 
-                                            <PreferenceRow
-                                                title={ui('notificationSourcing')}
-                                                description={ui('notificationSourcingDesc')}
-                                                checked={preferences.sourcingReply}
-                                                onToggle={() => setPreference('sourcingReply')}
-                                            />
                                         </div>
                                     </div>
 
-                                    <p className="mt-3 text-[11px] leading-5 text-store-muted">
-                                        {ui('notificationSessionNote')}
-                                    </p>
-                                </div>
-
-                                <div className="shrink-0 border-t border-store-line bg-white p-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => setView('list')}
-                                        className="w-full cursor-pointer rounded-xl border-0 bg-store-green px-4 py-3 text-[12px] font-bold text-white hover:bg-store-green"
-                                    >
-                                        {ui('notificationBack')}
-                                    </button>
+                                    <div className="mt-3 rounded-2xl border border-solid border-store-line bg-white p-4">
+                                        <div className="mb-1 flex items-center gap-2 text-xs font-extrabold text-store-ink">
+                                            <FileText size={16} />
+                                            {ui('notificationProductRequests')}
+                                        </div>
+                                        <PreferenceRow
+                                            title={ui('notificationSourcing')}
+                                            description={ui('notificationSourcingDesc')}
+                                            checked={preferences.sourcingReply}
+                                            onToggle={() => setPreference('sourcingReply')}
+                                        />
+                                    </div>
                                 </div>
                             </>
                         )}

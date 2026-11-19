@@ -5,6 +5,19 @@
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 
+html,
+body,
+* {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+    display: none;
+}
+
 /* Màu và font xài cho cả trang web */
 @theme static {
     --font-body: 'Be Vietnam Pro', sans-serif;
@@ -162,4 +175,10 @@
 
 :root body :is(input, select, textarea)[aria-invalid='true']:focus {
     border-color: var(--color-danger);
+}
+
+:root body .about-business-trigger:focus {
+    border: 0;
+    outline: none;
+    box-shadow: none;
 }

@@ -1,4 +1,6 @@
 import { LogOut } from 'lucide-react';
+import { useState } from 'react';
+import LogoutConfirmation from '@/components/common/LogoutConfirmation';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 import WorkspaceAccountMenu from '@/components/common/WorkspaceAccountMenu';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +15,7 @@ export default function LogisticsTopbar({ onOpenMenu }: { onOpenMenu: () => void
     const navigate = useNavigate();
     const clearSession = useAuthStore((x) => x.clearSession);
     const session = useAuthStore((x) => x.session);
+    const [confirmLogout, setConfirmLogout] = useState(false);
     return (
         <header className="lg-topbar">
             <div className="lg-topbar-title">
@@ -23,7 +26,7 @@ export default function LogisticsTopbar({ onOpenMenu }: { onOpenMenu: () => void
                 </div>
                 <div>
                     <div className="lg-topbar-eyebrow">
-                        {language === 'vi' ? 'KHÔNG GIAN QUẢN TRỊ!' : 'OPERATIONS WORKSPACE!'}
+                        {language === 'vi' ? 'KHÔNG GIAN QUẢN TRỊ' : 'OPERATIONS WORKSPACE'}
                     </div>
                     <div className="lg-topbar-script">
                         {language === 'vi' ? 'Góc điều hành.' : 'Operations hub.'}
@@ -39,14 +42,12 @@ export default function LogisticsTopbar({ onOpenMenu }: { onOpenMenu: () => void
                 <button
                     type="button"
                     className="lg-logout"
-                    onClick={() => {
-                        clearSession();
-                        navigate(ROUTES.LOGIN);
-                    }}
+                    onClick={() => setConfirmLogout(true)}
                 >
                     <LogOut size={16} />
                     <span>{language === 'vi' ? 'Đăng xuất' : 'Sign out'}</span>
                 </button>
+                <LogoutConfirmation open={confirmLogout} onCancel={() => setConfirmLogout(false)} onConfirm={() => { setConfirmLogout(false); clearSession(); navigate(ROUTES.LOGIN); }} />
             </div>
         </header>
     );

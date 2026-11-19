@@ -46,10 +46,8 @@ export default function AboutBusinessDropdown() {
                 aria-haspopup="menu"
                 aria-expanded={isOpen}
                 onClick={() => setIsOpen((current) => !current)}
-                className={`inline-flex min-h-8 cursor-pointer items-center gap-1.5 rounded-full border border-solid px-3 text-[11px] font-bold transition-colors ${
-                    isOpen
-                        ? 'border-store-yellow bg-store-yellow text-store-ink'
-                        : 'border-store-cream/20 bg-white/5 text-store-cream hover:border-store-yellow/60 hover:text-store-yellow'
+                className={`about-business-trigger inline-flex min-h-8 cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-[12px] font-semibold transition-colors focus-visible:underline ${
+                    isOpen ? 'text-store-yellow' : 'text-store-cream hover:text-store-yellow'
                 }`}
             >
                 <Info size={14} aria-hidden="true" />

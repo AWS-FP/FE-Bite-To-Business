@@ -92,7 +92,7 @@ export default function SearchModeDropdown({ value, onChange }: SearchModeDropdo
                 aria-expanded={isOpen}
                 aria-controls={isOpen ? menuId : undefined}
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex h-8 w-full cursor-pointer items-center justify-between gap-1.5 rounded-full border-2 border-solid border-transparent bg-store-cream px-2 text-[11px] leading-4 font-bold text-store-green transition-colors hover:bg-surface-yellow aria-expanded:bg-store-yellow"
+                className="relative flex h-8 w-full cursor-pointer items-center justify-center rounded-full border-2 border-solid border-transparent bg-store-cream px-5 text-[11px] leading-4 font-bold text-store-green transition-colors hover:bg-surface-yellow aria-expanded:bg-store-yellow"
             >
                 <span className="truncate">
                     {t(value === 'ai' ? 'search.askAI' : 'search.products')}
@@ -100,7 +100,7 @@ export default function SearchModeDropdown({ value, onChange }: SearchModeDropdo
                 <ChevronDown
                     size={14}
                     aria-hidden="true"
-                    className={`shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                    className={`absolute right-2 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                 />
             </button>
 

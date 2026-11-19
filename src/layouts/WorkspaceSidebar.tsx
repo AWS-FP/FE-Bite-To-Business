@@ -37,12 +37,12 @@ export default function WorkspaceSidebar({
 
     return (
         <aside
-            className={`admin-sidebar sticky top-0 flex h-dvh min-h-[450px] flex-col overflow-y-auto border-r-2 border-black bg-store-cream px-4 pt-[25px] pb-4 text-black [scrollbar-width:thin] ${className}`}
+            className={`admin-sidebar sticky top-0 flex h-dvh min-h-[450px] flex-col overflow-y-auto border-r-2 border-black bg-store-cream px-4 pt-[25px] pb-4 text-black ${className}`}
             id={sidebarId}
             aria-label={workspaceLabel}
         >
             <Link
-                className="admin-brand flex min-h-[98px] items-center gap-2 px-1 py-3 no-underline [.is-collapsed_&]:justify-center [.is-collapsed_&]:px-0"
+                className="admin-brand flex min-h-[98px] items-center gap-2 px-1 py-3 text-black no-underline [.is-collapsed_&]:justify-center [.is-collapsed_&]:px-0"
                 to={ROUTES.HOME}
                 onClick={onNavigate}
                 aria-label={t('common:home')}
@@ -79,7 +79,7 @@ export default function WorkspaceSidebar({
                         {group.items.map((item) => (
                             <NavLink
                                 key={item.path}
-                                className="admin-navigation-link relative flex min-h-[51px] items-center gap-[9px] rounded-[3px] border border-black bg-white px-[11px] py-[9px] text-[13px] leading-[18.2px] font-normal no-underline hover:bg-surface-yellow aria-[current=page]:bg-store-yellow aria-[current=page]:font-bold aria-[current=page]:shadow-[3px_3px_0_var(--color-black)] hover:aria-[current=page]:bg-store-yellow [.is-collapsed_&]:justify-center [.is-collapsed_&]:px-2"
+                                className="admin-navigation-link relative flex min-h-[51px] items-center gap-[9px] rounded-[3px] border border-black bg-white px-[11px] py-[9px] text-[13px] leading-[18.2px] font-normal text-black no-underline hover:bg-surface-yellow aria-[current=page]:bg-store-yellow aria-[current=page]:font-bold aria-[current=page]:shadow-[3px_3px_0_var(--color-black)] hover:aria-[current=page]:bg-store-yellow [.is-collapsed_&]:justify-center [.is-collapsed_&]:px-2"
                                 to={item.path}
                                 onClick={onNavigate}
                                 title={item.label}

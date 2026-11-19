@@ -195,7 +195,7 @@
         "beveragesBarista": "Bakery & Barista Mixes"
     },
     "footer": {
-        "description": "Direct farm-to-table clean food supply platform for households and professional F&B businesses (MD Foods).",
+        "description": "Bite to Business is a food supply platform for households and professional food service businesses.",
         "freshHeading": "Fresh Produce",
         "dryHeading": "Dry Goods, Dairy & Barista",
         "supportHeading": "Contact Support at",
@@ -720,8 +720,9 @@
         "notificationExpiryDesc": "Quotes that are about to expire",
         "notificationDelivery": "Delivery estimates",
         "notificationDeliveryDesc": "Delivery updates",
-        "notificationSourcing": "Product sourcing requests",
-        "notificationSourcingDesc": "Replies about requested products",
+        "notificationProductRequests": "Product requests",
+        "notificationSourcing": "Product request updates",
+        "notificationSourcingDesc": "Notifications about replies to your product requests",
         "notificationSessionNote": "These toggles change this session only; no backend settings are saved.",
         "avatarChooseTitle": "Choose a profile photo",
         "avatarCropTitle": "Edit photo",
