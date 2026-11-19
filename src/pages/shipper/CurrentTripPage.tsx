@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Package, RefreshCw, Truck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { routePaths } from '@/router/routes';
-import DeliveryPagination from '@/components/shipper/DeliveryPagination';
+import Pagination from '@/components/common/Pagination';
 import { SectionHeading } from '@/components/shipper/DeliveryUI';
 import { useDelivery } from '@/components/shipper/DeliveryModel';
 import { claimPackage, getMyPackages, getReadyOrders } from '@/services/shipper/deliveryService';
@@ -208,11 +208,11 @@ export default function CurrentTripPage() {
                     ))}
                 </div>
                 {mine && (
-                    <DeliveryPagination
+                    <Pagination
                         page={minePage}
                         totalPages={mine.totalPages}
                         loading={loading}
-                        onChange={changeMinePage}
+                        onPageChange={changeMinePage}
                     />
                 )}
             </section>
@@ -279,11 +279,11 @@ export default function CurrentTripPage() {
                     ))}
                 </div>
                 {ready && (
-                    <DeliveryPagination
+                    <Pagination
                         page={readyPage}
                         totalPages={ready.totalPages}
                         loading={loading}
-                        onChange={changeReadyPage}
+                        onPageChange={changeReadyPage}
                     />
                 )}
             </section>

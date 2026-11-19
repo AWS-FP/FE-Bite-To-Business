@@ -17,6 +17,7 @@ import { getWorkspaceHome, ROUTES } from '../../../router/routes';
 import { useAuthStore } from '../../../store/admin/authStore';
 import { useCartStore } from '../../../store/customer/cartStore';
 import GuestHeaderActions from './GuestHeaderActions';
+import LogoutConfirmation from '@/components/common/LogoutConfirmation';
 
 export default function StoreAccountActions() {
     const { t } = useTranslation('storefront');
@@ -30,6 +31,7 @@ export default function StoreAccountActions() {
     const [openDropdown, setOpenDropdown] = useState<'notifications' | 'profile' | 'cart' | null>(
         null,
     );
+    const [confirmLogout, setConfirmLogout] = useState(false);
 
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -83,15 +85,7 @@ export default function StoreAccountActions() {
     }
 
     return (
-        <div ref={dropdownRef} className="relative flex shrink-0 items-center gap-2.5">
-            {/* Quick Order */}
-            <Link
-                className="hidden min-h-[40px] items-center justify-center rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3.5 text-[12px] font-bold text-store-ink no-underline shadow-[2px_2px_0_var(--color-store-ink)] hover:bg-store-yellow min-[1280px]:flex"
-                to={ROUTES.CATALOG}
-            >
-                {t('header.quickOrder')}
-            </Link>
-
+        <div ref={dropdownRef} className="relative flex flex-1 items-center gap-2.5">
             {/* Guest Actions */}
             {!isLoggedIn && <GuestHeaderActions t={t} />}
 
@@ -102,7 +96,7 @@ export default function StoreAccountActions() {
                         to={ROUTES.QUOTES}
                         onClick={() => setOpenDropdown(null)}
                         aria-label={t('header.quote')}
-                        className="relative flex min-h-[42px] cursor-pointer items-center justify-center gap-2.5 rounded-full border-2 border-solid border-store-ink bg-store-cream px-3.5 py-1 text-left text-store-ink no-underline shadow-[2px_2px_0_var(--color-store-ink)] hover:bg-white"
+                        className="relative mx-auto flex min-h-[52px] shrink-0 cursor-pointer items-center justify-center gap-3 rounded-full border-2 border-solid border-store-ink bg-store-cream px-5 py-1 text-left text-store-ink no-underline shadow-[2px_2px_0_var(--color-store-ink)] hover:bg-white"
                     >
                         <div className="flex items-center border-0 border-r border-solid border-store-ink/25 pr-2">
                             <ShoppingCart size={18} className="text-store-ink" />
@@ -144,7 +138,7 @@ export default function StoreAccountActions() {
                         }
                         aria-label={accountLabel}
                         title={accountLabel}
-                        className="flex size-[42px] shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-solid border-store-ink bg-gradient-to-br from-surface-blue to-info p-0 text-[13px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)] hover:brightness-105"
+                        className="flex size-[52px] shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-solid border-store-ink bg-gradient-to-br from-surface-blue to-info p-0 text-[13px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)] hover:brightness-105"
                     >
                         {user?.avatarUrl && (
                             <img
@@ -162,7 +156,7 @@ export default function StoreAccountActions() {
 
             {/* Profile Dropdown */}
             {isLoggedIn && openDropdown === 'profile' && (
-                <div className="absolute right-0 top-[54px] z-50 w-[265px] overflow-hidden rounded-[22px] border border-solid border-store-ink/15 bg-store-cream text-store-ink shadow-[0_20px_50px_color-mix(in_srgb,_var(--color-black)_35%,_transparent)]">
+                <div className="absolute right-0 top-[60px] z-50 w-[265px] overflow-hidden rounded-[22px] border border-solid border-store-ink/15 bg-store-cream text-store-ink shadow-[0_20px_50px_color-mix(in_srgb,_var(--color-black)_35%,_transparent)]">
                     {/* User Information */}
                     <div className="flex items-center gap-3.5 border-0 border-b border-solid border-store-ink/10 p-4">
                         <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border border-solid border-store-ink bg-gradient-to-br from-surface-blue to-info text-sm font-black text-store-ink">
@@ -269,7 +263,7 @@ export default function StoreAccountActions() {
 
                         <button
                             type="button"
-                            onClick={handleSignOut}
+                            onClick={() => { setOpenDropdown(null); setConfirmLogout(true); }}
                             className="flex w-full cursor-pointer items-center gap-3 border-0 bg-transparent px-4 py-2 text-left text-xs font-semibold text-danger transition-colors hover:bg-danger/10"
                         >
                             <LogOut size={15} className="text-danger" />
@@ -279,6 +273,7 @@ export default function StoreAccountActions() {
                     </div>
                 </div>
             )}
+            <LogoutConfirmation open={confirmLogout} onCancel={() => setConfirmLogout(false)} onConfirm={() => { setConfirmLogout(false); handleSignOut(); }} />
         </div>
     );
 }

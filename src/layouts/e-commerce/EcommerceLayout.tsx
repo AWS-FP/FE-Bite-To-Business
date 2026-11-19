@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/admin/authStore';
 import WorkspaceSidebar from '@/layouts/WorkspaceSidebar';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 import WorkspaceAccountMenu from '@/components/common/WorkspaceAccountMenu';
+import LogoutConfirmation from '@/components/common/LogoutConfirmation';
 
 export default function EcommerceLayout() {
     const [queryClient] = useState(
@@ -34,6 +35,7 @@ function EcommerceWorkspace() {
     const user = useAuthStore((state) => state.session?.user ?? null);
     const clearSession = useAuthStore((state) => state.clearSession);
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [confirmLogout, setConfirmLogout] = useState(false);
     const [globalSearch, setGlobalSearch] = useState('');
     const loggingOut = useRef(false);
     const workspace = STAFF_WORKSPACES.ECOMMERCE_EXECUTIVE;
@@ -120,10 +122,11 @@ function EcommerceWorkspace() {
                             Điều phối đơn
                         </span>
                         <WorkspaceAccountMenu user={user} roleLabel={t(workspace.roleLabel)} />
+                        <LogoutConfirmation open={confirmLogout} onCancel={() => setConfirmLogout(false)} onConfirm={() => { setConfirmLogout(false); void handleLogout(); }} />
                         <button
                             type="button"
                             className="h-[53px] rounded-lg border border-store-ink bg-danger px-3 py-2 text-[11px] font-bold text-black hover:brightness-95"
-                            onClick={handleLogout}
+                            onClick={() => setConfirmLogout(true)}
                         >
                             Đăng xuất
                         </button>

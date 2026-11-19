@@ -13,6 +13,7 @@ import type {
     CustomerOrderDetail,
     OrderVatPreview,
 } from '@/services/customer/orderService';
+import { createBankPayment, getBankPayment, type BankPayment } from '@/services/customer/paymentService';
 
 const money = (value: number) => `${value.toLocaleString('vi-VN')}đ`;
 const statusLabel: Record<string, string> = {
@@ -30,6 +31,10 @@ export default function OrderStatusPage() {
     const [vat, setVat] = useState<OrderVatPreview | null>(null);
     const [error, setError] = useState(false);
     const [extraError, setExtraError] = useState('');
+    const [payment, setPayment] = useState<BankPayment | null>(null);
+    const [paymentLoading, setPaymentLoading] = useState(false);
+    const [paymentError, setPaymentError] = useState('');
+    const [qrError, setQrError] = useState(false);
 
     useEffect(() => {
         const abort = new AbortController();
@@ -61,6 +66,35 @@ export default function OrderStatusPage() {
             setVat(await getOrderVatPreview(orderId));
         } catch {
             setExtraError('Không lấy được bản tính VAT.');
+        }
+    }
+
+    async function showPayment() {
+        if (!orderId || paymentLoading) return;
+        setPaymentLoading(true);
+        setPaymentError('');
+        setQrError(false);
+        try {
+            setPayment(await createBankPayment(orderId));
+        } catch {
+            setPaymentError('Không thể tạo mã thanh toán. Đơn có thể đã hết hạn hoặc thanh toán không khả dụng.');
+        } finally {
+            setPaymentLoading(false);
+        }
+    }
+
+    async function refreshPayment() {
+        if (!payment || paymentLoading) return;
+        setPaymentLoading(true);
+        setPaymentError('');
+        try {
+            const result = await getBankPayment(payment.id);
+            setPayment(result);
+            if (result.status === 'SUCCESS' && orderId) setDetail(await getCustomerOrder(orderId));
+        } catch {
+            setPaymentError('Không kiểm tra được trạng thái thanh toán. Vui lòng thử lại.');
+        } finally {
+            setPaymentLoading(false);
         }
     }
 
@@ -155,6 +189,24 @@ export default function OrderStatusPage() {
                                         {detail.order.paymentStatus ?? 'Chưa có thông tin'}
                                     </p>
                                 </section>
+                                {['CONFIRMED', 'PROCESSING'].includes(detail.order.status) && detail.order.paymentStatus !== 'SUCCESS' && (
+                                    <section className="rounded-xl border-2 border-store-ink bg-white p-5 text-sm">
+                                        <h2 className="mt-0 text-lg font-bold">Thanh toán chuyển khoản</h2>
+                                        {!payment && <button type="button" disabled={paymentLoading} onClick={() => void showPayment()} className="rounded bg-store-green px-4 py-2 font-bold text-white disabled:opacity-50">{paymentLoading ? 'Đang tải...' : 'Hiển thị mã QR'}</button>}
+                                        {payment?.status === 'PENDING' && !payment.qrUrl && <p>Đơn không còn trong thời hạn thanh toán. Vui lòng kiểm tra lại đơn hàng.</p>}
+                                        {payment?.status === 'PENDING' && payment.qrUrl && <div className="space-y-2">
+                                            {payment.qrUrl && !qrError ? <img src={payment.qrUrl} alt="Mã QR chuyển khoản" className="mx-auto w-full max-w-64" onError={() => setQrError(true)} /> : <p>Không tải được ảnh QR. Bạn có thể chuyển khoản bằng thông tin bên dưới.</p>}
+                                            <p>Ngân hàng: <strong>{payment.bank}</strong></p>
+                                            <p>Số tài khoản: <strong>{payment.virtualAccount}</strong></p>
+                                            <p>Số tiền: <strong>{money(payment.amount)}</strong></p>
+                                            <p>Nội dung: <strong>{payment.paymentCode}</strong></p>
+                                            <p className="text-store-muted">Giữ nguyên số tiền và nội dung chuyển khoản để hệ thống đối chiếu.</p>
+                                            <button type="button" disabled={paymentLoading} onClick={() => void refreshPayment()} className="rounded border border-black px-4 py-2 font-semibold disabled:opacity-50">{paymentLoading ? 'Đang kiểm tra...' : 'Kiểm tra thanh toán'}</button>
+                                        </div>}
+                                        {payment && payment.status !== 'PENDING' && <p>Trạng thái: {payment.status === 'SUCCESS' ? 'Thanh toán thành công' : payment.status}</p>}
+                                        {paymentError && <p role="alert" className="mt-3 text-red-700">{paymentError}</p>}
+                                    </section>
+                                )}
                                 <section className="rounded-xl border-2 border-store-ink bg-white p-5 text-sm">
                                     <h2 className="mt-0 text-lg font-bold">Hóa đơn và VAT</h2>
                                     <div className="flex flex-wrap gap-2">

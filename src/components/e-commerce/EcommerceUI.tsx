@@ -14,8 +14,8 @@ export const ui = {
 export function PageTitle({ eyebrow, title, description, children }: { eyebrow: string; title: string; description: string; children?: ReactNode }) {
     return <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-            <p className="mb-2 font-label text-[11px] font-bold tracking-[0.18em] text-store-coral">{eyebrow}</p>
-            <h1 className="font-display text-[clamp(26px,3vw,40px)] font-extrabold leading-tight tracking-[-1px] text-store-ink">{title}</h1>
+            <p className="mb-2 font-body text-[11px] font-semibold tracking-[1.2px] text-store-ink">{eyebrow}</p>
+            <h1 className="font-heading text-[34px] leading-[44px] tracking-[-1px] text-store-ink">{title}</h1>
             <p className="mt-2 max-w-2xl text-[13px] leading-6 text-store-muted">{description}</p>
         </div>
         {children && <div className="flex flex-wrap items-center gap-2">{children}</div>}
@@ -74,7 +74,7 @@ export function Dialog({ title, description, onClose, children, wide = false }: 
     return <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-store-ink/60 p-3 sm:p-6" onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}>
         <div className={`my-auto max-h-[92vh] w-full overflow-y-auto border-2 border-black bg-store-cream p-5 shadow-[6px_6px_0_#14132b] sm:p-7 ${wide ? 'max-w-[760px]' : 'max-w-[560px]'}`} role="dialog" aria-modal="true" aria-label={title}>
             <div className="mb-5 flex items-start justify-between gap-3 border-b-2 border-black pb-4">
-                <div><h2 className="font-display text-[24px] font-extrabold text-store-ink">{title}</h2>{description && <p className="mt-1 text-[12px] leading-5 text-store-muted">{description}</p>}</div>
+                <div><h2 className="font-subheading text-[24px] font-extrabold text-store-ink">{title}</h2>{description && <p className="mt-1 text-[12px] leading-5 text-store-muted">{description}</p>}</div>
                 <button type="button" onClick={onClose} aria-label="Đóng" className="grid size-9 shrink-0 place-items-center border border-black bg-white hover:bg-surface-pink"><img src="/images/ui/e-commerce/x.svg" width="16" height="16" alt="" /></button>
             </div>
             {children}

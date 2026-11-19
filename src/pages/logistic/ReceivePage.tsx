@@ -1,29 +1,57 @@
-import { useRef, useState, type FormEvent } from 'react';
-import LogisticsPageShell, { ListStatus, Pagination } from '@/components/logistic/LogisticsPageShell';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { ImageOff, Package } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import LogisticsPageShell, { ListStatus } from '@/components/logistic/LogisticsPageShell';
 import { useLogisticsActions, useLogisticsList, type Stock } from '@/hooks/logistic/useLogisticsData';
 export default function ReceivePage() {
-    const data = useLogisticsList<Stock>('/api/logistics/inventory');
+    const { i18n } = useTranslation();
+    const [search, setSearch] = useState('');
+    const [keyword, setKeyword] = useState('');
+    const data = useLogisticsList<Stock>('/api/logistics/inventory', keyword);
     const action = useLogisticsActions(data.refresh);
     const [productId, setProductId] = useState('');
     const [quantity, setQuantity] = useState('');
     const [reason, setReason] = useState('');
     const [success, setSuccess] = useState(false);
+    const product = data.items.find((item) => item.productId === productId);
+    const unitNames: Record<string, string> = i18n.resolvedLanguage === 'en'
+        ? { KG: 'kg', G: 'g', BOX: 'box', TRAY: 'tray', PACK: 'pack', BAG: 'bag', CASE: 'case', CAN: 'can' }
+        : { KG: 'kg', G: 'g', BOX: 'hộp', TRAY: 'khay', PACK: 'gói', BAG: 'túi', CASE: 'thùng', CAN: 'lon' };
+    const unit = product ? unitNames[product.unit] || product.unit : '';
     const movementId = useRef<string | null>(null);
+    useEffect(() => {
+        const timer = window.setTimeout(() => setKeyword(search.trim()), 350);
+        return () => window.clearTimeout(timer);
+    }, [search]);
     async function save(event: FormEvent) {
         event.preventDefault();
-        if (!productId || !Number.isFinite(Number(quantity)) || Number(quantity) <= 0) return;
+        if (!productId || !Number.isInteger(Number(quantity)) || Number(quantity) <= 0) return;
         movementId.current ??= crypto.randomUUID();
         const saved = await action.submit(`/api/logistics/inventory/${productId}/receipts`, { movementId: movementId.current, quantity: Number(quantity), reason: reason.trim() || null });
         if (saved) { setQuantity(''); setReason(''); movementId.current = null; setSuccess(true); }
     }
     function changed() { movementId.current = null; setSuccess(false); }
-    return <LogisticsPageShell title="Nhập hàng" description="Ghi nhận số lượng sản phẩm nhận vào kho."><form onSubmit={save} className="max-w-2xl space-y-4 rounded-xl border border-store-line bg-white p-6">
+    return <LogisticsPageShell number="02" label="Quản lý kho" title="Nhập hàng" description="Ghi nhận số lượng sản phẩm nhận vào kho."><div className="grid grid-cols-[minmax(0,1.2fr)_minmax(300px,1fr)] items-start gap-6"><form onSubmit={save} className="space-y-4 rounded-xl border-2 border-black bg-white p-6">
+        <label className="block font-bold">Tìm sản phẩm<input value={search} maxLength={200} onChange={e => { setSearch(e.target.value); setProductId(''); changed(); }} placeholder="Nhập tên sản phẩm hoặc mã SKU" className="mt-2 w-full rounded border p-3 font-normal" /></label>
         <ListStatus loading={data.loading} error={data.error} empty={data.items.length === 0} />
-        <label className="block font-bold">Sản phẩm<select required value={productId} onChange={e => { setProductId(e.target.value); changed(); }} className="mt-2 w-full rounded border p-3 font-normal"><option value="">Chọn sản phẩm</option>{data.items.map(item => <option key={item.productId} value={item.productId}>{item.name} · {item.sku}</option>)}</select></label>
-        <Pagination {...data} />
-        <label className="block font-bold">Số lượng<input required type="number" min="0.001" step="0.001" value={quantity} onChange={e => { setQuantity(e.target.value); changed(); }} className="mt-2 w-full rounded border p-3 font-normal" /></label>
+        <label className="block font-bold">Sản phẩm<select required disabled={data.loading || search.trim() !== keyword} value={productId} onChange={e => { setProductId(e.target.value); changed(); }} className="mt-2 w-full rounded border p-3 font-normal"><option value="">Chọn sản phẩm</option>{data.items.map(item => <option key={item.productId} value={item.productId}>{item.name} · {item.sku}</option>)}</select></label>
+        <label className="block font-bold">Số lượng{unit && <span className="ml-2 text-sm font-normal text-store-muted">({unit})</span>}<input required type="number" min="1" step="1" value={quantity} onChange={e => { setQuantity(e.target.value); changed(); }} placeholder={unit ? `Nhập số lượng (${unit})` : 'Chọn sản phẩm để xem đơn vị'} className="mt-2 w-full rounded border p-3 font-normal" /></label>
         <label className="block font-bold">Ghi chú<input maxLength={1000} value={reason} onChange={e => { setReason(e.target.value); changed(); }} className="mt-2 w-full rounded border p-3 font-normal" /></label>
         {action.error && <p role="alert" className="text-red-700">{action.error}</p>}{success && <p role="status" className="text-green-700">Đã ghi nhận nhập hàng.</p>}
-        <button disabled={action.busy} className="rounded bg-store-green px-5 py-3 font-bold text-white disabled:opacity-50">{action.busy ? 'Đang lưu...' : 'Nhập hàng'}</button>
-    </form></LogisticsPageShell>;
+        <button disabled={action.busy} className="rounded bg-store-green px-5 py-3 font-bold text-white transition-colors hover:bg-store-dark disabled:opacity-50">{action.busy ? 'Đang lưu...' : 'Nhập hàng'}</button>
+    </form><section className="flex flex-col gap-5 rounded-xl border-2 border-black bg-white p-6">
+        <div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-lg bg-store-cream text-store-green"><Package size={20} aria-hidden="true" /></span><h2 className="font-subheading text-lg font-bold">Thông tin sản phẩm</h2></div>
+        {product ? <div className="space-y-4">
+            <div className="flex h-52 items-center justify-center overflow-hidden rounded-lg bg-store-cream">
+                {product.imageUrl ? <img src={product.imageUrl} alt={product.name} className="h-full w-full object-contain" /> : <div className="flex flex-col items-center gap-2 text-store-muted"><ImageOff size={32} aria-hidden="true" /><span className="text-sm">Chưa có ảnh sản phẩm</span></div>}
+            </div>
+            <h3 className="font-subheading text-lg font-bold">{product.name}</h3>
+            <dl className="space-y-3 text-sm">
+                <div className="flex justify-between gap-4 border-b border-store-line pb-3"><dt className="text-store-muted">Mã SKU</dt><dd className="text-right font-semibold">{product.sku}</dd></div>
+                <div className="flex justify-between gap-4 border-b border-store-line pb-3"><dt className="text-store-muted">Đơn vị nhập</dt><dd className="font-semibold">{unit}</dd></div>
+                <div className="flex justify-between gap-4 border-b border-store-line pb-3"><dt className="text-store-muted">Trong kho</dt><dd className="font-semibold">{product.onHand.toLocaleString('vi-VN')} {unit}</dd></div>
+                <div className="flex justify-between gap-4"><dt className="text-store-muted">Đã giữ</dt><dd className="font-semibold">{product.reserved.toLocaleString('vi-VN')} {unit}</dd></div>
+            </dl>
+        </div> : <p className="rounded-lg bg-store-cream p-6 text-sm text-store-muted">Chọn sản phẩm để xem hình ảnh và thông tin.</p>}
+    </section></div></LogisticsPageShell>;
 }

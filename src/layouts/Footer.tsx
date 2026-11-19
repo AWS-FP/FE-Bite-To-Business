@@ -48,6 +48,14 @@ export default function Footer() {
                                 ISO 22000 / HACCP
                             </span>
                         </div>
+                        <div className="mt-5 flex flex-col items-start gap-3 text-xs">
+                            <a href="/documents/Bang_gia_si_T11_2026.pdf" download="Bang_gia_si_T11_2026.pdf" className="inline-flex items-center gap-2 text-store-cream no-underline hover:text-store-yellow">
+                                <img src="/images/storefront/file.svg" alt="" className="block shrink-0" /> {t('header.priceList')}
+                            </a>
+                            <a href="/documents/TCVN11892-1_2017_916963.pdf" download="TCVN11892-1_2017_916963.pdf" className="inline-flex items-center gap-2 text-store-cream no-underline hover:text-store-yellow">
+                                <img src="/images/storefront/shield.svg" alt="" className="block shrink-0" /> {t('header.certifications')}
+                            </a>
+                        </div>
                     </div>
 
                     {/* Column 2: Fresh Produce */}
@@ -121,7 +129,7 @@ export default function Footer() {
                     </div>
                 </div>
 
-                <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-0 border-t border-solid border-white/10 pt-6 text-[11px] text-store-muted">
+                <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-0 border-t border-solid border-white/10 pt-6 text-[11px] text-white/75">
                     <span>{t('footer.copyright')}</span>
                     <span>{t('footer.educationalNote')}</span>
                 </div>

@@ -1,4 +1,6 @@
 import { LogOut } from 'lucide-react';
+import { useState } from 'react';
+import LogoutConfirmation from '@/components/common/LogoutConfirmation';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 import WorkspaceAccountMenu from '@/components/common/WorkspaceAccountMenu';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +14,7 @@ export default function DeliveryTopbar({ onOpenMenu }: { onOpenMenu: () => void 
     const navigate = useNavigate();
     const session = useAuthStore((state) => state.session);
     const clearSession = useAuthStore((state) => state.clearSession);
+    const [confirmLogout, setConfirmLogout] = useState(false);
 
     function signOut() {
         clearSession();
@@ -27,7 +30,7 @@ export default function DeliveryTopbar({ onOpenMenu }: { onOpenMenu: () => void 
                 </div>
                 <div className="dl-topbar-titles">
                     <p className="dl-eyebrow">
-                        {language === 'vi' ? 'KHÔNG GIAN QUẢN TRỊ!' : 'OPERATIONS WORKSPACE!'}
+                        {language === 'vi' ? 'KHÔNG GIAN QUẢN TRỊ' : 'OPERATIONS WORKSPACE'}
                     </p>
                     <div className="dl-script">
                         {language === 'vi' ? 'Góc điều hành.' : 'Operations hub.'}
@@ -40,10 +43,11 @@ export default function DeliveryTopbar({ onOpenMenu }: { onOpenMenu: () => void 
                     user={session?.user ?? null}
                     roleLabel="Delivery Staff"
                 />
-                <button type="button" className="dl-signout" onClick={signOut}>
+                <button type="button" className="dl-signout" onClick={() => setConfirmLogout(true)}>
                     <LogOut size={16} />
                     <span>{language === 'vi' ? 'Đăng xuất' : 'Sign out'}</span>
                 </button>
+                <LogoutConfirmation open={confirmLogout} onCancel={() => setConfirmLogout(false)} onConfirm={() => { setConfirmLogout(false); signOut(); }} />
             </div>
         </header>
     );

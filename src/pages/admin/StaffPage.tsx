@@ -8,7 +8,7 @@ import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import StaffCreateForm from '@/components/admin/StaffCreateForm';
 import StaffError from '@/components/admin/StaffError';
 import StaffIcon from '@/components/admin/StaffIcon';
-import RegistrationPagination from '@/components/admin/RegistrationPagination';
+import Pagination from '@/components/common/Pagination';
 import { useStaff } from '@/hooks/admin/useStaff';
 import { useAuthStore } from '@/store/admin/authStore';
 import type { StaffAccount } from '@/types/admin/staff';
@@ -33,7 +33,7 @@ export default function StaffPage() {
     const pageNumber = Number(searchParams.get('page') || 0);
     const page = Number.isSafeInteger(pageNumber) && pageNumber >= 0 ? pageNumber : 0;
     const keyword = (searchParams.get('keyword') || '').slice(0, 254);
-    const staffQuery = useStaff({ page, size: 6, role, keyword: keyword || undefined });
+    const staffQuery = useStaff({ page, size: 10, role, keyword: keyword || undefined });
 
     useEffect(() => {
         document.title = `${t('navigation.staff')} | Bite to Business`;
@@ -289,16 +289,11 @@ export default function StaffPage() {
                                 </tbody>
                             </table>
                         </div>
-                        <RegistrationPagination
+                        <Pagination
                             ariaLabel={t('staff.pagination')}
-                            resultsLabel="staff.results"
-                            previousIcon={<StaffIcon name="previous" />}
-                            nextIcon={<StaffIcon name="next" />}
                             page={page}
-                            size={staffQuery.data.size}
-                            total={staffQuery.data.totalElements}
                             totalPages={staffQuery.data.totalPages}
-                            onPage={(nextPage) => changeFilter('page', String(nextPage))}
+                            onPageChange={(nextPage) => changeFilter('page', String(nextPage))}
                         />
                     </>
                 )}
