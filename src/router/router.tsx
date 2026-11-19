@@ -117,6 +117,10 @@ export const router = createBrowserRouter([
         Component: BrandDetailPage,
     },
     {
+        path: ROUTES.BRAND_DETAIL_LEGACY,
+        Component: BrandDetailPage,
+    },
+    {
         path: ROUTES.CATALOG,
         Component: CustomerCatalogPage,
     },
