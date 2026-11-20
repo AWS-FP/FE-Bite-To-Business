@@ -1,31 +1,33 @@
 import axios from 'axios';
 import { ArrowLeft, ArrowRight, Package, Tag, Trash2 } from 'lucide-react';
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import Footer from '@/layouts/Footer';
 import Header from '@/layouts/Header';
 import QuoteSteps from '@/components/customer/checkout/QuoteSteps';
 import QuoteReview from '@/components/customer/checkout/QuoteReview';
 import CartItems from '@/components/customer/checkout/CartItems';
 import PackageForm from '@/components/customer/checkout/PackageForm';
+import { sameDeliveryAddress } from '@/components/customer/checkout/deliveryAddress';
 import type { PackageDraft } from '@/components/customer/checkout/PackageForm';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
 import { ROUTES } from '@/router/routes';
-import { addressToCoordinates } from '@/services/geocodingService';
+import { addressToCoordinates, placeToCoordinates } from '@/services/geocodingService';
 import {
-    addQuoteItem,
     addQuotePackage,
     applyQuoteCoupons,
-    createQuoteDraft,
+    createQuoteFromCart,
     deleteQuotePackage,
     getQuote,
     getQuotePackages,
-    refreshQuotePrices,
+    getQuotePackageTotals,
     saveQuoteContact,
 } from '@/services/customer/quoteService';
-import type { Quote, QuotePackage } from '@/services/customer/quoteService';
+import type { Quote, QuotePackage, QuotePackageAmount } from '@/services/customer/quoteService';
 import { useAuthStore } from '@/store/admin/authStore';
 import { useCartStore } from '@/store/customer/cartStore';
+import { emptyParcel, emptyQuoteForm, useQuoteDraftStore } from '@/store/customer/quoteDraftStore';
 
 const field =
     'w-full rounded-lg border border-store-ink/25 bg-white px-3 py-2.5 text-sm text-store-ink focus:border-store-ink focus:outline-none';
@@ -34,8 +36,7 @@ const primary =
 const secondary =
     'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-store-ink/25 bg-white px-4 py-2 font-bold text-store-ink hover:bg-store-cream';
 
-function errorMessage(error: unknown) {
-    const fallback = 'Không thể xử lý yêu cầu. Vui lòng thử lại.';
+function errorMessage(error: unknown, fallback: string) {
     if (axios.isAxiosError(error)) {
         const data = error.response?.data as { message?: string; code?: string } | undefined;
         const message = data?.message || fallback;
@@ -52,6 +53,11 @@ function errorMessage(error: unknown) {
 }
 
 export default function CartPage() {
+    const { t, i18n } = useTranslation('quote');
+    const productName = (item: Quote['items'][number]) =>
+        i18n.resolvedLanguage === 'en' ? item.nameEn || item.nameVi : item.nameVi;
+    const displayMessage = (value: string) =>
+        value.startsWith('errors.') || value.startsWith('notices.') ? t(value) : value;
     const navigate = useNavigate();
     const session = useAuthStore((state) => state.session);
     const items = useCartStore((state) => state.items);
@@ -59,23 +65,34 @@ export default function CartPage() {
     const [step, setStep] = useState(0);
     const [quote, setQuote] = useState<Quote | null>(null);
     const [packages, setPackages] = useState<QuotePackage[]>([]);
-    const [productCode, setProductCode] = useState('');
-    const [shippingCode, setShippingCode] = useState('');
-    const [quantities, setQuantities] = useState<Record<string, string>>({});
-    const [parcel, setParcel] = useState<PackageDraft>({
-        name: '',
-        recipientName: '',
-        recipientPhone: '',
-        deliveryDate: '',
-        deliveryTimeSlot: '',
-        address: '',
-        note: '',
-        city: 'HCM',
-    });
+    const owner = session?.user.id ?? 'guest';
+    const form = useQuoteDraftStore((state) => state.forms[owner] ?? emptyQuoteForm);
+    const updateForm = useQuoteDraftStore((state) => state.updateForm);
+    const { productCode, shippingCode, quantities, parcel } = form;
+    const setProductCode = (value: string) =>
+        updateForm(owner, (current) => ({ ...current, productCode: value }));
+    const setShippingCode = (value: string) =>
+        updateForm(owner, (current) => ({ ...current, shippingCode: value }));
+    const setQuantities: Dispatch<SetStateAction<Record<string, string>>> = (value) =>
+        updateForm(owner, (current) => ({
+            ...current,
+            quantities: typeof value === 'function' ? value(current.quantities) : value,
+        }));
+    const setParcel: Dispatch<SetStateAction<PackageDraft>> = (value) =>
+        updateForm(owner, (current) => ({
+            ...current,
+            parcel: typeof value === 'function' ? value(current.parcel) : value,
+        }));
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState('');
+    const [packageError, setPackageError] = useState('');
     const [notice, setNotice] = useState('');
-    const [savedDraft, setSavedDraft] = useState<Quote | null>(null);
+    const [packageTotals, setPackageTotals] = useState<{
+        quoteId: string;
+        revision: number;
+        values: Record<string, QuotePackageAmount>;
+    } | null>(null);
+    const [packageTotalsError, setPackageTotalsError] = useState(false);
     const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
     function go(next: number) {
@@ -103,32 +120,15 @@ export default function CartPage() {
             return;
         }
         if (session.user.role !== 'CUSTOMER') {
-            setMessage('Vui lòng đăng nhập bằng tài khoản customer để tiếp tục.');
+            setMessage('errors.customer');
             return;
         }
         setBusy(true);
         setMessage('');
         try {
-            let draft = await createQuoteDraft();
-            let different = false;
-            for (const line of draft.items) {
-                const cartItem = items.find((item) => item.id === line.productId);
-                if (!cartItem || cartItem.quantity !== Number(line.quantity)) {
-                    different = true;
-                    break;
-                }
-            }
-            if (different) {
-                setSavedDraft(draft);
-                throw new Error(
-                    'Báo giá đã lưu khác với giỏ hàng hiện tại. Bạn có thể mở báo giá đã lưu để kiểm tra.',
-                );
-            }
-            for (const item of items) {
-                if (!draft.items.some((line) => line.productId === item.id)) {
-                    draft = await addQuoteItem(draft.id, item.id, item.quantity);
-                }
-            }
+            let draft = await createQuoteFromCart(
+                items.map((item) => ({ productId: item.id, quantity: item.quantity })),
+            );
             if (!draft.contactName) {
                 draft = await saveQuoteContact(draft.id, {
                     name: `${session.user.firstName} ${session.user.lastName}`.trim(),
@@ -137,44 +137,12 @@ export default function CartPage() {
                 });
             }
             const savedPackages = await getQuotePackages(draft.id);
-            setSavedDraft(null);
             setQuote(draft);
             setPackages(savedPackages);
             setStep(1);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
-            setMessage(errorMessage(error));
-        } finally {
-            setBusy(false);
-        }
-    }
-
-    async function openSavedDraft() {
-        if (!savedDraft) return;
-        setBusy(true);
-        setMessage('');
-        try {
-            setPackages(await getQuotePackages(savedDraft.id));
-            setQuote(savedDraft);
-            setNotice('Bạn đang xem báo giá đã lưu, có thể khác với giỏ hàng hiện tại.');
-            setStep(1);
-            setSavedDraft(null);
-        } catch (error) {
-            setMessage(errorMessage(error));
-        } finally {
-            setBusy(false);
-        }
-    }
-
-    async function refreshPrices() {
-        if (!quote) return;
-        setBusy(true);
-        setMessage('');
-        try {
-            setQuote(await refreshQuotePrices(quote.id));
-            setNotice('Đã cập nhật giá và ưu đãi hiện tại. Vui lòng kiểm tra lại báo giá.');
-        } catch (error) {
-            setMessage(errorMessage(error));
+            setMessage(errorMessage(error, t('errors.fallback')));
         } finally {
             setBusy(false);
         }
@@ -186,16 +154,16 @@ export default function CartPage() {
             (quote.productCouponId && !productCode.trim()) ||
             (quote.shippingCouponId && !shippingCode.trim())
         ) {
-            setMessage('Báo giá đang có mã đã lưu. Nhập lại mã đang dùng để giữ mã khi cập nhật.');
+            setMessage('errors.savedCoupon');
             return;
         }
         setBusy(true);
         setMessage('');
         try {
             setQuote(await applyQuoteCoupons(quote.id, productCode, shippingCode));
-            setNotice('Đã cập nhật ưu đãi.');
+            setNotice('notices.couponsUpdated');
         } catch (error) {
-            setMessage(errorMessage(error));
+            setMessage(errorMessage(error, t('errors.fallback')));
         } finally {
             setBusy(false);
         }
@@ -209,9 +177,9 @@ export default function CartPage() {
             setQuote(await applyQuoteCoupons(quote.id, '', ''));
             setProductCode('');
             setShippingCode('');
-            setNotice('Đã bỏ các coupon khỏi báo giá.');
+            setNotice('notices.couponsRemoved');
         } catch (error) {
-            setMessage(errorMessage(error));
+            setMessage(errorMessage(error, t('errors.fallback')));
         } finally {
             setBusy(false);
         }
@@ -220,14 +188,18 @@ export default function CartPage() {
     async function createPackage(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         if (!quote) return;
+        setPackageError('');
+        const [startTime, endTime] = parcel.deliveryTimeSlot.split(' - ');
+        if (!startTime || !endTime || endTime <= startTime) {
+            setPackageError('errors.invalidTime');
+            return;
+        }
         const selected: { quoteItemId: string; quantity: number }[] = [];
         for (const item of quote.items) {
-            const quantity = Number(quantities[item.id] || 0);
+            const quantity = Number(quantities[item.productId] || 0);
             const remaining = Number(item.quantity) - allocated(item.id);
             if (quantity > remaining) {
-                setMessage(
-                    'Chọn số lượng hợp lệ, không vượt quá số lượng còn lại của từng sản phẩm.',
-                );
+                setPackageError('errors.invalidQuantity');
                 return;
             }
             if (quantity > 0) {
@@ -235,18 +207,37 @@ export default function CartPage() {
             }
         }
         if (selected.length === 0) {
-            setMessage('Chọn số lượng hợp lệ, không vượt quá số lượng còn lại của từng sản phẩm.');
+            setPackageError('errors.invalidQuantity');
             return;
         }
         setBusy(true);
         setMessage('');
+        let location: Awaited<ReturnType<typeof addressToCoordinates>>;
         try {
-            const location = await addressToCoordinates(
-                parcel.address,
-                parcel.city === 'HCM' ? 'hcm' : 'hanoi',
+            location = parcel.addressRefId
+                ? await placeToCoordinates(parcel.addressRefId)
+                : await addressToCoordinates(
+                      parcel.address,
+                      parcel.city === 'HCM' ? 'hcm' : 'hanoi',
+                  );
+        } catch (error) {
+            setPackageError(
+                axios.isAxiosError(error) && error.response?.status === 400
+                    ? 'errors.invalidAddress'
+                    : 'errors.geocode',
             );
+            setBusy(false);
+            return;
+        }
+        try {
             await addQuotePackage(quote.id, {
-                ...parcel,
+                name: parcel.name,
+                recipientName: parcel.recipientName,
+                recipientPhone: parcel.recipientPhone,
+                deliveryDate: parcel.deliveryDate,
+                deliveryTimeSlot: parcel.deliveryTimeSlot,
+                address: parcel.address,
+                city: parcel.city,
                 note: parcel.note || null,
                 latitude: location.lat,
                 longitude: location.lng,
@@ -255,19 +246,17 @@ export default function CartPage() {
             setPackages(await getQuotePackages(quote.id));
             setQuote(await getQuote(quote.id));
             setQuantities({});
-            setParcel({
-                name: '',
-                recipientName: '',
-                recipientPhone: '',
-                deliveryDate: '',
-                deliveryTimeSlot: '',
-                address: '',
-                note: '',
-                city: 'HCM',
-            });
-            setNotice('Đã thêm gói giao hàng.');
+            setParcel(emptyParcel);
+            setNotice('notices.packageAdded');
         } catch (error) {
-            setMessage(errorMessage(error));
+            setPackageError(
+                axios.isAxiosError(error) &&
+                    error.response?.data?.code === 'QUOTE_DUPLICATE_DELIVERY_ADDRESS'
+                    ? 'errors.duplicateAddress'
+                    : axios.isAxiosError(error) && error.response?.status === 503
+                      ? 'errors.shippingUnavailable'
+                      : errorMessage(error, t('errors.fallback')),
+            );
         } finally {
             setBusy(false);
         }
@@ -282,7 +271,7 @@ export default function CartPage() {
             setPackages(await getQuotePackages(quote.id));
             setQuote(await getQuote(quote.id));
         } catch (error) {
-            setMessage(errorMessage(error));
+            setMessage(errorMessage(error, t('errors.fallback')));
         } finally {
             setBusy(false);
         }
@@ -294,12 +283,41 @@ export default function CartPage() {
         quote.items.every(
             (item) => Math.abs(Number(item.quantity) - allocated(item.id)) < 0.000001,
         );
+    const duplicatePackages = packages.some((item, index) =>
+        packages
+            .slice(0, index)
+            .some((other) => sameDeliveryAddress(item.city, item.address, other)),
+    );
+    const quoteId = quote?.id;
+    const revision = quote?.revision;
+    useEffect(() => {
+        if (!allAllocated || !quoteId || revision == null || quote?.vatAmount == null) return;
+        const controller = new AbortController();
+        void getQuotePackageTotals(quoteId, controller.signal)
+            .then((values) => {
+                if (!controller.signal.aborted) {
+                    setPackageTotals({ quoteId, revision, values });
+                    setPackageTotalsError(false);
+                }
+            })
+            .catch(() => {
+                if (!controller.signal.aborted) setPackageTotalsError(true);
+            });
+        return () => controller.abort();
+    }, [allAllocated, quoteId, revision, quote?.vatAmount]);
+    const visibleTotals =
+        allAllocated &&
+        packageTotals &&
+        packageTotals.quoteId === quoteId &&
+        packageTotals.revision === revision
+            ? packageTotals.values
+            : {};
     const rows = quote
         ? ([
-              ['Tiền hàng', quote.itemsSubtotal],
-              ['Chiết khấu số lượng', -quote.volumeDiscountAmount],
-              ['Ưu đãi sản phẩm', -quote.saleDiscountAmount],
-              ['Coupon sản phẩm', -quote.couponDiscountAmount],
+              [t('merchandise'), quote.itemsSubtotal],
+              [t('volumeDiscount'), -quote.volumeDiscountAmount],
+              [t('productDiscount'), -quote.saleDiscountAmount],
+              [t('productCoupon'), -quote.couponDiscountAmount],
           ] as const)
         : [];
 
@@ -312,17 +330,9 @@ export default function CartPage() {
                 </p>
                 <div className="mt-2 flex items-end justify-between gap-5">
                     <div>
-                        <h1 className="m-0 font-display text-4xl font-bold">Giỏ hàng & báo giá</h1>
-                        <p className="mb-0 mt-3 text-store-muted">
-                            Chọn sản phẩm, chia gói giao và kiểm tra tổng tiền.
-                        </p>
+                        <h1 className="m-0 font-display text-4xl font-bold">{t('title')}</h1>
+                        <p className="mb-0 mt-3 text-store-muted">{t('subtitle')}</p>
                     </div>
-                    <Link
-                        to={ROUTES.HOME}
-                        className="font-bold text-store-green underline underline-offset-4"
-                    >
-                        Tiếp tục mua hàng
-                    </Link>
                 </div>
                 <QuoteSteps step={step} busy={busy} onSelectStep={go} />
                 {message && (
@@ -330,25 +340,15 @@ export default function CartPage() {
                         role="alert"
                         className="mb-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800"
                     >
-                        {message}
+                        {displayMessage(message)}
                     </p>
-                )}
-                {step === 0 && savedDraft && (
-                    <button
-                        type="button"
-                        className={`${secondary} mb-4`}
-                        disabled={busy}
-                        onClick={openSavedDraft}
-                    >
-                        Mở báo giá đã lưu
-                    </button>
                 )}
                 {notice && (
                     <p
                         role="status"
                         className="mb-4 rounded-xl border border-green-300 bg-green-50 px-4 py-3 text-sm text-store-green"
                     >
-                        {notice}
+                        {displayMessage(notice)}
                     </p>
                 )}
                 <div className="grid grid-cols-[minmax(0,1fr)_340px] items-start gap-6">
@@ -363,10 +363,10 @@ export default function CartPage() {
                                         </span>
                                         <div>
                                             <h2 className="m-0 font-subheading text-xl font-bold">
-                                                Giá sản phẩm & ưu đãi
+                                                {t('pricingTitle')}
                                             </h2>
                                             <p className="mb-0 mt-1 text-sm text-store-muted">
-                                                Giá hiện tại từ hệ thống, trước phí giao và VAT.
+                                                {t('pricingDescription')}
                                             </p>
                                         </div>
                                     </div>
@@ -377,7 +377,7 @@ export default function CartPage() {
                                                 className="flex items-center justify-between gap-4 py-4"
                                             >
                                                 <div>
-                                                    <strong>{item.nameVi}</strong>
+                                                    <strong>{productName(item)}</strong>
                                                     <p className="mb-0 mt-1 text-sm text-store-muted">
                                                         {Number(item.quantity)} {item.unitCode} ×{' '}
                                                         {formatCurrencyVnd(
@@ -397,21 +397,21 @@ export default function CartPage() {
                                 </section>
                                 <section className="rounded-2xl border border-store-ink/20 bg-white p-6">
                                     <h2 className="m-0 font-subheading text-xl font-bold">
-                                        Coupon sản phẩm
+                                        {t('productCoupon')}
                                     </h2>
                                     <p className="my-3 text-sm text-store-muted">
-                                        Nhập tối đa một mã giảm giá sản phẩm.
+                                        {t('productCouponDescription')}
                                     </p>
                                     <div className="flex gap-3">
                                         <input
-                                            aria-label="Mã giảm giá sản phẩm"
+                                            aria-label={t('productCouponLabel')}
                                             className={field}
                                             value={productCode}
                                             maxLength={8}
                                             onChange={(event) =>
                                                 setProductCode(event.target.value.toUpperCase())
                                             }
-                                            placeholder="Nhập mã coupon"
+                                            placeholder={t('couponPlaceholder')}
                                         />
                                         <button
                                             type="button"
@@ -419,7 +419,7 @@ export default function CartPage() {
                                             disabled={busy}
                                             onClick={applyCoupons}
                                         >
-                                            Áp dụng
+                                            {t('apply')}
                                         </button>
                                     </div>
                                 </section>
@@ -427,14 +427,6 @@ export default function CartPage() {
                         )}
                         {step === 1 && quote && (
                             <div className="flex gap-3">
-                                <button
-                                    type="button"
-                                    className={secondary}
-                                    disabled={busy}
-                                    onClick={refreshPrices}
-                                >
-                                    Cập nhật giá hiện tại
-                                </button>
                                 {(quote.productCouponId || quote.shippingCouponId) && (
                                     <button
                                         type="button"
@@ -442,7 +434,7 @@ export default function CartPage() {
                                         disabled={busy}
                                         onClick={removeCoupons}
                                     >
-                                        Bỏ tất cả coupon
+                                        {t('removeCoupons')}
                                     </button>
                                 )}
                             </div>
@@ -456,10 +448,10 @@ export default function CartPage() {
                                         </span>
                                         <div>
                                             <h2 className="m-0 font-subheading text-xl font-bold">
-                                                Gói giao hàng
+                                                {t('packages')}
                                             </h2>
                                             <p className="mb-0 mt-1 text-sm text-store-muted">
-                                                Chia số lượng sản phẩm cho từng địa chỉ nhận.
+                                                {t('packagesDescription')}
                                             </p>
                                         </div>
                                     </div>
@@ -469,10 +461,13 @@ export default function CartPage() {
                                                 key={item.id}
                                                 className="rounded-xl bg-store-cream p-4"
                                             >
-                                                <strong>{item.nameVi}</strong>
+                                                <strong>{productName(item)}</strong>
                                                 <p className="mb-0 mt-1 text-sm text-store-muted">
-                                                    Đã chia {allocated(item.id)} /{' '}
-                                                    {Number(item.quantity)} {item.unitCode}
+                                                    {t('allocated', {
+                                                        allocated: allocated(item.id),
+                                                        total: Number(item.quantity),
+                                                        unit: item.unitCode,
+                                                    })}
                                                 </p>
                                             </div>
                                         ))}
@@ -486,7 +481,9 @@ export default function CartPage() {
                                         <div className="flex items-start justify-between gap-4">
                                             <div>
                                                 <p className="m-0 text-xs font-bold uppercase tracking-widest text-store-green">
-                                                    Gói {String(index + 1).padStart(2, '0')}
+                                                    {t('packageNumber', {
+                                                        number: String(index + 1).padStart(2, '0'),
+                                                    })}
                                                 </p>
                                                 <h3 className="mb-1 mt-2 font-subheading text-xl font-bold">
                                                     {item.name}
@@ -506,7 +503,7 @@ export default function CartPage() {
                                                 disabled={busy}
                                                 className="border-0 bg-transparent p-2 text-store-muted hover:text-danger"
                                                 onClick={() => removePackage(item.id)}
-                                                aria-label={`Xóa ${item.name}`}
+                                                aria-label={t('remove', { name: item.name })}
                                             >
                                                 <Trash2 size={19} />
                                             </button>
@@ -514,49 +511,86 @@ export default function CartPage() {
                                         <div className="mt-4 border-t border-store-ink/10 pt-3 text-sm">
                                             {item.items.map((line) => (
                                                 <p className="my-1" key={line.quoteItemId}>
-                                                    {
-                                                        quote.items.find(
+                                                    {(() => {
+                                                        const product = quote.items.find(
                                                             (product) =>
                                                                 product.id === line.quoteItemId,
-                                                        )?.nameVi
-                                                    }{' '}
+                                                        );
+                                                        return product ? productName(product) : '';
+                                                    })()}{' '}
                                                     × {Number(line.quantity)}
                                                 </p>
                                             ))}
                                             <p className="mb-0 mt-3 font-bold text-store-green">
-                                                Phí giao dự kiến:{' '}
+                                                {t('estimatedShipping')}{' '}
                                                 {formatCurrencyVnd(Number(item.shippingFee))}
                                             </p>
+                                            {visibleTotals[item.id] && (
+                                                <p className="mb-0 mt-2 text-base font-bold text-store-green">
+                                                    {t('packageTotal')}{' '}
+                                                    {formatCurrencyVnd(
+                                                        Number(visibleTotals[item.id].total),
+                                                    )}
+                                                </p>
+                                            )}
                                         </div>
                                     </section>
                                 ))}
+                                {duplicatePackages && (
+                                    <p role="alert" className="text-sm text-red-700">
+                                        {t('validation.duplicatePackages')}
+                                    </p>
+                                )}
+                                {allAllocated && quote.vatAmount == null && (
+                                    <p className="text-sm text-store-muted">
+                                        {t('packageVatUnavailable')}
+                                    </p>
+                                )}
+                                {allAllocated && quote.vatAmount != null && packageTotalsError && (
+                                    <p role="alert" className="text-sm text-red-700">
+                                        {t('packageTotalsError')}
+                                    </p>
+                                )}
                                 <PackageForm
                                     quote={quote}
+                                    packages={packages}
                                     parcel={parcel}
                                     setParcel={setParcel}
                                     quantities={quantities}
                                     setQuantities={setQuantities}
                                     allocated={allocated}
                                     busy={busy}
+                                    error={
+                                        packageError === 'errors.duplicateAddress'
+                                            ? ''
+                                            : displayMessage(packageError)
+                                    }
+                                    duplicateAddressError={
+                                        packageError === 'errors.duplicateAddress'
+                                    }
+                                    clearAddressError={() => {
+                                        if (packageError === 'errors.duplicateAddress')
+                                            setPackageError('');
+                                    }}
                                     createPackage={createPackage}
                                 />
                                 <section className="rounded-2xl border border-store-ink/20 bg-white p-6">
                                     <h2 className="m-0 font-subheading text-xl font-bold">
-                                        Coupon phí giao
+                                        {t('shippingCoupon')}
                                     </h2>
                                     <p className="my-3 text-sm text-store-muted">
-                                        Nhập tối đa một mã giảm phí giao.
+                                        {t('shippingCouponDescription')}
                                     </p>
                                     <div className="flex gap-3">
                                         <input
-                                            aria-label="Mã giảm phí giao"
+                                            aria-label={t('shippingCouponLabel')}
                                             className={field}
                                             value={shippingCode}
                                             maxLength={8}
                                             onChange={(e) =>
                                                 setShippingCode(e.target.value.toUpperCase())
                                             }
-                                            placeholder="Nhập mã coupon"
+                                            placeholder={t('couponPlaceholder')}
                                         />
                                         <button
                                             type="button"
@@ -564,22 +598,24 @@ export default function CartPage() {
                                             disabled={busy}
                                             onClick={applyCoupons}
                                         >
-                                            Áp dụng
+                                            {t('apply')}
                                         </button>
                                     </div>
                                 </section>
                             </>
                         )}
-                        {step === 3 && quote && <QuoteReview quote={quote} packages={packages} />}
+                        {step === 3 && quote && (
+                            <QuoteReview quote={quote} packages={packages} totals={visibleTotals} />
+                        )}
                     </div>
                     <aside className="sticky top-36 rounded-2xl border border-store-ink/20 bg-white p-6">
                         <h2 className="mb-5 mt-0 font-subheading text-xl font-bold">
-                            Tóm tắt báo giá
+                            {t('summary')}
                         </h2>
                         <div className="space-y-3 text-sm">
                             {step === 0 ? (
                                 <div className="flex justify-between">
-                                    <span>Tiền hàng dự kiến</span>
+                                    <span>{t('estimatedMerchandise')}</span>
                                     <strong>{formatCurrencyVnd(subtotal)}</strong>
                                 </div>
                             ) : (
@@ -594,18 +630,20 @@ export default function CartPage() {
                                 ))
                             )}
                             <div className="flex justify-between gap-3">
-                                <span className="text-store-muted">Phí giao</span>
+                                <span className="text-store-muted">{t('shipping')}</span>
                                 <strong>
                                     {step >= 2 && quote && packages.length
                                         ? formatCurrencyVnd(Number(quote.shippingFee))
-                                        : 'Tính sau'}
+                                        : t('calculatedLater')}
                                 </strong>
                             </div>
                             {step >= 2 &&
                                 quote &&
                                 Number(quote.shippingCouponDiscountAmount) > 0 && (
                                     <div className="flex justify-between gap-3">
-                                        <span className="text-store-muted">Coupon phí giao</span>
+                                        <span className="text-store-muted">
+                                            {t('shippingCoupon')}
+                                        </span>
                                         <strong>
                                             -{' '}
                                             {formatCurrencyVnd(
@@ -615,24 +653,24 @@ export default function CartPage() {
                                     </div>
                                 )}
                             <div className="flex justify-between gap-3">
-                                <span className="text-store-muted">VAT sản phẩm</span>
+                                <span className="text-store-muted">{t('vat')}</span>
                                 <strong>
                                     {step === 3 && quote?.vatAmount != null
                                         ? formatCurrencyVnd(Number(quote.vatAmount))
-                                        : 'Tính sau'}
+                                        : t('calculatedLater')}
                                 </strong>
                             </div>
                         </div>
                         <div className="mt-5 flex justify-between gap-3 border-t border-store-ink/15 pt-5">
-                            <strong>{step === 3 ? 'Tổng dự kiến' : 'Tổng tiền'}</strong>
+                            <strong>{step === 3 ? t('estimatedTotal') : t('total')}</strong>
                             <strong className="text-lg text-store-green">
                                 {step === 3 && quote?.vatAmount != null
                                     ? formatCurrencyVnd(Number(quote.estimatedTotalAmount))
-                                    : 'Tính sau'}
+                                    : t('calculatedLater')}
                             </strong>
                         </div>
                         <p className="my-4 text-xs leading-relaxed text-store-muted">
-                            Giá và ưu đãi sẽ được hệ thống kiểm tra lại trước khi thanh toán.
+                            {t('priceNote')}
                         </p>
                         {step === 0 && (
                             <button
@@ -642,10 +680,10 @@ export default function CartPage() {
                                 onClick={startQuote}
                             >
                                 {busy
-                                    ? 'Đang xử lý...'
+                                    ? t('processing')
                                     : session
-                                      ? 'Tiếp tục'
-                                      : 'Đăng nhập để tiếp tục'}
+                                      ? t('continue')
+                                      : t('loginContinue')}
                                 <ArrowRight size={17} />
                             </button>
                         )}
@@ -656,7 +694,7 @@ export default function CartPage() {
                                 onClick={() => go(2)}
                                 disabled={busy}
                             >
-                                Tạo gói giao hàng <ArrowRight size={17} />
+                                {t('createPackage')} <ArrowRight size={17} />
                             </button>
                         )}
                         {step === 2 && (
@@ -665,20 +703,20 @@ export default function CartPage() {
                                     type="button"
                                     className={`${primary} w-full`}
                                     onClick={() => go(3)}
-                                    disabled={!allAllocated || busy}
+                                    disabled={!allAllocated || duplicatePackages || busy}
                                 >
-                                    Xem tổng báo giá <ArrowRight size={17} />
+                                    {t('viewTotal')} <ArrowRight size={17} />
                                 </button>
                                 {!allAllocated && (
                                     <p className="mb-0 mt-3 text-xs text-store-muted">
-                                        Hãy chia đủ số lượng sản phẩm vào các gói.
+                                        {t('allocateAll')}
                                     </p>
                                 )}
                             </>
                         )}
                         {step === 3 && (
                             <button type="button" className={`${primary} w-full`} disabled>
-                                Thanh toán chưa sẵn sàng
+                                {t('checkoutUnavailable')}
                             </button>
                         )}
                         {step > 0 && (
@@ -688,7 +726,7 @@ export default function CartPage() {
                                 disabled={busy}
                                 onClick={() => go(step - 1)}
                             >
-                                <ArrowLeft size={17} /> Quay lại
+                                <ArrowLeft size={17} /> {t('back')}
                             </button>
                         )}
                     </aside>

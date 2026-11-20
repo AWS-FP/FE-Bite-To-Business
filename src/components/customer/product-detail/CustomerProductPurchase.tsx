@@ -70,7 +70,11 @@ export default function CustomerProductPurchase({ product, pricing, name, spec }
             {
                 id: product.id,
                 name,
+                nameVi: product.nameVi,
+                nameEn: product.nameEn,
                 spec: spec || product.unitCode,
+                specVi: product.packageSpecVi,
+                specEn: product.packageSpecEn,
                 unitPrice,
                 imageUrl: product.imageUrl ?? undefined,
             },

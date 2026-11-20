@@ -5,8 +5,10 @@ export interface QuoteItem {
     id: string;
     productId: string;
     nameVi: string;
+    nameEn?: string | null;
     unitCode: string;
     quantity: number;
+    quantityStep: number | null;
     listUnitPrice: number;
     volumeUnitPrice: number;
     saleUnitPrice: number;
@@ -45,8 +47,32 @@ export interface QuotePackage {
     items: { quoteItemId: string; quantity: number }[];
 }
 
+export interface QuotePackageAmount {
+    merchandise: number;
+    productCoupon: number;
+    vat: number;
+    shippingFee: number;
+    shippingCoupon: number;
+    total: number;
+}
+
+export async function getQuotePackageTotals(id: string, signal?: AbortSignal) {
+    const response = await http.get<ApiResponse<Record<string, QuotePackageAmount>>>(
+        `/api/customer/quotes/${id}/package-totals`,
+        { signal },
+    );
+    return response.data.data;
+}
+
 export async function createQuoteDraft() {
     const response = await http.post<ApiResponse<Quote>>('/api/customer/quotes/draft');
+    return response.data.data;
+}
+
+export async function createQuoteFromCart(items: { productId: string; quantity: number }[]) {
+    const response = await http.post<ApiResponse<Quote>>('/api/customer/quotes/draft/from-cart', {
+        items,
+    });
     return response.data.data;
 }
 
@@ -105,7 +131,12 @@ export async function addQuotePackage(
 ) {
     const response = await http.post<ApiResponse<QuotePackage>>(
         `/api/customer/quotes/${id}/packages`,
-        parcel,
+        {
+            ...parcel,
+            latitude: Number(parcel.latitude.toFixed(6)),
+            longitude: Number(parcel.longitude.toFixed(6)),
+        },
+        { timeout: 25_000 },
     );
     return response.data.data;
 }
@@ -191,7 +222,11 @@ export async function updateQuotePackage(
 ) {
     const { data } = await http.put<ApiResponse<QuotePackage>>(
         `/api/customer/quotes/${encodeURIComponent(quoteId)}/packages/${encodeURIComponent(packageId)}`,
-        parcel,
+        {
+            ...parcel,
+            latitude: Number(parcel.latitude.toFixed(6)),
+            longitude: Number(parcel.longitude.toFixed(6)),
+        },
     );
     return data.data;
 }

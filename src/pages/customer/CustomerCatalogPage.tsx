@@ -107,7 +107,7 @@ export default function CustomerCatalogPage() {
                 </header>
 
                 <div className="mt-7 grid items-start gap-6 lg:grid-cols-[270px_minmax(0,1fr)] xl:gap-8">
-                    <aside className="min-w-0 rounded-2xl bg-white p-4 shadow-sm lg:sticky lg:top-[230px]">
+                    <aside className="min-w-0 rounded-2xl bg-white p-4 shadow-sm lg:sticky lg:top-[calc(var(--store-header-height,150px)+1rem)] lg:flex lg:max-h-[max(12rem,calc(100dvh-var(--store-header-height,150px)-1rem))] lg:flex-col">
                         <h2 className="mb-3 mt-0 font-subheading text-base font-bold">
                             {t('customerUI.categoryTitle')}
                         </h2>
@@ -129,7 +129,7 @@ export default function CustomerCatalogPage() {
 
                         <nav
                             aria-label={t('customerUI.categorySelect')}
-                            className="max-h-[62vh] overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-store-green"
+                            className="max-h-[62vh] overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-store-green lg:min-h-0 lg:max-h-none lg:flex-1"
                             tabIndex={0}
                         >
                             {categories.map((parent) => {

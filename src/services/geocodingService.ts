@@ -1,10 +1,35 @@
 import { publicHttp } from './axiosClient';
 
 export type MapLocation = { address: string; lat: number; lng: number };
+export type AddressSuggestion = { refId: string; display: string };
+
+export async function searchDeliveryAddresses(
+    address: string,
+    city: 'hcm' | 'hanoi',
+    signal: AbortSignal,
+) {
+    const response = await publicHttp.get<{ data: AddressSuggestion[] }>(
+        '/api/delivery-estimate/addresses',
+        {
+            params: { q: address, city },
+            signal,
+        },
+    );
+    return response.data.data;
+}
+
+export async function placeToCoordinates(refId: string) {
+    const response = await publicHttp.get<{ data: MapLocation }>('/api/delivery-estimate/place', {
+        params: { refId },
+        timeout: 20_000,
+    });
+    return response.data.data;
+}
 
 export async function addressToCoordinates(address: string, city: 'hcm' | 'hanoi') {
     const response = await publicHttp.get<{ data: MapLocation }>('/api/delivery-estimate/geocode', {
         params: { address, city },
+        timeout: 35_000,
     });
     return response.data.data;
 }

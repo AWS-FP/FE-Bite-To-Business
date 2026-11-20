@@ -99,7 +99,14 @@ export default function StoreAccountActions() {
                         className="relative mx-auto flex min-h-[52px] shrink-0 cursor-pointer items-center justify-center gap-3 rounded-full border-2 border-solid border-store-ink bg-store-cream px-5 py-1 text-left text-store-ink no-underline shadow-[2px_2px_0_var(--color-store-ink)] hover:bg-white"
                     >
                         <div className="flex items-center border-0 border-r border-solid border-store-ink/25 pr-2">
-                            <ShoppingCart size={18} className="text-store-ink" />
+                            <span className="relative inline-flex">
+                                <ShoppingCart size={23} className="text-store-ink" />
+                                {totalItemsCount > 0 && (
+                                    <span className="absolute -right-2 -top-2.5 flex h-4 min-w-4 items-center justify-center rounded-full border border-solid border-store-green bg-danger px-0.5 text-[9px] font-black leading-none text-white">
+                                        {totalItemsCount > 9 ? '9+' : totalItemsCount}
+                                    </span>
+                                )}
+                            </span>
                         </div>
 
                         <div className="leading-tight">
@@ -112,11 +119,6 @@ export default function StoreAccountActions() {
                             </span>
                         </div>
 
-                        {totalItemsCount > 0 && (
-                            <span className="absolute -right-1.5 -top-1.5 flex h-[19px] min-w-[19px] items-center justify-center rounded-full border-2 border-solid border-store-green bg-danger px-1 text-[10px] font-black leading-none text-white">
-                                {totalItemsCount > 9 ? '9+' : totalItemsCount}
-                            </span>
-                        )}
                     </Link>
 
                     {/* Notification Bell */}

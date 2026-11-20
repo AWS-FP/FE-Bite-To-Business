@@ -7,7 +7,7 @@ export default function ReceivePage() {
     const { i18n } = useTranslation();
     const [search, setSearch] = useState('');
     const [keyword, setKeyword] = useState('');
-    const data = useLogisticsList<Stock>('/api/logistics/inventory', keyword);
+    const data = useLogisticsList<Stock>('/api/logistics/inventory', keyword, true);
     const action = useLogisticsActions(data.refresh);
     const [productId, setProductId] = useState('');
     const [quantity, setQuantity] = useState('');

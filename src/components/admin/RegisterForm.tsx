@@ -35,14 +35,15 @@ export default function RegisterForm() {
 
     return (
         <>
-            <Link
-                className="auth-back-home mb-[18px] inline-flex items-center gap-[5px] text-[12px] font-bold text-black
- no-underline hover:text-auth-green"
-                to={ROUTES.HOME}
-            >
-                <ArrowLeft size={14} aria-hidden="true" />
-                {t('auth.home')}
-            </Link>
+            <div className="mb-[18px] flex justify-end">
+                <Link
+                    className="auth-back-home inline-flex items-center gap-1.5 text-[14px] font-bold text-black no-underline hover:text-auth-green"
+                    to={ROUTES.HOME}
+                >
+                    <ArrowLeft size={16} aria-hidden="true" />
+                    {t('auth.home')}
+                </Link>
+            </div>
             <h1 id="auth-title" ref={titleRef} tabIndex={-1}>
                 {t('register.title')}
             </h1>
