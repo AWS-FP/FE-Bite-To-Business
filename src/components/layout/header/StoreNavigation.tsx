@@ -1,11 +1,43 @@
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../../../router/routes';
 import ProductRequestSection from '@/components/customer/home/ProductRequestSection';
 import AboutBusinessDropdown from './AboutBusinessDropdown';
 
 export default function StoreNavigation() {
     const { t } = useTranslation('storefront');
+    const { pathname, search } = useLocation();
+    const [requestOpen, setRequestOpen] = useState(false);
+    const [aboutOpen, setAboutOpen] = useState(false);
+    const standardFood =
+        pathname === ROUTES.CATALOG && new URLSearchParams(search).get('view') === 'standard';
+    const current = requestOpen
+        ? 'request'
+        : aboutOpen
+          ? 'about'
+          : pathname === '/collections/deals'
+            ? 'deals'
+            : pathname === '/collections/combos'
+              ? 'combos'
+              : pathname === ROUTES.BRANDS ||
+                  pathname.startsWith('/brands/') ||
+                  pathname.startsWith('/brand/')
+                ? 'brands'
+                : standardFood
+                  ? 'standard'
+                  : [
+                          ROUTES.LANDING,
+                          ROUTES.WHY_BTB,
+                          ROUTES.BTB_MODEL,
+                          ROUTES.DISTRIBUTION_NETWORK,
+                      ].some((route) => route === pathname)
+                    ? 'about'
+                    : pathname.startsWith(ROUTES.ORDERS)
+                      ? 'invoice'
+                      : 'categories';
+    const linkStyle = (active: boolean) =>
+        `inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-bold no-underline transition-colors ${active ? 'bg-store-yellow text-store-ink' : 'text-store-cream hover:bg-white/10 hover:text-store-yellow'}`;
     return (
         <nav
             className="border-0 border-t border-solid border-store-cream/10 bg-store-dark/75"
@@ -14,42 +46,54 @@ export default function StoreNavigation() {
             <div className="mx-auto flex min-h-[42px] max-w-[1440px] items-center gap-4 px-5 py-1">
                 <Link
                     to={ROUTES.CATALOG}
-                    className="flex shrink-0 items-center gap-1.5 rounded-lg border-2 border-solid border-store-ink bg-store-yellow px-3 py-1.5 text-[12px] font-extrabold text-store-ink no-underline shadow-[2px_2px_0_var(--color-store-ink)] transition hover:bg-[#ffe97b]"
+                    className={`${linkStyle(current === 'categories')} text-[12px]`}
+                    aria-current={current === 'categories' ? 'page' : undefined}
                 >
-                    <img src="/images/storefront/menu.svg" width={16} height={16} alt="" />
+                    <img
+                        src="/images/storefront/menu.svg"
+                        width={16}
+                        height={16}
+                        alt=""
+                        className={current === 'categories' ? '' : 'brightness-0 invert'}
+                    />
                     {t('header.categories')}
                 </Link>
                 <div className="flex min-w-0 flex-1 items-center gap-4 py-1.5 text-[12px] leading-[1.5] whitespace-nowrap">
                     <Link
-                        className="text-store-cream no-underline hover:text-store-yellow"
+                        className={linkStyle(current === 'deals')}
                         to="/collections/deals"
+                        aria-current={current === 'deals' ? 'page' : undefined}
                     >
                         {t('header.deals')}
                     </Link>
                     <Link
-                        className="text-store-cream no-underline hover:text-store-yellow"
-                        to={ROUTES.CATALOG}
+                        className={linkStyle(current === 'standard')}
+                        to={`${ROUTES.CATALOG}?view=standard`}
+                        aria-current={current === 'standard' ? 'page' : undefined}
                     >
                         {t('header.standardFood')}
                     </Link>
                     <Link
-                        className="text-store-cream no-underline hover:text-store-yellow"
+                        className={linkStyle(current === 'brands')}
                         to={ROUTES.BRANDS}
+                        aria-current={current === 'brands' ? 'page' : undefined}
                     >
                         {t('brandPage.brands')}
                     </Link>
                     <Link
-                        className="text-store-cream no-underline hover:text-store-yellow"
+                        className={linkStyle(current === 'combos')}
                         to="/collections/combos"
+                        aria-current={current === 'combos' ? 'page' : undefined}
                     >
                         {t('header.combos')}
                     </Link>
-                    <ProductRequestSection />
+                    <ProductRequestSection onOpenChange={setRequestOpen} />
                 </div>
-                <AboutBusinessDropdown />
+                <AboutBusinessDropdown active={current === 'about'} onOpenChange={setAboutOpen} />
                 <Link
                     to={ROUTES.ORDERS}
-                    className="hidden shrink-0 items-center gap-1.5 text-[12px] font-semibold text-store-pink no-underline hover:text-store-yellow min-[1440px]:flex"
+                    className={`hidden text-[12px] min-[1440px]:inline-flex ${linkStyle(current === 'invoice')}`}
+                    aria-current={current === 'invoice' ? 'page' : undefined}
                     title={t('customerUI.navVat')}
                 >
                     {t('header.invoice')}

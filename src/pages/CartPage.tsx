@@ -325,14 +325,9 @@ export default function CartPage() {
         <div className="min-h-screen bg-store-cream text-store-ink">
             <Header />
             <main id="main-content" className="mx-auto min-h-[60vh] max-w-[1440px] px-8 py-10">
-                <p className="m-0 font-subheading text-sm font-bold uppercase tracking-widest text-store-green">
-                    Bite to Business
-                </p>
-                <div className="mt-2 flex items-end justify-between gap-5">
-                    <div>
-                        <h1 className="m-0 font-display text-4xl font-bold">{t('title')}</h1>
-                        <p className="mb-0 mt-3 text-store-muted">{t('subtitle')}</p>
-                    </div>
+                <div>
+                    <h1 className="m-0 font-subheading text-3xl font-bold sm:text-4xl">{t('title')}</h1>
+                    <p className="mb-0 mt-3 text-store-muted">{t('subtitle')}</p>
                 </div>
                 <QuoteSteps step={step} busy={busy} onSelectStep={go} />
                 {message && (
@@ -669,13 +664,10 @@ export default function CartPage() {
                                     : t('calculatedLater')}
                             </strong>
                         </div>
-                        <p className="my-4 text-xs leading-relaxed text-store-muted">
-                            {t('priceNote')}
-                        </p>
                         {step === 0 && (
                             <button
                                 type="button"
-                                className={`${primary} w-full`}
+                                className={`${primary} mt-5 w-full`}
                                 disabled={!items.length || busy}
                                 onClick={startQuote}
                             >
@@ -690,7 +682,7 @@ export default function CartPage() {
                         {step === 1 && (
                             <button
                                 type="button"
-                                className={`${primary} w-full`}
+                                className={`${primary} mt-5 w-full`}
                                 onClick={() => go(2)}
                                 disabled={busy}
                             >
@@ -701,7 +693,7 @@ export default function CartPage() {
                             <>
                                 <button
                                     type="button"
-                                    className={`${primary} w-full`}
+                                    className={`${primary} mt-5 w-full`}
                                     onClick={() => go(3)}
                                     disabled={!allAllocated || duplicatePackages || busy}
                                 >
@@ -715,7 +707,7 @@ export default function CartPage() {
                             </>
                         )}
                         {step === 3 && (
-                            <button type="button" className={`${primary} w-full`} disabled>
+                            <button type="button" className={`${primary} mt-5 w-full`} disabled>
                                 {t('checkoutUnavailable')}
                             </button>
                         )}
