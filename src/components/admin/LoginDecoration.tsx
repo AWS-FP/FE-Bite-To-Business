@@ -72,7 +72,7 @@ export default function LoginDecoration() {
                 </div>
 
                 <div
-                    className="auth-photo absolute top-[700px] right-[6%] h-[120px] w-[120px] -rotate-[8deg]
+                    className="auth-photo absolute top-[170px] right-[1%] h-[100px] w-[100px] -rotate-[8deg]
  overflow-hidden rounded-[32px] border-4 border-solid border-auth-cream
  bg-store-yellow shadow-[10px_10px_0_var(--color-auth-ink)]"
                 >
@@ -101,8 +101,8 @@ export default function LoginDecoration() {
                     </h2>
 
                     <ol className="mt-7 mb-0 list-none p-0">
-                        <li className="flex items-baseline gap-3">
-                            <span className="auth-note-number font-display text-[24px] leading-none font-bold text-auth-green">
+                        <li className="flex items-start gap-3">
+                            <span className="auth-note-number w-8 shrink-0 font-display text-[24px] leading-6 font-bold text-auth-green">
                                 01
                             </span>
                             <div>
@@ -114,8 +114,8 @@ export default function LoginDecoration() {
                                 </p>
                             </div>
                         </li>
-                        <li className="mt-5 flex items-baseline gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-5">
-                            <span className="auth-note-number font-display text-[24px] leading-none font-bold text-auth-green">
+                        <li className="mt-5 flex items-start gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-5">
+                            <span className="auth-note-number w-8 shrink-0 font-display text-[24px] leading-6 font-bold text-auth-green">
                                 02
                             </span>
                             <div>
@@ -127,8 +127,8 @@ export default function LoginDecoration() {
                                 </p>
                             </div>
                         </li>
-                        <li className="mt-5 flex items-baseline gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-5">
-                            <span className="auth-note-number font-display text-[24px] leading-none font-bold text-auth-green">
+                        <li className="mt-5 flex items-start gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-5">
+                            <span className="auth-note-number w-8 shrink-0 font-display text-[24px] leading-6 font-bold text-auth-green">
                                 03
                             </span>
                             <div>

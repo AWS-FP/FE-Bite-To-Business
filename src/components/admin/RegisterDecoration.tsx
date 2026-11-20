@@ -100,8 +100,8 @@ export default function RegisterDecoration() {
                     </h2>
 
                     <ol className="mt-7 mb-0 list-none p-0">
-                        <li className="flex items-baseline gap-3">
-                            <span className="auth-note-number font-display text-[24px] leading-none font-bold text-auth-green">
+                        <li className="flex items-start gap-3">
+                            <span className="auth-note-number w-8 shrink-0 font-display text-[24px] leading-6 font-bold text-auth-green">
                                 01
                             </span>
                             <div>
@@ -113,8 +113,8 @@ export default function RegisterDecoration() {
                                 </p>
                             </div>
                         </li>
-                        <li className="mt-5 flex items-baseline gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-5">
-                            <span className="auth-note-number font-display text-[24px] leading-none font-bold text-auth-green">
+                        <li className="mt-5 flex items-start gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-5">
+                            <span className="auth-note-number w-8 shrink-0 font-display text-[24px] leading-6 font-bold text-auth-green">
                                 02
                             </span>
                             <div>
@@ -126,8 +126,8 @@ export default function RegisterDecoration() {
                                 </p>
                             </div>
                         </li>
-                        <li className="mt-5 flex items-baseline gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-5">
-                            <span className="auth-note-number font-display text-[24px] leading-none font-bold text-auth-green">
+                        <li className="mt-5 flex items-start gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-5">
+                            <span className="auth-note-number w-8 shrink-0 font-display text-[24px] leading-6 font-bold text-auth-green">
                                 03
                             </span>
                             <div>
