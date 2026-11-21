@@ -289,12 +289,15 @@ export default function CartPage() {
         setMessage('');
         let location: Awaited<ReturnType<typeof addressToCoordinates>>;
         try {
-            location = parcel.addressRefId
-                ? await placeToCoordinates(parcel.addressRefId)
-                : await addressToCoordinates(
-                      parcel.address,
-                      parcel.city === 'HCM' ? 'hcm' : 'hanoi',
-                  );
+            location =
+                parcel.latitude != null && parcel.longitude != null
+                    ? { address: parcel.address, lat: parcel.latitude, lng: parcel.longitude }
+                    : parcel.addressRefId
+                      ? await placeToCoordinates(parcel.addressRefId)
+                      : await addressToCoordinates(
+                            parcel.address,
+                            parcel.city === 'HCM' ? 'hcm' : 'hanoi',
+                        );
         } catch (error) {
             setPackageError(
                 axios.isAxiosError(error) && error.response?.status === 400
@@ -423,6 +426,14 @@ export default function CartPage() {
                 )}
                 <div className="grid grid-cols-[minmax(0,1fr)_340px] items-start gap-6">
                     <div className="min-w-0 space-y-5">
+                        {step < 2 && parcel.address.trim() && parcel.latitude != null && (
+                            <p
+                                role="status"
+                                className="rounded-xl border border-store-green/30 bg-white px-4 py-3 text-sm text-store-ink"
+                            >
+                                {t('savedDeliveryAddress', { address: parcel.address })}
+                            </p>
+                        )}
                         {step === 0 && <CartItems items={items} updateQuantity={updateQuantity} />}
                         {step === 1 && quote && (
                             <>

@@ -1,4 +1,5 @@
 {
+    "savedDeliveryAddress": "Địa chỉ giao đã chọn ở trang Phân phối: {{address}}. Địa chỉ này sẽ được điền sẵn ở bước Gói giao hàng.",
     "steps": {
         "cart": "Giỏ hàng",
         "pricing": "Giá & ưu đãi",
@@ -79,6 +80,7 @@
         "missingStep": "(chưa có bước số lượng)",
         "quantityLabel": "Số lượng {{name}} cho gói này",
         "addressNote": "Địa chỉ được tìm tọa độ để tính phí; vui lòng kiểm tra lại địa chỉ trước khi lưu.",
+        "addressFromDistribution": "Dùng đúng vị trí đã chọn ở trang Phân phối. Sửa địa chỉ sẽ tìm lại tọa độ.",
         "creating": "Đang tạo gói..."
     },
     "review": {

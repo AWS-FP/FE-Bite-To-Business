@@ -1,4 +1,5 @@
 {
+    "savedDeliveryAddress": "Delivery address chosen on the Distribution page: {{address}}. It will be prefilled at the Delivery packages step.",
     "steps": {
         "cart": "Cart",
         "pricing": "Prices & discounts",
@@ -80,6 +81,7 @@
         "missingStep": "(quantity step unavailable)",
         "quantityLabel": "Quantity of {{name}} for this package",
         "addressNote": "The address is located on the map to calculate delivery fees. Please check it before saving.",
+        "addressFromDistribution": "Uses the exact location chosen on the Distribution page. Editing the address will locate it again.",
         "creating": "Creating package..."
     },
     "review": {
