@@ -1,5 +1,6 @@
 ﻿import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmModalProps {
     open: boolean;
@@ -15,6 +16,7 @@ interface ConfirmModalProps {
 }
 
 export default function ConfirmModal({ open, title, message, confirmLabel = 'Xác nhận', cancelLabel = 'Hủy', busy = false, error, danger = false, onConfirm, onCancel }: ConfirmModalProps) {
+    const { i18n } = useTranslation();
     const titleId = useId();
     const messageId = useId();
     const cancelButton = useRef<HTMLButtonElement>(null);
@@ -46,7 +48,7 @@ export default function ConfirmModal({ open, title, message, confirmLabel = 'Xá
                 {error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}
                 <div className="mt-6 flex justify-end gap-3">
                     <button ref={cancelButton} type="button" disabled={busy} onClick={onCancel} className="rounded border border-black bg-white px-4 py-2 text-sm font-semibold hover:bg-store-cream disabled:opacity-50">{cancelLabel}</button>
-                    <button type="button" disabled={busy} onClick={onConfirm} className={`rounded border px-4 py-2 text-sm font-semibold disabled:opacity-50 ${danger ? 'border-red-700 bg-red-700 text-white hover:bg-red-800' : 'border-black bg-store-yellow text-black hover:brightness-95'}`}>{busy ? 'Đang xử lý...' : confirmLabel}</button>
+                    <button type="button" disabled={busy} onClick={onConfirm} className={`rounded border px-4 py-2 text-sm font-semibold disabled:opacity-50 ${danger ? 'border-red-700 bg-red-700 text-white hover:bg-red-800' : 'border-black bg-store-yellow text-black hover:brightness-95'}`}>{busy ? (i18n.resolvedLanguage === 'en' ? 'Processing...' : 'Đang xử lý...') : confirmLabel}</button>
                 </div>
             </div>
         </div>, document.body,

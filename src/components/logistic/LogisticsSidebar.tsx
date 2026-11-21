@@ -16,7 +16,7 @@ export default function LogisticsSidebar({ open, onClose, isCollapsed, onToggleC
 
     return (
         <>
-            {open && <button type="button" className="lg-sidebar-backdrop" aria-label="Đóng menu" onClick={onClose} />}
+            {open && <button type="button" className="lg-sidebar-backdrop" aria-label={vietnamese ? 'Đóng menu' : 'Close menu'} onClick={onClose} />}
             <WorkspaceSidebar
                 sidebarId="logistics-sidebar"
                 className={`lg-shared-sidebar ${open ? 'lg-shared-sidebar--open' : ''}`}
@@ -46,5 +46,6 @@ export default function LogisticsSidebar({ open, onClose, isCollapsed, onToggleC
 }
 
 export function LogisticsMenuButton({ onClick }: { onClick: () => void }) {
-    return <button type="button" className="lg-mobile-menu lg-icon-button" aria-label="Mở menu" onClick={onClick}><Menu size={22} /></button>;
+    const { i18n } = useTranslation();
+    return <button type="button" className="lg-mobile-menu lg-icon-button" aria-label={i18n.resolvedLanguage === 'en' ? 'Open menu' : 'Mở menu'} onClick={onClick}><Menu size={22} /></button>;
 }

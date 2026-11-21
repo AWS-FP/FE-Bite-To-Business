@@ -20,6 +20,12 @@ import viProfile from './locales/vi/profile.json';
 import enProfile from './locales/en/profile.json';
 import viQuote from './locales/vi/quote.json';
 import enQuote from './locales/en/quote.json';
+import enLogistics from './locales/en/logistics.json';
+
+const viLogistics = {
+    ...Object.fromEntries(Object.keys(enLogistics).map((key) => [key, key])),
+    PENDING: 'Chờ xử lý', REVIEWING: 'Đang xem xét', ADDED: 'Đã thêm', REJECTED: 'Đã từ chối',
+};
 
 const storageKey = 'bitetobusiness.language';
 let language = 'en';
@@ -40,6 +46,7 @@ void i18n.use(initReactI18next).init({
             workspace: viWorkspace,
             profile: viProfile,
             quote: viQuote,
+            logistics: viLogistics,
         },
         en: {
             translation: en,
@@ -49,6 +56,7 @@ void i18n.use(initReactI18next).init({
             workspace: enWorkspace,
             profile: enProfile,
             quote: enQuote,
+            logistics: enLogistics,
         },
     },
     lng: language,

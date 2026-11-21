@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useLogisticsText } from '@/hooks/logistic/useLogisticsText';
 export function LogisticsPageHeader({ number, label, title, description, children }: { number: string; label: string; title: string; description?: string; children?: ReactNode }) {
     return <header className="flex items-start justify-between gap-6 text-black">
         <div>
@@ -17,8 +18,9 @@ export default function LogisticsPageShell({ number, label, title, description, 
     return <div className="mx-auto max-w-[1200px] space-y-6 text-black"><LogisticsPageHeader number={number} label={label} title={title} description={description} />{children}</div>;
 }
 export function ListStatus({ loading, error, empty }: { loading: boolean; error: string; empty: boolean }) {
-    if (loading) return <p role="status">Đang tải dữ liệu...</p>;
+    const { tr } = useLogisticsText();
+    if (loading) return <p role="status">{tr('Đang tải dữ liệu...')}</p>;
     if (error) return <p role="alert" className="text-red-700">{error}</p>;
-    if (empty) return <p className="text-store-muted">Chưa có dữ liệu.</p>;
+    if (empty) return <p className="text-store-muted">{tr('Chưa có dữ liệu.')}</p>;
     return null;
 }
