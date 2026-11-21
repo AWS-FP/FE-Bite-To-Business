@@ -22,7 +22,9 @@ import {
     getQuote,
     getQuotePackages,
     getQuotePackageTotals,
+    placeOrderFromQuote,
     saveQuoteContact,
+    validateQuotePricing,
 } from '@/services/customer/quoteService';
 import type { Quote, QuotePackage, QuotePackageAmount } from '@/services/customer/quoteService';
 import { useAuthStore } from '@/store/admin/authStore';
@@ -35,6 +37,19 @@ const primary =
     'inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-0 bg-store-green px-5 py-3 font-bold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50';
 const secondary =
     'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-store-ink/25 bg-white px-4 py-2 font-bold text-store-ink hover:bg-store-cream';
+
+const checkoutErrors: Record<string, string> = {
+    QUOTE_PRODUCT_VAT_MISSING: 'errors.vatMissing',
+    QUOTE_STOCK_UNAVAILABLE: 'errors.stockUnavailable',
+    QUOTE_REVISION_CONFLICT: 'errors.revisionConflict',
+    QUOTE_INCOMPLETE: 'errors.quoteIncomplete',
+    QUOTE_DUPLICATE_DELIVERY_ADDRESS: 'validation.duplicatePackages',
+};
+
+function errorCode(error: unknown) {
+    if (!axios.isAxiosError(error)) return undefined;
+    return (error.response?.data as { code?: string } | undefined)?.code;
+}
 
 function errorMessage(error: unknown, fallback: string) {
     if (axios.isAxiosError(error)) {
@@ -57,11 +72,17 @@ export default function CartPage() {
     const productName = (item: Quote['items'][number]) =>
         i18n.resolvedLanguage === 'en' ? item.nameEn || item.nameVi : item.nameVi;
     const displayMessage = (value: string) =>
-        value.startsWith('errors.') || value.startsWith('notices.') ? t(value) : value;
+        value.startsWith('errors.') ||
+        value.startsWith('notices.') ||
+        value.startsWith('validation.')
+            ? t(value)
+            : value;
     const navigate = useNavigate();
     const session = useAuthStore((state) => state.session);
     const items = useCartStore((state) => state.items);
     const updateQuantity = useCartStore((state) => state.updateQuantity);
+    const clearCart = useCartStore((state) => state.clear);
+    const resetForm = useQuoteDraftStore((state) => state.resetForm);
     const [step, setStep] = useState(0);
     const [quote, setQuote] = useState<Quote | null>(null);
     const [packages, setPackages] = useState<QuotePackage[]>([]);
@@ -100,6 +121,60 @@ export default function CartPage() {
         setNotice('');
         setStep(next);
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function selectStep(next: number) {
+        if (next === 3) {
+            void reviewQuote();
+            return;
+        }
+        go(next);
+    }
+
+    async function checkoutFailed(error: unknown) {
+        const code = errorCode(error);
+        if (code === 'QUOTE_REVISION_CONFLICT' && quote) {
+            try {
+                setQuote(await getQuote(quote.id));
+                setPackages(await getQuotePackages(quote.id));
+            } catch {
+                // Giữ thông báo xung đột; khách có thể tải lại trang.
+            }
+        }
+        setMessage(code && checkoutErrors[code] ? checkoutErrors[code] : errorMessage(error, t('errors.fallback')));
+    }
+
+    async function reviewQuote() {
+        if (!quote) return;
+        setBusy(true);
+        setMessage('');
+        setNotice('');
+        try {
+            setQuote(await validateQuotePricing(quote.id, quote.revision));
+            setStep(3);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (error) {
+            await checkoutFailed(error);
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    async function placeOrder() {
+        if (!quote) return;
+        setBusy(true);
+        setMessage('');
+        try {
+            const order = await placeOrderFromQuote(quote.id, quote.revision);
+            clearCart();
+            resetForm(owner);
+            navigate(ROUTES.ORDER_DETAIL.replace(':orderId', order.orderId), {
+                state: { showPayment: true },
+            });
+        } catch (error) {
+            await checkoutFailed(error);
+            setBusy(false);
+        }
     }
 
     function allocated(itemId: string) {
@@ -329,7 +404,7 @@ export default function CartPage() {
                     <h1 className="m-0 font-subheading text-3xl font-bold sm:text-4xl">{t('title')}</h1>
                     <p className="mb-0 mt-3 text-store-muted">{t('subtitle')}</p>
                 </div>
-                <QuoteSteps step={step} busy={busy} onSelectStep={go} />
+                <QuoteSteps step={step} busy={busy} onSelectStep={selectStep} />
                 {message && (
                     <p
                         role="alert"
@@ -694,10 +769,10 @@ export default function CartPage() {
                                 <button
                                     type="button"
                                     className={`${primary} mt-5 w-full`}
-                                    onClick={() => go(3)}
+                                    onClick={() => void reviewQuote()}
                                     disabled={!allAllocated || duplicatePackages || busy}
                                 >
-                                    {t('viewTotal')} <ArrowRight size={17} />
+                                    {busy ? t('processing') : t('viewTotal')} <ArrowRight size={17} />
                                 </button>
                                 {!allAllocated && (
                                     <p className="mb-0 mt-3 text-xs text-store-muted">
@@ -707,9 +782,20 @@ export default function CartPage() {
                             </>
                         )}
                         {step === 3 && (
-                            <button type="button" className={`${primary} mt-5 w-full`} disabled>
-                                {t('checkoutUnavailable')}
-                            </button>
+                            <>
+                                <button
+                                    type="button"
+                                    className={`${primary} mt-5 w-full`}
+                                    disabled={busy || quote?.vatAmount == null}
+                                    onClick={() => void placeOrder()}
+                                >
+                                    {busy ? t('placingOrder') : t('placeOrder')}
+                                    <ArrowRight size={17} />
+                                </button>
+                                <p className="mb-0 mt-3 text-xs leading-relaxed text-store-muted">
+                                    {quote?.vatAmount == null ? t('errors.vatMissing') : t('placeOrderHint')}
+                                </p>
+                            </>
                         )}
                         {step > 0 && (
                             <button

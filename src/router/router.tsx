@@ -7,6 +7,7 @@ import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 import ActivationPage from '@/pages/auth/ActivationPage';
 import VerifyOtpPage from '@/pages/auth/VerifyOtpPage';
+import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage';
 
 // Public Customer Pages
 import HomePage from '@/pages/HomePage';
@@ -85,7 +86,7 @@ export const router = createBrowserRouter([
     },
     {
         path: ROUTES.FORGOT_PASSWORD,
-        Component: PendingPage,
+        Component: ForgotPasswordPage,
     },
 
     // ==========================================

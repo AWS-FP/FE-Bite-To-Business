@@ -36,6 +36,30 @@ export async function verifyOtp(request: VerifyOtpRequest): Promise<OtpVerificat
     return response.data.data;
 }
 
+export async function requestPasswordReset(email: string): Promise<void> {
+    await publicHttp.post('/api/auth/forgot-password', { email });
+}
+
+export async function verifyPasswordResetOtp(
+    request: VerifyOtpRequest,
+): Promise<OtpVerificationResponse> {
+    const response = await publicHttp.post<ApiResponse<OtpVerificationResponse>>(
+        '/api/auth/forgot-password/verify-otp',
+        request,
+    );
+    return response.data.data;
+}
+
+export async function resetPassword(
+    request: SetPasswordRequest,
+    accessToken: string,
+): Promise<void> {
+    // Chỉ dùng token của bước OTP quên mật khẩu, không dùng phiên đăng nhập trong authStore.
+    await publicHttp.post('/api/auth/reset-password', request, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+    });
+}
+
 export async function activate(request: SetPasswordRequest, accessToken: string): Promise<void> {
     // Chi truyen token cua buoc OTP; khong dung token admin/customer dang luu trong authStore.
     await publicHttp.post('/api/auth/activate', request, {

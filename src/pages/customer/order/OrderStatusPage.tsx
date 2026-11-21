@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
 import { ROUTES } from '@/router/routes';
 import { useAuthStore } from '@/store/admin/authStore';
@@ -25,6 +25,8 @@ const statusLabel: Record<string, string> = {
 
 export default function OrderStatusPage() {
     const { orderId } = useParams<{ orderId: string }>();
+    const location = useLocation();
+    const openPaymentOnLoad = (location.state as { showPayment?: boolean } | null)?.showPayment === true;
     const session = useAuthStore((state) => state.session);
     const [detail, setDetail] = useState<CustomerOrderDetail | null>(null);
     const [invoice, setInvoice] = useState<CustomerInvoice | null>(null);
@@ -47,6 +49,46 @@ export default function OrderStatusPage() {
         return () => abort.abort();
     }, [orderId, session]);
 
+    const awaitingPayment =
+        !!detail &&
+        detail.order.orderId === orderId &&
+        ['CONFIRMED', 'PROCESSING'].includes(detail.order.status) &&
+        detail.order.paymentStatus !== 'SUCCESS';
+    const paymentId = payment?.status === 'PENDING' && payment.qrUrl ? payment.id : null;
+
+    // Vừa đặt hàng từ giỏ: mở QR ngay, không bắt khách bấm thêm.
+    useEffect(() => {
+        if (!openPaymentOnLoad || !awaitingPayment || !orderId) return;
+        let cancelled = false;
+        createBankPayment(orderId)
+            .then((result) => {
+                if (!cancelled) setPayment(result);
+            })
+            .catch(() => {
+                if (!cancelled) {
+                    setPaymentError('Không thể tạo mã thanh toán. Đơn có thể đã hết hạn hoặc thanh toán không khả dụng.');
+                }
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [openPaymentOnLoad, awaitingPayment, orderId]);
+
+    // Webhook SePay cập nhật thanh toán ở BE; FE hỏi lại mỗi 5 giây khi đang chờ.
+    useEffect(() => {
+        if (!paymentId || !orderId) return;
+        const timer = window.setInterval(() => {
+            getBankPayment(paymentId)
+                .then(async (result) => {
+                    setPayment(result);
+                    if (result.status === 'SUCCESS') setDetail(await getCustomerOrder(orderId));
+                })
+                .catch(() => undefined);
+        }, 5000);
+        return () => window.clearInterval(timer);
+    }, [paymentId, orderId]);
+
+    const openingPayment = openPaymentOnLoad && awaitingPayment && !payment && !paymentError;
     const loading = !!orderId && detail?.order.orderId !== orderId && !error;
     const canShowDetail = detail?.order.orderId === orderId && !error;
 
@@ -192,7 +234,7 @@ export default function OrderStatusPage() {
                                 {['CONFIRMED', 'PROCESSING'].includes(detail.order.status) && detail.order.paymentStatus !== 'SUCCESS' && (
                                     <section className="rounded-xl border-2 border-store-ink bg-white p-5 text-sm">
                                         <h2 className="mt-0 text-lg font-bold">Thanh toán chuyển khoản</h2>
-                                        {!payment && <button type="button" disabled={paymentLoading} onClick={() => void showPayment()} className="rounded bg-store-green px-4 py-2 font-bold text-white disabled:opacity-50">{paymentLoading ? 'Đang tải...' : 'Hiển thị mã QR'}</button>}
+                                        {!payment && <button type="button" disabled={paymentLoading || openingPayment} onClick={() => void showPayment()} className="rounded bg-store-green px-4 py-2 font-bold text-white disabled:opacity-50">{paymentLoading || openingPayment ? 'Đang tải...' : 'Hiển thị mã QR'}</button>}
                                         {payment?.status === 'PENDING' && !payment.qrUrl && <p>Đơn không còn trong thời hạn thanh toán. Vui lòng kiểm tra lại đơn hàng.</p>}
                                         {payment?.status === 'PENDING' && payment.qrUrl && <div className="space-y-2">
                                             {payment.qrUrl && !qrError ? <img src={payment.qrUrl} alt="Mã QR chuyển khoản" className="mx-auto w-full max-w-64" onError={() => setQrError(true)} /> : <p>Không tải được ảnh QR. Bạn có thể chuyển khoản bằng thông tin bên dưới.</p>}
@@ -205,6 +247,12 @@ export default function OrderStatusPage() {
                                         </div>}
                                         {payment && payment.status !== 'PENDING' && <p>Trạng thái: {payment.status === 'SUCCESS' ? 'Thanh toán thành công' : payment.status}</p>}
                                         {paymentError && <p role="alert" className="mt-3 text-red-700">{paymentError}</p>}
+                                    </section>
+                                )}
+                                {detail.order.paymentStatus === 'SUCCESS' && (
+                                    <section role="status" className="rounded-xl border-2 border-store-green bg-green-50 p-5 text-sm">
+                                        <h2 className="mt-0 text-lg font-bold text-store-green">Đã thanh toán</h2>
+                                        <p className="mb-0">SePay đã xác nhận giao dịch. Đơn hàng sẽ được chuyển cho bộ phận giao hàng.</p>
                                     </section>
                                 )}
                                 <section className="rounded-xl border-2 border-store-ink bg-white p-5 text-sm">

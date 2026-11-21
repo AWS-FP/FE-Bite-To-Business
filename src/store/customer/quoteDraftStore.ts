@@ -30,6 +30,7 @@ export const emptyQuoteForm: QuoteFormDraft = {
 interface QuoteDraftState {
     forms: Record<string, QuoteFormDraft>;
     updateForm: (owner: string, update: (form: QuoteFormDraft) => QuoteFormDraft) => void;
+    resetForm: (owner: string) => void;
 }
 
 export const useQuoteDraftStore = create<QuoteDraftState>()(
@@ -40,6 +41,12 @@ export const useQuoteDraftStore = create<QuoteDraftState>()(
                 set((state) => ({
                     forms: { ...state.forms, [owner]: update(state.forms[owner] ?? emptyQuoteForm) },
                 })),
+            resetForm: (owner) =>
+                set((state) => {
+                    const forms = { ...state.forms };
+                    delete forms[owner];
+                    return { forms };
+                }),
         }),
         {
             name: 'bitetobusiness.quote-form-drafts',

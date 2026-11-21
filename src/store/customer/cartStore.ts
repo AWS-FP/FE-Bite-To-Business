@@ -18,6 +18,7 @@ interface CartStoreState {
     items: CartItem[]
     addItem: (item: Omit<CartItem, 'quantity'>, quantity: number) => void
     updateQuantity: (id: string, delta: number) => void
+    clear: () => void
 }
 
 export const useCartStore = create<CartStoreState>()(persist((set) => ({
@@ -46,6 +47,7 @@ export const useCartStore = create<CartStoreState>()(persist((set) => ({
                 )
                 .filter((item) => item.quantity > 0),
         })),
+    clear: () => set({ items: [] }),
 }), {
     name: 'bitetobusiness.guest-cart',
     storage: createJSONStorage(() => localStorage),
