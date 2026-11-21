@@ -1,12 +1,540 @@
-import { useState, type FormEvent } from 'react';
-import { Link } from 'react-router-dom';
-import { ROUTES } from '@/router/routes';
-import { useEcommerceData } from '@/components/e-commerce/useEcommerceData';
-import { effectiveCouponState, money, newId, shortDate, type EcommerceCoupon } from '@/components/e-commerce/ecommerceData';
-import { Dialog, PageTitle, StatusPill, ui } from '@/components/e-commerce/EcommerceUI';
-const fresh = (): EcommerceCoupon => ({ id: '', code: '', description: '', type: 'percent', value: 10, minOrder: 5000000, maxDiscount: 2000000, usageLimit: 100, used: 0, startDate: '2026-11-08', endDate: '2026-12-31', state: 'active' });
+import { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Plus, Save, TicketPercent } from 'lucide-react';
+import { executiveUi, useExecutiveText } from '@/components/e-commerce/executiveTokens';
+import {
+    ExecutiveBadge,
+    ExecutiveFeedback,
+    ExecutivePagination,
+    ExecutiveSelect,
+} from '@/components/e-commerce/ExecutiveControls';
+import {
+    ExecutiveEmpty,
+    ExecutiveError,
+    ExecutiveHeading,
+    ExecutivePanel,
+    LoadingRows,
+} from '@/components/e-commerce/ExecutiveUI';
+import { executiveApi, type CouponWrite } from '@/services/e-commerce/executiveAdminService';
+import { formatVnd } from '@/services/e-commerce/executiveReadService';
+import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
+import CouponProductPicker from '@/components/e-commerce/CouponProductPicker';
+
+function localInput(iso: string) {
+    const d = new Date(iso);
+    const z = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
+}
 export default function EcommerceCouponsPage() {
-    const { data, updateCoupons } = useEcommerceData(); const [draft, setDraft] = useState<EcommerceCoupon>(fresh()); const [editing, setEditing] = useState<EcommerceCoupon | null>(null); const [dialog, setDialog] = useState(false); const [error, setError] = useState(''); const [demoSubtotal, setDemoSubtotal] = useState(18000000); const [campaignDiscount, setCampaignDiscount] = useState(900000); const [code, setCode] = useState('SALE2026'); const applied = data.coupons.find(c => c.code === code.trim().toUpperCase()); const afterCampaign = Math.max(0, demoSubtotal - campaignDiscount); const raw = applied ? (applied.type === 'percent' ? afterCampaign * applied.value / 100 : applied.value) : 0; const couponDiscount = applied && effectiveCouponState(applied) === 'active' && demoSubtotal >= applied.minOrder ? Math.min(raw, applied.maxDiscount || raw) : 0; const final = Math.max(0, afterCampaign - couponDiscount) + 1383200;
-    function edit(c?: EcommerceCoupon) { setEditing(c ?? null); setDraft(c ? { ...c } : fresh()); setError(''); setDialog(true) } function submit(e: FormEvent) { e.preventDefault(); const normalized = draft.code.trim().toUpperCase(); if (!/^[A-Z0-9_-]{4,24}$/.test(normalized) || data.coupons.some(c => c.code === normalized && c.id !== editing?.id)) { setError('Mã 4–24 ký tự A–Z, 0–9, _ hoặc -, không được trùng.'); return } if (draft.value <= 0 || (draft.type === 'percent' && draft.value > 100) || draft.minOrder < 0 || draft.maxDiscount < 0 || draft.startDate > draft.endDate) { setError('Kiểm tra giá trị giảm, giới hạn và thời gian hợp lệ.'); return } const item = { ...draft, code: normalized, id: editing?.id ?? newId('coupon') }; updateCoupons(all => editing ? all.map(c => c.id === editing.id ? item : c) : [item, ...all]); setCode(normalized); setDialog(false) }
-    return <div className="pb-10"><PageTitle eyebrow="GROWTH TOOLS / RULE ENGINE" title="Khuyến Mãi & Coupon" description="Tạo mã ưu đãi và xem trước cách áp dụng theo thứ tự minh bạch."><Link to={ROUTES.ECOMMERCE_PROMOTIONS} className={ui.secondary}>Chiến dịch Sale →</Link><button className={ui.primary} onClick={() => edit()}>+ Tạo mã giảm giá</button></PageTitle><div className="grid gap-5 xl:grid-cols-2"><section className="rounded-xl border-2 border-store-ink bg-white p-5 shadow-[3px_3px_0_#14132b]"><small className="font-bold tracking-widest text-emerald-700">COUPON BUILDER</small><h2 className="font-subheading text-lg font-extrabold">Tạo mã giảm giá</h2><div className="mt-4 space-y-3"><label className="block text-xs font-bold">Mã Coupon<input className={`${ui.input} mt-1`} value={code} onChange={e => setCode(e.target.value.toUpperCase())} /></label><label className="block text-xs font-bold">Đơn hàng thử (VNĐ)<input className={`${ui.input} mt-1`} type="number" min="0" value={demoSubtotal} onChange={e => setDemoSubtotal(Math.max(0, Number(e.target.value)))} /></label><label className="block text-xs font-bold">Giảm từ chiến dịch Sale (VNĐ)<input className={`${ui.input} mt-1`} type="number" min="0" value={campaignDiscount} onChange={e => setCampaignDiscount(Math.max(0, Number(e.target.value)))} /></label><button className={`${ui.primary} w-full`} onClick={() => edit()}>+ Tạo mã giảm giá</button></div><h3 className="mt-6 font-bold">Các mã hiện có</h3><div className="mt-3 max-h-72 space-y-2 overflow-y-auto">{data.coupons.map(c => <div key={c.id} className="flex items-center justify-between gap-2 rounded-lg border border-slate-200 p-3 text-xs"><div><b>{c.code}</b><div><StatusPill status={effectiveCouponState(c)} /></div><small>{shortDate(c.startDate)}–{shortDate(c.endDate)}</small></div><div className="flex gap-2"><button className="font-bold text-emerald-700" onClick={() => { setCode(c.code); edit(c) }}>Sửa</button><button className="font-bold text-amber-700" onClick={() => updateCoupons(all => all.map(x => x.id === c.id ? { ...x, state: x.state === 'paused' ? 'active' : 'paused' } : x))}>{c.state === 'paused' ? 'Bật' : 'Tắt'}</button></div></div>)}</div></section><section className="h-fit rounded-xl border-2 border-store-ink bg-white p-5 shadow-[3px_3px_0_#14132b]"><small className="font-bold tracking-widest text-emerald-700">RULE PREVIEW</small><h2 className="font-subheading text-lg font-extrabold">Thứ tự cộng dồn minh bạch</h2><div className="mt-5 space-y-5">{[['01', 'Áp giá Volume Pricing', money(demoSubtotal)], ['02', 'Trừ Sale Campaign', `−${money(campaignDiscount)}`], ['03', `Trừ Coupon · ${code || 'Chưa nhập mã'}`, `−${money(couponDiscount)}`], ['04', 'Cộng VAT / Phí giao (demo)', `+${money(1383200)}`]].map(([n, title, value]) => <div className="flex justify-between gap-4 text-xs" key={n}><span><b className="mr-3 rounded-full bg-slate-100 p-2">{n}</b>{title}</span><strong>{value}</strong></div>)}<div className="flex justify-between rounded-xl bg-emerald-50 p-4 font-bold text-emerald-800"><span>Khách thanh toán</span><span>{money(final)}</span></div></div><p className="mt-4 text-[11px] text-slate-500">Preview chỉ minh họa quy tắc. VAT, phí, stacking và mức giảm chính thức phải được Backend xác nhận.</p></section></div>{dialog && <Dialog title={editing ? 'Chỉnh sửa mã Coupon' : 'Tạo mã Coupon'} onClose={() => setDialog(false)} wide><form onSubmit={submit} className="grid gap-3 sm:grid-cols-2"><label className="sm:col-span-2"><span className={ui.label}>Mã coupon</span><input required className={ui.input} value={draft.code} onChange={e => setDraft({ ...draft, code: e.target.value.toUpperCase() })} /></label><label className="sm:col-span-2"><span className={ui.label}>Mô tả</span><input className={ui.input} value={draft.description} onChange={e => setDraft({ ...draft, description: e.target.value })} /></label><label><span className={ui.label}>Loại giảm</span><select className={ui.select} value={draft.type} onChange={e => setDraft({ ...draft, type: e.target.value as EcommerceCoupon['type'] })}><option value="percent">Phần trăm</option><option value="fixed">VNĐ</option></select></label><label><span className={ui.label}>Giá trị</span><input className={ui.input} type="number" min="1" value={draft.value} onChange={e => setDraft({ ...draft, value: Number(e.target.value) })} /></label>{([['minOrder', 'Đơn tối thiểu'], ['maxDiscount', 'Giảm tối đa'], ['usageLimit', 'Giới hạn lượt sử dụng']] as const).map(([k, label]) => <label key={k}><span className={ui.label}>{label}</span><input type="number" min="0" className={ui.input} value={draft[k]} onChange={e => setDraft({ ...draft, [k]: Number(e.target.value) })} /></label>)}<label><span className={ui.label}>Trạng thái</span><select className={ui.select} value={draft.state} onChange={e => setDraft({ ...draft, state: e.target.value as EcommerceCoupon['state'] })}><option value="active">Bật</option><option value="paused">Tắt</option></select></label><label><span className={ui.label}>Bắt đầu</span><input type="date" className={ui.input} value={draft.startDate} onChange={e => setDraft({ ...draft, startDate: e.target.value })} /></label><label><span className={ui.label}>Kết thúc</span><input type="date" className={ui.input} value={draft.endDate} onChange={e => setDraft({ ...draft, endDate: e.target.value })} /></label>{error && <p role="alert" className="sm:col-span-2 text-xs text-red-600">{error}</p>}<div className="sm:col-span-2 flex justify-end gap-2"><button type="button" className={ui.secondary} onClick={() => setDialog(false)}>Hủy</button><button className={ui.primary} type="submit">Lưu Coupon demo</button></div></form></Dialog>}</div>
+    const tr = useExecutiveText(),
+        qc = useQueryClient();
+    const [page, setPage] = useState(0),
+        [open, setOpen] = useState(false),
+        [editId, setEditId] = useState<string | null>(null),
+        [code, setCode] = useState(''),
+        [discountType, setDiscountType] = useState('PERCENTAGE'),
+        [discountValue, setDiscountValue] = useState(''),
+        [minimum, setMinimum] = useState('0'),
+        [maximum, setMaximum] = useState(''),
+        [startsAt, setStartsAt] = useState(''),
+        [endsAt, setEndsAt] = useState(''),
+        [usageLimit, setUsageLimit] = useState(''),
+        [perUser, setPerUser] = useState(''),
+        [appliesTo, setAppliesTo] = useState('PRODUCT'),
+        [scope, setScope] = useState('ALL'),
+        [selectedProductIds, setSelectedProductIds] = useState<string[]>([]),
+        [active, setActive] = useState(false),
+        [feedback, setFeedback] = useState(''),
+        [failed, setFailed] = useState(false);
+    const list = useQuery({
+        queryKey: ['ecom', 'coupons', page],
+        queryFn: () => executiveApi.coupons(page, 20),
+    });
+    function reset() {
+        setOpen(false);
+        setEditId(null);
+        setCode('');
+        setDiscountType('PERCENTAGE');
+        setDiscountValue('');
+        setMinimum('0');
+        setMaximum('');
+        setStartsAt('');
+        setEndsAt('');
+        setUsageLimit('');
+        setPerUser('');
+        setAppliesTo('PRODUCT');
+        setScope('ALL');
+        setSelectedProductIds([]);
+        setActive(false);
+    }
+    const save = useMutation({
+        mutationFn: (payload: CouponWrite) =>
+            editId
+                ? executiveApi.updateCoupon(editId, payload)
+                : executiveApi.createCoupon(payload),
+        onSuccess: () => {
+            setFeedback(tr('Đã lưu coupon thành công.', 'Coupon saved successfully.'));
+            setFailed(false);
+            reset();
+            void qc.invalidateQueries({ queryKey: ['ecom', 'coupons'] });
+        },
+        onError: (error) => {
+            setFailed(true);
+            setFeedback(
+                executiveErrorMessage(
+                    error,
+                    tr('Không lưu được coupon.', 'Could not save coupon.'),
+                ),
+            );
+        },
+    });
+    const toggle = useMutation({
+        mutationFn: ({ id, active }: { id: string; active: boolean }) =>
+            executiveApi.setCouponActive(id, active),
+        onSuccess: () => void qc.invalidateQueries({ queryKey: ['ecom', 'coupons'] }),
+        onError: (error) => {
+            setFailed(true);
+            setFeedback(
+                executiveErrorMessage(
+                    error,
+                    tr('Không thể đổi trạng thái coupon.', 'Could not change coupon status.'),
+                ),
+            );
+        },
+    });
+    function startEdit(id: string) {
+        void executiveApi
+            .coupon(id)
+            .then((c) => {
+                setEditId(c.id);
+                setCode(c.code);
+                setDiscountType(c.discountType);
+                setDiscountValue(String(c.discountValue));
+                setMinimum(String(c.minOrderAmount));
+                setMaximum(c.maxDiscountAmount == null ? '' : String(c.maxDiscountAmount));
+                setStartsAt(localInput(c.startsAt));
+                setEndsAt(localInput(c.endsAt));
+                setUsageLimit(c.usageLimit == null ? '' : String(c.usageLimit));
+                setPerUser(c.usageLimitPerUser == null ? '' : String(c.usageLimitPerUser));
+                setAppliesTo(c.appliesTo);
+                setScope(c.productScope);
+                setSelectedProductIds(c.productIds ?? []);
+                setActive(c.isActive);
+                setOpen(true);
+            })
+            .catch(() => {
+                setFailed(true);
+                setFeedback(tr('Không tải được coupon để sửa.', 'Could not load coupon details.'));
+            });
+    }
+    function submit(event: React.FormEvent) {
+        event.preventDefault();
+        if (
+            !/^[A-Z0-9]{8}$/.test(code) ||
+            !startsAt ||
+            !endsAt ||
+            !Number.isFinite(Date.parse(startsAt)) ||
+            !Number.isFinite(Date.parse(endsAt)) ||
+            Date.parse(startsAt) >= Date.parse(endsAt)
+        ) {
+            setFailed(true);
+            setFeedback(
+                tr(
+                    'Mã phải gồm 8 ký tự và thời gian kết thúc sau bắt đầu.',
+                    'Use an eight-character code and a valid date range.',
+                ),
+            );
+            return;
+        }
+        const amount = Number(discountValue);
+        if (
+            !Number.isFinite(amount) ||
+            amount <= 0 ||
+            (discountType === 'PERCENTAGE' && amount > 100) ||
+            !Number.isFinite(Number(minimum)) ||
+            Number(minimum) < 0 ||
+            (maximum !== '' && !(Number(maximum) > 0)) ||
+            (usageLimit !== '' &&
+                (!Number.isInteger(Number(usageLimit)) || Number(usageLimit) <= 0)) ||
+            (perUser !== '' && (!Number.isInteger(Number(perUser)) || Number(perUser) <= 0))
+        ) {
+            setFailed(true);
+            setFeedback(
+                tr(
+                    'Kiểm tra mức giảm, đơn hàng tối thiểu và giới hạn sử dụng.',
+                    'Check discount value, minimum order amount and usage limits.',
+                ),
+            );
+            return;
+        }
+        const productIds =
+            appliesTo === 'PRODUCT' && scope === 'SELECTED' ? selectedProductIds : [];
+        if (appliesTo === 'PRODUCT' && scope === 'SELECTED' && !productIds.length) {
+            setFailed(true);
+            setFeedback(
+                tr(
+                    'Chọn ít nhất một sản phẩm trong bảng.',
+                    'Select at least one product from the table.',
+                ),
+            );
+            return;
+        }
+        const payload: CouponWrite = {
+            code,
+            discountType,
+            discountValue: Number(discountValue),
+            minOrderAmount: Number(minimum),
+            maxDiscountAmount:
+                discountType === 'PERCENTAGE' && maximum !== '' ? Number(maximum) : null,
+            startsAt: new Date(startsAt).toISOString(),
+            endsAt: new Date(endsAt).toISOString(),
+            usageLimit: usageLimit === '' ? null : Number(usageLimit),
+            usageLimitPerUser: perUser === '' ? null : Number(perUser),
+            isActive: active,
+            appliesTo,
+            productScope: appliesTo === 'SHIPPING' ? 'ALL' : scope,
+            productIds: appliesTo === 'SHIPPING' ? [] : productIds,
+        };
+        save.mutate(payload);
+    }
+    return (
+        <div className="space-y-6">
+            <ExecutiveHeading
+                number="04"
+                eyebrow="MARKETING / COUPONS"
+                title={tr('Quản lý mã giảm giá', 'Coupon management')}
+                description={tr(
+                    'Tạo, theo dõi và bật/tắt coupon theo điều kiện thực tế.',
+                    'Create and maintain real discount codes and eligibility rules.',
+                )}
+                action={
+                    <button
+                        type="button"
+                        className={executiveUi.button}
+                        onClick={() => {
+                            reset();
+                            setOpen(true);
+                        }}
+                    >
+                        <Plus size={17} />
+                        {tr('Tạo coupon', 'New coupon')}
+                    </button>
+                }
+            />
+            <ExecutiveFeedback message={feedback} error={failed} />
+            {open && (
+                <ExecutivePanel
+                    title={
+                        editId
+                            ? tr('Chỉnh sửa coupon', 'Edit coupon')
+                            : tr('Coupon mới', 'Create coupon')
+                    }
+                >
+                    <form onSubmit={submit} className="grid gap-4 p-5 sm:grid-cols-2">
+                        <label className="text-xs font-bold">
+                            {tr('Mã coupon (8 ký tự)', 'Coupon code (8 characters)')}
+                            <input
+                                className={`${executiveUi.input} mt-2 font-mono uppercase`}
+                                value={code}
+                                maxLength={8}
+                                required
+                                pattern="[A-Z0-9]{8}"
+                                onChange={(e) =>
+                                    setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))
+                                }
+                                placeholder="BTBSALE1"
+                            />
+                        </label>
+                        <div className="rounded-2xl border border-[#dbe7d8] bg-[#f6faf5] p-4 sm:col-span-2">
+                            <h3 className="mb-3 text-sm font-extrabold text-[#173e2e]">
+                                {tr('Thiết lập mức giảm', 'Discount configuration')}
+                            </h3>
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <ExecutiveSelect
+                                    label={tr('Hình thức giảm', 'Discount type')}
+                                    value={discountType}
+                                    onValueChange={(value) => {
+                                        setDiscountType(value);
+                                        if (value === 'FIXED_AMOUNT') setMaximum('');
+                                    }}
+                                >
+                                    <option value="PERCENTAGE">
+                                        {tr('Phần trăm (%)', 'Percentage (%)')}
+                                    </option>
+                                    <option value="FIXED_AMOUNT">
+                                        {tr('Số tiền cố định (VND)', 'Fixed amount (VND)')}
+                                    </option>
+                                </ExecutiveSelect>
+                                <label className="text-xs font-bold">
+                                    {discountType === 'PERCENTAGE'
+                                        ? tr('Mức giảm (%)', 'Discount (%)')
+                                        : tr('Số tiền giảm (VND)', 'Discount amount (VND)')}
+                                    <div className="relative mt-2">
+                                        <input
+                                            className={`${executiveUi.input} !pr-12`}
+                                            required
+                                            type="number"
+                                            min="0.01"
+                                            max={discountType === 'PERCENTAGE' ? 100 : undefined}
+                                            step={discountType === 'PERCENTAGE' ? 'any' : '1'}
+                                            value={discountValue}
+                                            onChange={(e) => setDiscountValue(e.target.value)}
+                                        />
+                                        <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 font-extrabold text-[#397052]">
+                                            {discountType === 'PERCENTAGE' ? '%' : 'đ'}
+                                        </span>
+                                    </div>
+                                </label>
+                            </div>
+                            {discountType === 'PERCENTAGE' && (
+                                <div className="mt-4 max-w-[420px]">
+                                    <label
+                                        className="text-xs font-bold"
+                                        htmlFor="coupon-max-discount"
+                                    >
+                                        {tr(
+                                            'Trần giảm tối đa (VND, không bắt buộc)',
+                                            'Maximum discount cap (VND, optional)',
+                                        )}
+                                    </label>
+                                    <input
+                                        id="coupon-max-discount"
+                                        className={`${executiveUi.input} mt-2`}
+                                        type="number"
+                                        min="1"
+                                        step="1"
+                                        placeholder={tr('Ví dụ 50000', 'e.g. 50000')}
+                                        value={maximum}
+                                        onChange={(e) => setMaximum(e.target.value)}
+                                    />
+                                    <p className="mt-2 text-xs leading-5 text-[#617a68]">
+                                        {tr(
+                                            'Ví dụ: giảm 10%, trần 50.000đ — đơn 1.000.000đ chỉ giảm tối đa 50.000đ. Để trống nếu không đặt trần.',
+                                            'Example: 10% off capped at 50,000 VND gives at most 50,000 VND off a 1,000,000 VND order. Leave blank for no cap.',
+                                        )}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                        <label className="text-xs font-bold">
+                            {tr('Đơn hàng tối thiểu', 'Minimum order')}
+                            <input
+                                className={`${executiveUi.input} mt-2`}
+                                type="number"
+                                min="0"
+                                value={minimum}
+                                onChange={(e) => setMinimum(e.target.value)}
+                            />
+                        </label>
+                        <ExecutiveSelect
+                            label={tr('Áp dụng cho', 'Applies to')}
+                            value={appliesTo}
+                            onValueChange={setAppliesTo}
+                        >
+                            <option value="PRODUCT">{tr('Sản phẩm', 'Products')}</option>
+                            <option value="SHIPPING">{tr('Phí vận chuyển', 'Shipping')}</option>
+                        </ExecutiveSelect>
+                        {appliesTo === 'PRODUCT' && (
+                            <ExecutiveSelect
+                                label={tr('Phạm vi sản phẩm', 'Product scope')}
+                                value={scope}
+                                onValueChange={setScope}
+                            >
+                                <option value="ALL">
+                                    {tr('Tất cả sản phẩm', 'All published products')}
+                                </option>
+                                <option value="SELECTED">
+                                    {tr('Sản phẩm chỉ định', 'Selected products')}
+                                </option>
+                            </ExecutiveSelect>
+                        )}
+                        {appliesTo === 'PRODUCT' && scope === 'SELECTED' && (
+                            <CouponProductPicker
+                                selectedIds={selectedProductIds}
+                                onChange={setSelectedProductIds}
+                                disabled={save.isPending}
+                            />
+                        )}
+                        <label className="text-xs font-bold">
+                            {tr('Bắt đầu', 'Start date')}
+                            <input
+                                className={`${executiveUi.input} mt-2`}
+                                type="datetime-local"
+                                required
+                                value={startsAt}
+                                onChange={(e) => setStartsAt(e.target.value)}
+                            />
+                        </label>
+                        <label className="text-xs font-bold">
+                            {tr('Kết thúc', 'End date')}
+                            <input
+                                className={`${executiveUi.input} mt-2`}
+                                type="datetime-local"
+                                required
+                                min={startsAt}
+                                value={endsAt}
+                                onChange={(e) => setEndsAt(e.target.value)}
+                            />
+                        </label>
+                        <label className="text-xs font-bold">
+                            {tr('Giới hạn sử dụng', 'Total usage limit')}
+                            <input
+                                className={`${executiveUi.input} mt-2`}
+                                type="number"
+                                min="1"
+                                value={usageLimit}
+                                onChange={(e) => setUsageLimit(e.target.value)}
+                            />
+                        </label>
+                        <label className="text-xs font-bold">
+                            {tr('Mỗi khách sử dụng tối đa', 'Per-user limit')}
+                            <input
+                                className={`${executiveUi.input} mt-2`}
+                                type="number"
+                                min="1"
+                                value={perUser}
+                                onChange={(e) => setPerUser(e.target.value)}
+                            />
+                        </label>
+                        <div className="flex flex-wrap items-center gap-3 pt-3 sm:col-span-2">
+                            <button
+                                type="submit"
+                                disabled={save.isPending}
+                                className={executiveUi.button}
+                            >
+                                <Save size={16} />
+                                {tr('Lưu coupon', 'Save coupon')}
+                            </button>
+                            <button type="button" className={executiveUi.secondary} onClick={reset}>
+                                {tr('Hủy', 'Cancel')}
+                            </button>
+                            <span className="text-xs text-[#6b8172]">
+                                {tr(
+                                    'Coupon mới được lưu ở trạng thái tắt để kiểm tra trước khi phát hành.',
+                                    'New coupons are saved inactive until reviewed.',
+                                )}
+                            </span>
+                        </div>
+                    </form>
+                </ExecutivePanel>
+            )}
+            <ExecutivePanel
+                title={tr('Danh sách coupon', 'Coupon inventory')}
+                caption={list.data ? `${list.data.total} coupon` : ''}
+            >
+                {list.isLoading ? (
+                    <LoadingRows />
+                ) : list.isError ? (
+                    <div className="p-5">
+                        <ExecutiveError
+                            message={tr('Không tải được coupon.', 'Could not load coupons.')}
+                            retry={() => void list.refetch()}
+                        />
+                    </div>
+                ) : !list.data?.items.length ? (
+                    <ExecutiveEmpty
+                        icon={<TicketPercent />}
+                        title={tr('Chưa có coupon', 'No coupons yet')}
+                        description={tr('Tạo coupon mới để bắt đầu.', 'Create your first coupon.')}
+                    />
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full min-w-[940px] text-left text-sm">
+                            <thead>
+                                <tr>
+                                    {[
+                                        tr('Mã', 'Code'),
+                                        tr('Giảm giá', 'Discount'),
+                                        tr('Phạm vi', 'Applies to'),
+                                        tr('Thời gian', 'Validity'),
+                                        tr('Đã dùng', 'Used'),
+                                        tr('Trạng thái', 'Status'),
+                                        '',
+                                    ].map((h) => (
+                                        <th key={h} className={executiveUi.th}>
+                                            {h}
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {list.data.items.map((c) => (
+                                    <tr key={c.id}>
+                                        <td className={`${executiveUi.td} font-mono font-bold`}>
+                                            {c.code}
+                                        </td>
+                                        <td className={executiveUi.td}>
+                                            {c.discountType === 'PERCENTAGE'
+                                                ? `${c.discountValue}%`
+                                                : formatVnd(c.discountValue)}
+                                        </td>
+                                        <td className={executiveUi.td}>{c.appliesTo}</td>
+                                        <td className={executiveUi.td}>
+                                            <span className="block text-xs">
+                                                {new Date(c.startsAt).toLocaleDateString('vi-VN')}
+                                            </span>
+                                            <span className="block text-xs text-[#788b7d]">
+                                                → {new Date(c.endsAt).toLocaleDateString('vi-VN')}
+                                            </span>
+                                        </td>
+                                        <td className={executiveUi.td}>
+                                            {c.usedCount ?? 0}
+                                            {c.usageLimit != null ? `/${c.usageLimit}` : ''}
+                                        </td>
+                                        <td className={executiveUi.td}>
+                                            <ExecutiveBadge
+                                                status={c.isActive ? 'PUBLISHED' : 'DRAFT'}
+                                            />
+                                        </td>
+                                        <td className={executiveUi.td}>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    type="button"
+                                                    className={executiveUi.secondary}
+                                                    onClick={() => startEdit(c.id)}
+                                                >
+                                                    {tr('Sửa', 'Edit')}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className={executiveUi.secondary}
+                                                    disabled={toggle.isPending}
+                                                    onClick={() => {
+                                                        if (
+                                                            window.confirm(
+                                                                tr(
+                                                                    'Thay đổi trạng thái coupon?',
+                                                                    'Change coupon active status?',
+                                                                ),
+                                                            )
+                                                        )
+                                                            toggle.mutate({
+                                                                id: c.id,
+                                                                active: !c.isActive,
+                                                            });
+                                                    }}
+                                                >
+                                                    {c.isActive
+                                                        ? tr('Tắt', 'Disable')
+                                                        : tr('Bật', 'Enable')}
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+                {list.data && (
+                    <ExecutivePagination
+                        page={page}
+                        totalPages={list.data.totalPages}
+                        onChange={setPage}
+                        tr={tr}
+                    />
+                )}
+            </ExecutivePanel>
+        </div>
+    );
 }
