@@ -1,4 +1,5 @@
 {
+    "savedDeliveryAddress": "Delivery address chosen on the Distribution page: {{address}}. It will be prefilled at the Delivery packages step.",
     "steps": {
         "cart": "Cart",
         "pricing": "Prices & discounts",
@@ -53,6 +54,9 @@
     "viewTotal": "Review quote total",
     "allocateAll": "Allocate all products to delivery packages.",
     "checkoutUnavailable": "Checkout is not available yet",
+    "placeOrder": "Place order & pay",
+    "placingOrder": "Creating order...",
+    "placeOrderHint": "Stock is held for 1 hour. You will pay by QR bank transfer via SePay in the next step.",
     "back": "Back",
     "form": {
         "title": "Add delivery package",
@@ -77,13 +81,14 @@
         "missingStep": "(quantity step unavailable)",
         "quantityLabel": "Quantity of {{name}} for this package",
         "addressNote": "The address is located on the map to calculate delivery fees. Please check it before saving.",
+        "addressFromDistribution": "Uses the exact location chosen on the Distribution page. Editing the address will locate it again.",
         "creating": "Creating package..."
     },
     "review": {
         "title": "Review before checkout",
         "counts": "{{packages}} delivery packages · {{products}} products",
         "shipping": "Delivery fee:",
-        "note": "Order creation and checkout are being finalized. You can go back to review your quote."
+        "note": "Prices, discounts, VAT, delivery fees and stock have been rechecked. Placing the order holds stock for 1 hour and shows a bank transfer QR code."
     },
     "validation": {
         "required": "Please fill out this field.",
@@ -104,7 +109,11 @@
         "invalidTime": "The end time must be later than the start time.",
         "invalidAddress": "Invalid address. Please check the address and city.",
         "geocode": "Could not locate the address. Check it and try again; the map service may be temporarily unavailable.",
-        "shippingUnavailable": "Could not calculate the delivery fee. Please try again later."
+        "shippingUnavailable": "Could not calculate the delivery fee. Please try again later.",
+        "vatMissing": "Some products do not have a VAT rate configured yet, so the order cannot be placed. Please contact Bite to Business.",
+        "stockUnavailable": "Some products no longer have enough stock. Go back to the cart to adjust quantities.",
+        "revisionConflict": "The quote has just changed. Review the total and try again.",
+        "quoteIncomplete": "The quote is incomplete. Check the contact details and allocate every product to a package."
     },
     "notices": {
         "couponsUpdated": "Discounts updated.",

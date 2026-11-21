@@ -8,6 +8,9 @@ import { ROUTES } from '@/router/routes';
 import { publicHttp } from '@/services/axiosClient';
 import { addressToCoordinates, coordinatesToAddress } from '@/services/geocodingService';
 import { loadVietMap } from '@/services/shipper/vietmapService';
+import { useAuthStore } from '@/store/admin/authStore';
+import { useCartStore } from '@/store/customer/cartStore';
+import { useQuoteDraftStore } from '@/store/customer/quoteDraftStore';
 import '@vietmap/vietmap-gl-js/dist/vietmap-gl.css';
 
 type Suggestion = { refId: string; display: string };
@@ -31,9 +34,18 @@ const branches = {
 };
 const tileKey = import.meta.env.VITE_VIETMAP_TILEMAP_KEY?.trim() ?? '';
 
+/** Service area = the same bounding box the map is locked to for each branch city. */
+function inServiceArea(city: 'hcm' | 'hanoi', lng: number, lat: number) {
+    const [[minLng, minLat], [maxLng, maxLat]] = branches[city].bounds;
+    return lng >= minLng && lng <= maxLng && lat >= minLat && lat <= maxLat;
+}
+
 export default function DistributionExplorer() {
     const navigate = useNavigate();
     const { t, i18n } = useTranslation('storefront');
+    const owner = useAuthStore((state) => state.session?.user.id ?? 'guest');
+    const cartCount = useCartStore((state) => state.items.length);
+    const updateForm = useQuoteDraftStore((state) => state.updateForm);
     const mapContainer = useRef<HTMLDivElement>(null);
     const mapRef = useRef<Map | null>(null);
     const markerRef = useRef<Marker | null>(null);
@@ -49,6 +61,7 @@ export default function DistributionExplorer() {
     const [error, setError] = useState('');
     const [mapError, setMapError] = useState(false);
     const [mapReady, setMapReady] = useState(false);
+    const canSuggest = mode === 'search' && query.trim().length >= 2 && !loading && !estimate;
 
     const selectCoordinates = useCallback(
         async (lat: number, lng: number) => {
@@ -239,10 +252,7 @@ export default function DistributionExplorer() {
     }, [estimate, mapReady, city]);
 
     useEffect(() => {
-        if (mode === 'map' || query.trim().length < 2 || loading || estimate) {
-            setSuggestions([]);
-            return;
-        }
+        if (!canSuggest) return;
         const controller = new AbortController();
         const timer = window.setTimeout(async () => {
             try {
@@ -263,7 +273,7 @@ export default function DistributionExplorer() {
             window.clearTimeout(timer);
             controller.abort();
         };
-    }, [query, estimate, loading, city, mode]);
+    }, [query, canSuggest, city]);
 
     async function selectAddress(suggestion: Suggestion) {
         const request = ++requestRef.current;
@@ -309,14 +319,25 @@ export default function DistributionExplorer() {
         }
     }
 
+    const outsideArea = !!estimate && !inServiceArea(city, estimate.lng, estimate.lat);
+
     function useAddress() {
-        if (!estimate || !query.trim()) return;
-        try {
-            sessionStorage.setItem('btb.deliveryAddress', query.trim());
-        } catch {
-            /* Optional storage. */
-        }
-        navigate(ROUTES.CHECKOUT, { state: { deliveryAddress: query.trim() } });
+        if (!estimate || !query.trim() || outsideArea) return;
+        const address = query.trim();
+        // Prefill the delivery-package form (step 3 of /quotes) with the exact point that was
+        // priced here, so the package fee matches this estimate without re-geocoding the text.
+        updateForm(owner, (form) => ({
+            ...form,
+            parcel: {
+                ...form.parcel,
+                address,
+                city: city === 'hcm' ? 'HCM' : 'HANOI',
+                addressRefId: undefined,
+                latitude: estimate.lat,
+                longitude: estimate.lng,
+            },
+        }));
+        navigate(cartCount > 0 ? ROUTES.QUOTES : ROUTES.CATALOG);
     }
 
     return (
@@ -441,7 +462,7 @@ export default function DistributionExplorer() {
                         autoComplete="off"
                         className="w-full rounded-xl border-2 border-store-ink bg-store-cream py-2.5 pr-4 pl-12 font-body text-sm outline-none focus:border-store-green"
                     />
-                    {suggestions.length > 0 && (
+                    {canSuggest && suggestions.length > 0 && (
                         <ul className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-xl border-2 border-store-ink bg-white p-1 shadow-lg">
                             {suggestions.map((item) => (
                                 <li key={item.refId}>
@@ -489,14 +510,33 @@ export default function DistributionExplorer() {
                     </div>
                 </div>
                 <p className="m-0 mt-3 text-sm text-store-muted">{t('distribution.feePolicy')}</p>
+                {outsideArea && (
+                    <p className="m-0 mt-3 text-sm text-red-700" role="alert">
+                        {t('distribution.outsideArea', {
+                            city: t(city === 'hcm' ? 'distribution.hcm' : 'distribution.hanoi'),
+                        })}
+                    </p>
+                )}
                 <button
                     type="button"
-                    disabled={!estimate || !query.trim() || loading}
+                    disabled={!estimate || !query.trim() || loading || outsideArea}
                     onClick={useAddress}
                     className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-store-ink px-5 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                    {t('distribution.useAddress')} <ArrowRight size={18} />
+                    {t(
+                        cartCount > 0
+                            ? 'distribution.useAddressToQuote'
+                            : 'distribution.useAddressToCatalog',
+                    )}{' '}
+                    <ArrowRight size={18} />
                 </button>
+                <p className="m-0 mt-2 text-xs text-store-muted">
+                    {t(
+                        cartCount > 0
+                            ? 'distribution.useAddressHintQuote'
+                            : 'distribution.useAddressHintCatalog',
+                    )}
+                </p>
             </div>
             <div className="relative min-h-[620px] overflow-hidden border-2 border-store-ink bg-store-cream">
                 <div

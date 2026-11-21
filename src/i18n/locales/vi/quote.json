@@ -1,4 +1,5 @@
 {
+    "savedDeliveryAddress": "Địa chỉ giao đã chọn ở trang Phân phối: {{address}}. Địa chỉ này sẽ được điền sẵn ở bước Gói giao hàng.",
     "steps": {
         "cart": "Giỏ hàng",
         "pricing": "Giá & ưu đãi",
@@ -52,6 +53,9 @@
     "viewTotal": "Xem tổng báo giá",
     "allocateAll": "Hãy chia đủ số lượng sản phẩm vào các gói.",
     "checkoutUnavailable": "Thanh toán chưa sẵn sàng",
+    "placeOrder": "Đặt hàng & thanh toán",
+    "placingOrder": "Đang tạo đơn...",
+    "placeOrderHint": "Hệ thống giữ hàng trong 1 giờ. Thanh toán bằng chuyển khoản QR qua SePay ở bước tiếp theo.",
     "back": "Quay lại",
     "form": {
         "title": "Thêm gói giao hàng",
@@ -76,13 +80,14 @@
         "missingStep": "(chưa có bước số lượng)",
         "quantityLabel": "Số lượng {{name}} cho gói này",
         "addressNote": "Địa chỉ được tìm tọa độ để tính phí; vui lòng kiểm tra lại địa chỉ trước khi lưu.",
+        "addressFromDistribution": "Dùng đúng vị trí đã chọn ở trang Phân phối. Sửa địa chỉ sẽ tìm lại tọa độ.",
         "creating": "Đang tạo gói..."
     },
     "review": {
         "title": "Kiểm tra trước khi thanh toán",
         "counts": "{{packages}} gói giao hàng · {{products}} sản phẩm",
         "shipping": "Phí giao:",
-        "note": "Chức năng tạo đơn và thanh toán đang được hoàn thiện. Bạn có thể quay lại để kiểm tra thông tin báo giá."
+        "note": "Giá, ưu đãi, VAT, phí giao và tồn kho đã được kiểm tra lại. Khi bấm Đặt hàng & thanh toán, hệ thống tạo đơn, giữ hàng trong 1 giờ và hiển thị mã QR chuyển khoản."
     },
     "validation": {
         "required": "Vui lòng điền thông tin này.",
@@ -103,7 +108,11 @@
         "invalidTime": "Giờ kết thúc phải sau giờ bắt đầu.",
         "invalidAddress": "Địa chỉ không hợp lệ. Vui lòng kiểm tra lại địa chỉ và thành phố.",
         "geocode": "Không thể tìm tọa độ địa chỉ lúc này. Vui lòng kiểm tra địa chỉ và thử lại; nếu vẫn lỗi, dịch vụ bản đồ có thể đang gián đoạn.",
-        "shippingUnavailable": "Không thể tính phí giao hàng lúc này. Vui lòng thử lại sau."
+        "shippingUnavailable": "Không thể tính phí giao hàng lúc này. Vui lòng thử lại sau.",
+        "vatMissing": "Một số sản phẩm chưa được cấu hình thuế suất VAT nên chưa thể đặt hàng. Vui lòng liên hệ Bite to Business.",
+        "stockUnavailable": "Một số sản phẩm không còn đủ hàng. Vui lòng quay lại giỏ hàng để điều chỉnh số lượng.",
+        "revisionConflict": "Báo giá vừa thay đổi. Vui lòng kiểm tra lại tổng tiền rồi thử lại.",
+        "quoteIncomplete": "Báo giá chưa đầy đủ. Vui lòng kiểm tra thông tin liên hệ và phân bổ đủ sản phẩm vào gói giao."
     },
     "notices": {
         "couponsUpdated": "Đã cập nhật ưu đãi.",

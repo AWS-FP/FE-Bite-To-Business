@@ -1,6 +1,11 @@
 import { useLogisticsText } from '@/hooks/logistic/useLogisticsText';
-import { useEffect, useState, type ReactNode } from 'react';
-import { ArrowLeft, ArrowRight, Check, ImagePlus, PackagePlus } from 'lucide-react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { ArrowLeft, ArrowRight, Check, ImagePlus, Loader2, PackagePlus, Sparkles } from 'lucide-react';
+import {
+    suggestTranslation,
+    type TranslationField,
+    type TranslationLanguage,
+} from '@/services/logistic/translationService';
 import { getHomeCategories, type HomeCategory } from '@/services/customer/homeService';
 import { getCatalogBrands, type CatalogBrand } from '@/services/customer/catalogReadService';
 import type { ProductRequest } from '@/hooks/logistic/useLogisticsData';
@@ -9,6 +14,26 @@ import axios from 'axios';
 
 const inputClass =
     'mt-2 w-full rounded border border-black/40 bg-white px-3 py-3 text-sm font-normal text-black outline-none focus:border-black focus:ring-0';
+
+// Các cặp ô song ngữ: AI gợi ý bản dịch từ ô đã nhập sang ô còn lại.
+const BILINGUAL_FIELDS: [string, TranslationField][] = [
+    ['name', 'NAME'],
+    ['description', 'DESCRIPTION'],
+    ['spec', 'SPEC'],
+    ['technical', 'TECHNICAL'],
+    ['storage', 'STORAGE'],
+    ['compliance', 'COMPLIANCE'],
+    ['originDetail', 'ORIGIN_DETAIL'],
+];
+const bilingual: Record<string, { counterpart: string; lang: TranslationLanguage; field: TranslationField }> =
+    Object.fromEntries(
+        BILINGUAL_FIELDS.flatMap(([base, field]) => [
+            [`${base}Vi`, { counterpart: `${base}En`, lang: 'vi', field }],
+            [`${base}En`, { counterpart: `${base}Vi`, lang: 'en', field }],
+        ]),
+    );
+
+type Suggestion = { status: 'loading' | 'ready' | 'error'; sourceText: string; text?: string; error?: string };
 
 type Props = {
     request?: ProductRequest;
@@ -32,6 +57,74 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
     const [created, setCreated] = useState<{ id: string; sku: string } | null>(null);
+    const [suggestions, setSuggestions] = useState<Record<string, Suggestion>>({});
+    const suggestionRequests = useRef<Record<string, AbortController>>({});
+
+    useEffect(() => {
+        const pending = suggestionRequests.current;
+        return () => Object.values(pending).forEach((controller) => controller.abort());
+    }, []);
+
+    function dropSuggestion(targetKey: string) {
+        suggestionRequests.current[targetKey]?.abort();
+        delete suggestionRequests.current[targetKey];
+        setSuggestions((current) => {
+            const next = { ...current };
+            delete next[targetKey];
+            return next;
+        });
+    }
+
+    async function requestSuggestion(targetKey: string) {
+        const info = bilingual[targetKey];
+        const sourceText = values[info.counterpart]?.trim();
+        if (!sourceText) return;
+        suggestionRequests.current[targetKey]?.abort();
+        const controller = new AbortController();
+        suggestionRequests.current[targetKey] = controller;
+        setSuggestions((current) => ({ ...current, [targetKey]: { status: 'loading', sourceText } }));
+        try {
+            const text = await suggestTranslation(
+                sourceText,
+                bilingual[info.counterpart].lang,
+                info.field,
+                controller.signal,
+            );
+            if (controller.signal.aborted) return;
+            setSuggestions((current) => ({ ...current, [targetKey]: { status: 'ready', sourceText, text } }));
+        } catch (err) {
+            if (controller.signal.aborted || axios.isCancel(err)) return;
+            const status = axios.isAxiosError(err) ? err.response?.status : undefined;
+            const message =
+                status === 429
+                    ? tr("Bạn đã dùng hết lượt gợi ý dịch trong giờ này. Vui lòng thử lại sau.")
+                    : status === 403
+                      ? tr("Tài khoản không có quyền dùng gợi ý dịch.")
+                      : tr("Chưa lấy được gợi ý dịch. Bạn có thể tự nhập hoặc thử lại.");
+            setSuggestions((current) => ({ ...current, [targetKey]: { status: 'error', sourceText, error: message } }));
+        } finally {
+            if (suggestionRequests.current[targetKey] === controller) delete suggestionRequests.current[targetKey];
+        }
+    }
+
+    // Rời ô nguồn: tự gợi ý khi ô bên kia còn trống và chưa gợi ý cho đúng nội dung này.
+    function suggestAfterBlur(key: string) {
+        const info = bilingual[key];
+        if (!info) return;
+        const text = values[key]?.trim();
+        const target = info.counterpart;
+        if (!text || values[target]?.trim()) return;
+        const existing = suggestions[target];
+        if (existing && existing.sourceText === text && existing.status !== 'error') return;
+        void requestSuggestion(target);
+    }
+
+    function acceptSuggestion(targetKey: string) {
+        const text = suggestions[targetKey]?.text;
+        if (!text) return;
+        setValues((current) => ({ ...current, [targetKey]: text }));
+        dropSuggestion(targetKey);
+    }
 
     function validate(index: number): string {
         if (index === 0) {
@@ -225,17 +318,38 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         label: string,
         options?: { type?: string; placeholder?: string; area?: boolean },
     ) {
+        const pair = bilingual[key];
         const props = {
             id: key,
             value: values[key] || '',
-            onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-                setValues({ ...values, [key]: event.target.value }),
+            onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+                const value = event.target.value;
+                setValues((current) => ({ ...current, [key]: value }));
+                // Nội dung nguồn đổi thì gợi ý cũ ở ô bên kia không còn đúng.
+                const stale = pair && suggestions[pair.counterpart];
+                if (stale && stale.sourceText !== value.trim()) dropSuggestion(pair.counterpart);
+            },
+            onBlur: pair ? () => suggestAfterBlur(key) : undefined,
             className: inputClass,
             placeholder: options?.placeholder,
         };
+        const suggestion = pair ? suggestions[key] : undefined;
+        const canSuggest = pair && !!values[pair.counterpart]?.trim();
         return (
-            <label htmlFor={key} className="block text-sm font-semibold">
-                {label}
+            <div className="block text-sm font-semibold">
+                <div className="flex items-center justify-between gap-3">
+                    <label htmlFor={key}>{label}</label>
+                    {canSuggest && suggestion?.status !== 'loading' && (
+                        <button
+                            type="button"
+                            onClick={() => void requestSuggestion(key)}
+                            className="inline-flex shrink-0 items-center gap-1 border-0 bg-transparent p-0 text-xs font-semibold text-store-green underline underline-offset-2"
+                        >
+                            <Sparkles size={13} aria-hidden="true" />
+                            {pair.lang === 'en' ? tr("Dịch từ tiếng Việt") : tr("Dịch từ tiếng Anh")}
+                        </button>
+                    )}
+                </div>
                 {options?.area ? (
                     <textarea {...props} className={`${inputClass} resize-none`} rows={3} />
                 ) : (
@@ -245,7 +359,57 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                         min={options?.type === 'number' ? '0' : undefined}
                     />
                 )}
-            </label>
+                {suggestion && (
+                    <div
+                        className="mt-2 rounded border border-store-line bg-store-cream px-3 py-2 font-normal"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        {suggestion.status === 'loading' && (
+                            <span className="inline-flex items-center gap-2 text-store-muted">
+                                <Loader2 size={14} className="animate-spin" aria-hidden="true" />
+                                {tr("AI đang gợi ý bản dịch…")}
+                            </span>
+                        )}
+                        {suggestion.status === 'error' && (
+                            <span className="flex items-center justify-between gap-3 text-red-700">
+                                {suggestion.error}
+                                <button
+                                    type="button"
+                                    onClick={() => dropSuggestion(key)}
+                                    className="shrink-0 border-0 bg-transparent p-0 text-xs font-semibold text-black underline"
+                                >
+                                    {tr("Đóng")}
+                                </button>
+                            </span>
+                        )}
+                        {suggestion.status === 'ready' && (
+                            <>
+                                <p className="flex items-center gap-1 text-xs font-semibold text-store-green">
+                                    <Sparkles size={12} aria-hidden="true" /> {tr("Gợi ý từ AI")}
+                                </p>
+                                <p className="mt-1 whitespace-pre-line text-sm text-black">{suggestion.text}</p>
+                                <div className="mt-2 flex gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => acceptSuggestion(key)}
+                                        className="rounded bg-store-green px-3 py-1 text-xs font-bold text-white"
+                                    >
+                                        {values[key]?.trim() ? tr("Thay bằng gợi ý") : tr("Dùng gợi ý")}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => dropSuggestion(key)}
+                                        className="border-0 bg-transparent p-0 text-xs font-semibold underline"
+                                    >
+                                        {tr("Bỏ qua")}
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
+            </div>
         );
     }
     function categoryOptions(items: HomeCategory[], depth = 0): ReactNode[] {

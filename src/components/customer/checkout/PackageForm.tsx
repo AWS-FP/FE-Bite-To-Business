@@ -14,6 +14,9 @@ export interface PackageDraft {
     deliveryTimeSlot: string;
     address: string;
     addressRefId?: string;
+    /** Exact point chosen on the distribution page; used instead of geocoding the address text. */
+    latitude?: number;
+    longitude?: number;
     note: string;
     city: 'HCM' | 'HANOI';
 }
@@ -61,8 +64,10 @@ export default function PackageForm({
     const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
     const [suggestionError, setSuggestionError] = useState(false);
     const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+    const pinnedFromMap = parcel.latitude != null && parcel.longitude != null;
+    const addressResolved = !!parcel.addressRefId || pinnedFromMap;
     useEffect(() => {
-        if (parcel.addressRefId || parcel.address.trim().length < 2) return;
+        if (addressResolved || parcel.address.trim().length < 2) return;
         const controller = new AbortController();
         const timer = window.setTimeout(() => {
             void searchDeliveryAddresses(
@@ -87,7 +92,7 @@ export default function PackageForm({
             window.clearTimeout(timer);
             controller.abort();
         };
-    }, [parcel.address, parcel.addressRefId, parcel.city]);
+    }, [parcel.address, addressResolved, parcel.city]);
     const showError = (name: string, message: string | undefined) =>
         message && (submitted || touched[name] || (name === 'address' && duplicateAddressError))
             ? message
@@ -188,6 +193,8 @@ export default function PackageForm({
                                 ...parcel,
                                 city: e.target.value as 'HCM' | 'HANOI',
                                 addressRefId: undefined,
+                                latitude: undefined,
+                                longitude: undefined,
                             });
                         }}
                     >
@@ -316,13 +323,20 @@ export default function PackageForm({
                                 ...parcel,
                                 address: e.target.value,
                                 addressRefId: undefined,
+                                latitude: undefined,
+                                longitude: undefined,
                             });
                         }}
                         placeholder={t('form.addressPlaceholder')}
                     />
                     {errorText('address')}
+                    {pinnedFromMap && (
+                        <p className="mt-1 text-xs font-normal text-store-green">
+                            {t('form.addressFromDistribution')}
+                        </p>
+                    )}
                     {suggestionsOpen &&
-                        !parcel.addressRefId &&
+                        !addressResolved &&
                         parcel.address.trim().length >= 2 &&
                         suggestions.length > 0 && (
                             <ul className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-store-ink/20 bg-white p-1 shadow-lg">
@@ -336,6 +350,8 @@ export default function PackageForm({
                                                     ...parcel,
                                                     address: suggestion.display,
                                                     addressRefId: suggestion.refId,
+                                                    latitude: undefined,
+                                                    longitude: undefined,
                                                 });
                                                 setSuggestions([]);
                                                 setSuggestionsOpen(false);
@@ -349,7 +365,7 @@ export default function PackageForm({
                                 ))}
                             </ul>
                         )}
-                    {!parcel.addressRefId &&
+                    {!addressResolved &&
                         parcel.address.trim().length >= 2 &&
                         suggestionError && (
                             <p className="mt-1 text-xs font-normal text-store-muted">
