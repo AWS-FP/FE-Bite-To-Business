@@ -1,11 +1,448 @@
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { CalendarDays, Image as ImageIcon, Megaphone, Plus, Save } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/router/routes';
-import { useEcommerceData } from '@/components/e-commerce/useEcommerceData';
-import { effectiveCampaignState, newId, shortDate, type EcommerceCampaign } from '@/components/e-commerce/ecommerceData';
-import { Dialog, Empty, PageTitle, StatusPill, ui } from '@/components/e-commerce/EcommerceUI';
-const fresh = (): EcommerceCampaign => ({ id: '', name: '', description: '', type: 'percent', value: 10, startDate: '2026-11-08', endDate: '2026-11-30', state: 'draft', scope: 'all', productIds: [] });
+import { executiveUi, useExecutiveText } from '@/components/e-commerce/executiveTokens';
+import {
+    ExecutiveBadge,
+    ExecutiveFeedback,
+    ExecutivePagination,
+    ExecutiveSelect,
+} from '@/components/e-commerce/ExecutiveControls';
+import {
+    ExecutiveEmpty,
+    ExecutiveError,
+    ExecutiveHeading,
+    ExecutivePanel,
+    LoadingRows,
+} from '@/components/e-commerce/ExecutiveUI';
+import {
+    executiveApi,
+    type Promotion,
+    type PromotionWrite,
+} from '@/services/e-commerce/executiveAdminService';
+import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
+
+function localValue(iso: string) {
+    const d = new Date(iso);
+    const p = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
 export default function EcommercePromotionsPage() {
-    const { data, updateCampaigns } = useEcommerceData(); const [filter, setFilter] = useState('all'); const [editing, setEditing] = useState<EcommerceCampaign | null>(null); const [open, setOpen] = useState(false); const [draft, setDraft] = useState<EcommerceCampaign>(fresh()); const [error, setError] = useState(''); const list = data.campaigns.filter(c => filter === 'all' || effectiveCampaignState(c) === filter); function start(c?: EcommerceCampaign) { setDraft(c ? { ...c, productIds: [...c.productIds] } : fresh()); setEditing(c ?? null); setError(''); setOpen(true) } function submit(e: FormEvent) { e.preventDefault(); if (!draft.name.trim() || !draft.startDate || !draft.endDate || draft.startDate > draft.endDate || !Number.isFinite(draft.value) || draft.value <= 0 || (draft.type === 'percent' && draft.value > 100)) { setError('Kiểm tra tên, thời gian và giá trị giảm (phần trăm không vượt 100%).'); return } const next = { ...draft, id: editing?.id ?? newId('cam') }; updateCampaigns(old => editing ? old.map(c => c.id === editing.id ? next : c) : [next, ...old]); setOpen(false) } function setState(c: EcommerceCampaign) { const next = c.state === 'paused' ? 'active' : 'paused'; updateCampaigns(old => old.map(x => x.id === c.id ? { ...x, state: next } : x)) }
-    return <div className="pb-10"><PageTitle eyebrow="GROWTH TOOLS / RULE ENGINE" title="Khuyến Mãi & Coupon" description="Quản lý ưu đãi theo nguyên tắc rõ ràng, có lịch và phạm vi áp dụng."><Link to={ROUTES.ECOMMERCE_COUPONS} className={ui.secondary}>Mã giảm giá →</Link><button className={ui.primary} onClick={() => start()}>+ Tạo chiến dịch</button></PageTitle><div className="mb-4 flex flex-wrap items-center justify-between gap-3"><strong className="text-xs">Chiến dịch Sale</strong><div className="flex flex-wrap gap-2">{['all', 'draft', 'scheduled', 'active', 'paused', 'ended'].map(s => <button key={s} className={`rounded-full border px-3 py-1.5 text-[11px] font-bold ${filter === s ? 'bg-emerald-700 text-white' : 'bg-white'}`} onClick={() => setFilter(s)}>{({ all: 'Tất cả', draft: 'DRAFT', scheduled: 'SCHEDULED', active: 'PUBLISHED', paused: 'DISABLED', ended: 'ARCHIVED' } as Record<string, string>)[s]}</button>)}</div></div><div className="mb-4 flex flex-wrap justify-between gap-3 rounded-xl border border-store-ink bg-amber-50 p-4"><div><strong className="text-xs">✦ AI phát hiện xung đột liên kết</strong><p className="text-[11px] text-amber-800">Hãy kiểm tra các chương trình cùng áp dụng trên một SKU; trình tự giảm giá trong đơn hàng thật cần do Backend kiểm soát.</p></div><button className={ui.secondary} onClick={() => setFilter('active')}>Xác nhận thay thế</button></div><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{list.map(c => <article key={c.id} className="rounded-xl border-2 border-store-ink border-t-4 border-t-emerald-500 bg-white p-5 shadow-[2px_2px_0_#14132b]"><div className="flex items-center justify-between"><img src="/images/ui/e-commerce/info.svg" alt="" width="22" height="22" /><StatusPill status={effectiveCampaignState(c)} /></div><h2 className="mt-4 font-subheading text-lg font-extrabold">{c.name}</h2><p className="mt-2 text-xs text-store-muted">{c.description || 'Chiến dịch ưu đãi'}</p><p className="mt-3 border-t border-slate-100 pt-3 text-[11px] text-slate-500">{shortDate(c.startDate)} – {shortDate(c.endDate)} · {c.scope === 'all' ? 'Toàn catalog' : `${c.productIds.length} SKU`}</p><div className="mt-4 flex gap-2"><button className={ui.secondary} onClick={() => start(c)}>Chỉnh sửa</button><button className={ui.secondary} onClick={() => setState(c)}>{c.state === 'paused' ? 'Bật lại' : 'Tạm dừng'}</button></div></article>)}{!list.length && <Empty text="Chưa có chiến dịch ở trạng thái này." />}</div>{open && <Dialog title={editing ? 'Chỉnh sửa chiến dịch' : 'Tạo chiến dịch Sale'} onClose={() => setOpen(false)} wide><form className="grid gap-4 sm:grid-cols-2" onSubmit={submit}><label className="sm:col-span-2"><span className={ui.label}>Tên chiến dịch</span><input className={ui.input} required value={draft.name} onChange={e => setDraft({ ...draft, name: e.target.value })} /></label><label className="sm:col-span-2"><span className={ui.label}>Mô tả</span><textarea className={ui.input} value={draft.description} onChange={e => setDraft({ ...draft, description: e.target.value })} /></label><label><span className={ui.label}>Loại giảm giá</span><select className={ui.select} value={draft.type} onChange={e => setDraft({ ...draft, type: e.target.value as EcommerceCampaign['type'] })}><option value="percent">Phần trăm</option><option value="fixed">VNĐ</option></select></label><label><span className={ui.label}>Giá trị</span><input className={ui.input} type="number" min="1" value={draft.value} onChange={e => setDraft({ ...draft, value: Number(e.target.value) })} /></label><label><span className={ui.label}>Bắt đầu</span><input className={ui.input} type="date" value={draft.startDate} onChange={e => setDraft({ ...draft, startDate: e.target.value })} /></label><label><span className={ui.label}>Kết thúc</span><input className={ui.input} type="date" value={draft.endDate} onChange={e => setDraft({ ...draft, endDate: e.target.value })} /></label><label><span className={ui.label}>Trạng thái</span><select className={ui.select} value={draft.state} onChange={e => setDraft({ ...draft, state: e.target.value as EcommerceCampaign['state'] })}><option value="draft">Nháp</option><option value="active">Hoạt động</option><option value="paused">Tạm dừng</option></select></label><label><span className={ui.label}>Phạm vi áp dụng</span><select className={ui.select} value={draft.scope} onChange={e => setDraft({ ...draft, scope: e.target.value as EcommerceCampaign['scope'], productIds: e.target.value === 'all' ? [] : draft.productIds })}><option value="all">Toàn catalog</option><option value="selected">Chọn SKU</option></select></label>{draft.scope === 'selected' && <fieldset className="sm:col-span-2"><legend className={ui.label}>SKU áp dụng</legend><div className="grid max-h-32 gap-2 overflow-y-auto">{data.products.map(p => <label className="flex gap-2 text-xs" key={p.id}><input type="checkbox" checked={draft.productIds.includes(p.id)} onChange={e => setDraft(prev => ({ ...prev, productIds: e.target.checked ? [...prev.productIds, p.id] : prev.productIds.filter(id => id !== p.id) }))} />{p.name}</label>)}</div></fieldset>}{error && <p className="sm:col-span-2 text-xs text-red-600">{error}</p>}<div className="sm:col-span-2 flex justify-end gap-2"><button type="button" className={ui.secondary} onClick={() => setOpen(false)}>Hủy</button><button className={ui.primary} type="submit">Lưu chiến dịch demo</button></div></form></Dialog>}</div>
+    const tr = useExecutiveText(),
+        qc = useQueryClient();
+    const [status, setStatus] = useState(''),
+        [page, setPage] = useState(0),
+        [draftOpen, setDraftOpen] = useState(false),
+        [editId, setEditId] = useState<string | null>(null),
+        [vi, setVi] = useState(''),
+        [en, setEn] = useState(''),
+        [contentVi, setContentVi] = useState(''),
+        [contentEn, setContentEn] = useState(''),
+        [start, setStart] = useState(''),
+        [end, setEnd] = useState(''),
+        [imageUrl, setImageUrl] = useState(''),
+        [message, setMessage] = useState(''),
+        [failed, setFailed] = useState(false);
+    const list = useQuery({
+        queryKey: ['ecom', 'promotions', status, page],
+        queryFn: () => executiveApi.promotions(status || undefined, page, 20),
+    });
+    function reset() {
+        setDraftOpen(false);
+        setEditId(null);
+        setVi('');
+        setEn('');
+        setContentVi('');
+        setContentEn('');
+        setStart('');
+        setEnd('');
+        setImageUrl('');
+    }
+    function edit(p: Promotion) {
+        setEditId(p.id);
+        setVi(p.nameVi);
+        setEn(p.nameEn);
+        setContentVi(p.contentVi ?? '');
+        setContentEn(p.contentEn ?? '');
+        setStart(localValue(p.startsAt));
+        setEnd(localValue(p.endsAt));
+        setImageUrl(p.imageUrl ?? '');
+        setDraftOpen(true);
+    }
+    const save = useMutation({
+        mutationFn: (payload: PromotionWrite) =>
+            editId
+                ? executiveApi.updatePromotion(editId, payload)
+                : executiveApi.createPromotion(payload),
+        onSuccess: () => {
+            setFailed(false);
+            setMessage(tr('Chiến dịch đã được lưu ở trạng thái nháp.', 'Campaign saved as draft.'));
+            reset();
+            void qc.invalidateQueries({ queryKey: ['ecom', 'promotions'] });
+            void qc.invalidateQueries({ queryKey: ['ecom', 'images-promotions'] });
+        },
+        onError: (error) => {
+            setFailed(true);
+            setMessage(
+                executiveErrorMessage(
+                    error,
+                    tr('Không thể lưu chương trình.', 'Could not save campaign.'),
+                ),
+            );
+        },
+    });
+    const action = useMutation({
+        mutationFn: ({
+            id,
+            type,
+        }: {
+            id: string;
+            type: 'publish' | 'disable' | 'archive' | 'restore';
+        }) => executiveApi.promotionAction(id, type),
+        onSuccess: () => {
+            setFailed(false);
+            setMessage(tr('Đã cập nhật chiến dịch.', 'Campaign updated.'));
+            void qc.invalidateQueries({ queryKey: ['ecom', 'promotions'] });
+            void qc.invalidateQueries({ queryKey: ['ecom', 'images-promotions'] });
+        },
+        onError: (error) => {
+            setFailed(true);
+            setMessage(
+                executiveErrorMessage(
+                    error,
+                    tr('Không thể chuyển trạng thái.', 'Unable to change status.'),
+                ),
+            );
+        },
+    });
+    function submit(e: React.FormEvent) {
+        e.preventDefault();
+        if (!vi.trim() || !en.trim() || !start || !end || new Date(end) <= new Date(start)) {
+            setFailed(true);
+            setMessage(
+                tr(
+                    'Nhập đủ tiêu đề song ngữ và thời gian hợp lệ.',
+                    'Provide bilingual titles and valid dates.',
+                ),
+            );
+            return;
+        }
+        save.mutate({
+            nameVi: vi.trim(),
+            nameEn: en.trim(),
+            contentVi: contentVi.trim() || null,
+            contentEn: contentEn.trim() || null,
+            startsAt: new Date(start).toISOString(),
+            endsAt: new Date(end).toISOString(),
+            imageUrl: imageUrl.trim() || null,
+        });
+    }
+    return (
+        <div className="space-y-6">
+            <ExecutiveHeading
+                number="05"
+                eyebrow="MARKETING / CAMPAIGNS"
+                title={tr('Chương trình khuyến mãi', 'Promotion campaigns')}
+                description={tr(
+                    'Tạo chiến dịch, quản lý ảnh banner và lịch công bố.',
+                    'Manage campaigns, promotional imagery and publication dates.',
+                )}
+                action={
+                    <button
+                        type="button"
+                        className={executiveUi.button}
+                        onClick={() => {
+                            reset();
+                            setDraftOpen(true);
+                        }}
+                    >
+                        <Plus size={16} />
+                        {tr('Tạo chiến dịch', 'New campaign')}
+                    </button>
+                }
+            />
+            <ExecutiveFeedback message={message} error={failed} />
+            {draftOpen && (
+                <ExecutivePanel
+                    title={
+                        editId
+                            ? tr('Sửa chiến dịch', 'Edit campaign')
+                            : tr('Tạo chiến dịch', 'New campaign')
+                    }
+                    caption={tr(
+                        'Sau khi chỉnh sửa, hãy xuất bản lại để khách hàng thấy thay đổi.',
+                        'Publish your changes when they are ready for customers.',
+                    )}
+                >
+                    <form onSubmit={submit} className="grid gap-4 p-5 md:grid-cols-2">
+                        <label className="text-xs font-bold">
+                            {tr('Tên tiếng Việt', 'Vietnamese title')}
+                            <input
+                                className={`${executiveUi.input} mt-2`}
+                                maxLength={200}
+                                required
+                                value={vi}
+                                onChange={(e) => setVi(e.target.value)}
+                            />
+                        </label>
+                        <label className="text-xs font-bold">
+                            {tr('Tên tiếng Anh', 'English title')}
+                            <input
+                                className={`${executiveUi.input} mt-2`}
+                                maxLength={200}
+                                required
+                                value={en}
+                                onChange={(e) => setEn(e.target.value)}
+                            />
+                        </label>
+                        <label className="text-xs font-bold">
+                            {tr('Nội dung tiếng Việt', 'Vietnamese description')}
+                            <textarea
+                                rows={3}
+                                className={`${executiveUi.input} mt-2 !h-auto py-3`}
+                                value={contentVi}
+                                onChange={(e) => setContentVi(e.target.value)}
+                            />
+                        </label>
+                        <label className="text-xs font-bold">
+                            {tr('Nội dung tiếng Anh', 'English description')}
+                            <textarea
+                                rows={3}
+                                className={`${executiveUi.input} mt-2 !h-auto py-3`}
+                                value={contentEn}
+                                onChange={(e) => setContentEn(e.target.value)}
+                            />
+                        </label>
+                        <label className="text-xs font-bold">
+                            {tr('Bắt đầu', 'Starts')}
+                            <input
+                                required
+                                type="datetime-local"
+                                className={`${executiveUi.input} mt-2`}
+                                value={start}
+                                onChange={(e) => setStart(e.target.value)}
+                            />
+                        </label>
+                        <label className="text-xs font-bold">
+                            {tr('Kết thúc', 'Ends')}
+                            <input
+                                required
+                                type="datetime-local"
+                                min={start}
+                                className={`${executiveUi.input} mt-2`}
+                                value={end}
+                                onChange={(e) => setEnd(e.target.value)}
+                            />
+                        </label>
+                        <div className="md:col-span-2">
+                            <label className="text-xs font-bold">
+                                {tr(
+                                    'Đường dẫn ảnh quảng cáo (HTTPS)',
+                                    'Promotion image URL (HTTPS)',
+                                )}
+                                <input
+                                    type="url"
+                                    className={`${executiveUi.input} mt-2`}
+                                    placeholder="https://..."
+                                    value={imageUrl}
+                                    onChange={(e) => setImageUrl(e.target.value)}
+                                />
+                            </label>
+                            <Link
+                                to={ROUTES.ECOMMERCE_POSTER}
+                                className="mt-2 inline-flex items-center gap-2 text-xs font-bold text-[#24734c]"
+                            >
+                                <ImageIcon size={15} />
+                                {tr(
+                                    'Tải ảnh tại mục Ảnh khuyến mãi',
+                                    'Upload images in Promotion images',
+                                )}
+                            </Link>
+                        </div>
+                        <div className="flex gap-3 md:col-span-2">
+                            <button disabled={save.isPending} className={executiveUi.button}>
+                                <Save size={16} />
+                                {tr('Lưu chiến dịch', 'Save campaign')}
+                            </button>
+                            <button type="button" className={executiveUi.secondary} onClick={reset}>
+                                {tr('Hủy', 'Cancel')}
+                            </button>
+                        </div>
+                    </form>
+                </ExecutivePanel>
+            )}
+            <ExecutivePanel
+                title={tr('Danh sách chiến dịch', 'Campaign management')}
+                caption={list.data ? `${list.data.total} ${tr('chiến dịch', 'campaigns')}` : ''}
+            >
+                <div className="max-w-[240px] p-5">
+                    <ExecutiveSelect
+                        ariaLabel={tr('Trạng thái', 'Status')}
+                        value={status}
+                        onValueChange={(value) => {
+                            setStatus(value);
+                            setPage(0);
+                        }}
+                    >
+                        <option value="">{tr('Tất cả', 'All statuses')}</option>
+                        {['DRAFT', 'PUBLISHED', 'DISABLED', 'ARCHIVED'].map((s) => (
+                            <option key={s}>{s}</option>
+                        ))}
+                    </ExecutiveSelect>
+                </div>
+                {list.isLoading ? (
+                    <LoadingRows />
+                ) : list.isError ? (
+                    <div className="p-5">
+                        <ExecutiveError
+                            message={tr('Không lấy được chiến dịch.', 'Could not load campaigns.')}
+                            retry={() => void list.refetch()}
+                        />
+                    </div>
+                ) : !list.data?.items.length ? (
+                    <ExecutiveEmpty
+                        icon={<Megaphone />}
+                        title={tr('Chưa có chiến dịch', 'No campaigns')}
+                        description={tr(
+                            'Tạo chương trình mới để bắt đầu.',
+                            'Create a campaign to get started.',
+                        )}
+                    />
+                ) : (
+                    <div className="grid gap-4 p-5 lg:grid-cols-2">
+                        {list.data.items.map((p) => (
+                            <article
+                                key={p.id}
+                                className="overflow-hidden rounded-2xl border border-[#dbe8db] bg-white"
+                            >
+                                <div className="flex min-h-[155px] items-center justify-center bg-[#edf4e9]">
+                                    {p.imageUrl ? (
+                                        <img
+                                            alt=""
+                                            src={p.imageUrl}
+                                            loading="lazy"
+                                            className="h-44 w-full object-cover"
+                                        />
+                                    ) : (
+                                        <ImageIcon size={35} className="text-[#8ea896]" />
+                                    )}
+                                </div>
+                                <div className="p-5">
+                                    <div className="flex flex-wrap items-center justify-between gap-2">
+                                        <ExecutiveBadge status={p.status} />
+                                        <span className="inline-flex items-center gap-1 text-[11px] text-[#688373]">
+                                            <CalendarDays size={13} />
+                                            {new Date(p.startsAt).toLocaleDateString(
+                                                'vi-VN',
+                                            )} — {new Date(p.endsAt).toLocaleDateString('vi-VN')}
+                                        </span>
+                                    </div>
+                                    <h3 className="mt-3 text-lg font-bold">
+                                        {tr(p.nameVi, p.nameEn)}
+                                    </h3>
+                                    <p className="mt-2 line-clamp-2 min-h-10 text-sm text-[#6d8372]">
+                                        {tr(p.contentVi ?? '', p.contentEn ?? '') || '—'}
+                                    </p>
+                                    <div className="mt-4 flex flex-wrap gap-2">
+                                        {p.status === 'ARCHIVED' ? (
+                                            <button
+                                                className={executiveUi.secondary}
+                                                disabled={action.isPending}
+                                                onClick={() =>
+                                                    action.mutate({ id: p.id, type: 'restore' })
+                                                }
+                                            >
+                                                {tr('Khôi phục về bản nháp', 'Restore to draft')}
+                                            </button>
+                                        ) : (
+                                            <button
+                                                className={executiveUi.secondary}
+                                                type="button"
+                                                onClick={() => edit(p)}
+                                            >
+                                                {tr('Sửa', 'Edit')}
+                                            </button>
+                                        )}
+                                        {p.status !== 'ARCHIVED' && (
+                                            <button
+                                                className={executiveUi.secondary}
+                                                disabled={action.isPending}
+                                                onClick={() => {
+                                                    if (
+                                                        p.status !== 'PUBLISHED' &&
+                                                        (!p.contentVi ||
+                                                            !p.contentEn ||
+                                                            !p.imageUrl ||
+                                                            Date.parse(p.endsAt) <= Date.now())
+                                                    ) {
+                                                        setFailed(true);
+                                                        setMessage(
+                                                            tr(
+                                                                'Để xuất bản, hãy thêm ảnh, nhập nội dung tiếng Việt và tiếng Anh, rồi kiểm tra ngày kết thúc còn hiệu lực.',
+                                                                'To publish, add an image, enter Vietnamese and English content, and check that the end date is in the future.',
+                                                            ),
+                                                        );
+                                                        return;
+                                                    }
+                                                    const type =
+                                                        p.status === 'PUBLISHED'
+                                                            ? 'disable'
+                                                            : 'publish';
+                                                    if (
+                                                        window.confirm(
+                                                            tr(
+                                                                'Xác nhận thay đổi trạng thái chiến dịch?',
+                                                                'Change campaign status?',
+                                                            ),
+                                                        )
+                                                    )
+                                                        action.mutate({ id: p.id, type });
+                                                }}
+                                            >
+                                                {p.status === 'PUBLISHED'
+                                                    ? tr('Tắt', 'Disable')
+                                                    : tr('Xuất bản', 'Publish')}
+                                            </button>
+                                        )}
+                                        {p.status !== 'ARCHIVED' && (
+                                            <button
+                                                className={executiveUi.secondary}
+                                                disabled={action.isPending}
+                                                onClick={() => {
+                                                    if (
+                                                        window.confirm(
+                                                            tr(
+                                                                'Lưu trữ chiến dịch này?',
+                                                                'Archive this campaign?',
+                                                            ),
+                                                        )
+                                                    )
+                                                        action.mutate({
+                                                            id: p.id,
+                                                            type: 'archive',
+                                                        });
+                                                }}
+                                            >
+                                                {tr('Lưu trữ', 'Archive')}
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+                )}
+                {list.data && (
+                    <ExecutivePagination
+                        page={page}
+                        totalPages={list.data.totalPages}
+                        onChange={setPage}
+                        tr={tr}
+                    />
+                )}
+            </ExecutivePanel>
+        </div>
+    );
 }
