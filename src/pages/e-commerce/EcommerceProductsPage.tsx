@@ -1,119 +1,865 @@
-import Pagination from '@/components/common/Pagination';
-import { useMemo, useState, type FormEvent } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { ROUTES } from '@/router/routes';
-import { useEcommerceData } from '@/components/e-commerce/useEcommerceData';
-import { CATEGORIES, money, newId, toCsv, type EcommerceProduct, type ProductState } from '@/components/e-commerce/ecommerceData';
-import { DemoNotice, Dialog, Empty, Metric, PageTitle, ui } from '@/components/e-commerce/EcommerceUI';
+import { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ClipboardList, Package, RefreshCw, Search, X, Plus, Trash2, Save } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { executiveUi, useExecutiveText } from '@/components/e-commerce/executiveTokens';
+import {
+    ExecutiveBadge,
+    ExecutiveFeedback,
+    ExecutivePagination,
+    ExecutiveSelect,
+} from '@/components/e-commerce/ExecutiveControls';
+import {
+    ExecutiveEmpty,
+    ExecutiveError,
+    ExecutiveHeading,
+    ExecutivePanel,
+    LoadingRows,
+} from '@/components/e-commerce/ExecutiveUI';
+import {
+    executiveApi,
+    type AdminProduct,
+    type PricingWrite,
+} from '@/services/e-commerce/executiveAdminService';
+import {
+    formatVnd,
+    getExecutiveVat,
+    updateExecutiveVat,
+} from '@/services/e-commerce/executiveReadService';
+import { getCatalogBrands } from '@/services/customer/catalogReadService';
+import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
+import { getHomeCategories, type HomeCategory } from '@/services/customer/homeService';
 
-const emptyProduct = (): EcommerceProduct => ({
-    id: '', name: '', sku: '', brand: '', category: CATEGORIES[0], unit: 'kg', price: 0,
-    stock: 0, state: 'draft', description: '', updatedAt: '', moq: 20, step: 5, volumeTiers: [{ min: 1, price: 0 }],
-});
-
-function ProductForm({ original, products, onClose, onSave }: {
-    original: EcommerceProduct | null;
-    products: EcommerceProduct[];
+function ProductDrawer({
+    product,
+    category,
+    brand,
+    onClose,
+}: {
+    product: AdminProduct;
+    category: string;
+    brand: string;
     onClose: () => void;
-    onSave: (product: EcommerceProduct) => void;
 }) {
-    const [draft, setDraft] = useState<EcommerceProduct>(() => original ? { ...original } : emptyProduct());
-    const [error, setError] = useState('');
-    const update = <K extends keyof EcommerceProduct>(field: K, value: EcommerceProduct[K]) => setDraft(prev => ({ ...prev, [field]: value }));
-
-    function submit(e: FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        const sku = draft.sku.trim().toUpperCase();
-        if (!draft.name.trim() || !sku || !draft.brand.trim() || !draft.unit.trim()) { setError('Vui lòng nhập đủ tên, mã SKU, thương hiệu và đơn vị.'); return; }
-        if (products.some(p => p.sku.toLowerCase() === sku.toLowerCase() && p.id !== original?.id)) { setError('Mã SKU đã tồn tại.'); return; }
-        if (!Number.isFinite(draft.price) || draft.price <= 0 || !Number.isInteger(draft.stock) || draft.stock < 0) { setError('Giá phải lớn hơn 0 và tồn kho phải là số nguyên không âm.'); return; }
-        onSave({ ...draft, id: original?.id ?? newId('prd'), name: draft.name.trim(), sku, brand: draft.brand.trim(), unit: draft.unit.trim(), description: draft.description.trim(), updatedAt: new Date().toISOString().slice(0, 10) });
-    }
-
-    return <Dialog title={original ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'} description="Nhập thông tin sản phẩm. Bạn có thể lưu nháp trước khi hiển thị trên gian hàng." onClose={onClose} wide>
-        <form onSubmit={submit} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="sm:col-span-2"><label className={ui.label} htmlFor="prod-name">Tên sản phẩm *</label><input id="prod-name" required maxLength={120} className={ui.input} value={draft.name} onChange={e => update('name', e.target.value)} placeholder="Ví dụ: Cà phê Cold Brew" /></div>
-            <div><label className={ui.label} htmlFor="prod-sku">Mã SKU *</label><input id="prod-sku" required maxLength={36} className={ui.input} value={draft.sku} onChange={e => update('sku', e.target.value)} placeholder="BTB-BEV-010" /></div>
-            <div><label className={ui.label} htmlFor="prod-brand">Thương hiệu *</label><input id="prod-brand" required maxLength={80} className={ui.input} value={draft.brand} onChange={e => update('brand', e.target.value)} placeholder="Thương hiệu" /></div>
-            <div><label className={ui.label} htmlFor="prod-category">Danh mục</label><select id="prod-category" className={ui.select} value={draft.category} onChange={e => update('category', e.target.value)}>{CATEGORIES.map(x => <option key={x}>{x}</option>)}</select></div>
-            <div><label className={ui.label} htmlFor="prod-unit">Đơn vị bán *</label><input id="prod-unit" required maxLength={40} className={ui.input} value={draft.unit} onChange={e => update('unit', e.target.value)} placeholder="kg, thùng, chai..." /></div>
-            <div><label className={ui.label} htmlFor="prod-price">Giá bán (VNĐ) *</label><input id="prod-price" className={ui.input} required type="number" min="1" step="1000" value={draft.price || ''} onChange={e => update('price', Number(e.target.value))} /></div>
-            <div><label className={ui.label} htmlFor="prod-stock">Tồn kho (demo) *</label><input id="prod-stock" className={ui.input} required type="number" min="0" step="1" value={draft.stock} onChange={e => update('stock', Number(e.target.value))} /></div>
-            <div><label className={ui.label} htmlFor="prod-state">Hiển thị</label><select id="prod-state" className={ui.select} value={draft.state} onChange={e => update('state', e.target.value as ProductState)}><option value="draft">Bản nháp</option><option value="active">Đang bán</option><option value="hidden">Ẩn sản phẩm</option></select></div>
-            <div><label className={ui.label}>MOQ (đơn vị)</label><input type="number" min="1" className={ui.input} value={draft.moq ?? 20} onChange={e => update('moq', Math.max(1, Number(e.target.value)))} /></div>
-            <div><label className={ui.label}>Bước số lượng</label><input type="number" min="1" className={ui.input} value={draft.step ?? 5} onChange={e => update('step', Math.max(1, Number(e.target.value)))} /></div>
-            <fieldset className="sm:col-span-2 rounded-xl border border-store-line p-3"><legend className="text-xs font-bold text-emerald-700">VOLUME PRICING</legend>{(draft.volumeTiers ?? []).map((tier, i) => <div key={i} className="mt-2 flex gap-2"><label className="flex-1 text-xs">Từ số lượng<input className={ui.input} type="number" min="1" value={tier.min} onChange={e => update('volumeTiers', (draft.volumeTiers ?? []).map((t, j) => j === i ? { ...t, min: Number(e.target.value) } : t))} /></label><label className="flex-1 text-xs">Đơn giá<input className={ui.input} type="number" min="0" value={tier.price} onChange={e => update('volumeTiers', (draft.volumeTiers ?? []).map((t, j) => j === i ? { ...t, price: Number(e.target.value) } : t))} /></label><button type="button" className="px-2 text-red-500" onClick={() => update('volumeTiers', (draft.volumeTiers ?? []).filter((_, j) => j !== i))}>Xóa</button></div>)}<button type="button" className={`${ui.secondary} mt-2`} onClick={() => update('volumeTiers', [...(draft.volumeTiers ?? []), { min: 1, price: draft.price }])}>+ Thêm bậc</button></fieldset>
-            <div className="sm:col-span-2"><label className={ui.label} htmlFor="prod-description">Mô tả sản phẩm</label><textarea id="prod-description" rows={3} maxLength={500} className={ui.input} value={draft.description} onChange={e => update('description', e.target.value)} placeholder="Mô tả ngắn về sản phẩm..." /></div>
-            <div className="sm:col-span-2 flex items-center gap-3 border border-dashed border-store-line-strong bg-white p-3 text-[11px] text-store-muted"><img src="/images/ui/e-commerce/image-placeholder.svg" alt="" width="40" height="40" />Chưa có ảnh minh họa. Giữ khung ảnh trống, bổ sung ảnh từ thư viện sản phẩm khi có API.</div>
-            {error && <p className="sm:col-span-2 text-[12px] font-semibold text-danger" role="alert">{error}</p>}
-            <div className="sm:col-span-2 flex justify-end gap-2 border-t border-store-line pt-4"><button className={ui.secondary} type="button" onClick={onClose}>Hủy</button><button className={ui.primary} type="submit">{original ? 'Lưu thay đổi' : 'Thêm sản phẩm'}</button></div>
-        </form>
-    </Dialog>;
+    const tr = useExecutiveText(),
+        qc = useQueryClient();
+    const pricing = useQuery({
+        queryKey: ['ecom', 'product-pricing', product.id],
+        queryFn: () => executiveApi.productPricing(product.id),
+    });
+    const vat = useQuery({
+        queryKey: ['ecom', 'vat', product.id],
+        queryFn: () => getExecutiveVat(product.id),
+    });
+    const [editing, setEditing] = useState<PricingWrite | null>(null);
+    const [localStatus, setLocalStatus] = useState(product.status);
+    const [vatInput, setVatInput] = useState<string | null>(null);
+    const [feedback, setFeedback] = useState('');
+    const [failed, setFailed] = useState(false);
+    const tiers = editing?.tiers ?? pricing.data?.priceTiers ?? [];
+    const makeDraft = (): PricingWrite => ({
+        listPrice: pricing.data?.listPrice ?? 0,
+        salePrice: pricing.data?.salePrice ?? null,
+        saleDiscountPercent:
+            pricing.data?.salePrice != null ? null : (pricing.data?.saleDiscountPercent ?? null),
+        tiers: pricing.data?.priceTiers.map((t) => ({ ...t })) ?? [],
+    });
+    const pricingSave = useMutation({
+        mutationFn: (payload: PricingWrite) => executiveApi.savePricing(product.id, payload),
+        onSuccess: (saved) => {
+            qc.setQueryData(['ecom', 'product-pricing', product.id], saved);
+            setEditing(null);
+            setFeedback(tr('Đã lưu giá sản phẩm.', 'Product prices saved.'));
+            setFailed(false);
+            void qc.invalidateQueries({ queryKey: ['ecom', 'product-pricing', product.id] });
+            void qc.invalidateQueries({ queryKey: ['ecom', 'products'] });
+        },
+        onError: (error) => {
+            setFailed(true);
+            setFeedback(
+                executiveErrorMessage(
+                    error,
+                    tr(
+                        'Không lưu được giá: kiểm tra MOQ, giá niêm yết và các bậc giá. Các bậc đã được báo giá sử dụng không thể xóa.',
+                        'Unable to save prices: verify MOQ, list price and tiers. Referenced tiers cannot be removed.',
+                    ),
+                ),
+            );
+        },
+    });
+    const vatSave = useMutation({
+        mutationFn: (rate: number) => updateExecutiveVat(product.id, rate),
+        onSuccess: () => {
+            setFeedback(tr('Đã cập nhật VAT.', 'VAT saved.'));
+            setFailed(false);
+            void qc.invalidateQueries({ queryKey: ['ecom', 'vat', product.id] });
+            void qc.invalidateQueries({ queryKey: ['ecom', 'products'] });
+        },
+        onError: () => {
+            setFailed(true);
+            setFeedback(tr('Không thể lưu VAT.', 'VAT update failed.'));
+        },
+    });
+    const statusSave = useMutation({
+        mutationFn: (status: string) => executiveApi.setProductStatus(product.id, status),
+        onSuccess: (_, status) => {
+            setLocalStatus(status as AdminProduct['status']);
+            setFeedback(tr('Đã cập nhật trạng thái sản phẩm.', 'Publication status updated.'));
+            setFailed(false);
+            void qc.invalidateQueries({ queryKey: ['ecom', 'products'] });
+        },
+        onError: () => {
+            setFailed(true);
+            setFeedback(
+                tr(
+                    'Không đổi được trạng thái. Kiểm tra giá và thông tin sản phẩm.',
+                    'Could not change status. Check required product details and pricing.',
+                ),
+            );
+        },
+    });
+    const changeTier = (
+        index: number,
+        key: 'minQuantity' | 'maxQuantity' | 'unitPrice',
+        value: string,
+    ) =>
+        setEditing((prev) => {
+            const draft = prev ?? makeDraft();
+            return {
+                ...draft,
+                tiers: draft.tiers.map((item, i) =>
+                    i === index
+                        ? {
+                              ...item,
+                              [key]: value === '' && key === 'maxQuantity' ? null : Number(value),
+                          }
+                        : item,
+                ),
+            };
+        });
+    const selectStatus = (status: string) => {
+        if (
+            status !== localStatus &&
+            window.confirm(
+                tr(
+                    `Chuyển trạng thái ${product.sku} thành ${status}?`,
+                    `Change ${product.sku} to ${status}?`,
+                ),
+            )
+        )
+            statusSave.mutate(status);
+    };
+    return (
+        <div
+            className="fixed inset-0 z-[175] flex justify-end bg-black/50"
+            onMouseDown={(e) => {
+                if (e.target === e.currentTarget) onClose();
+            }}
+        >
+            <section
+                role="dialog"
+                aria-modal="true"
+                aria-label={tr('Chi tiết quản trị sản phẩm', 'Product management details')}
+                className="flex h-dvh w-full max-w-[650px] flex-col bg-[#faf7ec] shadow-2xl"
+            >
+                <div className="flex items-start justify-between gap-4 border-b bg-white px-6 py-5">
+                    <div className="flex items-center gap-4">
+                        {product.imageUrl ? (
+                            <img
+                                alt=""
+                                src={product.imageUrl}
+                                className="size-16 rounded-xl border object-contain"
+                            />
+                        ) : (
+                            <Package size={32} />
+                        )}
+                        <div>
+                            <span className="text-xs font-bold uppercase text-[#648772]">
+                                {product.sku}
+                            </span>
+                            <h2 className="mt-1 max-w-[420px] text-lg font-black">
+                                {tr(product.nameVi, product.nameEn)}
+                            </h2>
+                            <p className="mt-1 text-xs text-[#6d7f71]">
+                                {brand} · {category} · {product.unitCode}
+                            </p>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        aria-label={tr('Đóng', 'Close')}
+                        className="rounded-xl border bg-white p-2"
+                        onClick={onClose}
+                    >
+                        <X size={20} />
+                    </button>
+                </div>
+                <div className="flex-1 space-y-5 overflow-y-auto p-5 sm:p-6">
+                    <ExecutiveFeedback message={feedback} error={failed} />
+                    <section className="rounded-2xl border border-[#dde8dc] bg-white p-5">
+                        <h3 className="mb-3 font-bold">
+                            {tr('Thông tin hàng hóa', 'Product information')}
+                        </h3>
+                        <dl className="grid gap-3 text-sm sm:grid-cols-2">
+                            <div>
+                                <dt className="text-xs text-[#748577]">
+                                    {tr('Quy cách', 'Packaging')}
+                                </dt>
+                                <dd className="font-semibold">
+                                    {tr(product.packageSpecVi ?? '—', product.packageSpecEn ?? '—')}
+                                </dd>
+                            </div>
+                            <div>
+                                <dt className="text-xs text-[#748577]">
+                                    {tr('Xuất xứ', 'Origin')}
+                                </dt>
+                                <dd className="font-semibold">{product.origin || '—'}</dd>
+                            </div>
+                        </dl>
+                        <p className="mt-4 whitespace-pre-line text-sm leading-6 text-[#536958]">
+                            {tr(product.descriptionVi ?? '', product.descriptionEn ?? '') || '—'}
+                        </p>
+                    </section>
+                    <section className="rounded-2xl border border-[#dde8dc] bg-white p-5">
+                        <h3 className="mb-4 font-bold">
+                            {tr('Trạng thái & thông số', 'Status and specifications')}
+                        </h3>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span className="text-xs text-[#728576]">MOQ</span>
+                                <strong className="block">
+                                    {product.minOrderQuantity} {product.unitCode}
+                                </strong>
+                            </div>
+                            <div>
+                                <span className="text-xs text-[#728576]">
+                                    {tr('Bước số lượng', 'Quantity step')}
+                                </span>
+                                <strong className="block">{product.quantityStep}</strong>
+                            </div>
+                            <div>
+                                <span className="text-xs text-[#728576]">
+                                    {tr('Ngày cập nhật', 'Updated')}
+                                </span>
+                                <strong className="block">
+                                    {new Date(product.updatedAt).toLocaleDateString('vi-VN')}
+                                </strong>
+                            </div>
+                            <div>
+                                <span className="text-xs text-[#728576]">
+                                    {tr('VAT (%)', 'VAT (%)')}
+                                </span>
+                                <strong className="block">{product.vatRate ?? '—'}</strong>
+                            </div>
+                        </div>
+                        <ExecutiveSelect
+                            label={tr('Trạng thái sản phẩm', 'Publication status')}
+                            value={localStatus}
+                            onValueChange={selectStatus}
+                            disabled={statusSave.isPending}
+                            className="mt-4"
+                        >
+                            <option value="DRAFT">DRAFT</option>
+                            <option value="PUBLISHED">PUBLISHED</option>
+                            <option value="ARCHIVED">ARCHIVED</option>
+                        </ExecutiveSelect>
+                    </section>
+                    <section className="rounded-2xl border border-[#dde8dc] bg-white p-5">
+                        <div className="mb-4 flex items-center justify-between gap-3">
+                            <h3 className="font-bold">
+                                {tr('Giá bán & bảng giá sỉ', 'Prices and wholesale tiers')}
+                            </h3>
+                            {!editing && pricing.data && pricing.data.listPrice != null && (
+                                <button
+                                    type="button"
+                                    className={executiveUi.secondary}
+                                    onClick={() => setEditing(makeDraft())}
+                                >
+                                    {tr('Chỉnh sửa', 'Edit')}
+                                </button>
+                            )}
+                        </div>
+                        {pricing.isLoading ? (
+                            <LoadingRows />
+                        ) : pricing.isError ? (
+                            <ExecutiveError
+                                message={tr(
+                                    'Không tải được giá bán.',
+                                    'Failed to load product pricing.',
+                                )}
+                            />
+                        ) : (
+                            pricing.data && (
+                                <>
+                                    <div className="grid gap-3 sm:grid-cols-2">
+                                        <label className="text-xs font-semibold">
+                                            {tr('Giá niêm yết (VND)', 'List price (VND)')}
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                step="1"
+                                                readOnly
+                                                aria-readonly="true"
+                                                title={tr(
+                                                    'Giá niêm yết do bộ phận quản lý danh mục thiết lập. E-commerce không được thay đổi.',
+                                                    'List price is maintained by catalog administrators; E-commerce cannot edit it.',
+                                                )}
+                                                className={`${executiveUi.input} mt-2 !cursor-not-allowed !border-[#d7e0d5] !bg-[#edf2ec] !text-[#697a6e]`}
+                                                value={pricing.data.listPrice ?? ''}
+                                            />
+                                        </label>
+                                        <label className="text-xs font-semibold">
+                                            {tr('Giá sale (VND)', 'Sale price (VND)')}
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                step="1"
+                                                disabled={!editing}
+                                                className={`${executiveUi.input} mt-2`}
+                                                value={
+                                                    editing
+                                                        ? (editing.salePrice ?? '')
+                                                        : (pricing.data.salePrice ?? '')
+                                                }
+                                                onChange={(e) =>
+                                                    setEditing((prev) => ({
+                                                        ...(prev ?? makeDraft()),
+                                                        salePrice:
+                                                            e.target.value === ''
+                                                                ? null
+                                                                : Number(e.target.value),
+                                                        saleDiscountPercent: null,
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                    </div>
+                                    {pricing.data.listPrice == null && (
+                                        <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+                                            {tr(
+                                                'Sản phẩm chưa được thiết lập giá niêm yết. E-commerce không được tạo giá niêm yết; hãy liên hệ bộ phận quản lý danh mục.',
+                                                'This product has no list price. E-commerce cannot set list prices; contact catalog management.',
+                                            )}
+                                        </p>
+                                    )}
+                                    <p className="mt-3 text-xs text-[#6e8272]">
+                                        {tr(
+                                            'Giá niêm yết chỉ để xem, không thể chỉnh sửa bằng tài khoản E-commerce. Giá sale để trống nếu không áp dụng.',
+                                            'List price is read-only for E-commerce. Leave sale price empty when unused.',
+                                        )}
+                                    </p>
+                                    <div className="mt-5 overflow-x-auto">
+                                        <table className="w-full min-w-[400px] text-left text-xs">
+                                            <thead>
+                                                <tr className="border-b text-[#668071]">
+                                                    <th className="pb-3">{tr('Từ SL', 'From')}</th>
+                                                    <th>{tr('Đến SL', 'To')}</th>
+                                                    <th>{tr('Đơn giá', 'Unit price')}</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {tiers.map((tier, i) => (
+                                                    <tr
+                                                        key={tier.id ?? i}
+                                                        className="border-b border-[#edf1eb]"
+                                                    >
+                                                        <td className="py-2">
+                                                            <input
+                                                                aria-label={`Tier ${i + 1} min`}
+                                                                disabled={!editing}
+                                                                type="number"
+                                                                step="any"
+                                                                min="0.01"
+                                                                value={tier.minQuantity}
+                                                                onChange={(e) =>
+                                                                    changeTier(
+                                                                        i,
+                                                                        'minQuantity',
+                                                                        e.target.value,
+                                                                    )
+                                                                }
+                                                                className={`${executiveUi.input} !h-9 !w-[105px]`}
+                                                            />
+                                                        </td>
+                                                        <td>
+                                                            <input
+                                                                aria-label={`Tier ${i + 1} max`}
+                                                                disabled={!editing}
+                                                                type="number"
+                                                                step="any"
+                                                                min="0"
+                                                                value={tier.maxQuantity ?? ''}
+                                                                placeholder="∞"
+                                                                onChange={(e) =>
+                                                                    changeTier(
+                                                                        i,
+                                                                        'maxQuantity',
+                                                                        e.target.value,
+                                                                    )
+                                                                }
+                                                                className={`${executiveUi.input} !h-9 !w-[105px]`}
+                                                            />
+                                                        </td>
+                                                        <td>
+                                                            <input
+                                                                aria-label={`Tier ${i + 1} price`}
+                                                                disabled={!editing}
+                                                                type="number"
+                                                                step="1"
+                                                                min="0"
+                                                                value={tier.unitPrice}
+                                                                onChange={(e) =>
+                                                                    changeTier(
+                                                                        i,
+                                                                        'unitPrice',
+                                                                        e.target.value,
+                                                                    )
+                                                                }
+                                                                className={`${executiveUi.input} !h-9 !w-[125px]`}
+                                                            />
+                                                        </td>
+                                                        <td>
+                                                            {editing && (
+                                                                <button
+                                                                    type="button"
+                                                                    aria-label={tr(
+                                                                        'Xóa bậc giá',
+                                                                        'Remove tier',
+                                                                    )}
+                                                                    onClick={() =>
+                                                                        setEditing((prev) => ({
+                                                                            ...(prev ??
+                                                                                makeDraft()),
+                                                                            tiers: (
+                                                                                prev ?? makeDraft()
+                                                                            ).tiers.filter(
+                                                                                (_, j) => i !== j,
+                                                                            ),
+                                                                        }))
+                                                                    }
+                                                                    className="rounded-lg p-2 text-rose-600"
+                                                                >
+                                                                    <Trash2 size={15} />
+                                                                </button>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {editing && (
+                                        <div className="mt-4 flex flex-wrap gap-2">
+                                            <button
+                                                type="button"
+                                                className={executiveUi.secondary}
+                                                onClick={() =>
+                                                    setEditing((prev) => ({
+                                                        ...(prev ?? makeDraft()),
+                                                        tiers: [
+                                                            ...(prev ?? makeDraft()).tiers,
+                                                            {
+                                                                minQuantity:
+                                                                    product.minOrderQuantity,
+                                                                maxQuantity: null,
+                                                                unitPrice: 0,
+                                                            },
+                                                        ],
+                                                    }))
+                                                }
+                                            >
+                                                <Plus size={16} />
+                                                {tr('Thêm bậc giá', 'Add tier')}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                disabled={
+                                                    pricingSave.isPending ||
+                                                    !Number.isFinite(editing.listPrice) ||
+                                                    editing.listPrice < 0
+                                                }
+                                                className={executiveUi.button}
+                                                onClick={() => {
+                                                    const ordered = [...editing.tiers].sort(
+                                                        (a, b) => a.minQuantity - b.minQuantity,
+                                                    );
+                                                    const invalid = ordered.some(
+                                                        (tier, i) =>
+                                                            !Number.isFinite(tier.minQuantity) ||
+                                                            !Number.isFinite(tier.unitPrice) ||
+                                                            tier.minQuantity <
+                                                                product.minOrderQuantity ||
+                                                            (tier.minQuantity -
+                                                                product.minOrderQuantity) %
+                                                                product.quantityStep !==
+                                                                0 ||
+                                                            tier.unitPrice < 0 ||
+                                                            !Number.isInteger(tier.unitPrice) ||
+                                                            (tier.maxQuantity !== null &&
+                                                                (tier.maxQuantity <
+                                                                    tier.minQuantity ||
+                                                                    !Number.isFinite(
+                                                                        tier.maxQuantity,
+                                                                    ))) ||
+                                                            (i > 0 &&
+                                                                (ordered[i - 1].maxQuantity ===
+                                                                    null ||
+                                                                    tier.minQuantity <=
+                                                                        (ordered[i - 1]
+                                                                            .maxQuantity ??
+                                                                            Infinity))),
+                                                    );
+                                                    if (
+                                                        invalid ||
+                                                        (editing.salePrice !== null &&
+                                                            editing.salePrice >= editing.listPrice)
+                                                    ) {
+                                                        setFailed(true);
+                                                        setFeedback(
+                                                            tr(
+                                                                'Bảng giá không hợp lệ: bậc giá phải tăng, không chồng lấn, đúng MOQ/bước số lượng; giá sale phải thấp hơn giá niêm yết.',
+                                                                'Invalid tiers: ranges must increase without overlap, match MOQ/step, and sale price must be below list price.',
+                                                            ),
+                                                        );
+                                                        return;
+                                                    }
+                                                    setFailed(false);
+                                                    setFeedback('');
+                                                    pricingSave.mutate({
+                                                        ...editing,
+                                                        listPrice:
+                                                            pricing.data.listPrice ??
+                                                            editing.listPrice,
+                                                        tiers: ordered,
+                                                    });
+                                                }}
+                                            >
+                                                <Save size={16} />
+                                                {pricingSave.isPending
+                                                    ? tr('Đang lưu...', 'Saving...')
+                                                    : tr('Lưu bảng giá', 'Save pricing')}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={executiveUi.secondary}
+                                                onClick={() => setEditing(null)}
+                                            >
+                                                {tr('Hủy', 'Cancel')}
+                                            </button>
+                                        </div>
+                                    )}
+                                </>
+                            )
+                        )}
+                    </section>
+                    <form
+                        className="rounded-2xl border border-[#dde8dc] bg-white p-5"
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            if (window.confirm(tr('Lưu thuế suất VAT mới?', 'Save new VAT rate?')))
+                                vatSave.mutate(Number(vatInput ?? vat.data?.vatRate));
+                        }}
+                    >
+                        <h3 className="mb-4 font-bold">{tr('Thuế VAT', 'VAT rate')}</h3>
+                        {vat.isLoading ? (
+                            <LoadingRows />
+                        ) : (
+                            <div className="flex flex-wrap items-end gap-3">
+                                <label className="flex-1 text-xs font-semibold">
+                                    {tr('Thuế suất (%)', 'VAT rate (%)')}
+                                    <input
+                                        aria-label="VAT"
+                                        className={`${executiveUi.input} mt-2`}
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        max="100"
+                                        value={vatInput ?? vat.data?.vatRate ?? ''}
+                                        onChange={(e) => setVatInput(e.target.value)}
+                                    />
+                                </label>
+                                <button
+                                    className={executiveUi.button}
+                                    type="submit"
+                                    disabled={
+                                        vatSave.isPending ||
+                                        vat.isError ||
+                                        vatInput === '' ||
+                                        !Number.isFinite(Number(vatInput ?? vat.data?.vatRate)) ||
+                                        Number(vatInput ?? vat.data?.vatRate) < 0 ||
+                                        Number(vatInput ?? vat.data?.vatRate) > 100
+                                    }
+                                >
+                                    {tr('Lưu VAT', 'Save VAT')}
+                                </button>
+                            </div>
+                        )}
+                    </form>
+                </div>
+                <div className="flex justify-end border-t bg-white p-4">
+                    <button type="button" className={executiveUi.secondary} onClick={onClose}>
+                        {tr('Đóng', 'Close')}
+                    </button>
+                </div>
+            </section>
+        </div>
+    );
 }
-
 export default function EcommerceProductsPage() {
-    const { data, updateProducts, resetDemo } = useEcommerceData();
-    const { products, campaigns, coupons } = data;
-    const [searchParams] = useSearchParams();
-    const [search, setSearch] = useState(() => searchParams.get('q') ?? '');
-    const [category, setCategory] = useState('all');
-    const [status, setStatus] = useState('all');
-    const [sort, setSort] = useState('recent');
-    const [page, setPage] = useState(1);
-    const [editing, setEditing] = useState<EcommerceProduct | null>(null);
-    const [formOpen, setFormOpen] = useState(false);
-    const pageSize = 10;
-
-    const visible = useMemo(() => products.filter(p => {
-        const matchesSearch = `${p.name} ${p.sku} ${p.brand}`.toLowerCase().includes(search.trim().toLowerCase());
-        return matchesSearch && (category === 'all' || p.category === category) && (status === 'all' || p.state === status || (status === 'out-of-stock' && p.stock === 0));
-    }).sort((a, b) => sort === 'price-asc' ? a.price - b.price : sort === 'price-desc' ? b.price - a.price : sort === 'name' ? a.name.localeCompare(b.name, 'vi') : b.updatedAt.localeCompare(a.updatedAt)), [products, search, category, status, sort]);
-    const totalPages = Math.max(1, Math.ceil(visible.length / pageSize));
-    const currentPage = Math.min(page, totalPages);
-    const paged = visible.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-    const resetPage = () => setPage(1);
-
-    function save(product: EcommerceProduct) {
-        updateProducts(list => editing ? list.map(p => p.id === product.id ? product : p) : [product, ...list]);
-        setFormOpen(false); setEditing(null); resetPage();
-    }
-    function remove(product: EcommerceProduct) {
-        if (campaigns.some(c => c.productIds.includes(product.id))) { window.alert('Sản phẩm đang được gắn trong chương trình khuyến mãi. Hãy gỡ liên kết trước khi xóa.'); return; }
-        if (!window.confirm(`Xóa sản phẩm demo "${product.name}"?`)) return;
-        updateProducts(list => list.filter(p => p.id !== product.id));
-    }
-    function toggle(product: EcommerceProduct) {
-        const next: ProductState = product.state === 'active' ? 'hidden' : 'active';
-        updateProducts(list => list.map(p => p.id === product.id ? { ...p, state: next, updatedAt: new Date().toISOString().slice(0, 10) } : p));
-    }
-
-    return <div className="min-w-0 pb-12">
-        <PageTitle eyebrow="01 / QUẢN LÝ DANH MỤC" title="Sản phẩm & gian hàng" description="Cập nhật sản phẩm, giá bán, trạng thái hiển thị và kiểm tra hàng sắp hết để phối hợp cùng Logistics.">
-            <button type="button" className={ui.secondary} onClick={() => toCsv(['SKU', 'Sản phẩm', 'Thương hiệu', 'Danh mục', 'Đơn vị', 'Giá', 'Tồn kho', 'Trạng thái'], visible.map(p => [p.sku, p.name, p.brand, p.category, p.unit, p.price, p.stock, p.state]), 'btb-products-demo.csv')}>Xuất CSV</button>
-            <button className={ui.primary} type="button" onClick={() => { setEditing(null); setFormOpen(true); }}><img src="/images/ui/e-commerce/plus.svg" alt="" width="16" height="16" /> Thêm sản phẩm</button>
-        </PageTitle>
-        <DemoNotice />
-
-        <div className="mb-6 grid grid-cols-2 gap-4 xl:grid-cols-4">
-            <Metric label="Tổng sản phẩm" value={products.length} note="Trong danh mục demo" icon="box" />
-            <Metric label="Đang hiển thị" value={products.filter(p => p.state === 'active').length} note="Có thể xem trên gian hàng" icon="check" tint="bg-surface-green" />
-            <Metric label="Sắp hết hàng (≤ 20)" value={products.filter(p => p.stock > 0 && p.stock <= 20).length} note="Cần phối hợp kho" icon="clock" tint="bg-surface-yellow" />
-            <Metric label="Hết hàng" value={products.filter(p => p.stock === 0).length} note="Cần cập nhật tồn kho" icon="info" tint="bg-surface-pink" />
+    const tr = useExecutiveText(),
+        qc = useQueryClient();
+    const [params, setParams] = useSearchParams();
+    const q = params.get('q') ?? '';
+    const [draft, setDraft] = useState(q),
+        [status, setStatus] = useState(''),
+        [page, setPage] = useState(0),
+        [selected, setSelected] = useState<AdminProduct | null>(null);
+    const products = useQuery({
+        queryKey: ['ecom', 'products', q, status, page],
+        queryFn: () =>
+            executiveApi.products({
+                q: q || undefined,
+                status: status || undefined,
+                page,
+                size: 20,
+            }),
+    });
+    const brands = useQuery({ queryKey: ['ecom', 'brands'], queryFn: () => getCatalogBrands() });
+    const categories = useQuery({
+        queryKey: ['ecom', 'categories'],
+        queryFn: () => getHomeCategories(),
+    });
+    const brandMap = new Map(brands.data?.map((b) => [b.id, b.name]));
+    const categoryMap = new Map<string, HomeCategory>();
+    const add = (items: HomeCategory[]) =>
+        items.forEach((item) => {
+            categoryMap.set(item.id, item);
+            add(item.children);
+        });
+    add(categories.data ?? []);
+    const rows = products.data?.items ?? [];
+    return (
+        <div className="space-y-6">
+            <ExecutiveHeading
+                number="02"
+                eyebrow="CATALOG / PRICING"
+                title={tr('Quản lý sản phẩm', 'Product management')}
+                description={tr(
+                    'Toàn bộ sản phẩm, giá bán, giá sỉ, trạng thái và VAT.',
+                    'Manage all products, selling prices, wholesale tiers, publication status and VAT.',
+                )}
+                action={
+                    <button
+                        className={executiveUi.secondary}
+                        type="button"
+                        onClick={() =>
+                            void qc.invalidateQueries({ queryKey: ['ecom', 'products'] })
+                        }
+                    >
+                        <RefreshCw size={16} />
+                        {tr('Làm mới', 'Refresh')}
+                    </button>
+                }
+            />
+            <ExecutivePanel
+                title={tr('Danh mục sản phẩm', 'Product catalog')}
+                caption={
+                    products.data
+                        ? `${products.data.total.toLocaleString('vi-VN')} ${tr('sản phẩm', 'products')}`
+                        : ''
+                }
+            >
+                <form
+                    className="grid gap-3 p-5 sm:grid-cols-[minmax(220px,1fr)_190px_auto]"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        setPage(0);
+                        setParams(draft.trim() ? { q: draft.trim() } : {});
+                    }}
+                >
+                    <div className="relative">
+                        <Search size={17} className="absolute left-4 top-3.5 text-[#64866e]" />
+                        <input
+                            className={`${executiveUi.input} !pl-11`}
+                            value={draft}
+                            onChange={(e) => setDraft(e.target.value)}
+                            placeholder={tr(
+                                'Tìm SKU hoặc tên sản phẩm...',
+                                'Search SKU or product name...',
+                            )}
+                            aria-label={tr('Tìm sản phẩm', 'Search products')}
+                        />
+                    </div>
+                    <ExecutiveSelect
+                        value={status}
+                        ariaLabel={tr('Trạng thái', 'Status')}
+                        onValueChange={(value) => {
+                            setStatus(value);
+                            setPage(0);
+                        }}
+                    >
+                        <option value="">{tr('Tất cả trạng thái', 'All statuses')}</option>
+                        {['DRAFT', 'PUBLISHED', 'ARCHIVED'].map((s) => (
+                            <option key={s} value={s}>
+                                {s}
+                            </option>
+                        ))}
+                    </ExecutiveSelect>
+                    <button type="submit" className={executiveUi.button}>
+                        <Search size={16} />
+                        {tr('Tìm kiếm', 'Search')}
+                    </button>
+                </form>
+                {products.isLoading ? (
+                    <LoadingRows />
+                ) : products.isError ? (
+                    <div className="p-5">
+                        <ExecutiveError
+                            message={tr(
+                                'Không tải được danh mục quản trị. Kiểm tra token E-commerce.',
+                                'Unable to load executive catalog. Check your role/session.',
+                            )}
+                            retry={() => void products.refetch()}
+                        />
+                    </div>
+                ) : !rows.length ? (
+                    <ExecutiveEmpty
+                        title={tr('Không có sản phẩm phù hợp', 'No matching products')}
+                        description={tr('Hãy thử bộ lọc khác.', 'Try a different filter.')}
+                    />
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full min-w-[1080px] border-collapse text-left text-sm">
+                            <thead>
+                                <tr>
+                                    {[
+                                        tr('Sản phẩm', 'Product'),
+                                        'SKU',
+                                        tr('Thương hiệu / danh mục', 'Brand / category'),
+                                        tr('Giá niêm yết / Sale', 'List / sale'),
+                                        tr('Đơn vị / MOQ', 'Unit / MOQ'),
+                                        'VAT',
+                                        tr('Trạng thái', 'Status'),
+                                        tr('Thao tác', 'Action'),
+                                    ].map((h) => (
+                                        <th key={h} className={executiveUi.th}>
+                                            {h}
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {rows.map((p) => (
+                                    <tr key={p.id} className="hover:bg-[#f7fbf7]">
+                                        <td className={executiveUi.td}>
+                                            <div className="flex min-w-[200px] items-center gap-3">
+                                                {p.imageUrl ? (
+                                                    <img
+                                                        alt=""
+                                                        src={p.imageUrl}
+                                                        loading="lazy"
+                                                        className="size-12 rounded-xl border object-contain"
+                                                    />
+                                                ) : (
+                                                    <span className="grid size-12 place-items-center rounded-xl bg-[#eef4eb]">
+                                                        <Package size={18} />
+                                                    </span>
+                                                )}
+                                                <div className="min-w-0">
+                                                    <strong className="line-clamp-2">
+                                                        {tr(p.nameVi, p.nameEn)}
+                                                    </strong>
+                                                    <span className="mt-1 block text-[11px] text-[#6d8575]">
+                                                        {tr(
+                                                            p.packageSpecVi ?? '—',
+                                                            p.packageSpecEn ?? '—',
+                                                        )}
+                                                    </span>
+                                                    <span className="mt-1 block text-[11px] text-[#829789]">
+                                                        {tr('Cập nhật', 'Updated')}:{' '}
+                                                        {new Date(p.updatedAt).toLocaleDateString(
+                                                            'vi-VN',
+                                                        )}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td
+                                            className={`${executiveUi.td} max-w-[160px] break-all font-mono text-xs`}
+                                        >
+                                            {p.sku}
+                                        </td>
+                                        <td className={executiveUi.td}>
+                                            <strong className="block text-xs">
+                                                {brandMap.get(p.brandId ?? '') ?? '—'}
+                                            </strong>
+                                            <span className="mt-1 block text-xs text-[#6e8274]">
+                                                {tr(
+                                                    categoryMap.get(p.categoryId ?? '')?.nameVi ??
+                                                        '—',
+                                                    categoryMap.get(p.categoryId ?? '')?.nameEn ??
+                                                        '—',
+                                                )}
+                                            </span>
+                                        </td>
+                                        <td className={executiveUi.td}>
+                                            <strong className="block">
+                                                {formatVnd(p.listPrice)}
+                                            </strong>
+                                            <span className="text-xs text-[#2d7651]">
+                                                {p.salePrice != null ? formatVnd(p.salePrice) : '—'}
+                                            </span>
+                                        </td>
+                                        <td className={executiveUi.td}>
+                                            <strong>{p.unitCode}</strong>
+                                            <span className="block text-xs text-[#6b8874]">
+                                                MOQ {p.minOrderQuantity}
+                                            </span>
+                                        </td>
+                                        <td className={executiveUi.td}>
+                                            {p.vatRate == null ? '—' : `${p.vatRate}%`}
+                                        </td>
+                                        <td className={executiveUi.td}>
+                                            <ExecutiveBadge status={p.status} />
+                                        </td>
+                                        <td className={executiveUi.td}>
+                                            <button
+                                                type="button"
+                                                className={executiveUi.secondary}
+                                                onClick={() => setSelected(p)}
+                                            >
+                                                <ClipboardList size={16} />
+                                                {tr('Chi tiết', 'Details')}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+                {products.data && (
+                    <ExecutivePagination
+                        page={page}
+                        totalPages={products.data.totalPages}
+                        onChange={setPage}
+                        tr={tr}
+                    />
+                )}
+            </ExecutivePanel>
+            {selected && (
+                <ProductDrawer
+                    key={selected.id}
+                    product={selected}
+                    category={tr(
+                        categoryMap.get(selected.categoryId ?? '')?.nameVi ?? '—',
+                        categoryMap.get(selected.categoryId ?? '')?.nameEn ?? '—',
+                    )}
+                    brand={brandMap.get(selected.brandId ?? '') ?? '—'}
+                    onClose={() => setSelected(null)}
+                />
+            )}
         </div>
-
-        <div className="mb-6 grid gap-4 lg:grid-cols-[1.65fr_1fr]">
-            <div className={`${ui.panel} flex flex-wrap items-center justify-between gap-4 bg-store-green p-5 text-white`}>
-                <div><p className="font-label text-[10px] tracking-[0.2em] text-store-yellow">ĐIỀU PHỐI CÔNG VIỆC</p><h2 className="mt-1 font-subheading text-[21px] font-bold">Sẵn sàng cho chiến dịch tiếp theo?</h2><p className="mt-1 text-[11px] text-green-100">{campaigns.length} chương trình · {coupons.length} coupon trong workspace demo</p></div>
-                <div className="flex flex-wrap gap-2"><Link className="border border-white bg-white px-3 py-2 text-[11px] font-bold text-store-green hover:bg-store-yellow" to={ROUTES.ECOMMERCE_PROMOTIONS}>Xem khuyến mãi</Link><Link className="border border-white px-3 py-2 text-[11px] font-bold text-white hover:bg-white/10" to={ROUTES.ECOMMERCE_COUPONS}>Quản lý coupon</Link></div>
-            </div>
-            <div className={`${ui.panel} bg-store-cream p-5`}><p className="font-label text-[10px] font-bold tracking-[0.15em] text-store-coral">LƯU Ý VẬN HÀNH</p><h3 className="mt-2 font-subheading text-[17px] font-bold">Kiểm tra trước khi đăng bán</h3><p className="mt-2 text-[12px] leading-5 text-store-muted">Tên, SKU, giá, tồn kho và trạng thái cần nhất quán. Thay đổi tồn kho thật phải được đồng bộ với Logistics qua API.</p></div>
-        </div>
-
-        <section aria-label="Danh mục SKU và bảng giá">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border-2 border-store-ink bg-white p-4"><div><small className="text-[10px] font-bold tracking-widest text-emerald-700">SOURCE OF TRUTH</small><h2 className="font-subheading text-lg font-extrabold">Điều hành catalog theo quy chuẩn B2B</h2><p className="text-[11px] text-store-muted">Tồn thực tế cần đồng bộ Logistics; dữ liệu trang này chỉ là demo.</p></div><button className={ui.secondary} onClick={() => { if (window.confirm('Khôi phục dữ liệu E-commerce demo?')) { resetDemo(); setSearch(''); setStatus('all'); setCategory('all'); resetPage() } }}>Khôi phục dữ liệu</button></div>
-            <div className="mb-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4"><label className="relative"><span className="sr-only">Tìm sản phẩm</span><input className={ui.input} placeholder="Tên, SKU, thương hiệu..." value={search} onChange={e => { setSearch(e.target.value); resetPage() }} /></label><select aria-label="Danh mục" className={ui.select} value={category} onChange={e => { setCategory(e.target.value); resetPage() }}><option value="all">Tất cả danh mục</option>{CATEGORIES.map(c => <option key={c}>{c}</option>)}</select><select aria-label="Tình trạng" className={ui.select} value={status} onChange={e => { setStatus(e.target.value); resetPage() }}><option value="all">Tất cả</option><option value="active">Đang bán</option><option value="draft">Còn nháp</option><option value="hidden">Ẩn</option><option value="out-of-stock">Hết hàng</option></select><select aria-label="Sắp xếp" className={ui.select} value={sort} onChange={e => setSort(e.target.value)}><option value="recent">Cập nhật mới</option><option value="name">Tên A–Z</option><option value="price-asc">Giá tăng dần</option><option value="price-desc">Giá giảm dần</option></select></div>
-            <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-4">{paged.map(p => <article key={p.id} className="overflow-hidden rounded-xl border-2 border-store-ink bg-white shadow-[2px_3px_0_#14132b]"><div className="relative grid h-36 place-items-center bg-[#e5ece9]"><div className="flex flex-col items-center gap-2 text-xs text-slate-400"><img src="/images/ui/e-commerce/image-placeholder.svg" alt="" width="40" height="40" /><span>Ảnh đang cập nhật</span></div><button className="absolute right-2 top-2 rounded-md border bg-white px-2 py-1 text-xs" aria-label={`Chỉnh sửa ${p.name}`} onClick={() => { setEditing(p); setFormOpen(true) }}>✎</button><span className="absolute left-2 top-2 rounded-full bg-white px-2 py-1 text-[10px] font-bold">{p.stock === 0 ? 'Hết hàng' : p.stock <= 20 ? 'Bán chạy · Sắp hết' : p.state === 'draft' ? 'Nháp' : 'Đang bán'}</span></div><div className="p-4"><small className="font-bold text-emerald-700">{p.brand}</small><h3 className="mt-1 min-h-10 font-subheading text-sm font-extrabold">{p.name}</h3><small className="block font-mono text-slate-400">{p.sku}</small><div className="mt-3 flex justify-between"><strong className="font-price text-lg text-red-600">{money(p.price)}</strong><small className={`font-bold ${p.stock <= 20 ? 'text-red-600' : 'text-emerald-700'}`}>{p.stock} {p.unit}</small></div><div className="mt-3 grid grid-cols-3 gap-2 border-t pt-3 text-center text-[10px]"><div><small className="block text-slate-400">Đơn vị</small>{p.unit}</div><div><small className="block text-slate-400">MOQ</small>{p.moq ?? 20}</div><div><small className="block text-slate-400">Bước</small>{p.step ?? 5}</div></div><div className="mt-3 flex gap-2"><button className={`${ui.secondary} flex-1`} onClick={() => { setEditing(p); setFormOpen(true) }}>Sửa</button><button className={`${ui.secondary} flex-1`} onClick={() => toggle(p)}>{p.state === 'active' ? 'Ẩn' : 'Hiện'}</button><button className="rounded border px-2 text-xs text-red-600" onClick={() => remove(p)} aria-label={`Xóa ${p.name}`}>×</button></div></div></article>)}{visible.length === 0 && <Empty text="Không tìm thấy sản phẩm phù hợp." />}</div><Pagination page={currentPage - 1} totalPages={totalPages} onPageChange={(nextPage) => setPage(nextPage + 1)} />
-        </section>
-        {formOpen && <ProductForm original={editing} products={products} onSave={save} onClose={() => { setEditing(null); setFormOpen(false); }} />}
-    </div>;
+    );
 }

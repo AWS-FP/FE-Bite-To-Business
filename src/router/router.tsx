@@ -62,6 +62,8 @@ import EcommerceProductsPage from '@/pages/e-commerce/EcommerceProductsPage';
 import EcommercePromotionsPage from '@/pages/e-commerce/EcommercePromotionsPage';
 import EcommerceCouponsPage from '@/pages/e-commerce/EcommerceCouponsPage';
 import EcommercePosterPage from '@/pages/e-commerce/EcommercePosterPage';
+import EcommerceRequestsPage from '@/pages/e-commerce/EcommerceRequestsPage';
+import EcommerceReviewsPage from '@/pages/e-commerce/EcommerceReviewsPage';
 
 export const router = createBrowserRouter([
     // ==========================================
@@ -250,6 +252,8 @@ export const router = createBrowserRouter([
                     },
                     { path: ROUTES.ECOMMERCE_COUPONS, Component: EcommerceCouponsPage },
                     { path: ROUTES.ECOMMERCE_POSTER, Component: EcommercePosterPage },
+                    { path: ROUTES.ECOMMERCE_REQUESTS, Component: EcommerceRequestsPage },
+                    { path: ROUTES.ECOMMERCE_REVIEWS, Component: EcommerceReviewsPage },
                 ],
             },
         ],

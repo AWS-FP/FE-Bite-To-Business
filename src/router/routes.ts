@@ -43,6 +43,8 @@ export const ROUTES = {
     ECOMMERCE_PRODUCTS: '/e-commerce/products',
     ECOMMERCE_PROMOTIONS: '/e-commerce/promotions',
     ECOMMERCE_COUPONS: '/e-commerce/coupons',
+    ECOMMERCE_REQUESTS: '/e-commerce/product-requests',
+    ECOMMERCE_REVIEWS: '/e-commerce/reviews',
 
     LOGISTICS: '/logistics',
     LOGISTICS_INVENTORY: '/logistics/inventory',
