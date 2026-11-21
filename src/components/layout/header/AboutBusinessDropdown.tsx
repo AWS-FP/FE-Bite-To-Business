@@ -1,14 +1,24 @@
 import { ArrowUpRight, BriefcaseBusiness, ChevronDown, Info, Network } from 'lucide-react';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../router/routes';
 
-export default function AboutBusinessDropdown() {
+export default function AboutBusinessDropdown({
+    active = false,
+    onOpenChange,
+}: {
+    active?: boolean;
+    onOpenChange?: (open: boolean) => void;
+}) {
     const { t } = useTranslation('storefront');
 
     const [isOpen, setIsOpen] = useState(false);
+    const setMenuOpen = useCallback((value: boolean) => {
+        setIsOpen(value);
+        onOpenChange?.(value);
+    }, [onOpenChange]);
 
     const wrapperRef = useRef<HTMLDivElement>(null);
     const triggerRef = useRef<HTMLButtonElement>(null);
@@ -18,13 +28,13 @@ export default function AboutBusinessDropdown() {
 
         const handlePointerDown = (event: globalThis.PointerEvent) => {
             if (!wrapperRef.current?.contains(event.target as Node)) {
-                setIsOpen(false);
+                setMenuOpen(false);
             }
         };
 
         const handleEscape = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
-                setIsOpen(false);
+                setMenuOpen(false);
                 triggerRef.current?.focus();
             }
         };
@@ -36,7 +46,7 @@ export default function AboutBusinessDropdown() {
             document.removeEventListener('pointerdown', handlePointerDown);
             document.removeEventListener('keydown', handleEscape);
         };
-    }, [isOpen]);
+    }, [isOpen, setMenuOpen]);
 
     return (
         <div ref={wrapperRef} className="relative shrink-0">
@@ -45,9 +55,11 @@ export default function AboutBusinessDropdown() {
                 type="button"
                 aria-haspopup="menu"
                 aria-expanded={isOpen}
-                onClick={() => setIsOpen((current) => !current)}
-                className={`about-business-trigger inline-flex min-h-8 cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-[12px] font-semibold transition-colors focus-visible:underline ${
-                    isOpen ? 'text-store-yellow' : 'text-store-cream hover:text-store-yellow'
+                onClick={() => setMenuOpen(!isOpen)}
+                className={`about-business-trigger inline-flex min-h-8 cursor-pointer items-center gap-1.5 rounded-lg border-0 px-2.5 py-1.5 text-[12px] font-semibold transition-colors focus-visible:underline ${
+                    active
+                        ? 'bg-store-yellow text-store-ink'
+                        : 'bg-transparent text-store-cream hover:bg-white/10 hover:text-store-yellow'
                 }`}
             >
                 <Info size={14} aria-hidden="true" />
@@ -71,7 +83,7 @@ export default function AboutBusinessDropdown() {
                     <Link
                         role="menuitem"
                         to={ROUTES.LANDING}
-                        onClick={() => setIsOpen(false)}
+                        onClick={() => setMenuOpen(false)}
                         className="flex items-center justify-between gap-3 rounded-xl px-3 py-3 text-[12px] font-bold text-store-green no-underline hover:bg-surface-green"
                     >
                         <span className="inline-flex items-center gap-2">
@@ -88,15 +100,13 @@ export default function AboutBusinessDropdown() {
                     <Link
                         role="menuitem"
                         to={ROUTES.BTB_MODEL}
-                        onClick={() => setIsOpen(false)}
+                        onClick={() => setMenuOpen(false)}
                         className="flex items-center gap-2 rounded-xl px-3 py-3 text-[12px] font-semibold text-store-green no-underline hover:bg-surface-green"
                     >
                         <span className="inline-flex items-center gap-2">
                             <BriefcaseBusiness size={16} aria-hidden="true" />
                             {t('header.b2bModelPage')}
                         </span>
-
-
                     </Link>
 
                     <div className="mx-2 border-t border-solid border-store-line" />
@@ -104,7 +114,7 @@ export default function AboutBusinessDropdown() {
                     <Link
                         role="menuitem"
                         to={ROUTES.DISTRIBUTION_NETWORK}
-                        onClick={() => setIsOpen(false)}
+                        onClick={() => setMenuOpen(false)}
                         className="flex items-center gap-2 rounded-xl px-3 py-3 text-[12px] font-semibold text-store-green no-underline hover:bg-surface-green"
                     >
                         <span className="inline-flex items-center gap-2">

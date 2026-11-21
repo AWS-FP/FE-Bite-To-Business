@@ -1,5 +1,6 @@
 import { ImageIcon, Minus, Plus, ShoppingBasket, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
 import { ROUTES } from '@/router/routes';
 import type { CartItem } from '@/store/customer/cartStore';
@@ -10,21 +11,25 @@ interface CartItemsProps {
 }
 
 export default function CartItems({ items, updateQuantity }: CartItemsProps) {
+    const { t, i18n } = useTranslation('quote');
+    const english = i18n.resolvedLanguage === 'en';
     return (
         <section className="overflow-hidden rounded-2xl border border-store-ink/20 bg-white">
             <div className="flex items-center justify-between border-b border-store-ink/10 px-6 py-5">
                 <div>
-                    <h2 className="m-0 font-subheading text-xl font-bold">Sản phẩm trong giỏ</h2>
-                    <p className="mb-0 mt-1 text-sm text-store-muted">{items.length} sản phẩm</p>
+                    <h2 className="m-0 font-subheading text-xl font-bold">{t('cartTitle')}</h2>
+                    <p className="mb-0 mt-1 text-sm text-store-muted">
+                        {t('productCount', { count: items.length })}
+                    </p>
                 </div>
                 <ShoppingBasket className="text-store-green" />
             </div>
             {items.length === 0 ? (
                 <div className="px-6 py-12 text-center">
                     <ShoppingBasket className="mx-auto mb-3 text-store-green" size={36} />
-                    <p>Giỏ hàng của bạn đang trống.</p>
+                    <p>{t('emptyCart')}</p>
                     <Link className="font-bold text-store-green underline" to={ROUTES.HOME}>
-                        Xem sản phẩm
+                        {t('browse')}
                     </Link>
                 </div>
             ) : (
@@ -45,14 +50,20 @@ export default function CartItems({ items, updateQuantity }: CartItemsProps) {
                             )}
                         </div>
                         <div className="min-w-0 flex-1">
-                            <h3 className="m-0 font-bold">{item.name}</h3>
-                            <p className="my-1 text-sm text-store-muted">{item.spec}</p>
+                            <h3 className="m-0 font-bold">
+                                {(english ? item.nameEn : item.nameVi) || item.name}
+                            </h3>
+                            <p className="my-1 text-sm text-store-muted">
+                                {(english ? item.specEn : item.specVi) || item.spec}
+                            </p>
                             <span className="font-bold">{formatCurrencyVnd(item.unitPrice)}</span>
                         </div>
                         <div className="flex items-center rounded-lg border border-store-ink/25">
                             <button
                                 type="button"
-                                aria-label={`Giảm số lượng ${item.name}`}
+                                aria-label={t('decrease', {
+                                    name: (english ? item.nameEn : item.nameVi) || item.name,
+                                })}
                                 className="grid size-9 place-items-center border-0 bg-transparent"
                                 onClick={() => updateQuantity(item.id, -1)}
                             >
@@ -61,7 +72,9 @@ export default function CartItems({ items, updateQuantity }: CartItemsProps) {
                             <span className="min-w-8 text-center font-bold">{item.quantity}</span>
                             <button
                                 type="button"
-                                aria-label={`Tăng số lượng ${item.name}`}
+                                aria-label={t('increase', {
+                                    name: (english ? item.nameEn : item.nameVi) || item.name,
+                                })}
                                 className="grid size-9 place-items-center border-0 bg-transparent"
                                 onClick={() => updateQuantity(item.id, 1)}
                             >
@@ -73,7 +86,9 @@ export default function CartItems({ items, updateQuantity }: CartItemsProps) {
                         </strong>
                         <button
                             type="button"
-                            aria-label={`Xóa ${item.name}`}
+                            aria-label={t('remove', {
+                                name: (english ? item.nameEn : item.nameVi) || item.name,
+                            })}
                             className="border-0 bg-transparent p-2 text-store-muted hover:text-danger"
                             onClick={() => updateQuantity(item.id, -item.quantity)}
                         >

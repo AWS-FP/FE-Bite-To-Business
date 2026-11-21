@@ -5,6 +5,10 @@ export interface CartItem {
     id: string
     name: string
     spec: string
+    nameVi?: string
+    nameEn?: string
+    specVi?: string | null
+    specEn?: string | null
     unitPrice: number
     quantity: number
     imageUrl?: string
@@ -24,7 +28,7 @@ export const useCartStore = create<CartStoreState>()(persist((set) => ({
             if (existing) {
                 return {
                     items: state.items.map((i) =>
-                        i.id === newItem.id ? { ...i, quantity: i.quantity + quantity } : i
+                        i.id === newItem.id ? { ...i, ...newItem, quantity: i.quantity + quantity } : i
                     ),
                 }
             }

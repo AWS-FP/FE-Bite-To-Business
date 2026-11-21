@@ -107,7 +107,7 @@ export default function CustomerCatalogPage() {
                 </header>
 
                 <div className="mt-7 grid items-start gap-6 lg:grid-cols-[270px_minmax(0,1fr)] xl:gap-8">
-                    <aside className="min-w-0 rounded-2xl bg-white p-4 shadow-sm lg:sticky lg:top-[230px]">
+                    <aside className="min-w-0 rounded-2xl bg-white p-4 shadow-sm lg:sticky lg:top-[calc(var(--store-header-height,150px)+1rem)] lg:flex lg:max-h-[max(12rem,calc(100dvh-var(--store-header-height,150px)-1rem))] lg:flex-col">
                         <h2 className="mb-3 mt-0 font-subheading text-base font-bold">
                             {t('customerUI.categoryTitle')}
                         </h2>
@@ -118,7 +118,7 @@ export default function CustomerCatalogPage() {
                             type="button"
                             onClick={() => setFilter('category')}
                             aria-current={!categoryId ? 'page' : undefined}
-                            className={`mb-2 w-full rounded-lg px-3 py-3 text-left text-sm font-bold transition-colors ${
+                            className={`mb-2 w-full rounded-lg border-0 px-3 py-3 text-left text-sm font-bold transition-colors ${
                                 !categoryId
                                     ? 'bg-store-yellow text-store-ink'
                                     : 'bg-surface-soft hover:bg-surface-green'
@@ -129,7 +129,7 @@ export default function CustomerCatalogPage() {
 
                         <nav
                             aria-label={t('customerUI.categorySelect')}
-                            className="max-h-[62vh] overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-store-green"
+                            className="max-h-[62vh] overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-store-green lg:min-h-0 lg:max-h-none lg:flex-1"
                             tabIndex={0}
                         >
                             {categories.map((parent) => {
@@ -154,7 +154,7 @@ export default function CustomerCatalogPage() {
                                                     setExpanded(parent.id);
                                                     setFilter('category', parent.id);
                                                 }}
-                                                className={`flex min-w-0 flex-1 items-center gap-2.5 rounded-xl px-2.5 py-3 text-left text-sm font-semibold transition-colors ${
+                                                className={`flex min-w-0 flex-1 items-center gap-2.5 rounded-xl border-0 px-2.5 py-3 text-left text-sm font-semibold transition-colors ${
                                                     selectedParent
                                                         ? 'bg-surface-green text-store-green'
                                                         : 'text-store-ink hover:bg-surface-soft'
@@ -188,47 +188,44 @@ export default function CustomerCatalogPage() {
                                             )}
                                         </div>
 
-                                        {/* A genuine tree: one vertical stem, branches with arrowheads, no child boxes. */}
-                                        {open && parent.children.length > 0 && (
-                                            <div className="relative mb-2 ml-4 mt-1 pl-6">
-                                                <span
-                                                    aria-hidden="true"
-                                                    className="pointer-events-none absolute bottom-4 left-[7px] top-0 w-px bg-store-green/35"
-                                                />
-                                                <div className="space-y-0.5">
-                                                    {parent.children.map((child) => (
-                                                        <button
-                                                            key={child.id}
-                                                            type="button"
-                                                            onClick={() =>
-                                                                setFilter('category', child.id)
-                                                            }
-                                                            aria-current={
-                                                                categoryId === child.id
-                                                                    ? 'page'
-                                                                    : undefined
-                                                            }
-                                                            className={`group relative flex w-full min-w-0 items-center rounded-lg py-2.5 pl-2 pr-1 text-left text-xs leading-5 transition-colors ${
-                                                                categoryId === child.id
-                                                                    ? 'bg-surface-green font-bold text-store-green'
-                                                                    : 'text-store-muted hover:bg-surface-soft hover:text-store-green'
-                                                            }`}
-                                                        >
-                                                            <span
-                                                                aria-hidden="true"
-                                                                className="pointer-events-none absolute -left-[17px] top-1/2 h-px w-[15px] -translate-y-1/2 bg-store-green/35"
-                                                            />
-                                                            <ChevronRight
-                                                                aria-hidden="true"
-                                                                size={15}
-                                                                strokeWidth={2.5}
-                                                                className="pointer-events-none absolute -left-[4px] top-1/2 -translate-y-1/2 text-store-green/80"
-                                                            />
-                                                            <span className="min-w-0 flex-1 break-words pl-2">
-                                                                {title(child)}
-                                                            </span>
-                                                        </button>
-                                                    ))}
+                                        {parent.children.length > 0 && (
+                                            <div
+                                                className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out motion-reduce:transition-none ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+                                                aria-hidden={!open}
+                                                inert={!open}
+                                            >
+                                                <div className="min-h-0 overflow-hidden">
+                                                    <div className="mb-2 ml-6 mt-1 space-y-0.5 border-0 border-l border-solid border-store-green/20 pl-3">
+                                                        {parent.children.map((child) => (
+                                                            <button
+                                                                key={child.id}
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    setFilter('category', child.id)
+                                                                }
+                                                                aria-current={
+                                                                    categoryId === child.id
+                                                                        ? 'page'
+                                                                        : undefined
+                                                                }
+                                                                className={`group flex w-full min-w-0 items-center gap-2 rounded-lg border-0 px-2 py-2 text-left text-xs leading-5 transition-colors ${
+                                                                    categoryId === child.id
+                                                                        ? 'bg-surface-green font-bold text-store-green'
+                                                                        : 'bg-transparent text-store-muted hover:bg-surface-soft hover:text-store-green'
+                                                                }`}
+                                                            >
+                                                                <ChevronRight
+                                                                    aria-hidden="true"
+                                                                    size={14}
+                                                                    strokeWidth={2}
+                                                                    className="shrink-0 text-store-green/70 transition-transform duration-200 group-hover:translate-x-0.5 group-focus-visible:translate-x-0.5 motion-reduce:transition-none"
+                                                                />
+                                                                <span className="min-w-0 flex-1 break-words">
+                                                                    {title(child)}
+                                                                </span>
+                                                            </button>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}

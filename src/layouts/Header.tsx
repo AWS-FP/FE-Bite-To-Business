@@ -17,7 +17,9 @@ export default function Header() {
             if (!headerRef.current) return;
             const height = `${headerRef.current.offsetHeight}px`;
             if (spacerRef.current) spacerRef.current.style.height = height;
-            document.getElementById('main-content')?.style.setProperty('scroll-margin-top', height);
+            const main = document.getElementById('main-content');
+            main?.style.setProperty('scroll-margin-top', height);
+            main?.style.setProperty('--store-header-height', height);
         }
 
         updateHeaderHeight();
