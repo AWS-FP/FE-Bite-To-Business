@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Trash2, X } from 'lucide-react';
 import type { FormEvent, MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
@@ -14,13 +14,16 @@ export default function StoreSearch() {
     const [searchMode, setSearchMode] = useState<'products' | 'ai'>('products');
     const [showAINotice, setShowAINotice] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
-    const { history, recordSearch } = useSearchHistory();
+    const { historyEntries, recordSearch, deleteSearch, clearHistory, deleting, deleteError } =
+        useSearchHistory();
 
     async function handleSearch(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        if (isSearching) return;
+        await searchFor(keyword);
+    }
 
-        const searchText = keyword.replace(/\s+/gu, ' ').trim();
+    async function searchFor(value: string) {
+        const searchText = value.replace(/\s+/gu, ' ').trim();
         if (!searchText) return;
 
         if (searchMode === 'ai') {
@@ -28,25 +31,21 @@ export default function StoreSearch() {
             return;
         }
 
-        await searchFor(searchText);
-    }
-
-    async function searchFor(searchText: string) {
         if (isSearching) return;
         setIsSearching(true);
         try {
-            const canNavigate = await recordSearch(searchText);
-            if (canNavigate) navigate(getCatalogSearchPath(searchText));
+            const shouldNavigate = await recordSearch(searchText);
+            if (shouldNavigate) navigate(getCatalogSearchPath(searchText));
         } finally {
             setIsSearching(false);
         }
     }
 
-    async function handleHistoryClick(event: MouseEvent<HTMLAnchorElement>, searchText: string) {
-        if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0)
+    async function handleHistoryClick(event: MouseEvent<HTMLAnchorElement>, word: string) {
+        if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey || event.button !== 0)
             return;
         event.preventDefault();
-        await searchFor(searchText);
+        await searchFor(word);
     }
 
     return (
@@ -83,7 +82,6 @@ export default function StoreSearch() {
                     type="submit"
                     aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.submit')}
                     disabled={isSearching}
-                    aria-busy={isSearching}
                 >
                     {searchMode === 'ai' ? (
                         <Sparkles size={16} className="shrink-0" aria-hidden="true" />
@@ -104,23 +102,53 @@ export default function StoreSearch() {
                 </p>
             )}
 
-            {/* Only show actual past searches. No empty/loading/unavailable debug-like status line. */}
-            {history.length > 0 && (
+            {historyEntries.length > 0 && (
                 <nav
-                    className="mt-2 flex flex-wrap items-center gap-1.5 px-2"
+                    className="mt-2 flex flex-wrap items-center gap-2 px-2"
                     aria-label={t('search.history')}
                 >
-                    {history.map((searchText) => (
-                        <Link
-                            key={searchText}
-                            to={getCatalogSearchPath(searchText)}
-                            onClick={(event) => handleHistoryClick(event, searchText)}
-                            className="shrink-0 rounded-full border border-solid border-white/15 bg-white/10 px-2.5 py-1 text-[11px] text-store-cream no-underline hover:bg-white/20"
+                    {historyEntries.map((entry) => (
+                        <span
+                            key={entry.id}
+                            className="inline-flex items-center overflow-hidden rounded-full border border-white/20 bg-white/10 text-[11px] text-store-cream"
                         >
-                            {searchText}
-                        </Link>
+                            <Link
+                                to={getCatalogSearchPath(entry.keyword)}
+                                onClick={(event) => void handleHistoryClick(event, entry.keyword)}
+                                className="px-3 py-1.5 text-store-cream no-underline hover:bg-white/10"
+                            >
+                                {entry.keyword}
+                            </Link>
+                            <button
+                                type="button"
+                                disabled={deleting}
+                                aria-label={`${t('searchHistory.remove')}: ${entry.keyword}`}
+                                title={t('searchHistory.remove')}
+                                onClick={() => void deleteSearch(entry.id)}
+                                className="flex size-7 cursor-pointer items-center justify-center border-0 border-l border-white/20 bg-transparent text-store-cream hover:bg-red-500/30 disabled:opacity-50"
+                            >
+                                <X size={13} aria-hidden="true" />
+                            </button>
+                        </span>
                     ))}
+                    <button
+                        type="button"
+                        disabled={deleting}
+                        onClick={() => {
+                            if (window.confirm(t('searchHistory.confirmClear')))
+                                void clearHistory();
+                        }}
+                        className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-white/20 bg-transparent px-2.5 py-1.5 text-[11px] text-store-cream hover:bg-red-500/20 disabled:opacity-50"
+                    >
+                        <Trash2 size={12} aria-hidden="true" />
+                        {t('searchHistory.clearAll')}
+                    </button>
                 </nav>
+            )}
+            {deleteError && (
+                <p role="alert" className="mt-1 px-2 text-xs text-red-200">
+                    {t('searchHistory.deleteError')}
+                </p>
             )}
         </div>
     );

@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CalendarDays, Image as ImageIcon, Megaphone, Plus, Save } from 'lucide-react';
+import {
+    CalendarDays,
+    Image as ImageIcon,
+    Megaphone,
+    Plus,
+    Save,
+    PackageCheck,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/router/routes';
 import { executiveUi, useExecutiveText } from '@/components/e-commerce/executiveTokens';
@@ -23,6 +30,7 @@ import {
     type PromotionWrite,
 } from '@/services/e-commerce/executiveAdminService';
 import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
+import PromotionProductManager from '@/components/e-commerce/PromotionProductManager';
 
 function localValue(iso: string) {
     const d = new Date(iso);
@@ -43,6 +51,8 @@ export default function EcommercePromotionsPage() {
         [start, setStart] = useState(''),
         [end, setEnd] = useState(''),
         [imageUrl, setImageUrl] = useState(''),
+        [promotionType, setPromotionType] = useState<'STANDARD' | 'FLASH_SALE'>('STANDARD'),
+        [managing, setManaging] = useState<Promotion | null>(null),
         [message, setMessage] = useState(''),
         [failed, setFailed] = useState(false);
     const list = useQuery({
@@ -59,6 +69,7 @@ export default function EcommercePromotionsPage() {
         setStart('');
         setEnd('');
         setImageUrl('');
+        setPromotionType('STANDARD');
     }
     function edit(p: Promotion) {
         setEditId(p.id);
@@ -69,6 +80,7 @@ export default function EcommercePromotionsPage() {
         setStart(localValue(p.startsAt));
         setEnd(localValue(p.endsAt));
         setImageUrl(p.imageUrl ?? '');
+        setPromotionType(p.promotionType ?? 'STANDARD');
         setDraftOpen(true);
     }
     const save = useMutation({
@@ -76,9 +88,15 @@ export default function EcommercePromotionsPage() {
             editId
                 ? executiveApi.updatePromotion(editId, payload)
                 : executiveApi.createPromotion(payload),
-        onSuccess: () => {
+        onSuccess: (saved) => {
             setFailed(false);
-            setMessage(tr('Chiến dịch đã được lưu ở trạng thái nháp.', 'Campaign saved as draft.'));
+            setMessage(
+                tr(
+                    'Chiến dịch đã lưu. Chọn sản phẩm áp dụng rồi xuất bản.',
+                    'Campaign saved. Assign products, then publish.',
+                ),
+            );
+            if (!editId) setManaging(saved);
             reset();
             void qc.invalidateQueries({ queryKey: ['ecom', 'promotions'] });
             void qc.invalidateQueries({ queryKey: ['ecom', 'images-promotions'] });
@@ -129,7 +147,21 @@ export default function EcommercePromotionsPage() {
             );
             return;
         }
+        if (
+            promotionType === 'FLASH_SALE' &&
+            new Date(end).getTime() - new Date(start).getTime() > 72 * 60 * 60 * 1000
+        ) {
+            setFailed(true);
+            setMessage(
+                tr(
+                    'Flash Sale không được dài hơn 72 giờ.',
+                    'Flash Sale cannot last more than 72 hours.',
+                ),
+            );
+            return;
+        }
         save.mutate({
+            promotionType,
             nameVi: vi.trim(),
             nameEn: en.trim(),
             contentVi: contentVi.trim() || null,
@@ -177,6 +209,40 @@ export default function EcommercePromotionsPage() {
                     )}
                 >
                     <form onSubmit={submit} className="grid gap-4 p-5 md:grid-cols-2">
+                        <label className="text-xs font-bold md:col-span-2">
+                            {tr('Loại chiến dịch', 'Campaign type')}
+                            <select
+                                className={`${executiveUi.input} mt-2`}
+                                value={promotionType}
+                                onChange={(e) =>
+                                    setPromotionType(e.target.value as 'STANDARD' | 'FLASH_SALE')
+                                }
+                            >
+                                <option value="STANDARD">
+                                    {tr(
+                                        'Khuyến mãi thông thường (dài hạn)',
+                                        'Standard promotion (long-term)',
+                                    )}
+                                </option>
+                                <option value="FLASH_SALE">
+                                    {tr(
+                                        'Chợ sớm giá sốc (tối đa 72 giờ)',
+                                        'Flash Sale (max 72 hours)',
+                                    )}
+                                </option>
+                            </select>
+                            <span className="mt-2 block text-[11px] font-normal text-[#6b7972]">
+                                {promotionType === 'FLASH_SALE'
+                                    ? tr(
+                                          'Chỉ tối đa 8 sản phẩm có giá sale và tồn kho đủ MOQ. Thời gian sale lấy theo ngày bắt đầu/kết thúc của chiến dịch.',
+                                          'Maximum 8 products with valid sale prices and enough stock for MOQ. Sale dates come from this campaign.',
+                                      )
+                                    : tr(
+                                          'Chương trình dài hạn không xuất hiện trong Chợ sớm giá sốc.',
+                                          'Long-term promotions do not appear in Flash Sale.',
+                                      )}
+                            </span>
+                        </label>
                         <label className="text-xs font-bold">
                             {tr('Tên tiếng Việt', 'Vietnamese title')}
                             <input
@@ -331,7 +397,14 @@ export default function EcommercePromotionsPage() {
                                 </div>
                                 <div className="p-5">
                                     <div className="flex flex-wrap items-center justify-between gap-2">
-                                        <ExecutiveBadge status={p.status} />
+                                        <div className="flex items-center gap-2">
+                                            <ExecutiveBadge status={p.status} />
+                                            <span className="rounded-full bg-[#e7f1e9] px-2 py-1 text-[10px] font-bold text-[#165b3d]">
+                                                {p.promotionType === 'FLASH_SALE'
+                                                    ? 'FLASH SALE'
+                                                    : 'STANDARD'}
+                                            </span>
+                                        </div>
                                         <span className="inline-flex items-center gap-1 text-[11px] text-[#688373]">
                                             <CalendarDays size={13} />
                                             {new Date(p.startsAt).toLocaleDateString(
@@ -363,6 +436,16 @@ export default function EcommercePromotionsPage() {
                                                 onClick={() => edit(p)}
                                             >
                                                 {tr('Sửa', 'Edit')}
+                                            </button>
+                                        )}
+                                        {p.status !== 'ARCHIVED' && (
+                                            <button
+                                                type="button"
+                                                className={executiveUi.secondary}
+                                                onClick={() => setManaging(p)}
+                                            >
+                                                <PackageCheck size={15} />
+                                                {tr('Sản phẩm áp dụng', 'Assign products')}
                                             </button>
                                         )}
                                         {p.status !== 'ARCHIVED' && (
@@ -443,6 +526,22 @@ export default function EcommercePromotionsPage() {
                     />
                 )}
             </ExecutivePanel>
+            {managing && (
+                <PromotionProductManager
+                    key={managing.id}
+                    campaign={managing}
+                    onClose={() => setManaging(null)}
+                    onSaved={() => {
+                        setFailed(false);
+                        setMessage(
+                            tr(
+                                'Đã lưu sản phẩm áp dụng. Hãy xuất bản lại chiến dịch để kích hoạt.',
+                                'Assigned products saved. Publish the campaign again to activate the changes.',
+                            ),
+                        );
+                    }}
+                />
+            )}
         </div>
     );
 }

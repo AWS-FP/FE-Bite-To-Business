@@ -1,41 +1,38 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuthStore } from '@/store/admin/authStore';
-import { getSearchHistory, saveSearchHistory } from '@/services/searchHistoryService';
+import {
+    getSearchHistory,
+    saveSearchHistory,
+    deleteSearchHistoryEntry,
+    clearSearchHistory,
+} from '@/services/searchHistoryService';
 import type { SearchHistoryResponse } from '@/types/searchHistory';
 
 const guestHistoryKey = 'bitetobusiness.search-history';
-
+export interface SearchHistoryEntry {
+    id: string;
+    keyword: string;
+}
 interface AccountHistory {
     userId: string;
     sessionVersion: number;
-    keywords: string[];
+    rows: SearchHistoryResponse[];
     unavailable: boolean;
 }
 
 function readGuestHistory(): string[] {
     try {
-        const savedHistory: unknown = JSON.parse(sessionStorage.getItem(guestHistoryKey) || '[]');
-        if (!Array.isArray(savedHistory)) return [];
-
-        const keywords: string[] = [];
-        for (const keyword of savedHistory) {
-            if (typeof keyword === 'string' && keyword.trim() && keyword.length <= 160) {
-                keywords.push(keyword);
-            }
-            if (keywords.length === 5) break;
-        }
-        return keywords;
+        const stored: unknown = JSON.parse(sessionStorage.getItem(guestHistoryKey) || '[]');
+        if (!Array.isArray(stored)) return [];
+        return stored
+            .filter(
+                (item): item is string =>
+                    typeof item === 'string' && item.trim().length > 0 && item.length <= 160,
+            )
+            .slice(0, 5);
     } catch {
         return [];
     }
-}
-
-function readKeywords(rows: SearchHistoryResponse[]): string[] {
-    const keywords: string[] = [];
-    for (const row of rows) {
-        keywords.push(row.keyword);
-    }
-    return keywords;
 }
 
 export default function useSearchHistory() {
@@ -43,100 +40,116 @@ export default function useSearchHistory() {
     const sessionVersion = useAuthStore((state) => state.sessionVersion);
     const [guestHistory, setGuestHistory] = useState(readGuestHistory);
     const [accountHistory, setAccountHistory] = useState<AccountHistory | null>(null);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState(false);
     const loadControllerRef = useRef<AbortController | null>(null);
     const saveControllerRef = useRef<AbortController | null>(null);
 
     useEffect(() => {
         const controller = new AbortController();
         loadControllerRef.current = controller;
-
         if (userId) {
-            // Chỉ tài khoản đăng nhập gọi BE. Kết quả cũ bị bỏ khi logout/đổi tài khoản.
             getSearchHistory(controller.signal)
                 .then((rows) => {
-                    if (controller.signal.aborted) return;
-                    setAccountHistory({
-                        userId,
-                        sessionVersion,
-                        keywords: readKeywords(rows),
-                        unavailable: false,
-                    });
+                    if (!controller.signal.aborted)
+                        setAccountHistory({ userId, sessionVersion, rows, unavailable: false });
                 })
                 .catch(() => {
-                    if (controller.signal.aborted) return;
-                    setAccountHistory({ userId, sessionVersion, keywords: [], unavailable: true });
+                    if (!controller.signal.aborted)
+                        setAccountHistory({ userId, sessionVersion, rows: [], unavailable: true });
                 });
         }
-
         return () => {
             controller.abort();
             saveControllerRef.current?.abort();
         };
     }, [userId, sessionVersion]);
 
-    let history = guestHistory;
-    let isLoadingHistory = false;
-    let isHistoryUnavailable = false;
-    if (userId) {
-        // Không hiện lịch sử Guest hoặc tài khoản cũ trong lúc chờ API của tài khoản mới.
-        history = [];
-        isLoadingHistory = true;
-        if (accountHistory?.userId === userId && accountHistory.sessionVersion === sessionVersion) {
-            history = accountHistory.keywords;
-            isLoadingHistory = false;
-            isHistoryUnavailable = accountHistory.unavailable;
+    const accountReady =
+        accountHistory?.userId === userId && accountHistory?.sessionVersion === sessionVersion;
+    const historyEntries: SearchHistoryEntry[] = userId
+        ? accountReady
+            ? (accountHistory?.rows ?? []).map(({ id, keyword }) => ({ id, keyword }))
+            : []
+        : guestHistory.map((keyword) => ({ id: keyword, keyword }));
+    const history = historyEntries.map(({ keyword }) => keyword);
+    const isLoadingHistory = Boolean(userId && !accountReady);
+    const isHistoryUnavailable = Boolean(userId && accountReady && accountHistory?.unavailable);
+
+    function storeGuestKeywords(values: string[]) {
+        setGuestHistory(values);
+        try {
+            sessionStorage.setItem(guestHistoryKey, JSON.stringify(values));
+        } catch {
+            /* unavailable storage */
         }
     }
-
+    function isSameSession() {
+        const state = useAuthStore.getState();
+        return state.session?.user.id === userId && state.sessionVersion === sessionVersion;
+    }
     async function recordSearch(keyword: string): Promise<boolean> {
         if (!userId) {
-            const nextHistory = [keyword];
-            for (const oldKeyword of guestHistory) {
-                if (oldKeyword.toLowerCase() !== keyword.toLowerCase() && nextHistory.length < 5) {
-                    nextHistory.push(oldKeyword);
-                }
-            }
-            setGuestHistory(nextHistory);
-
-            try {
-                sessionStorage.setItem(guestHistoryKey, JSON.stringify(nextHistory));
-            } catch {
-                // Không lưu được trên trình duyệt vẫn cho Guest tìm kiếm.
-            }
+            storeGuestKeywords(
+                [
+                    keyword,
+                    ...guestHistory.filter(
+                        (value) => value.toLowerCase() !== keyword.toLowerCase(),
+                    ),
+                ].slice(0, 5),
+            );
             return true;
         }
-
-        // Hủy GET đang chờ để nó không ghi đè kết quả mới sau khi lưu từ khóa.
         loadControllerRef.current?.abort();
         saveControllerRef.current?.abort();
         const controller = new AbortController();
         saveControllerRef.current = controller;
-
         try {
             const rows = await saveSearchHistory(keyword, controller.signal);
-            if (!controller.signal.aborted) {
-                setAccountHistory({
-                    userId,
-                    sessionVersion,
-                    keywords: readKeywords(rows),
-                    unavailable: false,
-                });
+            if (!controller.signal.aborted && isSameSession()) {
+                setAccountHistory({ userId, sessionVersion, rows, unavailable: false });
             }
         } catch {
-            if (!controller.signal.aborted) {
-                setAccountHistory({ userId, sessionVersion, keywords: [], unavailable: true });
+            if (!controller.signal.aborted && isSameSession()) {
+                setAccountHistory({ userId, sessionVersion, rows: [], unavailable: true });
             }
-            // API lịch sử lỗi không ngăn người dùng tiếp tục tìm sản phẩm.
         }
-
-        // Không điều hướng muộn nếu page đã đóng, user logout hoặc vừa đổi tài khoản.
-        const currentState = useAuthStore.getState();
-        return (
-            !controller.signal.aborted &&
-            currentState.session?.user.id === userId &&
-            currentState.sessionVersion === sessionVersion
-        );
+        return !controller.signal.aborted && isSameSession();
+    }
+    async function changeHistory(id?: string): Promise<boolean> {
+        if (deleting) return false;
+        setDeleting(true);
+        setDeleteError(false);
+        if (!userId) {
+            storeGuestKeywords(id ? guestHistory.filter((value) => value !== id) : []);
+            setDeleting(false);
+            return true;
+        }
+        loadControllerRef.current?.abort();
+        saveControllerRef.current?.abort();
+        try {
+            const rows = id ? await deleteSearchHistoryEntry(id) : await clearSearchHistory();
+            if (isSameSession()) {
+                setAccountHistory({ userId, sessionVersion, rows, unavailable: false });
+            }
+            return true;
+        } catch {
+            if (isSameSession()) setDeleteError(true);
+            return false;
+        } finally {
+            setDeleting(false);
+        }
     }
 
-    return { history, isLoadingHistory, isHistoryUnavailable, recordSearch };
+    return {
+        history,
+        historyEntries,
+        isLoadingHistory,
+        isHistoryUnavailable,
+        recordSearch,
+        deleteSearch: (id: string) => changeHistory(id),
+        clearHistory: () => changeHistory(),
+        deleting,
+        deleteError,
+    };
 }
