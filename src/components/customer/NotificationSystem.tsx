@@ -15,14 +15,21 @@ import {
     X,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { INITIAL_NOTIFICATIONS } from '../../constants/customer/homeData';
 import { useAuthStore } from '@/store/admin/authStore';
 import {
     getCustomerNotifications,
+    getUnreadNotificationCount,
+    getNotificationPreferences,
+    updateNotificationPreferences,
     markAllNotificationsRead,
     markNotificationRead,
 } from '@/services/customer/notificationService';
-import type { CustomerNotification } from '@/services/customer/notificationService';
+import type {
+    CustomerNotification,
+    CustomerNotificationPreferences,
+} from '@/services/customer/notificationService';
 import type { NotificationItemData } from '../../constants/customer/homeData';
 
 export interface NotificationSystemProps {
@@ -50,11 +57,15 @@ function toNotificationItem(item: CustomerNotification, english: boolean): Notif
         description: english ? item.contentEn : item.contentVi,
         timeAgo: new Date(item.createdAt).toLocaleString(english ? 'en-US' : 'vi-VN'),
         unread: !item.isRead,
+        actionUrl:
+            item.actionUrl?.startsWith('/') && !item.actionUrl.startsWith('//')
+                ? item.actionUrl
+                : undefined,
     };
 }
 type PreferenceKey = 'quoteApproval' | 'quoteExpiry' | 'deliveryEta' | 'sourcingReply';
 
-type Preferences = Record<PreferenceKey, boolean>;
+type Preferences = CustomerNotificationPreferences;
 
 const DEFAULT_PREFS: Preferences = {
     quoteApproval: true,
@@ -93,11 +104,13 @@ function PreferenceRow({
     description,
     checked,
     onToggle,
+    disabled = false,
 }: {
     title: string;
     description: string;
     checked: boolean;
     onToggle: () => void;
+    disabled?: boolean;
 }) {
     return (
         <div className="flex items-center justify-between gap-4 py-3.5">
@@ -112,7 +125,8 @@ function PreferenceRow({
                 aria-checked={checked}
                 aria-label={title}
                 onClick={onToggle}
-                className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full !border-0 p-0 !shadow-none transition-colors duration-200 focus:!border-0 focus:!shadow-none focus:!outline-none focus-visible:!outline-2 focus-visible:!outline-offset-2 focus-visible:!outline-store-yellow ${
+                disabled={disabled}
+                className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full !border-0 p-0 !shadow-none transition-colors duration-200 disabled:cursor-wait disabled:opacity-60 focus:!border-0 focus:!shadow-none focus:!outline-none focus-visible:!outline-2 focus-visible:!outline-offset-2 focus-visible:!outline-store-yellow ${
                     checked ? 'bg-store-green' : 'bg-surface-soft'
                 }`}
             >
@@ -135,7 +149,10 @@ export default function NotificationSystem({
     const { t, i18n } = useTranslation('storefront');
     const ui = (key: string) => t(`customerUI.${key}`);
     const english = i18n.resolvedLanguage?.startsWith('en') ?? false;
-    const isCustomer = useAuthStore((state) => state.session?.user.role === 'CUSTOMER');
+    const customerId = useAuthStore((state) =>
+        state.session?.user.role === 'CUSTOMER' ? state.session.user.id : null,
+    );
+    const isCustomer = Boolean(customerId);
     const [localIsOpen, setLocalIsOpen] = useState(false);
     const isOpen = controlledIsOpen ?? localIsOpen;
 
@@ -148,14 +165,39 @@ export default function NotificationSystem({
     const [view, setView] = useState<'list' | 'settings'>('list');
     const [selected, setSelected] = useState<NotificationItemData | null>(null);
     const [preferences, setPreferences] = useState<Preferences>(DEFAULT_PREFS);
+    const [preferencesLoadedFor, setPreferencesLoadedFor] = useState<string | null>(null);
+    const preferencesReady = Boolean(customerId && preferencesLoadedFor === customerId);
+    const [preferencesBusy, setPreferencesBusy] = useState(false);
+    const [preferencesError, setPreferencesError] = useState(false);
+    const [refreshNotifications, setRefreshNotifications] = useState(0);
+    const [serverUnreadCount, setServerUnreadCount] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (!customerId) return;
+        let alive = true;
+        getNotificationPreferences()
+            .then((result) => {
+                if (!alive) return;
+                setPreferences(result);
+                setPreferencesLoadedFor(customerId);
+                setPreferencesError(false);
+            })
+            .catch(() => {
+                if (alive) setPreferencesError(true);
+            });
+        return () => {
+            alive = false;
+        };
+    }, [customerId]);
 
     useEffect(() => {
         if (!isCustomer) return;
         let active = true;
-        getCustomerNotifications(0, 20)
-            .then((page) => {
+        Promise.all([getCustomerNotifications(0, 20), getUnreadNotificationCount()])
+            .then(([page, unread]) => {
                 if (active) {
                     setNotifications(page.content.map((item) => toNotificationItem(item, english)));
+                    setServerUnreadCount(unread);
                     setLoadError(false);
                 }
             })
@@ -165,9 +207,11 @@ export default function NotificationSystem({
         return () => {
             active = false;
         };
-    }, [isCustomer, isOpen, english]);
+    }, [isCustomer, isOpen, english, refreshNotifications]);
 
-    const unreadCount = notifications.filter((item) => item.unread).length;
+    const unreadCount = isCustomer
+        ? (serverUnreadCount ?? notifications.filter((item) => item.unread).length)
+        : notifications.filter((item) => item.unread).length;
 
     const visibleNotifications = useMemo(
         () =>
@@ -202,7 +246,10 @@ export default function NotificationSystem({
     }
 
     function markRead(id: string) {
-        if (isCustomer) void markNotificationRead(id).catch(() => setLoadError(true));
+        if (isCustomer) {
+            void markNotificationRead(id).catch(() => setLoadError(true));
+            setServerUnreadCount((count) => (count === null ? null : Math.max(0, count - 1)));
+        }
         setNotifications((current) =>
             current.map((item) => (item.id === id ? { ...item, unread: false } : item)),
         );
@@ -214,11 +261,22 @@ export default function NotificationSystem({
         setSelected(item);
     }
 
-    function setPreference(key: PreferenceKey) {
-        setPreferences((previous) => ({
-            ...previous,
-            [key]: !previous[key],
-        }));
+    async function setPreference(key: PreferenceKey) {
+        if (!customerId || !preferencesReady || preferencesBusy) return;
+        setPreferencesBusy(true);
+        setPreferencesError(false);
+        try {
+            const updated = await updateNotificationPreferences({
+                ...preferences,
+                [key]: !preferences[key],
+            });
+            setPreferences(updated);
+            setRefreshNotifications((current) => current + 1);
+        } catch {
+            setPreferencesError(true);
+        } finally {
+            setPreferencesBusy(false);
+        }
     }
 
     return (
@@ -327,10 +385,12 @@ export default function NotificationSystem({
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                if (isCustomer)
+                                                if (isCustomer) {
                                                     void markAllNotificationsRead().catch(() =>
                                                         setLoadError(true),
                                                     );
+                                                    setServerUnreadCount(0);
+                                                }
                                                 setNotifications((list) =>
                                                     list.map((n) => ({ ...n, unread: false })),
                                                 );
@@ -434,7 +494,7 @@ export default function NotificationSystem({
                                 {/* FOOTER */}
                                 <div className="flex shrink-0 items-center justify-between gap-3 border-0 border-t border-solid border-store-line bg-white px-4 py-3">
                                     <span className="text-[10px] text-store-muted">
-                                        {isCustomer ? ui('notifSystem') : ui('notifSystem')}
+                                        {ui('notifSystem')}
                                     </span>
 
                                     {!isCustomer && (
@@ -454,6 +514,39 @@ export default function NotificationSystem({
                             <>
                                 {/* NOTIFICATION SETTINGS */}
                                 <div className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden overscroll-contain bg-surface-green p-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                                    {isCustomer && !preferencesReady && !preferencesError && (
+                                        <p
+                                            role="status"
+                                            className="mb-3 rounded-lg bg-white px-3 py-2 text-xs text-store-muted"
+                                        >
+                                            {ui('notificationPreferencesLoading')}
+                                        </p>
+                                    )}
+                                    {isCustomer && preferencesError && (
+                                        <div
+                                            role="alert"
+                                            className="mb-3 rounded-lg bg-white px-3 py-2 text-xs text-danger"
+                                        >
+                                            {ui('notificationPreferencesError')}
+                                            {!preferencesReady && (
+                                                <button
+                                                    type="button"
+                                                    className="ml-2 font-bold underline"
+                                                    onClick={() => {
+                                                        setPreferencesError(false);
+                                                        void getNotificationPreferences()
+                                                            .then((data) => {
+                                                                setPreferences(data);
+                                                                setPreferencesLoadedFor(customerId);
+                                                            })
+                                                            .catch(() => setPreferencesError(true));
+                                                    }}
+                                                >
+                                                    {ui('notificationPreferencesRetry')}
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
                                     <div className="rounded-2xl border border-solid border-store-line bg-white p-4">
                                         <div className="mb-1 flex items-center gap-2 text-xs font-extrabold text-store-ink">
                                             <FileText size={16} />
@@ -465,14 +558,24 @@ export default function NotificationSystem({
                                                 title={ui('notificationApproval')}
                                                 description={ui('notificationApprovalDesc')}
                                                 checked={preferences.quoteApproval}
-                                                onToggle={() => setPreference('quoteApproval')}
+                                                disabled={
+                                                    !isCustomer ||
+                                                    !preferencesReady ||
+                                                    preferencesBusy
+                                                }
+                                                onToggle={() => void setPreference('quoteApproval')}
                                             />
 
                                             <PreferenceRow
                                                 title={ui('notificationExpiry')}
                                                 description={ui('notificationExpiryDesc')}
                                                 checked={preferences.quoteExpiry}
-                                                onToggle={() => setPreference('quoteExpiry')}
+                                                disabled={
+                                                    !isCustomer ||
+                                                    !preferencesReady ||
+                                                    preferencesBusy
+                                                }
+                                                onToggle={() => void setPreference('quoteExpiry')}
                                             />
                                         </div>
                                     </div>
@@ -488,9 +591,13 @@ export default function NotificationSystem({
                                                 title={ui('notificationDelivery')}
                                                 description={ui('notificationDeliveryDesc')}
                                                 checked={preferences.deliveryEta}
-                                                onToggle={() => setPreference('deliveryEta')}
+                                                disabled={
+                                                    !isCustomer ||
+                                                    !preferencesReady ||
+                                                    preferencesBusy
+                                                }
+                                                onToggle={() => void setPreference('deliveryEta')}
                                             />
-
                                         </div>
                                     </div>
 
@@ -589,11 +696,14 @@ export default function NotificationSystem({
                                 </div>
                             ) : null}
 
-                            {!selected.isSystemUpdatePopup && (
-                                <p className="m-0 rounded-xl bg-surface-green p-3 text-[11px] leading-5 text-store-muted">
-                                    This is a sample notification. Related purchasing actions will
-                                    be available after backend integration.
-                                </p>
+                            {selected.actionUrl && (
+                                <Link
+                                    to={selected.actionUrl}
+                                    onClick={() => setSelected(null)}
+                                    className="inline-flex rounded-lg bg-store-green px-4 py-2 text-xs font-bold text-white no-underline"
+                                >
+                                    {ui('notificationOpenRelated')}
+                                </Link>
                             )}
                         </div>
 

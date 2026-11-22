@@ -27,14 +27,41 @@ export async function getCustomerNotifications(page = 0, size = 20, unreadOnly =
     return data.data;
 }
 export async function getUnreadNotificationCount() {
-    const { data } = await http.get<ApiResponse<{ unreadCount: number }>>('/api/customer/notifications/unread-count');
+    const { data } = await http.get<ApiResponse<{ unreadCount: number }>>(
+        '/api/customer/notifications/unread-count',
+    );
     return data.data.unreadCount;
 }
 export async function markNotificationRead(id: string) {
-    const { data } = await http.patch<ApiResponse<{ updatedCount: number }>>(`/api/customer/notifications/${encodeURIComponent(id)}/read`);
+    const { data } = await http.patch<ApiResponse<{ updatedCount: number }>>(
+        `/api/customer/notifications/${encodeURIComponent(id)}/read`,
+    );
     return data.data;
 }
 export async function markAllNotificationsRead() {
-    const { data } = await http.patch<ApiResponse<{ updatedCount: number }>>('/api/customer/notifications/read-all');
+    const { data } = await http.patch<ApiResponse<{ updatedCount: number }>>(
+        '/api/customer/notifications/read-all',
+    );
+    return data.data;
+}
+
+// Choices are stored server-side per authenticated customer, not in browser memory.
+export interface CustomerNotificationPreferences {
+    quoteApproval: boolean;
+    quoteExpiry: boolean;
+    deliveryEta: boolean;
+    sourcingReply: boolean;
+}
+export async function getNotificationPreferences() {
+    const { data } = await http.get<ApiResponse<CustomerNotificationPreferences>>(
+        '/api/customer/notifications/preferences',
+    );
+    return data.data;
+}
+export async function updateNotificationPreferences(preferences: CustomerNotificationPreferences) {
+    const { data } = await http.put<ApiResponse<CustomerNotificationPreferences>>(
+        '/api/customer/notifications/preferences',
+        preferences,
+    );
     return data.data;
 }

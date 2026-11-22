@@ -10,7 +10,6 @@ import {
     MessageSquare,
     Package,
     Search,
-    Image,
     TicketPercent,
     X,
 } from 'lucide-react';
@@ -60,11 +59,6 @@ function EcommerceWorkspace() {
             path: ROUTES.ECOMMERCE_PROMOTIONS,
             label: tr('Khuyến mãi', 'Promotions'),
             icon: <Megaphone size={18} />,
-        },
-        {
-            path: ROUTES.ECOMMERCE_POSTER,
-            label: tr('Ảnh khuyến mãi', 'Promotion images'),
-            icon: <Image size={18} />,
         },
         {
             path: ROUTES.ECOMMERCE_REQUESTS,
@@ -140,11 +134,11 @@ function EcommerceWorkspace() {
                         },
                         {
                             label: tr('MARKETING & NỘI DUNG', 'MARKETING & CONTENT'),
-                            items: navigation.slice(3, 6),
+                            items: navigation.slice(3, 5),
                         },
                         {
                             label: tr('KHÁCH HÀNG & YÊU CẦU', 'CUSTOMERS & REQUESTS'),
-                            items: navigation.slice(6),
+                            items: navigation.slice(5),
                         },
                     ]}
                 />
