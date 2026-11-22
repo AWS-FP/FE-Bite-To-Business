@@ -84,13 +84,15 @@ export interface OrderVatPreview {
 /** All endpoints require a logged-in CUSTOMER; http handles Bearer/refresh. */
 export async function getCustomerOrders(page = 0, size = 10, signal?: AbortSignal) {
     const { data } = await http.get<ApiResponse<CustomerOrdersPage>>('/api/customer/orders', {
-        params: { page, size }, signal,
+        params: { page, size },
+        signal,
     });
     return data.data;
 }
 export async function getCustomerOrder(orderId: string, signal?: AbortSignal) {
     const { data } = await http.get<ApiResponse<CustomerOrderDetail>>(
-        `/api/customer/orders/${encodeURIComponent(orderId)}`, { signal },
+        `/api/customer/orders/${encodeURIComponent(orderId)}`,
+        { signal },
     );
     return data.data;
 }

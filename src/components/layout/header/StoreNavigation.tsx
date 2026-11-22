@@ -23,15 +23,13 @@ export default function StoreNavigation() {
                   pathname.startsWith('/brand/')
                 ? 'brands'
                 : [
-                          ROUTES.LANDING,
-                          ROUTES.WHY_BTB,
-                          ROUTES.BTB_MODEL,
-                          ROUTES.DISTRIBUTION_NETWORK,
-                      ].some((route) => route === pathname)
-                    ? 'about'
-                    : pathname.startsWith(ROUTES.ORDERS)
-                      ? 'invoice'
-                      : 'categories';
+                        ROUTES.LANDING,
+                        ROUTES.WHY_BTB,
+                        ROUTES.BTB_MODEL,
+                        ROUTES.DISTRIBUTION_NETWORK,
+                    ].some((route) => route === pathname)
+                  ? 'about'
+                  : 'categories';
     const linkStyle = (active: boolean) =>
         `inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-bold no-underline transition-colors ${active ? 'bg-store-yellow text-store-ink' : 'text-store-cream hover:bg-white/10 hover:text-store-yellow'}`;
     return (
@@ -79,19 +77,6 @@ export default function StoreNavigation() {
                     <ProductRequestSection onOpenChange={setRequestOpen} />
                 </div>
                 <AboutBusinessDropdown active={current === 'about'} onOpenChange={setAboutOpen} />
-                <Link
-                    to={ROUTES.ORDERS}
-                    className={`ml-auto hidden text-[12px] min-[1440px]:inline-flex ${linkStyle(current === 'invoice')}`}
-                    aria-current={current === 'invoice' ? 'page' : undefined}
-                    title={t('customerUI.navVat')}
-                >
-                    {t('header.invoice')}
-                    <img
-                        className="block shrink-0"
-                        src="/images/storefront/arrow-right.svg"
-                        alt=""
-                    />
-                </Link>
             </div>
         </nav>
     );

@@ -6,7 +6,9 @@ import {
     ReceiptText,
     Settings,
     ShoppingCart,
-    Users,
+    Minus,
+    Plus,
+    PackageOpen,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +22,7 @@ import GuestHeaderActions from './GuestHeaderActions';
 import LogoutConfirmation from '@/components/common/LogoutConfirmation';
 
 export default function StoreAccountActions() {
-    const { t } = useTranslation('storefront');
+    const { t, i18n } = useTranslation('storefront');
 
     const session = useAuthStore((state) => state.session);
     const clearSession = useAuthStore((state) => state.clearSession);
@@ -36,6 +38,9 @@ export default function StoreAccountActions() {
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const cartItems = useCartStore((state) => state.items);
+    const updateQuantity = useCartStore((state) => state.updateQuantity);
+    const cartIsOpen = openDropdown === 'cart';
+    const isVietnamese = i18n.language.startsWith('vi');
 
     const isLoggedIn = Boolean(user);
 
@@ -65,6 +70,14 @@ export default function StoreAccountActions() {
     }
 
     useEffect(() => {
+        function handleEscape(event: KeyboardEvent) {
+            if (event.key === 'Escape') setOpenDropdown(null);
+        }
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+    }, []);
+
+    useEffect(() => {
         function handleOutsideClick(event: globalThis.MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setOpenDropdown(null);
@@ -91,12 +104,14 @@ export default function StoreAccountActions() {
 
             {isLoggedIn && (
                 <>
-                    {/* Cart / Estimated Order */}
-                    <Link
-                        to={ROUTES.QUOTES}
-                        onClick={() => setOpenDropdown(null)}
-                        aria-label={t('header.quote')}
-                        className="relative mx-auto flex min-h-[52px] shrink-0 cursor-pointer items-center justify-center gap-3 rounded-full border-2 border-solid border-store-ink bg-store-cream px-5 py-1 text-left text-store-ink no-underline shadow-[2px_2px_0_var(--color-store-ink)] hover:bg-white"
+                    {/* Cart button opens a preview; navigating starts from the preview actions. */}
+                    <button
+                        type="button"
+                        onClick={() => setOpenDropdown((previous) => previous === 'cart' ? null : 'cart')}
+                        aria-expanded={cartIsOpen}
+                        aria-controls="customer-cart-preview"
+                        aria-label={t('cartPreview.toggle')}
+                        className="relative mx-auto flex min-h-[52px] shrink-0 cursor-pointer items-center justify-center gap-3 rounded-full border-2 border-solid border-store-ink bg-store-cream px-5 py-1 text-left text-store-ink shadow-[2px_2px_0_var(--color-store-ink)] hover:bg-white"
                     >
                         <div className="flex items-center border-0 border-r border-solid border-store-ink/25 pr-2">
                             <span className="relative inline-flex">
@@ -108,18 +123,15 @@ export default function StoreAccountActions() {
                                 )}
                             </span>
                         </div>
-
                         <div className="leading-tight">
                             <span className="block text-[10px] font-medium text-store-muted">
                                 {t('header.estimatedOrder')}
                             </span>
-
                             <span className="block text-xs font-black text-store-ink">
                                 {formatCurrencyVnd(subtotalAmount)}
                             </span>
                         </div>
-
-                    </Link>
+                    </button>
 
                     {/* Notification Bell */}
                     <NotificationSystem
@@ -154,6 +166,81 @@ export default function StoreAccountActions() {
                         {!user?.avatarUrl && <span>{initials}</span>}
                     </button>
                 </>
+            )}
+
+            {/* Preview of products currently in cart (not completed orders). */}
+            {isLoggedIn && cartIsOpen && (
+                <div id="customer-cart-preview" role="dialog" aria-label={t('cartPreview.title')}
+                     className="absolute left-0 top-[62px] z-[70] w-[min(385px,calc(100vw-2rem))] overflow-hidden rounded-[22px] border border-store-ink/15 bg-white text-store-ink shadow-[0_22px_60px_rgba(0,0,0,0.28)]">
+                    <div className="flex items-center justify-between border-b border-store-ink/10 px-5 py-4">
+                        <h3 className="m-0 text-sm font-extrabold">
+                            {t('cartPreview.title')} ({cartItems.length})
+                        </h3>
+                        <button type="button" onClick={() => setOpenDropdown(null)}
+                                aria-label={t('cartPreview.close')}
+                                className="cursor-pointer rounded-full border-0 bg-transparent px-2 py-1 text-store-ink hover:bg-store-cream">
+                            ×
+                        </button>
+                    </div>
+                    {cartItems.length > 0 ? (
+                        <div className="max-h-[390px] overflow-y-auto overscroll-contain">
+                            {cartItems.map((item) => {
+                                const title = (isVietnamese ? item.nameVi : item.nameEn) || item.name;
+                                const spec = (isVietnamese ? item.specVi : item.specEn) || item.spec;
+                                return (
+                                    <div key={item.id} className="flex gap-3 border-b border-store-ink/10 px-4 py-3">
+                                        <div className="flex size-[70px] shrink-0 items-center justify-center overflow-hidden rounded-lg bg-store-cream">
+                                            {item.imageUrl ? <img src={item.imageUrl} alt="" loading="lazy"
+                                                                  className="size-full object-contain" /> :
+                                                <PackageOpen size={26} className="text-store-muted" aria-hidden="true" />}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="m-0 line-clamp-2 text-xs font-bold leading-snug">{title}</p>
+                                            {spec && <p className="mb-1 mt-1 line-clamp-1 text-[11px] text-store-muted">{spec}</p>}
+                                            <div className="mt-2 flex items-end justify-between gap-2">
+                                                <strong className="text-xs text-store-green">{formatCurrencyVnd(item.unitPrice)}</strong>
+                                                <div className="flex shrink-0 items-center rounded-lg border border-store-ink/15">
+                                                    <button type="button" onClick={() => updateQuantity(item.id, -1)}
+                                                            aria-label={`${t('cartPreview.decrease')} ${title}`}
+                                                            className="flex size-7 cursor-pointer items-center justify-center border-0 bg-transparent hover:bg-store-cream">
+                                                        <Minus size={12}/>
+                                                    </button>
+                                                    <span className="min-w-6 text-center text-[11px] font-bold tabular-nums">{item.quantity}</span>
+                                                    <button type="button" onClick={() => updateQuantity(item.id, 1)}
+                                                            aria-label={`${t('cartPreview.increase')} ${title}`}
+                                                            className="flex size-7 cursor-pointer items-center justify-center border-0 bg-transparent hover:bg-store-cream">
+                                                        <Plus size={12}/>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ) : <div className="flex flex-col items-center gap-2 px-5 py-9 text-center text-store-muted">
+                        <PackageOpen size={28}/><p className="m-0 text-xs">{t('cartPreview.empty')}</p>
+                    </div>}
+                    <div className="bg-store-cream/70 px-4 py-4">
+                        <div className="mb-3 flex items-center justify-between gap-3">
+                            <span className="text-xs font-semibold text-store-muted">{t('cartPreview.total')}</span>
+                            <strong className="text-base font-black tabular-nums">{formatCurrencyVnd(subtotalAmount)}</strong>
+                        </div>
+                        <p className="mb-3 text-[10px] leading-relaxed text-store-muted">{t('cartPreview.totalNote')}</p>
+                        <div>
+                            {cartItems.length > 0 ? (
+                                <Link to={ROUTES.QUOTES} onClick={() => setOpenDropdown(null)}
+                                      className="block w-full rounded-lg bg-store-green px-3 py-3 text-center text-xs font-bold text-white no-underline hover:opacity-90">
+                                    {t('cartPreview.checkout')}
+                                </Link>
+                            ) : (
+                                <span aria-disabled="true" className="block w-full rounded-lg bg-store-green/50 px-3 py-3 text-center text-xs font-bold text-white">
+                                    {t('cartPreview.checkout')}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </div>
             )}
 
             {/* Profile Dropdown */}
@@ -205,7 +292,7 @@ export default function StoreAccountActions() {
                             <>
                                 {/* Order History */}
                                 <Link
-                                    to={ROUTES.QUOTES}
+                                    to={ROUTES.ORDERS}
                                     onClick={() => setOpenDropdown(null)}
                                     className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-store-ink no-underline transition-colors hover:bg-store-ink/10"
                                 >
@@ -234,17 +321,6 @@ export default function StoreAccountActions() {
                                     <ReceiptText size={15} className="text-store-ink" />
 
                                     <span>{t('profileDropdown.recurringLists')}</span>
-                                </Link>
-
-                                {/* Custom Quotes */}
-                                <Link
-                                    to={ROUTES.QUOTES}
-                                    onClick={() => setOpenDropdown(null)}
-                                    className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-store-ink no-underline transition-colors hover:bg-store-ink/10"
-                                >
-                                    <Users size={15} className="text-store-ink" />
-
-                                    <span>{t('profileDropdown.customQuotes')}</span>
                                 </Link>
                             </>
                         )}
