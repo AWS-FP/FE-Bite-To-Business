@@ -82,15 +82,29 @@ export interface OrderVatPreview {
 }
 
 /** All endpoints require a logged-in CUSTOMER; http handles Bearer/refresh. */
-export async function getCustomerOrders(page = 0, size = 10, signal?: AbortSignal) {
+/** ACTIVE = awaiting payment or delivery; FINISHED = completed or cancelled. */
+export type CustomerOrderGroup = 'ALL' | 'ACTIVE' | 'FINISHED';
+export async function getCustomerOrders(
+    page = 0,
+    size = 10,
+    signal?: AbortSignal,
+    group: CustomerOrderGroup = 'ALL',
+) {
     const { data } = await http.get<ApiResponse<CustomerOrdersPage>>('/api/customer/orders', {
-        params: { page, size }, signal,
+        params: { group, page, size }, signal,
     });
     return data.data;
 }
 export async function getCustomerOrder(orderId: string, signal?: AbortSignal) {
     const { data } = await http.get<ApiResponse<CustomerOrderDetail>>(
         `/api/customer/orders/${encodeURIComponent(orderId)}`, { signal },
+    );
+    return data.data;
+}
+/** Cancels my unpaid order; BE returns reserved stock and responds with the updated detail. */
+export async function cancelCustomerOrder(orderId: string) {
+    const { data } = await http.post<ApiResponse<CustomerOrderDetail>>(
+        `/api/customer/orders/${encodeURIComponent(orderId)}/cancel`,
     );
     return data.data;
 }

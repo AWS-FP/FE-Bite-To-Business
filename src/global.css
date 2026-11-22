@@ -129,6 +129,37 @@ body::-webkit-scrollbar,
     select {
         font: inherit;
     }
+
+    /* Mọi phần tử bấm được hiện con trỏ tay; nút bị vô hiệu hiện not-allowed. */
+    button,
+    [role='button'],
+    [role='tab'],
+    summary,
+    label[for],
+    select,
+    input:is([type='button'], [type='submit'], [type='reset'], [type='checkbox'], [type='radio'], [type='file']),
+    a[href] {
+        cursor: pointer;
+    }
+
+    button:disabled,
+    [role='button'][aria-disabled='true'],
+    input:disabled,
+    select:disabled {
+        cursor: not-allowed;
+    }
+
+    /*
+     * Hover dự phòng cho nút chưa có kiểu hover riêng (không có class `hover:` nào),
+     * để không nút nào đứng yên khi rê chuột. Nút đã có hover riêng giữ nguyên thiết kế.
+     */
+    :is(button, [role='button']):not(:disabled):not([aria-disabled='true']):not([class*='hover:']) {
+        transition: filter 150ms ease;
+    }
+
+    :is(button, [role='button']):not(:disabled):not([aria-disabled='true']):not([class*='hover:']):hover {
+        filter: brightness(0.93);
+    }
 }
 
 /* Kiểu focus dùng chung cho chuột và bàn phím. */
