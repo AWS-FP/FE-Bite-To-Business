@@ -194,9 +194,16 @@ export default function ProductShowcaseCard({
                         <span
                             className={`font-price text-[20px] font-black leading-6 tabular-nums ${validSale ? 'text-[#d73a30]' : 'text-store-green'}`}
                         >
-                            {unitPrice == null
-                                ? t('customerUI.priceUnavailable')
-                                : formatCurrencyVnd(unitPrice)}
+                            {product.priceLoading ? (
+                                <span
+                                    className="inline-block h-5 w-24 animate-pulse rounded bg-store-line/60 align-middle"
+                                    aria-hidden="true"
+                                />
+                            ) : unitPrice == null ? (
+                                t('customerUI.priceUnavailable')
+                            ) : (
+                                formatCurrencyVnd(unitPrice)
+                            )}
                         </span>
                         <span className="pb-0.5 text-xs font-bold text-store-muted">/ {unit}</span>
                     </div>
@@ -250,7 +257,9 @@ export default function ProductShowcaseCard({
                             }
                             className="h-9 min-w-0 flex-1 cursor-pointer rounded-lg border-0 bg-store-green px-2 text-[11px] font-bold text-white transition hover:bg-store-dark disabled:cursor-not-allowed disabled:bg-[#91a59d]"
                         >
-                            {unitPrice == null
+                            {product.priceLoading
+                                ? t('customerUI.checkingStock')
+                                : unitPrice == null
                                 ? t('customerUI.priceUnavailable')
                                 : inStock
                                   ? t('homePage.addToOrder', 'Add to Order')

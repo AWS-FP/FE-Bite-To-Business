@@ -130,6 +130,13 @@
         "loadMoreReviews": "Load more reviews",
         "reviewCount": "Real customer reviews",
         "removeReviewPhoto": "Remove this photo",
+        "previewReviewPhoto": "View larger",
+        "addReviewPhoto": "Add photo",
+        "reviewImageViewer": "Review photo viewer",
+        "reviewImageCounter": "Photo {{current}} of {{total}}",
+        "closeImageViewer": "Close",
+        "previousImage": "Previous photo",
+        "nextImage": "Next photo",
         "reviewRatingUnit": "stars",
         "unitClarification": "Order quantities refer to the selling unit above. Net weight is a separate product specification, not the selling unit."
     },
@@ -702,6 +709,7 @@
         }
     },
     "customerUI": {
+        "checkingStock": "Checking stock…",
         "heroCatalogLabel": "EXPLORE B2B INGREDIENTS",
         "heroPromotionLabel": "CURRENT PROMOTION",
         "heroProduce": "Fresh ingredients for professional kitchens",

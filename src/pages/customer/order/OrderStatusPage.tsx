@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { RotateCw } from 'lucide-react';
+import { useLocation, useParams } from 'react-router-dom';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
+import OrderStatusBadge from '@/components/customer/order/OrderStatusBadge';
+import { paymentStatusLabel } from '@/utils/orderStatus';
 import { ROUTES } from '@/router/routes';
 import { useAuthStore } from '@/store/admin/authStore';
 import {
@@ -14,20 +17,21 @@ import type {
     OrderVatPreview,
 } from '@/services/customer/orderService';
 import { createBankPayment, getBankPayment, type BankPayment } from '@/services/customer/paymentService';
+import PageNav from '@/components/common/PageNav';
 
 const money = (value: number) => `${value.toLocaleString('vi-VN')}đ`;
-const statusLabel: Record<string, string> = {
-    CONFIRMED: 'Đã xác nhận',
-    PROCESSING: 'Đang xử lý',
-    COMPLETED: 'Hoàn thành',
-    CANCELLED: 'Đã hủy',
-};
+const QR_LIFETIME_MS = 5 * 60 * 1000;
 
 export default function OrderStatusPage() {
     const { orderId } = useParams<{ orderId: string }>();
     const location = useLocation();
     const openPaymentOnLoad = (location.state as { showPayment?: boolean } | null)?.showPayment === true;
     const session = useAuthStore((state) => state.session);
+    // Only the owning customer can open this page, so the signed-in user is who placed the order.
+    const customerName = session
+        ? `${session.user.lastName ?? ''} ${session.user.firstName ?? ''}`.trim() ||
+          session.user.email
+        : '';
     const [detail, setDetail] = useState<CustomerOrderDetail | null>(null);
     const [invoice, setInvoice] = useState<CustomerInvoice | null>(null);
     const [vat, setVat] = useState<OrderVatPreview | null>(null);
@@ -37,6 +41,10 @@ export default function OrderStatusPage() {
     const [paymentLoading, setPaymentLoading] = useState(false);
     const [paymentError, setPaymentError] = useState('');
     const [qrError, setQrError] = useState(false);
+    // The QR is shown for QR_LIFETIME_MS, then blurred until the customer asks for a fresh one.
+    // A fresh one re-checks with BE that the order can still be paid before showing it again.
+    const [qrIssuedAt, setQrIssuedAt] = useState<number | null>(null);
+    const [now, setNow] = useState(0);
 
     useEffect(() => {
         const abort = new AbortController();
@@ -62,7 +70,11 @@ export default function OrderStatusPage() {
         let cancelled = false;
         createBankPayment(orderId)
             .then((result) => {
-                if (!cancelled) setPayment(result);
+                if (cancelled) return;
+                setPayment(result);
+                const issued = Date.now();
+                setQrIssuedAt(issued);
+                setNow(issued);
             })
             .catch(() => {
                 if (!cancelled) {
@@ -87,6 +99,19 @@ export default function OrderStatusPage() {
         }, 5000);
         return () => window.clearInterval(timer);
     }, [paymentId, orderId]);
+
+    // Ticks once a second while a QR is on screen, to drive the countdown and the expiry.
+    const qrVisible = payment?.status === 'PENDING' && !!payment.qrUrl && qrIssuedAt != null;
+    useEffect(() => {
+        if (!qrVisible) return;
+        const timer = window.setInterval(() => setNow(Date.now()), 1000);
+        return () => window.clearInterval(timer);
+    }, [qrVisible]);
+    const qrRemainingMs = qrIssuedAt == null ? 0 : Math.max(0, qrIssuedAt + QR_LIFETIME_MS - now);
+    const qrExpired = qrVisible && qrRemainingMs === 0;
+    const qrCountdown = `${String(Math.floor(qrRemainingMs / 60000)).padStart(2, '0')}:${String(
+        Math.floor((qrRemainingMs % 60000) / 1000),
+    ).padStart(2, '0')}`;
 
     const openingPayment = openPaymentOnLoad && awaitingPayment && !payment && !paymentError;
     const loading = !!orderId && detail?.order.orderId !== orderId && !error;
@@ -118,6 +143,9 @@ export default function OrderStatusPage() {
         setQrError(false);
         try {
             setPayment(await createBankPayment(orderId));
+            const issued = Date.now();
+            setQrIssuedAt(issued);
+            setNow(issued);
         } catch {
             setPaymentError('Không thể tạo mã thanh toán. Đơn có thể đã hết hạn hoặc thanh toán không khả dụng.');
         } finally {
@@ -146,9 +174,7 @@ export default function OrderStatusPage() {
             mainClassName="w-full flex-1 px-5 py-12"
         >
             <div className="mx-auto max-w-[1150px]">
-                <Link to={ROUTES.ORDERS} className="text-xs font-bold text-store-green">
-                    ← Về lịch sử đơn hàng
-                </Link>
+                <PageNav back={{ label: 'Về lịch sử đơn hàng', to: ROUTES.ORDERS }} />
                 {loading && (
                     <p className="py-10" role="status">
                         Đang tải đơn hàng...
@@ -164,16 +190,17 @@ export default function OrderStatusPage() {
                         <div className="my-6 flex flex-wrap items-start justify-between gap-4">
                             <div>
                                 <h1 className="m-0 font-heading text-4xl">
-                                    Đơn hàng #{detail.order.orderNumber}
+                                    Đơn hàng của {customerName}
                                 </h1>
                                 <p className="text-xs text-store-muted">
                                     Tạo lúc{' '}
                                     {new Date(detail.order.createdAt).toLocaleString('vi-VN')}
                                 </p>
                             </div>
-                            <span className="rounded-lg bg-store-yellow px-4 py-2 text-xs font-extrabold">
-                                {statusLabel[detail.order.status] ?? detail.order.status}
-                            </span>
+                            <OrderStatusBadge
+                                status={detail.order.status}
+                                paymentStatus={detail.order.paymentStatus}
+                            />
                         </div>
                         <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
                             <div className="space-y-5">
@@ -228,7 +255,7 @@ export default function OrderStatusPage() {
                                     </strong>
                                     <p className="text-xs text-store-muted">
                                         Thanh toán:{' '}
-                                        {detail.order.paymentStatus ?? 'Chưa có thông tin'}
+                                        {paymentStatusLabel(detail.order.paymentStatus)}
                                     </p>
                                 </section>
                                 {['CONFIRMED', 'PROCESSING'].includes(detail.order.status) && detail.order.paymentStatus !== 'SUCCESS' && (
@@ -237,12 +264,25 @@ export default function OrderStatusPage() {
                                         {!payment && <button type="button" disabled={paymentLoading || openingPayment} onClick={() => void showPayment()} className="rounded bg-store-green px-4 py-2 font-bold text-white disabled:opacity-50">{paymentLoading || openingPayment ? 'Đang tải...' : 'Hiển thị mã QR'}</button>}
                                         {payment?.status === 'PENDING' && !payment.qrUrl && <p>Đơn không còn trong thời hạn thanh toán. Vui lòng kiểm tra lại đơn hàng.</p>}
                                         {payment?.status === 'PENDING' && payment.qrUrl && <div className="space-y-2">
-                                            {payment.qrUrl && !qrError ? <img src={payment.qrUrl} alt="Mã QR chuyển khoản" className="mx-auto w-full max-w-64" onError={() => setQrError(true)} /> : <p>Không tải được ảnh QR. Bạn có thể chuyển khoản bằng thông tin bên dưới.</p>}
-                                            <p>Ngân hàng: <strong>{payment.bank}</strong></p>
-                                            <p>Số tài khoản: <strong>{payment.virtualAccount}</strong></p>
-                                            <p>Số tiền: <strong>{money(payment.amount)}</strong></p>
-                                            <p>Nội dung: <strong>{payment.paymentCode}</strong></p>
-                                            <p className="text-store-muted">Giữ nguyên số tiền và nội dung chuyển khoản để hệ thống đối chiếu.</p>
+                                            <div className="relative mx-auto w-full max-w-64">
+                                                {!qrError ? <img src={payment.qrUrl} alt="Mã QR chuyển khoản" aria-hidden={qrExpired} className={`w-full transition-[filter,opacity] duration-300 ${qrExpired ? 'pointer-events-none select-none opacity-40 blur-sm' : ''}`} onError={() => setQrError(true)} /> : <p>Không tải được ảnh QR. Bạn có thể chuyển khoản bằng thông tin bên dưới.</p>}
+                                                {qrExpired && (
+                                                    <button type="button" disabled={paymentLoading} onClick={() => void showPayment()} className="absolute inset-0 m-auto flex size-28 flex-col items-center justify-center gap-1.5 rounded-full border-2 border-store-ink bg-white text-xs font-bold text-store-ink shadow-lg transition-transform hover:scale-105 disabled:opacity-60" aria-label="Mã QR đã hết hạn. Tạo mã mới">
+                                                        <RotateCw size={26} aria-hidden="true" className={paymentLoading ? 'animate-spin' : ''} />
+                                                        {paymentLoading ? 'Đang tạo...' : 'Tạo mã mới'}
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <p role="timer" aria-live="off" className={`text-center text-xs font-bold ${qrExpired ? 'text-red-700' : 'text-store-muted'}`}>
+                                                {qrExpired ? 'Mã QR đã hết hạn. Bấm vào biểu tượng để tạo mã mới.' : `Mã QR hết hạn sau ${qrCountdown}`}
+                                            </p>
+                                            <div className={qrExpired ? 'pointer-events-none select-none opacity-40 blur-[2px]' : ''} aria-hidden={qrExpired}>
+                                                <p>Ngân hàng: <strong>{payment.bank}</strong></p>
+                                                <p>Số tài khoản: <strong>{payment.virtualAccount}</strong></p>
+                                                <p>Số tiền: <strong>{money(payment.amount)}</strong></p>
+                                                <p>Nội dung: <strong>{payment.paymentCode}</strong></p>
+                                                <p className="text-store-muted">Giữ nguyên số tiền và nội dung chuyển khoản để hệ thống đối chiếu.</p>
+                                            </div>
                                             <button type="button" disabled={paymentLoading} onClick={() => void refreshPayment()} className="rounded border border-black px-4 py-2 font-semibold disabled:opacity-50">{paymentLoading ? 'Đang kiểm tra...' : 'Kiểm tra thanh toán'}</button>
                                         </div>}
                                         {payment && payment.status !== 'PENDING' && <p>Trạng thái: {payment.status === 'SUCCESS' ? 'Thanh toán thành công' : payment.status}</p>}

@@ -43,7 +43,7 @@
     "productDiscount": "Product discount",
     "shipping": "Delivery fee",
     "vat": "Product VAT",
-    "calculatedLater": "Calculated later",
+    "calculatedLater": "Not final",
     "estimatedTotal": "Estimated total",
     "total": "Total",
     "priceNote": "Prices and discounts will be checked again before checkout.",
@@ -56,7 +56,7 @@
     "checkoutUnavailable": "Checkout is not available yet",
     "placeOrder": "Place order & pay",
     "placingOrder": "Creating order...",
-    "placeOrderHint": "Stock is held for 1 hour. You will pay by QR bank transfer via SePay in the next step.",
+    "placeOrderHint": "Stock is held for 6 hours. You will pay by QR bank transfer via SePay in the next step.",
     "back": "Back",
     "form": {
         "title": "Add delivery package",
@@ -88,7 +88,7 @@
         "title": "Review before checkout",
         "counts": "{{packages}} delivery packages · {{products}} products",
         "shipping": "Delivery fee:",
-        "note": "Prices, discounts, VAT, delivery fees and stock have been rechecked. Placing the order holds stock for 1 hour and shows a bank transfer QR code."
+        "note": "Prices, discounts, VAT, delivery fees and stock have been rechecked. Placing the order holds stock for 6 hours and shows a bank transfer QR code."
     },
     "validation": {
         "required": "Please fill out this field.",
@@ -119,5 +119,38 @@
         "couponsUpdated": "Discounts updated.",
         "couponsRemoved": "All coupons removed from the quote.",
         "packageAdded": "Delivery package added."
+    },
+    "lineVat": "VAT {{rate}}%: {{amount}}",
+    "lineVatMissing": "VAT rate not set",
+    "vatIncomplete": "VAT missing for some products",
+    "totalBeforeShipping": "Subtotal",
+    "couponPicker": {
+        "productTitle": "Product coupon",
+        "shippingTitle": "Shipping coupon",
+        "selectOrEnter": "Select or enter",
+        "appliedUnknown": "Applied",
+        "inputLabel": "Coupon code",
+        "inputPlaceholder": "Enter 8-character code",
+        "invalidCode": "A coupon code is exactly 8 letters or digits.",
+        "notApplicable": "This code does not exist or cannot be used for this quote.",
+        "loading": "Loading available codes…",
+        "loadFailed": "Could not load codes. You can still enter one.",
+        "empty": "No codes available right now. You can still enter one.",
+        "available": "Available codes",
+        "notEligible": "Not eligible yet",
+        "percentOff": "{{value}}% off",
+        "percentOffMax": "{{value}}% off, up to {{max}}",
+        "amountOff": "{{value}} off",
+        "minOrder": "Min. order {{value}}",
+        "noMinOrder": "No minimum order",
+        "selectedProducts": "Selected products only",
+        "expires": "Expires {{date}}",
+        "estimated": "Est. saving {{value}}",
+        "reasonMinOrder": "Minimum order not reached",
+        "reasonNoProduct": "No eligible product in this quote",
+        "choose": "Use",
+        "inUse": "In use",
+        "remove": "Remove current code",
+        "close": "Close"
     }
 }

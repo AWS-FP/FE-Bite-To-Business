@@ -238,10 +238,21 @@ export default function ReceivePage() {
                                         {product.onHand.toLocaleString('vi-VN')} {unit}
                                     </dd>
                                 </div>
-                                <div className="flex justify-between gap-4">
+                                <div className="flex justify-between gap-4 border-b border-store-line pb-3">
                                     <dt className="text-store-muted">{tr("Đã giữ")}</dt>
                                     <dd className="font-semibold">
                                         {product.reserved.toLocaleString('vi-VN')} {unit}
+                                    </dd>
+                                </div>
+                                {/* Same rule as the DB's available_quantity: on hand minus reserved. */}
+                                <div className="flex justify-between gap-4">
+                                    <dt className="text-store-muted">{tr("Có thể bán")}</dt>
+                                    <dd className="font-bold text-store-green">
+                                        {Math.max(
+                                            0,
+                                            Math.round((product.onHand - product.reserved) * 1000) / 1000,
+                                        ).toLocaleString('vi-VN')}{' '}
+                                        {unit}
                                     </dd>
                                 </div>
                             </dl>

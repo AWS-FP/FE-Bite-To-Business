@@ -7,11 +7,9 @@ import AboutBusinessDropdown from './AboutBusinessDropdown';
 
 export default function StoreNavigation() {
     const { t } = useTranslation('storefront');
-    const { pathname, search } = useLocation();
+    const { pathname } = useLocation();
     const [requestOpen, setRequestOpen] = useState(false);
     const [aboutOpen, setAboutOpen] = useState(false);
-    const standardFood =
-        pathname === ROUTES.CATALOG && new URLSearchParams(search).get('view') === 'standard';
     const current = requestOpen
         ? 'request'
         : aboutOpen
@@ -24,9 +22,7 @@ export default function StoreNavigation() {
                   pathname.startsWith('/brands/') ||
                   pathname.startsWith('/brand/')
                 ? 'brands'
-                : standardFood
-                  ? 'standard'
-                  : [
+                : [
                           ROUTES.LANDING,
                           ROUTES.WHY_BTB,
                           ROUTES.BTB_MODEL,
@@ -58,20 +54,13 @@ export default function StoreNavigation() {
                     />
                     {t('header.categories')}
                 </Link>
-                <div className="flex min-w-0 flex-1 items-center gap-4 py-1.5 text-[12px] leading-[1.5] whitespace-nowrap">
+                <div className="flex shrink-0 items-center gap-4 py-1.5 text-[12px] leading-[1.5] whitespace-nowrap">
                     <Link
                         className={linkStyle(current === 'deals')}
                         to="/collections/deals"
                         aria-current={current === 'deals' ? 'page' : undefined}
                     >
                         {t('header.deals')}
-                    </Link>
-                    <Link
-                        className={linkStyle(current === 'standard')}
-                        to={`${ROUTES.CATALOG}?view=standard`}
-                        aria-current={current === 'standard' ? 'page' : undefined}
-                    >
-                        {t('header.standardFood')}
                     </Link>
                     <Link
                         className={linkStyle(current === 'brands')}
@@ -92,7 +81,7 @@ export default function StoreNavigation() {
                 <AboutBusinessDropdown active={current === 'about'} onOpenChange={setAboutOpen} />
                 <Link
                     to={ROUTES.ORDERS}
-                    className={`hidden text-[12px] min-[1440px]:inline-flex ${linkStyle(current === 'invoice')}`}
+                    className={`ml-auto hidden text-[12px] min-[1440px]:inline-flex ${linkStyle(current === 'invoice')}`}
                     aria-current={current === 'invoice' ? 'page' : undefined}
                     title={t('customerUI.navVat')}
                 >

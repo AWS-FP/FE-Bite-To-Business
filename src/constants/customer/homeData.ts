@@ -28,6 +28,8 @@ export interface HomeProductCardItem {
     rating?: number;
     reviewCount?: number;
     listPrice: number | null;
+    /** True while the price is still being fetched; the card shows a placeholder, not "unavailable". */
+    priceLoading?: boolean;
     salePrice?: number;
     discountBadge?: string;
     topLeftBadge?: string;

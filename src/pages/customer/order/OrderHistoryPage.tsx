@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
+import OrderStatusBadge from '@/components/customer/order/OrderStatusBadge';
 import { ROUTES } from '@/router/routes';
 import { useAuthStore } from '@/store/admin/authStore';
 import { getCustomerOrders } from '@/services/customer/orderService';
 import type { CustomerOrdersPage, CustomerOrderSummary } from '@/services/customer/orderService';
+import PageNav from '@/components/common/PageNav';
 
 const labels: Record<CustomerOrderSummary['status'], string> = {
     CONFIRMED: 'Đã xác nhận',
@@ -43,15 +45,10 @@ export default function OrderHistoryPage() {
             mainClassName="w-full flex-1 px-5 py-12"
         >
             <div className="mx-auto max-w-[1150px]">
-                <Link to={ROUTES.HOME} className="text-xs font-bold text-store-green">
-                    Trang chủ
-                </Link>
+                <PageNav back={{ label: 'Trang chủ', to: ROUTES.HOME }} />
                 <h1 className="mt-4 font-heading text-5xl">
                     Lịch sử <em className="text-store-coral">đặt hàng</em>
                 </h1>
-                <p className="text-sm text-store-muted">
-                    Đơn hàng thật của tài khoản Customer, được lấy từ hệ thống.
-                </p>
                 <div className="mb-6 flex flex-wrap gap-2">
                     {(['ALL', 'CONFIRMED', 'PROCESSING', 'COMPLETED', 'CANCELLED'] as const).map(
                         (status) => (
@@ -93,13 +90,13 @@ export default function OrderHistoryPage() {
                                         <p className="mt-1 text-xs text-store-muted">
                                             {new Date(order.createdAt).toLocaleString('vi-VN')}
                                         </p>
-                                        <p className="mt-2 text-xs">
-                                            Trạng thái:{' '}
-                                            <strong>{labels[order.status] ?? order.status}</strong>
-                                        </p>
-                                        <p className="mt-1 text-xs">
-                                            Thanh toán: {order.paymentStatus ?? 'Chưa có thông tin'}
-                                        </p>
+                                        <div className="mt-2">
+                                            <OrderStatusBadge
+                                                status={order.status}
+                                                paymentStatus={order.paymentStatus}
+                                                size="sm"
+                                            />
+                                        </div>
                                     </div>
                                     <div className="text-right">
                                         <p className="m-0 text-xl font-black text-store-coral">

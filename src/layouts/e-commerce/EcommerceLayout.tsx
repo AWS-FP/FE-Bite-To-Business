@@ -179,9 +179,6 @@ function EcommerceWorkspace() {
                             <p className="mt-1 font-heading text-2xl leading-tight sm:text-3xl">
                                 {tr('Góc kinh doanh.', 'Commerce desk.')}
                             </p>
-                            <span className="mt-1 block text-xs font-medium text-[#728279]">
-                                {current.label}
-                            </span>
                         </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3">

@@ -1,4 +1,4 @@
-import { ArrowLeft, Eye, EyeOff, LoaderCircle } from 'lucide-react';
+import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import { useRef, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import useAuth from '@/hooks/admin/useAuth';
 import { getAuthError, type AuthError } from '@/utils/admin/authError';
 import { loginSchema } from '@/validations/admin/authSchema';
 import AuthField from './AuthField';
+import PageNav from '@/components/common/PageNav';
 
 export default function LoginForm() {
     const { t } = useTranslation();
@@ -80,13 +81,7 @@ export default function LoginForm() {
     return (
         <>
             <div className="mb-[18px] flex justify-end">
-                <Link
-                    className="auth-back-home inline-flex items-center gap-1.5 text-[14px] font-bold text-black no-underline hover:text-auth-green"
-                    to={ROUTES.HOME}
-                >
-                    <ArrowLeft size={16} aria-hidden="true" />
-                    {t('auth.home')}
-                </Link>
+                <PageNav back={{ label: t('auth.home'), to: ROUTES.HOME }} />
             </div>
             <h1 id="auth-title">{t('login.title')}</h1>
             {location.state?.activationComplete && (

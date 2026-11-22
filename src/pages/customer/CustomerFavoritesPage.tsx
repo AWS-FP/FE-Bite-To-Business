@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ChevronLeft, ChevronRight, Heart, ImageOff, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Heart, ImageOff, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
@@ -10,6 +10,7 @@ import {
     removeFavorite,
     type FavoritePage,
 } from '@/services/customer/favoriteService';
+import PageNav from '@/components/common/PageNav';
 
 const PAGE_SIZE = 12;
 
@@ -64,12 +65,7 @@ export default function CustomerFavoritesPage() {
     return (
         <StorefrontLayout rootClassName="min-h-screen bg-store-cream text-store-ink">
             <div className="mx-auto max-w-[1320px] px-4 pb-16 pt-8 sm:px-6">
-                <Link
-                    to={ROUTES.CATALOG}
-                    className="inline-flex items-center gap-2 text-sm font-bold text-store-green no-underline hover:underline"
-                >
-                    <ArrowLeft size={17} /> {tr('browse')}
-                </Link>
+                <PageNav back={{ label: tr('browse'), to: ROUTES.CATALOG }} />
                 <div className="mt-5 flex items-center gap-4 rounded-xl bg-store-green px-6 py-6 text-white">
                     <Heart size={28} className="text-store-yellow" />
                     <div>

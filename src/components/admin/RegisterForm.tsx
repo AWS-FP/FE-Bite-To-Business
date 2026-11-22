@@ -7,6 +7,7 @@ import useRegisterForm from '@/hooks/admin/useRegisterForm';
 import CustomerInformationStep from './CustomerInformationStep';
 import DeliveryAddressStep from './DeliveryAddressStep';
 import InvoiceInformationStep from './InvoiceInformationStep';
+import PageNav from '@/components/common/PageNav';
 
 export default function RegisterForm() {
     const { t } = useTranslation();
@@ -36,13 +37,7 @@ export default function RegisterForm() {
     return (
         <>
             <div className="mb-[18px] flex justify-end">
-                <Link
-                    className="auth-back-home inline-flex items-center gap-1.5 text-[14px] font-bold text-black no-underline hover:text-auth-green"
-                    to={ROUTES.HOME}
-                >
-                    <ArrowLeft size={16} aria-hidden="true" />
-                    {t('auth.home')}
-                </Link>
+                <PageNav back={{ label: t('auth.home'), to: ROUTES.HOME }} />
             </div>
             <h1 id="auth-title" ref={titleRef} tabIndex={-1}>
                 {t('register.title')}

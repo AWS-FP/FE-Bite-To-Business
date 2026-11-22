@@ -19,6 +19,7 @@ import {
     applyQuoteCoupons,
     createQuoteFromCart,
     deleteQuotePackage,
+    getAvailableCoupons,
     getQuote,
     getQuotePackages,
     getQuotePackageTotals,
@@ -26,13 +27,17 @@ import {
     saveQuoteContact,
     validateQuotePricing,
 } from '@/services/customer/quoteService';
-import type { Quote, QuotePackage, QuotePackageAmount } from '@/services/customer/quoteService';
+import type {
+    CouponScope,
+    Quote,
+    QuotePackage,
+    QuotePackageAmount,
+} from '@/services/customer/quoteService';
+import CouponPicker from '@/components/customer/checkout/CouponPicker';
 import { useAuthStore } from '@/store/admin/authStore';
 import { useCartStore } from '@/store/customer/cartStore';
 import { emptyParcel, emptyQuoteForm, useQuoteDraftStore } from '@/store/customer/quoteDraftStore';
 
-const field =
-    'w-full rounded-lg border border-store-ink/25 bg-white px-3 py-2.5 text-sm text-store-ink focus:border-store-ink focus:outline-none';
 const primary =
     'inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-0 bg-store-green px-5 py-3 font-bold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50';
 const secondary =
@@ -223,42 +228,59 @@ export default function CartPage() {
         }
     }
 
-    async function applyCoupons() {
-        if (!quote) return;
-        if (
-            (quote.productCouponId && !productCode.trim()) ||
-            (quote.shippingCouponId && !shippingCode.trim())
-        ) {
-            setMessage('errors.savedCoupon');
-            return;
-        }
+    // The PUT sends both scopes, so the code of the other scope must be known before changing one.
+    async function applyCoupon(scope: CouponScope, code: string): Promise<string | null> {
+        if (!quote) return t('errors.fallback');
+        const otherMissing =
+            scope === 'PRODUCT'
+                ? quote.shippingCouponId && !shippingCode.trim()
+                : quote.productCouponId && !productCode.trim();
+        if (otherMissing) return t('errors.savedCoupon');
         setBusy(true);
         setMessage('');
         try {
-            setQuote(await applyQuoteCoupons(quote.id, productCode, shippingCode));
-            setNotice('notices.couponsUpdated');
+            setQuote(
+                await applyQuoteCoupons(
+                    quote.id,
+                    scope === 'PRODUCT' ? code : productCode,
+                    scope === 'SHIPPING' ? code : shippingCode,
+                ),
+            );
+            if (scope === 'PRODUCT') setProductCode(code);
+            else setShippingCode(code);
+            setNotice(code ? 'notices.couponsUpdated' : 'notices.couponsRemoved');
+            return null;
         } catch (error) {
-            setMessage(errorMessage(error, t('errors.fallback')));
+            return axios.isAxiosError(error) && error.response?.status === 400
+                ? t('couponPicker.notApplicable')
+                : errorMessage(error, t('errors.fallback'));
         } finally {
             setBusy(false);
         }
     }
 
-    async function removeCoupons() {
-        if (!quote) return;
-        setBusy(true);
-        setMessage('');
-        try {
-            setQuote(await applyQuoteCoupons(quote.id, '', ''));
-            setProductCode('');
-            setShippingCode('');
-            setNotice('notices.couponsRemoved');
-        } catch (error) {
-            setMessage(errorMessage(error, t('errors.fallback')));
-        } finally {
-            setBusy(false);
-        }
-    }
+    // A coupon saved on the quote from another device has no code in local storage; recover it so
+    // changing the other scope does not drop it.
+    const quoteIdForCoupons = quote?.id;
+    const missingProductCode = !!quote?.productCouponId && !productCode;
+    const missingShippingCode = !!quote?.shippingCouponId && !shippingCode;
+    const productCouponId = quote?.productCouponId;
+    const shippingCouponId = quote?.shippingCouponId;
+    useEffect(() => {
+        if (!quoteIdForCoupons || (!missingProductCode && !missingShippingCode)) return;
+        const controller = new AbortController();
+        getAvailableCoupons(quoteIdForCoupons, controller.signal)
+            .then((list) => {
+                const byId = new Map(list.map((item) => [item.id, item.code]));
+                if (missingProductCode && productCouponId && byId.has(productCouponId))
+                    setProductCode(byId.get(productCouponId)!);
+                if (missingShippingCode && shippingCouponId && byId.has(shippingCouponId))
+                    setShippingCode(byId.get(shippingCouponId)!);
+            })
+            .catch(() => {});
+        return () => controller.abort();
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- setters come from the draft store
+    }, [quoteIdForCoupons, missingProductCode, missingShippingCode, productCouponId, shippingCouponId]);
 
     async function createPackage(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -390,6 +412,7 @@ export default function CartPage() {
         packageTotals.revision === revision
             ? packageTotals.values
             : {};
+    const shippingKnown = step >= 2 && !!quote && packages.length > 0;
     const rows = quote
         ? ([
               [t('merchandise'), quote.itemsSubtotal],
@@ -452,73 +475,85 @@ export default function CartPage() {
                                         </div>
                                     </div>
                                     <div className="mt-5 divide-y divide-store-ink/10">
-                                        {quote.items.map((item) => (
-                                            <div
-                                                key={item.id}
-                                                className="flex items-center justify-between gap-4 py-4"
-                                            >
-                                                <div>
-                                                    <strong>{productName(item)}</strong>
-                                                    <p className="mb-0 mt-1 text-sm text-store-muted">
-                                                        {Number(item.quantity)} {item.unitCode} ×{' '}
-                                                        {formatCurrencyVnd(
-                                                            Number(item.saleUnitPrice),
+                                        {quote.items.map((item) => {
+                                            const list = Number(item.listUnitPrice);
+                                            const sale = Number(item.saleUnitPrice);
+                                            const discounted = list > 0 && sale < list;
+                                            const percent = discounted
+                                                ? Math.round(((list - sale) / list) * 100)
+                                                : 0;
+                                            return (
+                                                <div
+                                                    key={item.id}
+                                                    className="flex items-start justify-between gap-4 py-4"
+                                                >
+                                                    <div className="min-w-0">
+                                                        <strong>{productName(item)}</strong>
+                                                        <p className="mb-0 mt-1 flex flex-wrap items-center gap-x-2 text-sm text-store-muted">
+                                                            <span>
+                                                                {Number(item.quantity)}{' '}
+                                                                {item.unitCode} ×{' '}
+                                                                <strong className="text-store-ink">
+                                                                    {formatCurrencyVnd(sale)}
+                                                                </strong>
+                                                            </span>
+                                                            {discounted && (
+                                                                <>
+                                                                    <span className="line-through">
+                                                                        {formatCurrencyVnd(list)}
+                                                                    </span>
+                                                                    <span className="rounded bg-[#fde3df] px-1.5 py-0.5 text-xs font-bold text-[#c0392b]">
+                                                                        -{percent}%
+                                                                    </span>
+                                                                </>
+                                                            )}
+                                                        </p>
+                                                        <p className="mb-0 mt-1 text-xs text-store-muted">
+                                                            {item.vatRate != null &&
+                                                            item.productVatAmount != null ? (
+                                                                t('lineVat', {
+                                                                    rate: Number(item.vatRate),
+                                                                    amount: formatCurrencyVnd(
+                                                                        Number(
+                                                                            item.productVatAmount,
+                                                                        ),
+                                                                    ),
+                                                                })
+                                                            ) : (
+                                                                <span className="font-bold text-red-700">
+                                                                    {t('lineVatMissing')}
+                                                                </span>
+                                                            )}
+                                                        </p>
+                                                    </div>
+                                                    <div className="shrink-0 text-right">
+                                                        <strong>
+                                                            {formatCurrencyVnd(
+                                                                Number(item.quantity) * sale,
+                                                            )}
+                                                        </strong>
+                                                        {discounted && (
+                                                            <p className="mb-0 mt-1 text-xs text-store-muted line-through">
+                                                                {formatCurrencyVnd(
+                                                                    Number(item.quantity) * list,
+                                                                )}
+                                                            </p>
                                                         )}
-                                                    </p>
+                                                    </div>
                                                 </div>
-                                                <strong>
-                                                    {formatCurrencyVnd(
-                                                        Number(item.quantity) *
-                                                            Number(item.saleUnitPrice),
-                                                    )}
-                                                </strong>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </section>
-                                <section className="rounded-2xl border border-store-ink/20 bg-white p-6">
-                                    <h2 className="m-0 font-subheading text-xl font-bold">
-                                        {t('productCoupon')}
-                                    </h2>
-                                    <p className="my-3 text-sm text-store-muted">
-                                        {t('productCouponDescription')}
-                                    </p>
-                                    <div className="flex gap-3">
-                                        <input
-                                            aria-label={t('productCouponLabel')}
-                                            className={field}
-                                            value={productCode}
-                                            maxLength={8}
-                                            onChange={(event) =>
-                                                setProductCode(event.target.value.toUpperCase())
-                                            }
-                                            placeholder={t('couponPlaceholder')}
-                                        />
-                                        <button
-                                            type="button"
-                                            className={secondary}
-                                            disabled={busy}
-                                            onClick={applyCoupons}
-                                        >
-                                            {t('apply')}
-                                        </button>
-                                    </div>
-                                </section>
+                                <CouponPicker
+                                    quoteId={quote.id}
+                                    scope="PRODUCT"
+                                    appliedCode={quote.productCouponId ? productCode : ''}
+                                    applied={!!quote.productCouponId}
+                                    busy={busy}
+                                    onApply={(code) => applyCoupon('PRODUCT', code)}
+                                />
                             </>
-                        )}
-                        {step === 1 && quote && (
-                            <div className="flex gap-3">
-                                {(quote.productCouponId || quote.shippingCouponId) && (
-                                    <button
-                                        type="button"
-                                        className={secondary}
-                                        disabled={busy}
-                                        onClick={removeCoupons}
-                                    >
-                                        {t('removeCoupons')}
-                                    </button>
-                                )}
-                            </div>
                         )}
                         {step === 2 && quote && (
                             <>
@@ -655,34 +690,14 @@ export default function CartPage() {
                                     }}
                                     createPackage={createPackage}
                                 />
-                                <section className="rounded-2xl border border-store-ink/20 bg-white p-6">
-                                    <h2 className="m-0 font-subheading text-xl font-bold">
-                                        {t('shippingCoupon')}
-                                    </h2>
-                                    <p className="my-3 text-sm text-store-muted">
-                                        {t('shippingCouponDescription')}
-                                    </p>
-                                    <div className="flex gap-3">
-                                        <input
-                                            aria-label={t('shippingCouponLabel')}
-                                            className={field}
-                                            value={shippingCode}
-                                            maxLength={8}
-                                            onChange={(e) =>
-                                                setShippingCode(e.target.value.toUpperCase())
-                                            }
-                                            placeholder={t('couponPlaceholder')}
-                                        />
-                                        <button
-                                            type="button"
-                                            className={secondary}
-                                            disabled={busy}
-                                            onClick={applyCoupons}
-                                        >
-                                            {t('apply')}
-                                        </button>
-                                    </div>
-                                </section>
+                                <CouponPicker
+                                    quoteId={quote.id}
+                                    scope="SHIPPING"
+                                    appliedCode={quote.shippingCouponId ? shippingCode : ''}
+                                    applied={!!quote.shippingCouponId}
+                                    busy={busy}
+                                    onApply={(code) => applyCoupon('SHIPPING', code)}
+                                />
                             </>
                         )}
                         {step === 3 && quote && (
@@ -711,43 +726,59 @@ export default function CartPage() {
                                 ))
                             )}
                             <div className="flex justify-between gap-3">
+                                <span className="text-store-muted">{t('vat')}</span>
+                                {step >= 1 && quote ? (
+                                    quote.vatAmount != null ? (
+                                        <strong>{formatCurrencyVnd(Number(quote.vatAmount))}</strong>
+                                    ) : (
+                                        <strong className="text-right text-red-700">
+                                            {t('vatIncomplete')}
+                                        </strong>
+                                    )
+                                ) : (
+                                    <strong>{t('calculatedLater')}</strong>
+                                )}
+                            </div>
+                            <div className="flex justify-between gap-3">
                                 <span className="text-store-muted">{t('shipping')}</span>
                                 <strong>
-                                    {step >= 2 && quote && packages.length
+                                    {shippingKnown
                                         ? formatCurrencyVnd(Number(quote.shippingFee))
                                         : t('calculatedLater')}
                                 </strong>
                             </div>
-                            {step >= 2 &&
-                                quote &&
-                                Number(quote.shippingCouponDiscountAmount) > 0 && (
-                                    <div className="flex justify-between gap-3">
-                                        <span className="text-store-muted">
-                                            {t('shippingCoupon')}
-                                        </span>
-                                        <strong>
-                                            -{' '}
-                                            {formatCurrencyVnd(
-                                                Number(quote.shippingCouponDiscountAmount),
-                                            )}
-                                        </strong>
-                                    </div>
-                                )}
-                            <div className="flex justify-between gap-3">
-                                <span className="text-store-muted">{t('vat')}</span>
-                                <strong>
-                                    {step === 3 && quote?.vatAmount != null
-                                        ? formatCurrencyVnd(Number(quote.vatAmount))
-                                        : t('calculatedLater')}
-                                </strong>
-                            </div>
+                            {shippingKnown && Number(quote.shippingCouponDiscountAmount) > 0 && (
+                                <div className="flex justify-between gap-3">
+                                    <span className="text-store-muted">{t('shippingCoupon')}</span>
+                                    <strong>
+                                        -{' '}
+                                        {formatCurrencyVnd(
+                                            Number(quote.shippingCouponDiscountAmount),
+                                        )}
+                                    </strong>
+                                </div>
+                            )}
                         </div>
                         <div className="mt-5 flex justify-between gap-3 border-t border-store-ink/15 pt-5">
-                            <strong>{step === 3 ? t('estimatedTotal') : t('total')}</strong>
-                            <strong className="text-lg text-store-green">
-                                {step === 3 && quote?.vatAmount != null
-                                    ? formatCurrencyVnd(Number(quote.estimatedTotalAmount))
-                                    : t('calculatedLater')}
+                            <strong>
+                                {step === 0 || !quote
+                                    ? t('total')
+                                    : shippingKnown
+                                      ? t('estimatedTotal')
+                                      : t('totalBeforeShipping')}
+                            </strong>
+                            <strong className="whitespace-nowrap text-right text-lg text-store-green">
+                                {step === 0 || !quote || quote.vatAmount == null
+                                    ? t('calculatedLater')
+                                    : formatCurrencyVnd(
+                                          shippingKnown
+                                              ? Number(quote.estimatedTotalAmount)
+                                              : Number(quote.itemsSubtotal) -
+                                                    Number(quote.volumeDiscountAmount) -
+                                                    Number(quote.saleDiscountAmount) -
+                                                    Number(quote.couponDiscountAmount) +
+                                                    Number(quote.vatAmount),
+                                      )}
                             </strong>
                         </div>
                         {step === 0 && (

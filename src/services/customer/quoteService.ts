@@ -13,6 +13,25 @@ export interface QuoteItem {
     volumeUnitPrice: number;
     saleUnitPrice: number;
     vatRate: number | null;
+    /** VAT on this line after its product-coupon share; null when the product has no VAT rate yet. */
+    productVatAmount: number | null;
+}
+
+export type CouponScope = 'PRODUCT' | 'SHIPPING';
+
+export interface AvailableCoupon {
+    id: string;
+    code: string;
+    appliesTo: CouponScope;
+    productScope: 'ALL' | 'SELECTED';
+    discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
+    discountValue: number;
+    minOrderAmount: number;
+    maxDiscountAmount: number | null;
+    endsAt: string;
+    applicable: boolean;
+    reason: 'MIN_ORDER_NOT_MET' | 'NO_ELIGIBLE_PRODUCT' | null;
+    estimatedDiscount: number;
 }
 
 export interface Quote {
@@ -27,7 +46,11 @@ export interface Quote {
     shippingCouponDiscountAmount: number;
     productCouponId: string | null;
     shippingCouponId: string | null;
+    /** Null until every product in the quote has a VAT rate. */
     vatAmount: number | null;
+    /** VAT of the lines that do have a rate, available even when vatAmount is null. */
+    productVatAmount: number;
+    vatStatus: 'COMPLETE' | 'PRODUCT_RATES_MISSING';
     estimatedTotalAmount: number;
     items: QuoteItem[];
 }
@@ -103,6 +126,14 @@ export async function saveQuoteContact(
     const response = await http.put<ApiResponse<Quote>>(
         `/api/customer/quotes/${id}/contact`,
         contact,
+    );
+    return response.data.data;
+}
+
+export async function getAvailableCoupons(id: string, signal?: AbortSignal) {
+    const response = await http.get<ApiResponse<AvailableCoupon[]>>(
+        `/api/customer/quotes/${id}/coupons/available`,
+        { signal },
     );
     return response.data.data;
 }
