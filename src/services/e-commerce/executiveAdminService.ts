@@ -244,9 +244,12 @@ export const executiveApi = {
         putData<Coupon>(`${api}/coupons/${id}`, payload),
     setCouponActive: (id: string, active: boolean) =>
         patchData<Coupon>(`${api}/coupons/${id}/active`, {}, { active }),
-    promotions: (status?: string, page = 0, size = 20) =>
-        getData<AdminPage<Promotion>>(`${api}/promotions`, { status, page, size }),
+    promotions: (status?: string, page = 0, size = 20, q?: string) =>
+        getData<AdminPage<Promotion>>(`${api}/promotions`, { status, page, size, q }),
     promotion: (id: string) => getData<Promotion>(`${api}/promotions/${id}`),
+    deletePromotion: async (id: string): Promise<void> => {
+        await http.delete(`${api}/promotions/${encodeURIComponent(id)}`);
+    },
     promotionProductIds: (id: string) => getData<string[]>(`${api}/promotions/${id}/product-ids`),
     promotionProductOptions: (id: string, filter: PromotionProductFilter, page = 0, size = 20) =>
         getData<AdminPage<PromotionProductChoice>>(`${api}/promotions/${id}/products`, {

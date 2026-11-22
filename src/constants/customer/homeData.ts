@@ -69,6 +69,7 @@ export interface NotificationItemData {
     description: string;
     timeAgo: string;
     unread: boolean;
+    actionUrl?: string;
     primaryActionLabel?: string;
     secondaryActionLabel?: string;
     isSystemUpdatePopup?: boolean;

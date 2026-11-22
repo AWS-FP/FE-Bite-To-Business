@@ -762,7 +762,7 @@
         "notificationTitle": "Notifications",
         "notificationSettings": "Notification settings",
         "notificationDesc": "Your BTB activity",
-        "notificationSettingsDesc": "Preferences for this session",
+        "notificationSettingsDesc": "Saved to your account across sessions",
         "notificationQuotes": "Quotes & orders",
         "notificationLogistics": "Delivery & products",
         "notificationApproval": "Quote approval status",
@@ -859,13 +859,19 @@
             "previous": "Previous page",
             "next": "Next page",
             "priceUnavailable": "Price unavailable"
-        }
+        },
+        "notificationPreferencesLoading": "Loading notification preferences…",
+        "notificationPreferencesError": "Could not load or save preferences. Please try again.",
+        "notificationPreferencesRetry": "Retry",
+        "notificationOpenRelated": "View details"
     },
     "searchHistory": {
         "remove": "Remove search",
         "clearAll": "Clear all",
         "confirmClear": "Delete all search history for this account?",
-        "deleteError": "Could not delete search history. Please try again."
+        "deleteError": "Could not delete search history. Please try again.",
+        "scrollLeft": "Scroll history left",
+        "scrollRight": "Scroll history right"
     },
     "cartPreview": {
         "title": "Shopping cart",

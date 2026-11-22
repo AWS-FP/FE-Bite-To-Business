@@ -762,7 +762,7 @@
         "notificationTitle": "Thông báo",
         "notificationSettings": "Cài đặt thông báo",
         "notificationDesc": "Hoạt động của bạn trên BTB",
-        "notificationSettingsDesc": "Tùy chọn hiển thị trong phiên này",
+        "notificationSettingsDesc": "Được lưu vào tài khoản và giữ lại sau khi đăng nhập",
         "notificationQuotes": "Báo giá & đơn hàng",
         "notificationLogistics": "Giao hàng & sản phẩm",
         "notificationApproval": "Trạng thái duyệt báo giá",
@@ -859,13 +859,19 @@
             "previous": "Trang trước",
             "next": "Trang tiếp",
             "priceUnavailable": "Chưa có giá"
-        }
+        },
+        "notificationPreferencesLoading": "Đang tải cài đặt thông báo…",
+        "notificationPreferencesError": "Không thể tải hoặc lưu cài đặt. Vui lòng thử lại.",
+        "notificationPreferencesRetry": "Thử lại",
+        "notificationOpenRelated": "Xem chi tiết"
     },
     "searchHistory": {
         "remove": "Xóa từ khóa",
         "clearAll": "Xóa tất cả",
         "confirmClear": "Bạn muốn xóa toàn bộ lịch sử tìm kiếm của tài khoản này?",
-        "deleteError": "Không xóa được lịch sử tìm kiếm. Vui lòng thử lại."
+        "deleteError": "Không xóa được lịch sử tìm kiếm. Vui lòng thử lại.",
+        "scrollLeft": "Cuộn lịch sử sang trái",
+        "scrollRight": "Cuộn lịch sử sang phải"
     },
     "cartPreview": {
         "title": "Giỏ hàng",
