@@ -2,9 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
-    ArrowLeft,
     ArrowRight,
-    ChevronRight,
     PackageSearch,
     ShieldCheck,
     Store,
@@ -24,6 +22,7 @@ import {
     type CustomerBrand,
 } from '@/services/customer/brandService';
 import { ROUTES } from '@/router/routes';
+import PageNav from '@/components/common/PageNav';
 
 const PRODUCT_BATCH = 12;
 
@@ -195,35 +194,14 @@ export default function BrandDetailPage() {
     return (
         <StorefrontLayout rootClassName="min-h-screen bg-[#fcf6e9] text-store-ink">
             <div className="mx-auto w-full max-w-[1440px] px-5 pb-20 pt-6">
-                <nav
-                    aria-label="Breadcrumb"
-                    className="mb-5 flex flex-wrap items-center gap-2 text-sm font-medium text-store-muted"
-                >
-                    <Link
-                        to={ROUTES.HOME}
-                        className="text-store-green no-underline hover:underline"
-                    >
-                        {t('home')}
-                    </Link>
-                    <ChevronRight size={14} aria-hidden="true" />
-                    <Link
-                        to={ROUTES.BRANDS}
-                        className="text-store-green no-underline hover:underline"
-                    >
-                        {t('brandPage.brands')}
-                    </Link>
-                    {brand && (
-                        <>
-                            <ChevronRight size={14} aria-hidden="true" />
-                            <span
-                                aria-current="page"
-                                className="max-w-[55vw] truncate font-extrabold text-store-ink"
-                            >
-                                {brand.name}
-                            </span>
-                        </>
-                    )}
-                </nav>
+                <PageNav
+                    className="mb-5"
+                    items={[
+                        { label: t('home'), to: ROUTES.HOME },
+                        { label: t('brandPage.brands'), to: ROUTES.BRANDS },
+                        ...(brand ? [{ label: brand.name }] : []),
+                    ]}
+                />
 
                 {brandsLoading && (
                     <p
@@ -472,12 +450,10 @@ export default function BrandDetailPage() {
                                 )}
                             </section>
                         )}
-                        <Link
-                            to={ROUTES.BRANDS}
-                            className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-store-green no-underline hover:underline"
-                        >
-                            <ArrowLeft size={17} /> {t('brandPage.backToBrands')}
-                        </Link>
+                        <PageNav
+                            className="mt-7"
+                            back={{ label: t('brandPage.backToBrands'), to: ROUTES.BRANDS }}
+                        />
                     </>
                 )}
             </div>

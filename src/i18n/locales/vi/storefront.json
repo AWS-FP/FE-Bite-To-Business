@@ -130,6 +130,13 @@
         "loadMoreReviews": "Xem thêm đánh giá",
         "reviewCount": "Đánh giá thật của khách hàng",
         "removeReviewPhoto": "Bỏ ảnh này",
+        "previewReviewPhoto": "Xem ảnh lớn",
+        "addReviewPhoto": "Thêm ảnh",
+        "reviewImageViewer": "Xem ảnh đánh giá",
+        "reviewImageCounter": "Ảnh {{current}} trên {{total}}",
+        "closeImageViewer": "Đóng",
+        "previousImage": "Ảnh trước",
+        "nextImage": "Ảnh tiếp theo",
         "reviewRatingUnit": "sao",
         "unitClarification": "Số lượng đặt hàng tính theo đơn vị bán bên trên. Khối lượng tịnh chỉ là thông số sản phẩm, không phải đơn vị tính số lượng đặt."
     },
@@ -702,6 +709,7 @@
         }
     },
     "customerUI": {
+        "checkingStock": "Đang kiểm tra hàng…",
         "heroCatalogLabel": "KHÁM PHÁ NGUYÊN LIỆU B2B",
         "heroPromotionLabel": "CHƯƠNG TRÌNH ĐANG DIỄN RA",
         "heroProduce": "Nguồn rau củ tươi cho bếp chuyên nghiệp",

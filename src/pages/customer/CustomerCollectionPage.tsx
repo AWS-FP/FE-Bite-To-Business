@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, PackageOpen } from "lucide-react";
+import { PackageOpen } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import StorefrontLayout from "@/layouts/StorefrontLayout";
@@ -10,6 +10,7 @@ import { toCard } from "@/components/customer/home/homeProductMapper";
 import SectionPaginationBar from "@/components/customer/home/SectionPaginationBar";
 import { formatCurrencyVnd } from "@/constants/customer/homeData";
 import { ROUTES } from "@/router/routes";
+import PageNav from "@/components/common/PageNav";
 
 type Collection =
   "deals" | "best-selling" | "deep-discount" | "top-rated" | "combos";
@@ -65,13 +66,7 @@ export default function CustomerCollectionPage() {
   return (
     <StorefrontLayout rootClassName="min-h-screen bg-store-cream text-store-ink">
       <main className="mx-auto max-w-[1320px] px-4 py-9 sm:px-6">
-        <Link
-          to={ROUTES.HOME}
-          className="inline-flex items-center gap-2 text-sm font-bold text-store-green no-underline"
-        >
-          <ArrowLeft size={17} />
-          {t("home")}
-        </Link>
+        <PageNav back={{ label: t("home"), to: ROUTES.HOME }} />
         <div className="mt-5 rounded-[24px] bg-store-green p-7 text-white">
           <h1 className="m-0 font-subheading text-3xl font-bold">{heading}</h1>
         </div>

@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronRight, Search, Store, X } from 'lucide-react';
+import { ArrowRight, Search, Store, X } from 'lucide-react';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
 import CustomerBrandTile from '@/components/brand/CustomerBrandTile';
 import { getBrandDirectory, type CustomerBrand } from '@/services/customer/brandService';
 import { getHomeCategories, type HomeCategory } from '@/services/customer/homeService';
 import { ROUTES } from '@/router/routes';
+import PageNav from '@/components/common/PageNav';
 
 const BATCH_SIZE = 24;
 
@@ -96,21 +97,10 @@ export default function BrandsPage() {
     return (
         <StorefrontLayout rootClassName="min-h-screen bg-[#fcf6e9] text-store-ink">
             <div className="mx-auto w-full max-w-[1440px] px-5 pb-20 pt-6">
-                <nav
-                    aria-label="Breadcrumb"
-                    className="mb-5 flex flex-wrap items-center gap-2 text-sm font-medium text-store-muted"
-                >
-                    <Link
-                        to={ROUTES.HOME}
-                        className="text-store-green no-underline hover:underline"
-                    >
-                        {t('home')}
-                    </Link>
-                    <ChevronRight size={14} aria-hidden="true" />
-                    <span aria-current="page" className="font-bold text-store-ink">
-                        {t('brandPage.brands')}
-                    </span>
-                </nav>
+                <PageNav
+                    className="mb-5"
+                    items={[{ label: t('home'), to: ROUTES.HOME }, { label: t('brandPage.brands') }]}
+                />
 
                 <section className="relative isolate grid min-h-[260px] overflow-hidden rounded-[28px] bg-[#103c2c] text-white lg:grid-cols-[1fr_0.8fr]">
                     <div className="relative z-10 flex flex-col justify-center p-7 sm:p-10 lg:p-12">

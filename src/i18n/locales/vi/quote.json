@@ -42,7 +42,7 @@
     "productDiscount": "Ưu đãi sản phẩm",
     "shipping": "Phí giao",
     "vat": "VAT sản phẩm",
-    "calculatedLater": "Tính sau",
+    "calculatedLater": "Chưa chốt",
     "estimatedTotal": "Tổng dự kiến",
     "total": "Tổng tiền",
     "priceNote": "Giá và ưu đãi sẽ được hệ thống kiểm tra lại trước khi thanh toán.",
@@ -55,7 +55,7 @@
     "checkoutUnavailable": "Thanh toán chưa sẵn sàng",
     "placeOrder": "Đặt hàng & thanh toán",
     "placingOrder": "Đang tạo đơn...",
-    "placeOrderHint": "Hệ thống giữ hàng trong 1 giờ. Thanh toán bằng chuyển khoản QR qua SePay ở bước tiếp theo.",
+    "placeOrderHint": "Hệ thống giữ hàng trong 6 giờ. Thanh toán bằng chuyển khoản QR qua SePay ở bước tiếp theo.",
     "back": "Quay lại",
     "form": {
         "title": "Thêm gói giao hàng",
@@ -87,7 +87,7 @@
         "title": "Kiểm tra trước khi thanh toán",
         "counts": "{{packages}} gói giao hàng · {{products}} sản phẩm",
         "shipping": "Phí giao:",
-        "note": "Giá, ưu đãi, VAT, phí giao và tồn kho đã được kiểm tra lại. Khi bấm Đặt hàng & thanh toán, hệ thống tạo đơn, giữ hàng trong 1 giờ và hiển thị mã QR chuyển khoản."
+        "note": "Giá, ưu đãi, VAT, phí giao và tồn kho đã được kiểm tra lại. Khi bấm Đặt hàng & thanh toán, hệ thống tạo đơn, giữ hàng trong 6 giờ và hiển thị mã QR chuyển khoản."
     },
     "validation": {
         "required": "Vui lòng điền thông tin này.",
@@ -118,5 +118,38 @@
         "couponsUpdated": "Đã cập nhật ưu đãi.",
         "couponsRemoved": "Đã bỏ các coupon khỏi báo giá.",
         "packageAdded": "Đã thêm gói giao hàng."
+    },
+    "lineVat": "VAT {{rate}}%: {{amount}}",
+    "lineVatMissing": "Chưa có thuế suất VAT",
+    "vatIncomplete": "Thiếu VAT một số sản phẩm",
+    "totalBeforeShipping": "Tạm tính",
+    "couponPicker": {
+        "productTitle": "Coupon sản phẩm",
+        "shippingTitle": "Coupon phí giao hàng",
+        "selectOrEnter": "Chọn hoặc nhập mã",
+        "appliedUnknown": "Đã áp dụng",
+        "inputLabel": "Mã coupon",
+        "inputPlaceholder": "Nhập mã 8 ký tự",
+        "invalidCode": "Mã coupon gồm đúng 8 chữ cái hoặc chữ số.",
+        "notApplicable": "Mã không tồn tại hoặc không áp dụng được cho báo giá này.",
+        "loading": "Đang tải mã có sẵn…",
+        "loadFailed": "Không tải được danh sách mã. Bạn vẫn có thể nhập mã.",
+        "empty": "Hiện chưa có mã nào. Bạn vẫn có thể nhập mã nếu có.",
+        "available": "Mã có thể dùng",
+        "notEligible": "Chưa đủ điều kiện",
+        "percentOff": "Giảm {{value}}%",
+        "percentOffMax": "Giảm {{value}}%, tối đa {{max}}",
+        "amountOff": "Giảm {{value}}",
+        "minOrder": "Đơn tối thiểu {{value}}",
+        "noMinOrder": "Không yêu cầu đơn tối thiểu",
+        "selectedProducts": "Áp dụng cho một số sản phẩm",
+        "expires": "HSD {{date}}",
+        "estimated": "Dự kiến giảm {{value}}",
+        "reasonMinOrder": "Chưa đạt giá trị đơn tối thiểu",
+        "reasonNoProduct": "Báo giá chưa có sản phẩm được áp dụng",
+        "choose": "Chọn",
+        "inUse": "Đang dùng",
+        "remove": "Bỏ mã đang dùng",
+        "close": "Đóng"
     }
 }

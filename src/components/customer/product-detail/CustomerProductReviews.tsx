@@ -8,6 +8,7 @@ import {
     type ProductReviewsPage,
 } from '@/services/customer/reviewService';
 import CustomerWriteReview from '@/components/customer/product-detail/CustomerWriteReview';
+import ReviewImageLightbox from '@/components/customer/product-detail/ReviewImageLightbox';
 
 const PAGE_SIZE = 20;
 const SCROLL_SPEED_PX_PER_SECOND = 16;
@@ -22,6 +23,7 @@ function ReviewBubble({
     duplicate = false,
     expandLabel,
     collapseLabel,
+    onOpenImage,
 }: {
     review: CustomerReview;
     english: boolean;
@@ -32,8 +34,10 @@ function ReviewBubble({
     duplicate?: boolean;
     expandLabel: string;
     collapseLabel: string;
+    onOpenImage: (urls: string[], index: number) => void;
 }) {
     const hasMoreText = (review.content?.length ?? 0) > 160;
+    const sortedImages = [...(review.images ?? [])].sort((a, b) => a.sortOrder - b.sortOrder);
 
     return (
         <article className="min-h-[142px] rounded-2xl border border-white/15 bg-[#28523f] p-4 text-[#fffdf3] shadow-[0_8px_18px_rgba(0,0,0,0.08)]">
@@ -70,28 +74,31 @@ function ReviewBubble({
                     {review.content}
                 </p>
             )}
-            {review.images?.length > 0 && (
+            {sortedImages.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
-                    {[...review.images]
-                        .sort((a, b) => a.sortOrder - b.sortOrder)
-                        .map((image) => (
-                            <a
-                                key={image.id}
-                                href={image.imageUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                aria-label={imageLabel}
-                                tabIndex={duplicate ? -1 : undefined}
-                                className="inline-block rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffdf7c]"
-                            >
-                                <img
-                                    src={image.imageUrl}
-                                    alt={imageLabel}
-                                    loading="lazy"
-                                    className="h-16 w-16 rounded-md object-cover transition-transform hover:scale-105"
-                                />
-                            </a>
-                        ))}
+                    {sortedImages.map((image, index) => (
+                        <button
+                            key={image.id}
+                            type="button"
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                onOpenImage(
+                                    sortedImages.map((item) => item.imageUrl),
+                                    index,
+                                );
+                            }}
+                            aria-label={imageLabel}
+                            tabIndex={duplicate ? -1 : undefined}
+                            className="inline-block cursor-zoom-in overflow-hidden rounded-md !border-0 !bg-transparent !p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffdf7c]"
+                        >
+                            <img
+                                src={image.imageUrl}
+                                alt=""
+                                loading="lazy"
+                                className="h-20 w-20 rounded-md object-cover transition-transform hover:scale-105"
+                            />
+                        </button>
+                    ))}
                 </div>
             )}
             {hasMoreText && (
@@ -124,6 +131,7 @@ export default function CustomerProductReviews({ productId }: { productId: strin
     const [error, setError] = useState(false);
     const [hovered, setHovered] = useState(false);
     const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [viewer, setViewer] = useState<{ urls: string[]; index: number } | null>(null);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const firstListRef = useRef<HTMLDivElement>(null);
 
@@ -169,7 +177,8 @@ export default function CustomerProductReviews({ productId }: { productId: strin
             reviews.length < 2 ||
             reducedMotion ||
             hovered ||
-            expandedId !== null
+            expandedId !== null ||
+            viewer !== null
         )
             return;
 
@@ -189,10 +198,10 @@ export default function CustomerProductReviews({ productId }: { productId: strin
         };
         frame = window.requestAnimationFrame(animate);
         return () => window.cancelAnimationFrame(frame);
-    }, [reviews, reducedMotion, hovered, expandedId]);
+    }, [reviews, reducedMotion, hovered, expandedId, viewer]);
 
     const hasMore = page < (result?.totalPages ?? 1) - 1;
-    const isRunning = !reducedMotion && !hovered && expandedId === null;
+    const isRunning = !reducedMotion && !hovered && expandedId === null && viewer === null;
     const toggleReview = (id: string) => setExpandedId((current) => (current === id ? null : id));
 
     const refresh = () => {
@@ -214,6 +223,7 @@ export default function CustomerProductReviews({ productId }: { productId: strin
             duplicate={duplicate}
             expandLabel={tr('reviewExpand')}
             collapseLabel={tr('reviewCollapse')}
+            onOpenImage={(urls, index) => setViewer({ urls, index })}
         />
     );
 
@@ -292,7 +302,7 @@ export default function CustomerProductReviews({ productId }: { productId: strin
                         }}
                         onTouchStart={() => setHovered(true)}
                         onTouchEnd={() => setHovered(false)}
-                        className="h-[260px] overflow-y-auto overscroll-contain rounded-xl outline-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden focus-visible:ring-2 focus-visible:ring-[#ffe17c]"
+                        className="h-[360px] overflow-y-auto overscroll-contain rounded-xl outline-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden focus-visible:ring-2 focus-visible:ring-[#ffe17c]"
                         style={{ scrollBehavior: isRunning ? 'auto' : 'smooth' }}
                     >
                         <div ref={firstListRef} className="space-y-3 pb-3">
@@ -320,6 +330,16 @@ export default function CustomerProductReviews({ productId }: { productId: strin
                 </div>
             )}
             <CustomerWriteReview productId={productId} onCreated={refresh} />
+            {viewer && (
+                <ReviewImageLightbox
+                    images={viewer.urls}
+                    index={viewer.index}
+                    onIndexChange={(index) =>
+                        setViewer((current) => (current ? { ...current, index } : current))
+                    }
+                    onClose={() => setViewer(null)}
+                />
+            )}
         </section>
     );
 }

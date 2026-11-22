@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
-import { ChevronRight, PackageX } from 'lucide-react';
+import { PackageX } from 'lucide-react';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
 import CustomerProductInfo from '@/components/customer/product-detail/CustomerProductInfo';
 import CustomerProductPurchase from '@/components/customer/product-detail/CustomerProductPurchase';
@@ -14,6 +14,7 @@ import {
     type CustomerProductPricing,
 } from '@/services/customer/productDetailService';
 import { ROUTES } from '@/router/routes';
+import PageNav from '@/components/common/PageNav';
 
 export default function CustomerProductDetailPage() {
     const { productId } = useParams<{ productId: string }>();
@@ -110,41 +111,23 @@ function CustomerProductDetailContent({ productId }: { productId?: string }) {
             mainClassName="box-border flex-1 pb-20 [&_button]:cursor-pointer [&_button:disabled]:cursor-not-allowed [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-offset-2 [&_button:focus-visible]:outline-[#b08b22]"
         >
             <div className="mx-auto w-full max-w-[1440px] px-5 pb-5 pt-6">
-                <nav
-                    aria-label={tr('breadcrumb')}
-                    className="flex flex-wrap items-center gap-2 text-xs text-[#d1dfd2]"
-                >
-                    <Link
-                        to={ROUTES.HOME}
-                        className="text-[#d1dfd2] no-underline hover:text-store-yellow"
-                    >
-                        {tr('home')}
-                    </Link>
-                    <ChevronRight size={14} />
-                    <Link
-                        to={ROUTES.CATALOG}
-                        className="text-[#d1dfd2] no-underline hover:text-store-yellow"
-                    >
-                        {tr('catalog')}
-                    </Link>
-                    {category && product?.categoryId && (
-                        <>
-                            <ChevronRight size={14} aria-hidden="true" />
-                            <Link
-                                to={`${ROUTES.CATALOG}?category=${encodeURIComponent(product.categoryId)}`}
-                                className="text-[#d1dfd2] underline-offset-4 hover:text-store-yellow hover:underline"
-                            >
-                                {category}
-                            </Link>
-                        </>
-                    )}
-                    {name && (
-                        <>
-                            <ChevronRight size={14} />
-                            <span className="font-bold text-[#ffdd63]">{name}</span>
-                        </>
-                    )}
-                </nav>
+                <PageNav
+                    tone="dark"
+                    ariaLabel={tr('breadcrumb')}
+                    items={[
+                        { label: tr('home'), to: ROUTES.HOME },
+                        { label: tr('catalog'), to: ROUTES.CATALOG },
+                        ...(category && product?.categoryId
+                            ? [
+                                  {
+                                      label: category,
+                                      to: `${ROUTES.CATALOG}?category=${encodeURIComponent(product.categoryId)}`,
+                                  },
+                              ]
+                            : []),
+                        ...(name ? [{ label: name }] : []),
+                    ]}
+                />
             </div>
 
             <div className="mx-auto w-full max-w-[1440px] px-5">

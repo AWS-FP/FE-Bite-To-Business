@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, ChevronDown, ChevronRight, PackageSearch } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { ChevronDown, ChevronRight, PackageSearch } from 'lucide-react';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
 import { getHomeCategories, type HomeCategory } from '@/services/customer/homeService';
 import {
@@ -12,6 +12,7 @@ import SectionPaginationBar from '@/components/customer/home/SectionPaginationBa
 import CatalogShowcaseCard from '@/components/customer/CatalogShowcaseCard';
 import CategoryIcon from '@/components/customer/CategoryIcon';
 import { ROUTES } from '@/router/routes';
+import PageNav from '@/components/common/PageNav';
 
 export default function CustomerCatalogPage() {
     const { t, i18n } = useTranslation('storefront');
@@ -89,13 +90,7 @@ export default function CustomerCatalogPage() {
         <StorefrontLayout rootClassName="min-h-screen bg-store-cream text-store-ink">
             {/* Same 1440px + 20px gutters as the main navigation above. */}
             <div className="mx-auto w-full max-w-[1440px] px-5 pb-16 pt-7 sm:pt-9">
-                <Link
-                    to={ROUTES.HOME}
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-store-green no-underline hover:underline"
-                >
-                    <ArrowLeft size={17} />
-                    {t('home')}
-                </Link>
+                <PageNav back={{ label: t('home'), to: ROUTES.HOME }} />
 
                 <header className="mt-5 rounded-[22px] bg-store-green px-6 py-7 text-white sm:px-9 sm:py-9">
                     <h1 className="m-0 font-subheading text-3xl font-bold sm:text-4xl">

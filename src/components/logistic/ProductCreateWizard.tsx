@@ -11,6 +11,7 @@ import { getCatalogBrands, type CatalogBrand } from '@/services/customer/catalog
 import type { ProductRequest } from '@/hooks/logistic/useLogisticsData';
 import { http } from '@/services/axiosClient';
 import axios from 'axios';
+import PageNav from '@/components/common/PageNav';
 
 const inputClass =
     'mt-2 w-full rounded border border-black/40 bg-white px-3 py-3 text-sm font-normal text-black outline-none focus:border-black focus:ring-0';
@@ -445,14 +446,13 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
 
     return (
         <div className="mx-auto max-w-[1200px] space-y-6 text-black">
-            <button
-                type="button"
-                onClick={onClose}
-                disabled={busy}
-                className="inline-flex items-center gap-2 border-0 bg-transparent p-0 text-[17px] font-bold underline underline-offset-4 disabled:opacity-50"
-            >
-                <ArrowLeft size={17} /> {request ? tr("Quay lại yêu cầu") : tr("Quay lại nhập hàng")}
-            </button>
+            <PageNav
+                back={{
+                    label: request ? tr("Quay lại yêu cầu") : tr("Quay lại nhập hàng"),
+                    onClick: onClose,
+                    disabled: busy,
+                }}
+            />
             <div className="flex items-start justify-between gap-6">
                 <div>
                     <p className="text-xs font-bold uppercase tracking-widest text-store-green">

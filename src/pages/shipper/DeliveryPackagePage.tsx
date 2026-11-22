@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import DeliveryMap from '@/components/shipper/DeliveryMap';
 import { getPackageDetail } from '@/services/shipper/deliveryService';
 import type { ClaimedPackage } from '@/services/shipper/deliveryService';
 import { ROUTES } from '@/router/routes';
+import PageNav from '@/components/common/PageNav';
 
 export default function DeliveryPackagePage() {
     const { tripId } = useParams();
@@ -24,7 +25,7 @@ export default function DeliveryPackagePage() {
 
     return (
         <div className="space-y-6 text-store-ink">
-            <Link to={ROUTES.DELIVERY_TRIPS} className="dl-btn">← Quay lại</Link>
+            <PageNav back={{ label: 'Quay lại', to: ROUTES.DELIVERY_TRIPS }} />
             <h1 className="font-subheading text-3xl font-bold">Chi tiết package</h1>
             {error && <p role="alert">{error}</p>}
             {!parcel && !error && <p>Đang tải thông tin...</p>}

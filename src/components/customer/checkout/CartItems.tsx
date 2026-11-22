@@ -5,6 +5,9 @@ import { formatCurrencyVnd } from '@/constants/customer/homeData';
 import { ROUTES } from '@/router/routes';
 import type { CartItem } from '@/store/customer/cartStore';
 
+const productPath = (id: string) =>
+    ROUTES.PRODUCT_DETAIL.replace(':productId', encodeURIComponent(id));
+
 interface CartItemsProps {
     items: CartItem[];
     updateQuantity: (id: string, delta: number) => void;
@@ -38,20 +41,30 @@ export default function CartItems({ items, updateQuantity }: CartItemsProps) {
                         key={item.id}
                         className="flex items-center gap-4 border-b border-store-ink/10 p-5 last:border-b-0"
                     >
-                        <div className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-xl bg-store-cream text-store-green">
+                        <Link
+                            to={productPath(item.id)}
+                            tabIndex={-1}
+                            aria-hidden="true"
+                            className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-xl bg-store-cream text-store-green"
+                        >
                             {item.imageUrl ? (
                                 <img
                                     src={item.imageUrl}
                                     alt=""
-                                    className="size-full object-cover"
+                                    className="size-full object-cover transition-transform duration-300 hover:scale-105"
                                 />
                             ) : (
                                 <ImageIcon size={26} />
                             )}
-                        </div>
+                        </Link>
                         <div className="min-w-0 flex-1">
                             <h3 className="m-0 font-bold">
-                                {(english ? item.nameEn : item.nameVi) || item.name}
+                                <Link
+                                    to={productPath(item.id)}
+                                    className="text-store-ink no-underline hover:text-store-green hover:underline"
+                                >
+                                    {(english ? item.nameEn : item.nameVi) || item.name}
+                                </Link>
                             </h3>
                             <p className="my-1 text-sm text-store-muted">
                                 {(english ? item.specEn : item.specVi) || item.spec}
