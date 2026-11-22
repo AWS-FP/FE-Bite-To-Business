@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowRight, MapPin, Navigation, Search, Truck } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { Map, Marker } from '@vietmap/vietmap-gl-js/dist/vietmap-gl';
 import { deliveryMapCities } from '@/utils/deliveryMapCities';
@@ -42,6 +42,11 @@ function inServiceArea(city: 'hcm' | 'hanoi', lng: number, lat: number) {
 
 export default function DistributionExplorer() {
     const navigate = useNavigate();
+    // Opened from the delivery-package form on /quotes: go straight back to that step.
+    const [searchParams] = useSearchParams();
+    const backToPackage =
+        searchParams.get('returnTo') === 'quote-delivery' &&
+        useCartStore.getState().items.length > 0;
     const { t, i18n } = useTranslation('storefront');
     const owner = useAuthStore((state) => state.session?.user.id ?? 'guest');
     const cartCount = useCartStore((state) => state.items.length);
@@ -335,9 +340,16 @@ export default function DistributionExplorer() {
                 addressRefId: undefined,
                 latitude: estimate.lat,
                 longitude: estimate.lng,
+                fromProfile: false,
             },
         }));
-        navigate(cartCount > 0 ? ROUTES.QUOTES : ROUTES.CATALOG);
+        navigate(
+            backToPackage
+                ? `${ROUTES.QUOTES}?step=delivery`
+                : cartCount > 0
+                  ? ROUTES.QUOTES
+                  : ROUTES.CATALOG,
+        );
     }
 
     return (
@@ -524,17 +536,21 @@ export default function DistributionExplorer() {
                     className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-store-ink px-5 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
                 >
                     {t(
-                        cartCount > 0
-                            ? 'distribution.useAddressToQuote'
-                            : 'distribution.useAddressToCatalog',
+                        backToPackage
+                            ? 'distribution.useAddressBackToPackage'
+                            : cartCount > 0
+                              ? 'distribution.useAddressToQuote'
+                              : 'distribution.useAddressToCatalog',
                     )}{' '}
                     <ArrowRight size={18} />
                 </button>
                 <p className="m-0 mt-2 text-xs text-store-muted">
                     {t(
-                        cartCount > 0
-                            ? 'distribution.useAddressHintQuote'
-                            : 'distribution.useAddressHintCatalog',
+                        backToPackage
+                            ? 'distribution.useAddressHintBackToPackage'
+                            : cartCount > 0
+                              ? 'distribution.useAddressHintQuote'
+                              : 'distribution.useAddressHintCatalog',
                     )}
                 </p>
             </div>

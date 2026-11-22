@@ -112,14 +112,8 @@ export default function useRegisterForm() {
                     }
                     setStep(firstErrorStep);
                 }
-                if (error.response?.data?.code === 'EMAIL_ALREADY_EXISTS') {
-                    form.setError('email', { type: 'server', message: 'errors.emailExists' });
-                    setStep(1);
-                }
-                if (error.response?.data?.code === 'PHONE_ALREADY_EXISTS') {
-                    form.setError('phone', { type: 'server', message: 'errors.phoneExists' });
-                    setStep(1);
-                }
+                // No "email/phone already registered" handling: the API never reveals that (it would
+                // let anyone probe accounts). Duplicates get a normal receipt and an emailed rejection.
             }
         } finally {
             submittingRef.current = false;

@@ -7,6 +7,8 @@ export interface QuoteFormDraft {
     shippingCode: string;
     quantities: Record<string, string>;
     parcel: PackageDraft;
+    /** The customer cleared the default package filled from their profile; do not fill it again. */
+    profileDefaultDismissed?: boolean;
 }
 
 export const emptyParcel: PackageDraft = {

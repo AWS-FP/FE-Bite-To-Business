@@ -8,6 +8,7 @@ import { RegistrationError, RegistrationLoading } from '@/components/admin/Regis
 import Pagination from '@/components/common/Pagination';
 import RegistrationStats from '@/components/admin/RegistrationStats';
 import RegistrationTable from '@/components/admin/RegistrationTable';
+import RegistrationDuplicates from '@/components/admin/RegistrationDuplicates';
 import { useRegistrations, useRegistrationStats } from '@/hooks/admin/useRegistrations';
 import {
     readCustomerType,
@@ -267,6 +268,8 @@ export default function RegistrationsPage() {
                     />
                 )}
             </section>
+
+            <RegistrationDuplicates />
 
             <Outlet />
         </>

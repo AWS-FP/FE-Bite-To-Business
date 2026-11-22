@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react';
+import { MapPinned, Plus, Trash2, UserRoundCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Dispatch, FormEvent, SetStateAction } from 'react';
@@ -17,6 +17,8 @@ export interface PackageDraft {
     /** Exact point chosen on the distribution page; used instead of geocoding the address text. */
     latitude?: number;
     longitude?: number;
+    /** Filled from the delivery details the customer gave at registration. */
+    fromProfile?: boolean;
     note: string;
     city: 'HCM' | 'HANOI';
 }
@@ -34,6 +36,12 @@ interface PackageFormProps {
     duplicateAddressError: boolean;
     clearAddressError: () => void;
     createPackage: (event: FormEvent<HTMLFormElement>) => void;
+    /** Opens the distribution map to pick the address, then comes back to this step. */
+    onPickOnMap?: () => void;
+    /** Clears the default package filled from the profile. */
+    onClearProfileDefault?: () => void;
+    /** Bumped each time the customer tries to continue with products left unallocated. */
+    revealErrors?: number;
 }
 
 const field =
@@ -54,6 +62,9 @@ export default function PackageForm({
     duplicateAddressError,
     clearAddressError,
     createPackage,
+    onPickOnMap,
+    onClearProfileDefault,
+    revealErrors = 0,
 }: PackageFormProps) {
     const { t, i18n } = useTranslation('quote');
     const productName = (item: Quote['items'][number]) =>
@@ -93,8 +104,12 @@ export default function PackageForm({
             controller.abort();
         };
     }, [parcel.address, addressResolved, parcel.city]);
+    // "Review quote total" with products still unallocated reveals every error in this form too.
+    const [revealHandled, setRevealHandled] = useState(0);
+    const revealed = revealErrors > revealHandled;
     const showError = (name: string, message: string | undefined) =>
-        message && (submitted || touched[name] || (name === 'address' && duplicateAddressError))
+        message &&
+        (submitted || revealed || touched[name] || (name === 'address' && duplicateAddressError))
             ? message
             : undefined;
     const markTouched = (name: string) => setTouched((current) => ({ ...current, [name]: true }));
@@ -148,6 +163,7 @@ export default function PackageForm({
         }
         setSubmitted(false);
         setTouched({});
+        setRevealHandled(revealErrors);
         createPackage(event);
     }
     const errorText = (name: string) => {
@@ -160,11 +176,30 @@ export default function PackageForm({
     };
     return (
         <form
+            id="package-form"
             noValidate
             onSubmit={onSubmit}
             className="rounded-2xl border border-store-ink/20 bg-white p-6"
         >
             <h2 className="m-0 font-subheading text-xl font-bold">{t('form.title')}</h2>
+            {parcel.fromProfile && (
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-store-green/30 bg-surface-green px-4 py-3 text-sm">
+                    <p className="m-0 flex items-center gap-2 text-store-ink">
+                        <UserRoundCheck size={18} className="shrink-0 text-store-green" aria-hidden="true" />
+                        {t('form.profileDefault')}
+                    </p>
+                    {onClearProfileDefault && (
+                        <button
+                            type="button"
+                            onClick={onClearProfileDefault}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-red-300 bg-white px-3 py-1.5 text-xs font-bold text-red-700 hover:bg-red-50"
+                        >
+                            <Trash2 size={14} aria-hidden="true" />
+                            {t('form.clearProfileDefault')}
+                        </button>
+                    )}
+                </div>
+            )}
             <div className="mt-5 grid grid-cols-2 gap-4">
                 <label className="text-sm font-bold">
                     {t('form.name')}
@@ -305,7 +340,19 @@ export default function PackageForm({
                             setSuggestionsOpen(false);
                     }}
                 >
-                    <label htmlFor="package-address">{t('form.address')}</label>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                        <label htmlFor="package-address">{t('form.address')}</label>
+                        {onPickOnMap && (
+                            <button
+                                type="button"
+                                onClick={onPickOnMap}
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-store-ink/25 bg-white px-3 py-1.5 text-xs font-bold text-store-green hover:bg-store-cream"
+                            >
+                                <MapPinned size={15} aria-hidden="true" />
+                                {t('form.pickOnMap')}
+                            </button>
+                        )}
+                    </div>
                     <input
                         id="package-address"
                         className={`${field} mt-2`}
@@ -443,6 +490,18 @@ export default function PackageForm({
                             />
                         </label>
                         {errorText(item.productId)}
+                        {revealed &&
+                            !errors[item.productId] &&
+                            Number(item.quantity) - allocated(item.id) > 1e-8 && (
+                                <span role="alert" className="mt-1 block text-sm font-normal text-red-700">
+                                    {t('validation.unallocated', {
+                                        quantity: Number(
+                                            (Number(item.quantity) - allocated(item.id)).toFixed(3),
+                                        ),
+                                        unit: item.unitCode,
+                                    })}
+                                </span>
+                            )}
                     </div>
                 ))}
             </div>

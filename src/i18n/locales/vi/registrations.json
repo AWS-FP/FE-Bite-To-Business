@@ -154,5 +154,31 @@
     "footer": {
         "copyright": "© {{year}} Bite to Business. Kết nối nguồn thực phẩm tốt.",
         "adminOnly": "Chỉ dành cho quản trị viên"
+    },
+    "duplicates": {
+        "title": "Đăng ký trùng – tự động từ chối",
+        "description": "Email hoặc số điện thoại trùng với tài khoản đã có. Form đăng ký vẫn báo đã nhận yêu cầu (để không lộ tài khoản nào tồn tại); hệ thống tự gửi mail từ chối sau vài phút, mỗi địa chỉ tối đa 1 mail/24 giờ.",
+        "loading": "Đang tải...",
+        "error": "Không tải được danh sách đăng ký trùng.",
+        "empty": "Chưa có đăng ký trùng.",
+        "columns": {
+            "time": "Thời gian",
+            "name": "Họ tên",
+            "email": "Email",
+            "phone": "Số điện thoại",
+            "duplicate": "Trùng",
+            "mail": "Mail từ chối"
+        },
+        "field": {
+            "EMAIL": "Trùng email",
+            "PHONE": "Trùng số điện thoại",
+            "EMAIL_AND_PHONE": "Trùng email & SĐT"
+        },
+        "mail": {
+            "PENDING": "Đang chờ gửi",
+            "SENT": "Đã gửi",
+            "SKIPPED": "Bỏ qua (đã gửi trong 24 giờ)",
+            "FAILED": "Gửi lỗi"
+        }
     }
 }

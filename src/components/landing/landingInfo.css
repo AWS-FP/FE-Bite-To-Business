@@ -6,7 +6,7 @@
 
 .btb-landing .btb-info h1 {
     font-family: var(--font-heading);
-    font-weight: 400;
+    font-weight: 700;
     font-synthesis: none;
 }
 
@@ -51,7 +51,7 @@
     max-width: 820px;
     color: var(--color-store-cream);
     font-family: var(--font-heading);
-    font-weight: 400;
+    font-weight: 700;
     font-synthesis: none;
 }
 

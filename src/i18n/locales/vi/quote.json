@@ -16,6 +16,11 @@
     "decrease": "Giảm số lượng {{name}}",
     "increase": "Tăng số lượng {{name}}",
     "remove": "Xóa {{name}}",
+    "quantityRules": "Tối thiểu {{min}} · tăng giảm theo bước {{step}}",
+    "atMinimum": "Đã ở số lượng tối thiểu ({{min}}). Dùng nút xóa để bỏ khỏi giỏ.",
+    "stockAvailable": "Còn {{stock}} có thể đặt",
+    "stockBelowMinimum": "Chỉ còn {{stock}}, chưa đủ số lượng tối thiểu. Vui lòng xóa sản phẩm này hoặc chờ nhập hàng.",
+    "atStockLimit": "Đã đạt số lượng tồn kho có thể đặt ({{stock}}).",
     "pricingTitle": "Giá sản phẩm & ưu đãi",
     "pricingDescription": "Giá hiện tại từ hệ thống, trước phí giao và VAT.",
     "productCoupon": "Coupon sản phẩm",
@@ -81,7 +86,11 @@
         "quantityLabel": "Số lượng {{name}} cho gói này",
         "addressNote": "Địa chỉ được tìm tọa độ để tính phí; vui lòng kiểm tra lại địa chỉ trước khi lưu.",
         "addressFromDistribution": "Dùng đúng vị trí đã chọn ở trang Phân phối. Sửa địa chỉ sẽ tìm lại tọa độ.",
-        "creating": "Đang tạo gói..."
+        "creating": "Đang tạo gói...",
+        "profileDefault": "Đã điền sẵn thông tin giao hàng mặc định từ hồ sơ của bạn. Chỉ cần nhập số lượng rồi tạo gói.",
+        "clearProfileDefault": "Xóa thông tin mặc định",
+        "pickOnMap": "Chọn trên bản đồ",
+        "defaultPackageName": "Gói giao hàng mặc định"
     },
     "review": {
         "title": "Kiểm tra trước khi thanh toán",
@@ -98,7 +107,10 @@
         "quantityInvalid": "Vui lòng nhập số lượng hợp lệ, tối đa 3 chữ số thập phân.",
         "quantityMax": "Số lượng không được vượt quá {{max}} {{unit}}.",
         "quantityStep": "Số lượng phải là bội số của {{step}} {{unit}}.",
-        "quantityRequired": "Vui lòng chọn số lượng cho ít nhất một sản phẩm."
+        "quantityRequired": "Vui lòng chọn số lượng cho ít nhất một sản phẩm.",
+        "noPackage": "Chưa có gói giao hàng nào. Điền thông tin gói và bấm Tạo gói.",
+        "unallocatedProducts": "Còn {{count}} sản phẩm chưa được chia vào gói giao hàng.",
+        "unallocated": "Còn {{quantity}} {{unit}} chưa được chia vào gói nào."
     },
     "errors": {
         "fallback": "Không thể xử lý yêu cầu. Vui lòng thử lại.",

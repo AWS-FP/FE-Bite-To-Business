@@ -77,6 +77,9 @@ export default function CustomerProductPurchase({ product, pricing, name, spec }
                 specEn: product.packageSpecEn,
                 unitPrice,
                 imageUrl: product.imageUrl ?? undefined,
+                minOrderQuantity: min,
+                quantityStep: step,
+                maxQuantity: availableQuantity,
             },
             selectedQuantity,
         );

@@ -1,5 +1,10 @@
-/* Font dùng chung và tiêu đề Staff tải từ Google Fonts. */
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Inter:wght@100..900&family=Kavoon&family=Manrope:wght@200..800&family=Oswald:wght@200..700&family=Prata&family=Space+Grotesk:wght@300..700&display=swap');
+/*
+ * Chỉ 3 font cho cả website (đủ dấu tiếng Việt, đọc tốt tiếng Anh):
+ * - Be Vietnam Pro: mọi chữ (body, tiêu đề, label, chữ phụ).
+ * - Inter: số và giá tiền (số đều độ rộng, "1" không lẫn với "l").
+ * - Kavoon: chỉ cho logo "Bite to Business".
+ */
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Inter:wght@400..900&family=Kavoon&display=swap');
 
 @layer theme, base, components, utilities;
 @import 'tailwindcss/theme.css' layer(theme);
@@ -20,14 +25,15 @@ body::-webkit-scrollbar,
 
 /* Màu và font xài cho cả trang web */
 @theme static {
-    --font-body: 'Be Vietnam Pro', sans-serif;
-    --font-subtext: 'Manrope', sans-serif;
-    --font-heading: 'Prata', Georgia, serif;
-    --font-subheading: 'Space Grotesk', sans-serif;
+    /* Các tên cũ được giữ làm bí danh để không phải sửa hơn 500 chỗ đang dùng. */
+    --font-body: 'Be Vietnam Pro', system-ui, sans-serif;
+    --font-subtext: 'Be Vietnam Pro', system-ui, sans-serif;
+    --font-heading: 'Be Vietnam Pro', system-ui, sans-serif;
+    --font-subheading: 'Be Vietnam Pro', system-ui, sans-serif;
+    --font-label: 'Be Vietnam Pro', system-ui, sans-serif;
+    --font-display: 'Be Vietnam Pro', system-ui, sans-serif;
+    --font-price: 'Inter', system-ui, sans-serif;
     --font-brand: 'Kavoon', Georgia, serif;
-    --font-price: 'Inter', sans-serif;
-    --font-label: 'Oswald', sans-serif;
-    --font-display: 'Bricolage Grotesque', sans-serif;
     --font-mono: ui-monospace, 'SFMono-Regular', Consolas, monospace;
     --color-store-green: #12372a;
     --color-store-dark: #0b241b;
@@ -80,7 +86,8 @@ body::-webkit-scrollbar,
 
 @utility font-heading {
     font-family: var(--font-heading);
-    font-weight: 400;
+    /* Prata cũ đậm sẵn ở 400; Be Vietnam Pro cần 700 để tiêu đề không bị mảnh. */
+    font-weight: 700;
     font-style: normal;
     font-synthesis: none;
 }
@@ -104,7 +111,7 @@ body::-webkit-scrollbar,
 
     h1 {
         font-family: var(--font-heading);
-        font-weight: 400;
+        font-weight: 700;
         font-synthesis: none;
     }
 

@@ -1,6 +1,6 @@
 import axios, { type InternalAxiosRequestConfig } from 'axios';
 import { env } from '@/lib/env';
-import type { AuthResponse, RefreshTokenRequest } from '@/types/admin/auth';
+import type { AuthResponse } from '@/types/admin/auth';
 import { useAuthStore } from '@/store/admin/authStore';
 import type { ApiResponse } from '@/types/api';
 
@@ -24,17 +24,19 @@ interface AuthRequestConfig extends InternalAxiosRequestConfig {
 
 let refreshing: { version: number; promise: Promise<AuthResponse> } | null = null;
 
-async function refreshSession(version: number, refreshToken: string) {
+/** POST /api/auth/refresh with the HttpOnly refresh cookie (no token in JS or in the body). */
+function requestRefresh() {
+    return refreshClient.post<ApiResponse<AuthResponse>>('/api/auth/refresh', undefined, {
+        withCredentials: true,
+    });
+}
+
+async function refreshSession(version: number) {
     try {
-        // BE hiện nhận refreshToken trong JSON body, không đọc refresh cookie như SWP.
-        const body: RefreshTokenRequest = { refreshToken };
-        const response = await refreshClient.post<ApiResponse<AuthResponse>>(
-            '/api/auth/refresh',
-            body,
-        );
+        const response = await requestRefresh();
         const session = response.data.data;
 
-        if (!session.accessToken || !session.refreshToken || !session.user) {
+        if (!session.accessToken || !session.user) {
             throw new Error('Backend returned an invalid authentication session.');
         }
 
@@ -102,7 +104,7 @@ http.interceptors.response.use(
         // Nhiều request 401 cùng phiên dùng chung một lần refresh, không đổi token nhiều lần.
         if (!refreshing || refreshing.version !== state.sessionVersion) {
             const version = state.sessionVersion;
-            const promise = refreshSession(version, session.refreshToken).finally(() => {
+            const promise = refreshSession(version).finally(() => {
                 if (refreshing?.version === version) {
                     refreshing = null;
                 }
@@ -119,6 +121,35 @@ http.interceptors.response.use(
         return http(request);
     },
 );
+
+/**
+ * Runs once at startup: the session is not stored in the browser, so a reload, a new tab or
+ * reopening the site asks BE for a fresh access token using the HttpOnly refresh cookie.
+ * Route guards wait until this finishes.
+ */
+let restoring: Promise<void> | null = null;
+export function restoreSession() {
+    restoring ??= (async () => {
+        const version = useAuthStore.getState().sessionVersion;
+        try {
+            const response = await requestRefresh();
+            const session = response.data.data;
+            // A login that finished meanwhile wins over the restored session.
+            if (
+                session?.accessToken &&
+                session.user &&
+                useAuthStore.getState().sessionVersion === version
+            ) {
+                useAuthStore.getState().setSession(session);
+            }
+        } catch {
+            // No cookie, expired, or offline: stay signed out.
+        } finally {
+            useAuthStore.getState().finishRestoring();
+        }
+    })();
+    return restoring;
+}
 
 // Login/register/verify-otp/activate dùng publicHttp: không tự gắn token hoặc refresh.
 // Khi activate, service sẽ truyền token từ bước verify-otp vào header của riêng request đó.

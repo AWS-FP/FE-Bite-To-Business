@@ -94,6 +94,9 @@ export default function ProductShowcaseCard({
                 spec: product.spec,
                 unitPrice,
                 imageUrl: product.imageUrl,
+                minOrderQuantity: minQuantity,
+                quantityStep: step,
+                maxQuantity: available ?? null,
             },
             quantity,
         );

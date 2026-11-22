@@ -179,7 +179,7 @@ export default function OrderStatusPage() {
                     const quantity = Number(item.quantity);
                     const existing = cart.items.find((entry) => entry.id === item.productId);
                     if (existing) {
-                        cart.updateQuantity(item.productId, quantity - existing.quantity);
+                        cart.setQuantity(item.productId, quantity);
                     } else {
                         cart.addItem(
                             {

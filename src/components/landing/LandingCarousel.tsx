@@ -390,7 +390,7 @@ export default function LandingCarousel() {
                                     alt="Logo BTB Bite to Business"
                                     className="haccp-logo-img"
                                 />
-                                <div className="font-heading text-[clamp(36px,5vw,58px)] font-normal leading-none tracking-[0.02em] text-store-ink">BITE TO BUSINESS</div>
+                                <div className="font-heading text-[clamp(36px,5vw,58px)] font-bold leading-none tracking-[0.02em] text-store-ink">BITE TO BUSINESS</div>
                             </div>
                             <div className="mb-[18px] font-body text-[clamp(18px,2.4vw,26px)] font-extrabold tracking-[0.12em] text-store-coral">
                                 HACCP CODEX &amp; AI A2UI PLATFORM 2026
@@ -483,7 +483,7 @@ export default function LandingCarousel() {
                     data-chapter="0"
                     onClick={() => changeSlide(0)}
                 >
-                    <span className="rounded-md border-[1.5px] border-solid border-store-ink bg-store-yellow px-1.5 py-0.5 font-heading text-sm font-normal text-store-green">01</span>
+                    <span className="rounded-md border-[1.5px] border-solid border-store-ink bg-store-yellow px-1.5 py-0.5 font-heading text-sm font-bold text-store-green">01</span>
                     <span>Kho vận chuẩn quốc tế</span>
                 </button>
                 <button
@@ -492,7 +492,7 @@ export default function LandingCarousel() {
                     data-chapter="1"
                     onClick={() => changeSlide(1)}
                 >
-                    <span className="rounded-md border-[1.5px] border-solid border-store-ink bg-store-yellow px-1.5 py-0.5 font-heading text-sm font-normal text-store-green">02</span>
+                    <span className="rounded-md border-[1.5px] border-solid border-store-ink bg-store-yellow px-1.5 py-0.5 font-heading text-sm font-bold text-store-green">02</span>
                     <span>Kiểm định lạnh &amp; Đóng kiện</span>
                 </button>
                 <button
@@ -501,7 +501,7 @@ export default function LandingCarousel() {
                     data-chapter="2"
                     onClick={() => changeSlide(2)}
                 >
-                    <span className="rounded-md border-[1.5px] border-solid border-store-ink bg-store-yellow px-1.5 py-0.5 font-heading text-sm font-normal text-store-green">03</span>
+                    <span className="rounded-md border-[1.5px] border-solid border-store-ink bg-store-yellow px-1.5 py-0.5 font-heading text-sm font-bold text-store-green">03</span>
                     <span>Thực phẩm &amp; Đồ chế biến sẵn</span>
                 </button>
                 <button
@@ -510,7 +510,7 @@ export default function LandingCarousel() {
                     data-chapter="3"
                     onClick={() => changeSlide(3)}
                 >
-                    <span className="rounded-md border-[1.5px] border-solid border-store-ink bg-store-yellow px-1.5 py-0.5 font-heading text-sm font-normal text-store-green">04</span>
+                    <span className="rounded-md border-[1.5px] border-solid border-store-ink bg-store-yellow px-1.5 py-0.5 font-heading text-sm font-bold text-store-green">04</span>
                     <span>Mạng lưới giao TP.HCM</span>
                 </button>
                 <button
@@ -519,7 +519,7 @@ export default function LandingCarousel() {
                     data-chapter="4"
                     onClick={() => changeSlide(4)}
                 >
-                    <span className="rounded-md border-[1.5px] border-solid border-store-ink bg-store-yellow px-1.5 py-0.5 font-heading text-sm font-normal text-store-green">05</span>
+                    <span className="rounded-md border-[1.5px] border-solid border-store-ink bg-store-yellow px-1.5 py-0.5 font-heading text-sm font-bold text-store-green">05</span>
                     <span>Chuẩn HACCP &amp; A2UI</span>
                 </button>
             </div>

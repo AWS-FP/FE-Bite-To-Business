@@ -180,7 +180,9 @@
             "search": "Could not search for addresses. Please try again.",
             "estimate": "Could not calculate the route. Please select the address again.",
             "geocode": "Could not find coordinates for this address. Select a suggestion or a point on the map."
-        }
+        },
+        "useAddressBackToPackage": "Use this address for the delivery package",
+        "useAddressHintBackToPackage": "You will return to the Delivery packages step with this address filled in."
     },
     "home": "Bite to Business home",
     "main": "Homepage content",

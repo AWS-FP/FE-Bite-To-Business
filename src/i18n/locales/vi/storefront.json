@@ -180,7 +180,9 @@
             "search": "Không tìm được địa chỉ. Vui lòng thử lại.",
             "estimate": "Không tính được quãng đường. Vui lòng chọn lại địa chỉ.",
             "geocode": "Không tìm được tọa độ cho địa chỉ này. Vui lòng chọn gợi ý hoặc điểm trên bản đồ."
-        }
+        },
+        "useAddressBackToPackage": "Dùng địa chỉ này cho gói giao hàng",
+        "useAddressHintBackToPackage": "Bạn sẽ quay lại bước Gói giao hàng với địa chỉ này đã được điền sẵn."
     },
     "home": "Trang chủ Bite to Business",
     "main": "Nội dung trang chủ",
