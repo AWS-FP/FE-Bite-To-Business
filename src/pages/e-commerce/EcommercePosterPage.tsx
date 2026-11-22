@@ -110,6 +110,7 @@ export default function EcommercePosterPage() {
                 startsAt: promotion.startsAt,
                 endsAt: promotion.endsAt,
                 imageUrl: result.imageUrl,
+                promotionType: promotion.promotionType ?? 'STANDARD',
             });
         },
         onSuccess: () => {
