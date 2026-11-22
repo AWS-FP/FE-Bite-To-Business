@@ -723,12 +723,12 @@
         "exploreCategories": "Khám phá danh mục",
         "viewPromotion": "Xem chương trình",
         "bestSelling": "Sản phẩm bán chạy",
-        "bestSellingHint": "Xếp theo đơn hàng đã hoàn tất",
+        "bestSellingHint": "Xếp theo số lượng bán trong 30 ngày gần nhất",
         "deepDiscount": "Sản phẩm giảm giá sâu",
         "deepDiscountHint": "Ưu đãi thực sự đang có hiệu lực",
         "topRated": "Sản phẩm được đánh giá cao",
         "topRatedHint": "Khách hàng đã mua và chia sẻ trải nghiệm",
-        "bestSellingEmpty": "Sản phẩm bán chạy sẽ xuất hiện tại đây khi có đơn hàng hoàn tất.",
+        "bestSellingEmpty": "Chưa có sản phẩm bán chạy từ các đơn hoàn tất trong 30 ngày gần nhất.",
         "deepDiscountEmpty": "Sản phẩm giảm giá sẽ xuất hiện khi có chương trình ưu đãi mới.",
         "topRatedEmpty": "Sản phẩm được đánh giá cao sẽ xuất hiện khi khách hàng chia sẻ nhận xét.",
         "groupEmpty": "Chưa có sản phẩm đủ điều kiện. Nội dung sẽ cập nhật khi có dữ liệu mới.",
@@ -764,7 +764,7 @@
         "notificationTitle": "Thông báo",
         "notificationSettings": "Cài đặt thông báo",
         "notificationDesc": "Hoạt động của bạn trên BTB",
-        "notificationSettingsDesc": "Tùy chọn hiển thị trong phiên này",
+        "notificationSettingsDesc": "Được lưu vào tài khoản và giữ lại sau khi đăng nhập",
         "notificationQuotes": "Báo giá & đơn hàng",
         "notificationLogistics": "Giao hàng & sản phẩm",
         "notificationApproval": "Trạng thái duyệt báo giá",
@@ -861,6 +861,29 @@
             "previous": "Trang trước",
             "next": "Trang tiếp",
             "priceUnavailable": "Chưa có giá"
-        }
+        },
+        "notificationPreferencesLoading": "Đang tải cài đặt thông báo…",
+        "notificationPreferencesError": "Không thể tải hoặc lưu cài đặt. Vui lòng thử lại.",
+        "notificationPreferencesRetry": "Thử lại",
+        "notificationOpenRelated": "Xem chi tiết"
+    },
+    "searchHistory": {
+        "remove": "Xóa từ khóa",
+        "clearAll": "Xóa tất cả",
+        "confirmClear": "Bạn muốn xóa toàn bộ lịch sử tìm kiếm của tài khoản này?",
+        "deleteError": "Không xóa được lịch sử tìm kiếm. Vui lòng thử lại.",
+        "scrollLeft": "Cuộn lịch sử sang trái",
+        "scrollRight": "Cuộn lịch sử sang phải"
+    },
+    "cartPreview": {
+        "title": "Giỏ hàng",
+        "toggle": "Mở giỏ hàng",
+        "close": "Đóng giỏ hàng",
+        "empty": "Giỏ hàng chưa có sản phẩm.",
+        "total": "Tổng tiền",
+        "totalNote": "Giá các sản phẩm trong giỏ. Phí giao hàng, thuế và ưu đãi cuối cùng được xác nhận khi đặt hàng.",
+        "checkout": "Thanh toán",
+        "decrease": "Giảm số lượng",
+        "increase": "Tăng số lượng"
     }
 }

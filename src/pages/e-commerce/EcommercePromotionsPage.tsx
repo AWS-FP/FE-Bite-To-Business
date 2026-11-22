@@ -1,8 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CalendarDays, Image as ImageIcon, Megaphone, Plus, Save } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { ROUTES } from '@/router/routes';
+import {
+    CalendarDays,
+    Image as ImageIcon,
+    Megaphone,
+    Plus,
+    Save,
+    Search,
+    Trash2,
+    UploadCloud,
+    PackageCheck,
+} from 'lucide-react';
 import { executiveUi, useExecutiveText } from '@/components/e-commerce/executiveTokens';
 import {
     ExecutiveBadge,
@@ -23,16 +31,45 @@ import {
     type PromotionWrite,
 } from '@/services/e-commerce/executiveAdminService';
 import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
+import PromotionProductManager from '@/components/e-commerce/PromotionProductManager';
+import PromotionImageCropper from '@/components/e-commerce/PromotionImageCropper';
 
 function localValue(iso: string) {
     const d = new Date(iso);
     const p = (n: number) => String(n).padStart(2, '0');
     return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
 }
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
+/** Same formats as Promotion images; convert AVIF before cropping/uploading. */
+async function preparePromotionImage(file: File): Promise<File> {
+    if (file.type !== 'image/avif') return file;
+    const bitmap = await createImageBitmap(file);
+    try {
+        const canvas = document.createElement('canvas');
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('Image conversion failed');
+        ctx.drawImage(bitmap, 0, 0);
+        const blob = await new Promise<Blob | null>((resolve) =>
+            canvas.toBlob(resolve, 'image/jpeg', 0.86),
+        );
+        if (!blob || blob.size > MAX_IMAGE_BYTES) throw new Error('Image conversion failed');
+        return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', {
+            type: 'image/jpeg',
+        });
+    } finally {
+        bitmap.close();
+    }
+}
+
 export default function EcommercePromotionsPage() {
     const tr = useExecutiveText(),
         qc = useQueryClient();
     const [status, setStatus] = useState(''),
+        [search, setSearch] = useState(''),
+        [debouncedSearch, setDebouncedSearch] = useState(''),
         [page, setPage] = useState(0),
         [draftOpen, setDraftOpen] = useState(false),
         [editId, setEditId] = useState<string | null>(null),
@@ -43,11 +80,24 @@ export default function EcommercePromotionsPage() {
         [start, setStart] = useState(''),
         [end, setEnd] = useState(''),
         [imageUrl, setImageUrl] = useState(''),
+        [promotionType, setPromotionType] = useState<'STANDARD' | 'FLASH_SALE'>('STANDARD'),
+        [managing, setManaging] = useState<Promotion | null>(null),
         [message, setMessage] = useState(''),
-        [failed, setFailed] = useState(false);
+        [failed, setFailed] = useState(false),
+        [cropUrl, setCropUrl] = useState(''),
+        [cropFilename, setCropFilename] = useState('');
+    const imageInput = useRef<HTMLInputElement>(null);
+    useEffect(() => {
+        const timeout = window.setTimeout(() => setDebouncedSearch(search.trim()), 300);
+        return () => window.clearTimeout(timeout);
+    }, [search]);
+    useEffect(() => {
+        if (!cropUrl) return;
+        return () => URL.revokeObjectURL(cropUrl);
+    }, [cropUrl]);
     const list = useQuery({
-        queryKey: ['ecom', 'promotions', status, page],
-        queryFn: () => executiveApi.promotions(status || undefined, page, 20),
+        queryKey: ['ecom', 'promotions', status, page, debouncedSearch],
+        queryFn: () => executiveApi.promotions(status || undefined, page, 20, debouncedSearch),
     });
     function reset() {
         setDraftOpen(false);
@@ -59,6 +109,7 @@ export default function EcommercePromotionsPage() {
         setStart('');
         setEnd('');
         setImageUrl('');
+        setPromotionType('STANDARD');
     }
     function edit(p: Promotion) {
         setEditId(p.id);
@@ -69,16 +120,110 @@ export default function EcommercePromotionsPage() {
         setStart(localValue(p.startsAt));
         setEnd(localValue(p.endsAt));
         setImageUrl(p.imageUrl ?? '');
+        setPromotionType(p.promotionType ?? 'STANDARD');
         setDraftOpen(true);
     }
+    const uploadImage = useMutation({
+        mutationFn: (file: File) => executiveApi.uploadPromotionImage(file),
+        onSuccess: (result) => {
+            // Only fill the local form; creating/updating the campaign still requires Save.
+            setImageUrl(result.imageUrl);
+            setCropUrl('');
+            setFailed(false);
+            setMessage(
+                tr(
+                    'Ảnh đã tải lên. Thông tin chiến dịch vẫn được giữ; hãy bấm Lưu chiến dịch khi hoàn tất.',
+                    'Image uploaded. Your form is intact; click Save campaign when ready.',
+                ),
+            );
+        },
+        onError: (error) => {
+            setFailed(true);
+            setMessage(
+                executiveErrorMessage(
+                    error,
+                    tr(
+                        'Tải ảnh thất bại. Nội dung đã nhập vẫn được giữ nguyên.',
+                        'Image upload failed. Your form details have been preserved.',
+                    ),
+                ),
+            );
+        },
+    });
+    async function selectImage(file: File | undefined) {
+        if (!file) return;
+        if (
+            !['image/jpeg', 'image/png', 'image/webp', 'image/avif'].includes(file.type) ||
+            file.size > MAX_IMAGE_BYTES
+        ) {
+            setFailed(true);
+            setMessage(
+                tr(
+                    'Chỉ hỗ trợ JPG, PNG, WebP, AVIF tối đa 5 MB.',
+                    'JPG, PNG, WebP or AVIF, maximum 5 MB.',
+                ),
+            );
+            return;
+        }
+        try {
+            const prepared = await preparePromotionImage(file);
+            setCropFilename(file.name);
+            setCropUrl(URL.createObjectURL(prepared));
+            setFailed(false);
+            setMessage('');
+        } catch {
+            setFailed(true);
+            setMessage(
+                tr(
+                    'Không đọc được ảnh. Hãy chọn file khác.',
+                    'Cannot read this image. Choose another file.',
+                ),
+            );
+        }
+    }
+    const removeCampaign = useMutation({
+        mutationFn: (id: string) => executiveApi.deletePromotion(id),
+        onSuccess: (_result, id) => {
+            if (editId === id) reset();
+            if (managing?.id === id) setManaging(null);
+            setFailed(false);
+            setMessage(
+                tr(
+                    'Đã xóa vĩnh viễn chiến dịch chưa xuất bản.',
+                    'Unpublished campaign permanently deleted.',
+                ),
+            );
+            if (list.data?.items.length === 1 && page > 0) setPage(page - 1);
+            void qc.invalidateQueries({ queryKey: ['ecom', 'promotions'] });
+            void qc.invalidateQueries({ queryKey: ['ecom', 'images-promotions'] });
+        },
+        onError: (error) => {
+            setFailed(true);
+            setMessage(
+                executiveErrorMessage(
+                    error,
+                    tr(
+                        'Không thể xóa chiến dịch. Chiến dịch đã xuất bản chỉ có thể lưu trữ.',
+                        'Could not delete campaign. Previously published campaigns can only be archived.',
+                    ),
+                ),
+            );
+        },
+    });
     const save = useMutation({
         mutationFn: (payload: PromotionWrite) =>
             editId
                 ? executiveApi.updatePromotion(editId, payload)
                 : executiveApi.createPromotion(payload),
-        onSuccess: () => {
+        onSuccess: (saved) => {
             setFailed(false);
-            setMessage(tr('Chiến dịch đã được lưu ở trạng thái nháp.', 'Campaign saved as draft.'));
+            setMessage(
+                tr(
+                    'Chiến dịch đã lưu. Chọn sản phẩm áp dụng rồi xuất bản.',
+                    'Campaign saved. Assign products, then publish.',
+                ),
+            );
+            if (!editId) setManaging(saved);
             reset();
             void qc.invalidateQueries({ queryKey: ['ecom', 'promotions'] });
             void qc.invalidateQueries({ queryKey: ['ecom', 'images-promotions'] });
@@ -129,7 +274,21 @@ export default function EcommercePromotionsPage() {
             );
             return;
         }
+        if (
+            promotionType === 'FLASH_SALE' &&
+            new Date(end).getTime() - new Date(start).getTime() > 72 * 60 * 60 * 1000
+        ) {
+            setFailed(true);
+            setMessage(
+                tr(
+                    'Flash Sale không được dài hơn 72 giờ.',
+                    'Flash Sale cannot last more than 72 hours.',
+                ),
+            );
+            return;
+        }
         save.mutate({
+            promotionType,
             nameVi: vi.trim(),
             nameEn: en.trim(),
             contentVi: contentVi.trim() || null,
@@ -177,6 +336,40 @@ export default function EcommercePromotionsPage() {
                     )}
                 >
                     <form onSubmit={submit} className="grid gap-4 p-5 md:grid-cols-2">
+                        <label className="text-xs font-bold md:col-span-2">
+                            {tr('Loại chiến dịch', 'Campaign type')}
+                            <select
+                                className={`${executiveUi.input} mt-2`}
+                                value={promotionType}
+                                onChange={(e) =>
+                                    setPromotionType(e.target.value as 'STANDARD' | 'FLASH_SALE')
+                                }
+                            >
+                                <option value="STANDARD">
+                                    {tr(
+                                        'Khuyến mãi thông thường (dài hạn)',
+                                        'Standard promotion (long-term)',
+                                    )}
+                                </option>
+                                <option value="FLASH_SALE">
+                                    {tr(
+                                        'Chợ sớm giá sốc (tối đa 72 giờ)',
+                                        'Flash Sale (max 72 hours)',
+                                    )}
+                                </option>
+                            </select>
+                            <span className="mt-2 block text-[11px] font-normal text-[#6b7972]">
+                                {promotionType === 'FLASH_SALE'
+                                    ? tr(
+                                          'Chỉ tối đa 8 sản phẩm có giá sale và tồn kho đủ MOQ. Thời gian sale lấy theo ngày bắt đầu/kết thúc của chiến dịch.',
+                                          'Maximum 8 products with valid sale prices and enough stock for MOQ. Sale dates come from this campaign.',
+                                      )
+                                    : tr(
+                                          'Chương trình dài hạn không xuất hiện trong Chợ sớm giá sốc.',
+                                          'Long-term promotions do not appear in Flash Sale.',
+                                      )}
+                            </span>
+                        </label>
                         <label className="text-xs font-bold">
                             {tr('Tên tiếng Việt', 'Vietnamese title')}
                             <input
@@ -250,19 +443,46 @@ export default function EcommercePromotionsPage() {
                                     onChange={(e) => setImageUrl(e.target.value)}
                                 />
                             </label>
-                            <Link
-                                to={ROUTES.ECOMMERCE_POSTER}
-                                className="mt-2 inline-flex items-center gap-2 text-xs font-bold text-[#24734c]"
-                            >
-                                <ImageIcon size={15} />
-                                {tr(
-                                    'Tải ảnh tại mục Ảnh khuyến mãi',
-                                    'Upload images in Promotion images',
-                                )}
-                            </Link>
+                            <div className="mt-3 flex flex-wrap items-center gap-3">
+                                <input
+                                    ref={imageInput}
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp,image/avif"
+                                    className="hidden"
+                                    aria-label={tr('Chọn ảnh chiến dịch', 'Choose campaign image')}
+                                    onChange={(event) => {
+                                        void selectImage(event.currentTarget.files?.[0]);
+                                        event.currentTarget.value = '';
+                                    }}
+                                />
+                                <button
+                                    type="button"
+                                    disabled={uploadImage.isPending || save.isPending}
+                                    className={executiveUi.secondary}
+                                    onClick={() => imageInput.current?.click()}
+                                >
+                                    <UploadCloud size={15} />
+                                    {uploadImage.isPending
+                                        ? tr('Đang tải ảnh...', 'Uploading image...')
+                                        : tr(
+                                              'Chọn, cắt và tải ảnh ngay tại đây',
+                                              'Choose, crop and upload here',
+                                          )}
+                                </button>
+                            </div>
+                            {imageUrl && (
+                                <img
+                                    src={imageUrl}
+                                    alt={tr('Xem trước ảnh chiến dịch', 'Campaign image preview')}
+                                    className="mt-3 max-h-44 w-auto max-w-full rounded-lg border border-[#dbe8db] object-contain"
+                                />
+                            )}
                         </div>
                         <div className="flex gap-3 md:col-span-2">
-                            <button disabled={save.isPending} className={executiveUi.button}>
+                            <button
+                                disabled={save.isPending || uploadImage.isPending}
+                                className={executiveUi.button}
+                            >
                                 <Save size={16} />
                                 {tr('Lưu chiến dịch', 'Save campaign')}
                             </button>
@@ -277,20 +497,43 @@ export default function EcommercePromotionsPage() {
                 title={tr('Danh sách chiến dịch', 'Campaign management')}
                 caption={list.data ? `${list.data.total} ${tr('chiến dịch', 'campaigns')}` : ''}
             >
-                <div className="max-w-[240px] p-5">
-                    <ExecutiveSelect
-                        ariaLabel={tr('Trạng thái', 'Status')}
-                        value={status}
-                        onValueChange={(value) => {
-                            setStatus(value);
-                            setPage(0);
-                        }}
-                    >
-                        <option value="">{tr('Tất cả', 'All statuses')}</option>
-                        {['DRAFT', 'PUBLISHED', 'DISABLED', 'ARCHIVED'].map((s) => (
-                            <option key={s}>{s}</option>
-                        ))}
-                    </ExecutiveSelect>
+                <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center">
+                    <div className="relative min-w-0 flex-1">
+                        <Search
+                            size={17}
+                            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#5c7467]"
+                        />
+                        <input
+                            type="search"
+                            value={search}
+                            maxLength={100}
+                            onChange={(event) => {
+                                setSearch(event.target.value);
+                                setPage(0);
+                            }}
+                            placeholder={tr(
+                                'Tìm theo tên chiến dịch (VI/EN)...',
+                                'Search campaigns by name (VI/EN)...',
+                            )}
+                            aria-label={tr('Tìm kiếm chiến dịch', 'Search campaigns')}
+                            className={`${executiveUi.input} pl-10`}
+                        />
+                    </div>
+                    <div className="w-full sm:w-[240px] sm:shrink-0">
+                        <ExecutiveSelect
+                            ariaLabel={tr('Trạng thái', 'Status')}
+                            value={status}
+                            onValueChange={(value) => {
+                                setStatus(value);
+                                setPage(0);
+                            }}
+                        >
+                            <option value="">{tr('Tất cả', 'All statuses')}</option>
+                            {['DRAFT', 'PUBLISHED', 'DISABLED', 'ARCHIVED'].map((value) => (
+                                <option key={value}>{value}</option>
+                            ))}
+                        </ExecutiveSelect>
+                    </div>
                 </div>
                 {list.isLoading ? (
                     <LoadingRows />
@@ -304,7 +547,11 @@ export default function EcommercePromotionsPage() {
                 ) : !list.data?.items.length ? (
                     <ExecutiveEmpty
                         icon={<Megaphone />}
-                        title={tr('Chưa có chiến dịch', 'No campaigns')}
+                        title={
+                            search.trim()
+                                ? tr('Không tìm thấy chiến dịch', 'No matching campaigns')
+                                : tr('Chưa có chiến dịch', 'No campaigns')
+                        }
                         description={tr(
                             'Tạo chương trình mới để bắt đầu.',
                             'Create a campaign to get started.',
@@ -331,7 +578,14 @@ export default function EcommercePromotionsPage() {
                                 </div>
                                 <div className="p-5">
                                     <div className="flex flex-wrap items-center justify-between gap-2">
-                                        <ExecutiveBadge status={p.status} />
+                                        <div className="flex items-center gap-2">
+                                            <ExecutiveBadge status={p.status} />
+                                            <span className="rounded-full bg-[#e7f1e9] px-2 py-1 text-[10px] font-bold text-[#165b3d]">
+                                                {p.promotionType === 'FLASH_SALE'
+                                                    ? 'FLASH SALE'
+                                                    : 'STANDARD'}
+                                            </span>
+                                        </div>
                                         <span className="inline-flex items-center gap-1 text-[11px] text-[#688373]">
                                             <CalendarDays size={13} />
                                             {new Date(p.startsAt).toLocaleDateString(
@@ -363,6 +617,16 @@ export default function EcommercePromotionsPage() {
                                                 onClick={() => edit(p)}
                                             >
                                                 {tr('Sửa', 'Edit')}
+                                            </button>
+                                        )}
+                                        {p.status !== 'ARCHIVED' && (
+                                            <button
+                                                type="button"
+                                                className={executiveUi.secondary}
+                                                onClick={() => setManaging(p)}
+                                            >
+                                                <PackageCheck size={15} />
+                                                {tr('Sản phẩm áp dụng', 'Assign products')}
                                             </button>
                                         )}
                                         {p.status !== 'ARCHIVED' && (
@@ -428,6 +692,31 @@ export default function EcommercePromotionsPage() {
                                                 {tr('Lưu trữ', 'Archive')}
                                             </button>
                                         )}
+                                        {!p.publishedAt &&
+                                            ['DRAFT', 'ARCHIVED'].includes(p.status) && (
+                                                <button
+                                                    type="button"
+                                                    disabled={
+                                                        removeCampaign.isPending || action.isPending
+                                                    }
+                                                    className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-rose-300 bg-white px-4 py-2 text-xs font-bold text-rose-700 hover:bg-rose-50 disabled:opacity-50"
+                                                    onClick={() => {
+                                                        if (
+                                                            window.confirm(
+                                                                tr(
+                                                                    `Bạn có chắc muốn xóa chiến dịch "${p.nameVi}"? Hành động này không thể hoàn tác. Liên kết sản phẩm sẽ được gỡ, giá sale không đổi.`,
+                                                                    `Are you sure you want to delete "${p.nameEn}"? This cannot be undone. Product links will be removed; sale prices stay unchanged.`,
+                                                                ),
+                                                            )
+                                                        ) {
+                                                            removeCampaign.mutate(p.id);
+                                                        }
+                                                    }}
+                                                >
+                                                    <Trash2 size={15} />
+                                                    {tr('Xóa', 'Delete')}
+                                                </button>
+                                            )}
                                     </div>
                                 </div>
                             </article>
@@ -443,6 +732,33 @@ export default function EcommercePromotionsPage() {
                     />
                 )}
             </ExecutivePanel>
+            {cropUrl && (
+                <PromotionImageCropper
+                    src={cropUrl}
+                    originalName={cropFilename}
+                    onCancel={() => setCropUrl('')}
+                    onApply={(file) => {
+                        setCropUrl('');
+                        uploadImage.mutate(file);
+                    }}
+                />
+            )}
+            {managing && (
+                <PromotionProductManager
+                    key={managing.id}
+                    campaign={managing}
+                    onClose={() => setManaging(null)}
+                    onSaved={() => {
+                        setFailed(false);
+                        setMessage(
+                            tr(
+                                'Đã lưu sản phẩm áp dụng. Hãy xuất bản lại chiến dịch để kích hoạt.',
+                                'Assigned products saved. Publish the campaign again to activate the changes.',
+                            ),
+                        );
+                    }}
+                />
+            )}
         </div>
     );
 }

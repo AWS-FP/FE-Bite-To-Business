@@ -91,13 +91,15 @@ export async function getCustomerOrders(
     group: CustomerOrderGroup = 'ALL',
 ) {
     const { data } = await http.get<ApiResponse<CustomerOrdersPage>>('/api/customer/orders', {
-        params: { group, page, size }, signal,
+        params: { group, page, size },
+        signal,
     });
     return data.data;
 }
 export async function getCustomerOrder(orderId: string, signal?: AbortSignal) {
     const { data } = await http.get<ApiResponse<CustomerOrderDetail>>(
-        `/api/customer/orders/${encodeURIComponent(orderId)}`, { signal },
+        `/api/customer/orders/${encodeURIComponent(orderId)}`,
+        { signal },
     );
     return data.data;
 }

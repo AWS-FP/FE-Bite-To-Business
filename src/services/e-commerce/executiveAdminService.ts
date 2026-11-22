@@ -84,13 +84,55 @@ export type Promotion = {
     endsAt: string;
     imageUrl: string | null;
     status: string;
+    promotionType: 'STANDARD' | 'FLASH_SALE';
     publishedAt?: string | null;
     createdAt?: string;
     updatedAt?: string;
 };
+export type PromotionProductChoice = {
+    id: string;
+    sku: string;
+    nameVi: string;
+    nameEn: string;
+    imageUrl: string | null;
+    status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+    unitCode: string;
+    listPrice: number | null;
+    salePrice: number | null;
+    minOrderQuantity: number;
+    availableQuantity: number;
+    legacyPromotionId: string | null;
+    legacyPromotionName: string | null;
+    brandId: string | null;
+    categoryId: string | null;
+    saleDiscountPercent: number | null;
+    categoryActive: boolean;
+    selected: boolean;
+};
+export type PromotionProductFilter = {
+    q: string;
+    brandId: string | null;
+    categoryId: string | null;
+    inStockOnly: boolean;
+    discountOnly: boolean;
+};
+export type PromotionPriceUpdate = {
+    productId: string;
+    expectedListPrice: number;
+    expectedSalePrice: number | null;
+    expectedSaleDiscountPercent: number | null;
+    newSalePrice: number | null;
+};
 export type PromotionWrite = Pick<
     Promotion,
-    'nameVi' | 'nameEn' | 'contentVi' | 'contentEn' | 'startsAt' | 'endsAt' | 'imageUrl'
+    | 'nameVi'
+    | 'nameEn'
+    | 'contentVi'
+    | 'contentEn'
+    | 'startsAt'
+    | 'endsAt'
+    | 'imageUrl'
+    | 'promotionType'
 >;
 export type Quote = {
     id: string;
@@ -202,9 +244,36 @@ export const executiveApi = {
         putData<Coupon>(`${api}/coupons/${id}`, payload),
     setCouponActive: (id: string, active: boolean) =>
         patchData<Coupon>(`${api}/coupons/${id}/active`, {}, { active }),
-    promotions: (status?: string, page = 0, size = 20) =>
-        getData<AdminPage<Promotion>>(`${api}/promotions`, { status, page, size }),
+    promotions: (status?: string, page = 0, size = 20, q?: string) =>
+        getData<AdminPage<Promotion>>(`${api}/promotions`, { status, page, size, q }),
     promotion: (id: string) => getData<Promotion>(`${api}/promotions/${id}`),
+    deletePromotion: async (id: string): Promise<void> => {
+        await http.delete(`${api}/promotions/${encodeURIComponent(id)}`);
+    },
+    promotionProductIds: (id: string) => getData<string[]>(`${api}/promotions/${id}/product-ids`),
+    promotionProductOptions: (id: string, filter: PromotionProductFilter, page = 0, size = 20) =>
+        getData<AdminPage<PromotionProductChoice>>(`${api}/promotions/${id}/products`, {
+            ...filter,
+            page,
+            size,
+        }),
+    promotionProductDetails: (id: string, productIds: string[]) =>
+        postData<PromotionProductChoice[]>(`${api}/promotions/${id}/products/resolve`, {
+            productIds,
+        }),
+    promotionMatchingProductIds: (id: string, filter: PromotionProductFilter) =>
+        postData<string[]>(`${api}/promotions/${id}/products/matching`, filter),
+    savePromotionProducts: (
+        id: string,
+        productIds: string[],
+        priceUpdates: PromotionPriceUpdate[],
+        expectedProductIds: string[],
+    ) =>
+        putData<Promotion>(`${api}/promotions/${id}/products`, {
+            productIds,
+            priceUpdates,
+            expectedProductIds,
+        }),
     createPromotion: (payload: PromotionWrite) => postData<Promotion>(`${api}/promotions`, payload),
     updatePromotion: (id: string, payload: PromotionWrite) =>
         putData<Promotion>(`${api}/promotions/${id}`, payload),

@@ -723,12 +723,12 @@
         "exploreCategories": "Explore categories",
         "viewPromotion": "View promotion",
         "bestSelling": "Best sellers",
-        "bestSellingHint": "Ranked by completed orders",
+        "bestSellingHint": "Ranked by units sold in the last 30 days",
         "deepDiscount": "Biggest discounts",
         "deepDiscountHint": "Genuine promotions currently in effect",
         "topRated": "Top rated products",
         "topRatedHint": "Rated by customers after their experience",
-        "bestSellingEmpty": "Best-selling products will appear here as orders are completed.",
+        "bestSellingEmpty": "No best sellers yet from orders completed in the last 30 days.",
         "deepDiscountEmpty": "Discounted products will appear here when new offers go live.",
         "topRatedEmpty": "Top-rated products will appear here as customers share their reviews.",
         "groupEmpty": "No qualifying products yet. This will update when new data is available.",
@@ -764,7 +764,7 @@
         "notificationTitle": "Notifications",
         "notificationSettings": "Notification settings",
         "notificationDesc": "Your BTB activity",
-        "notificationSettingsDesc": "Preferences for this session",
+        "notificationSettingsDesc": "Saved to your account across sessions",
         "notificationQuotes": "Quotes & orders",
         "notificationLogistics": "Delivery & products",
         "notificationApproval": "Quote approval status",
@@ -861,6 +861,29 @@
             "previous": "Previous page",
             "next": "Next page",
             "priceUnavailable": "Price unavailable"
-        }
+        },
+        "notificationPreferencesLoading": "Loading notification preferences…",
+        "notificationPreferencesError": "Could not load or save preferences. Please try again.",
+        "notificationPreferencesRetry": "Retry",
+        "notificationOpenRelated": "View details"
+    },
+    "searchHistory": {
+        "remove": "Remove search",
+        "clearAll": "Clear all",
+        "confirmClear": "Delete all search history for this account?",
+        "deleteError": "Could not delete search history. Please try again.",
+        "scrollLeft": "Scroll history left",
+        "scrollRight": "Scroll history right"
+    },
+    "cartPreview": {
+        "title": "Shopping cart",
+        "toggle": "Open shopping cart",
+        "close": "Close cart",
+        "empty": "Your cart is empty.",
+        "total": "Total",
+        "totalNote": "Cart item prices only. Shipping, tax and final discounts are confirmed at checkout.",
+        "checkout": "Checkout",
+        "decrease": "Decrease quantity of",
+        "increase": "Increase quantity of"
     }
 }

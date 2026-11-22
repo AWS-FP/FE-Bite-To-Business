@@ -28,3 +28,16 @@ export async function saveSearchHistory(
     );
     return response.data.data;
 }
+
+/** Delete only the authenticated account's own history entry. */
+export async function deleteSearchHistoryEntry(id: string): Promise<SearchHistoryResponse[]> {
+    const response = await http.delete<ApiResponse<SearchHistoryResponse[]>>(
+        `${searchHistoryPath}/${encodeURIComponent(id)}`,
+    );
+    return response.data.data;
+}
+
+export async function clearSearchHistory(): Promise<SearchHistoryResponse[]> {
+    const response = await http.delete<ApiResponse<SearchHistoryResponse[]>>(searchHistoryPath);
+    return response.data.data;
+}

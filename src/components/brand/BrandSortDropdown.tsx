@@ -37,7 +37,8 @@ export default function BrandSortDropdown({ value, onChange }: BrandSortDropdown
     useEffect(() => {
         if (!open) return;
 
-        optionRefs.current[selectedIndex]?.focus();
+        // Avoid the browser scrolling the entire brand page to reveal the menu option.
+        optionRefs.current[selectedIndex]?.focus({ preventScroll: true });
 
         const handleOutsideClick = (event: PointerEvent) => {
             if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -45,33 +46,39 @@ export default function BrandSortDropdown({ value, onChange }: BrandSortDropdown
             }
         };
 
+        // The header is fixed; keeping the menu open while scrolling makes it overlap
+        // the navigation even after its trigger has left the visible section.
+        const handleScroll = () => setOpen(false);
+
         const handleEscape = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 setOpen(false);
-                triggerRef.current?.focus();
+                triggerRef.current?.focus({ preventScroll: true });
             }
         };
 
         document.addEventListener('pointerdown', handleOutsideClick);
         document.addEventListener('keydown', handleEscape);
+        window.addEventListener('scroll', handleScroll, true);
 
         return () => {
             document.removeEventListener('pointerdown', handleOutsideClick);
             document.removeEventListener('keydown', handleEscape);
+            window.removeEventListener('scroll', handleScroll, true);
         };
     }, [open, selectedIndex]);
 
     const handleSelect = (nextValue: BrandSortValue) => {
         onChange(nextValue);
         setOpen(false);
-        triggerRef.current?.focus();
+        triggerRef.current?.focus({ preventScroll: true });
     };
 
     return (
         <div className="flex flex-wrap items-center gap-3">
             <span className="text-xs font-bold text-store-muted">{t('brandPage.sortLabel')}</span>
 
-            <div ref={containerRef} className="relative z-30">
+            <div ref={containerRef} className="relative z-10">
                 <button
                     ref={triggerRef}
                     type="button"
@@ -164,17 +171,21 @@ export default function BrandSortDropdown({ value, onChange }: BrandSortDropdown
                                                 (index + direction + OPTIONS.length) %
                                                 OPTIONS.length;
 
-                                            optionRefs.current[nextIndex]?.focus();
+                                            optionRefs.current[nextIndex]?.focus({
+                                                preventScroll: true,
+                                            });
                                         }
 
                                         if (event.key === 'Home') {
                                             event.preventDefault();
-                                            optionRefs.current[0]?.focus();
+                                            optionRefs.current[0]?.focus({ preventScroll: true });
                                         }
 
                                         if (event.key === 'End') {
                                             event.preventDefault();
-                                            optionRefs.current[OPTIONS.length - 1]?.focus();
+                                            optionRefs.current[OPTIONS.length - 1]?.focus({
+                                                preventScroll: true,
+                                            });
                                         }
                                     }}
                                     className={`
