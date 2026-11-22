@@ -278,10 +278,9 @@
         "checkout": "Thanh toán"
     },
     "profileDropdown": {
+        "myOrders": "Đơn hàng của bạn",
         "workspace": "Về trang quản trị",
         "orderHistory": "Lịch sử nhập hàng",
-        "recurringLists": "Danh sách mua định kỳ",
-        "customQuotes": "Báo giá & Chiết khấu riêng",
         "accountSettings": "Cài đặt tài khoản",
         "signOut": "Đăng xuất",
         "favorites": "Sản phẩm yêu thích"

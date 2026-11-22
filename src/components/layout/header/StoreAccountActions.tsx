@@ -3,10 +3,9 @@ import {
     Heart,
     LayoutDashboard,
     LogOut,
-    ReceiptText,
+    Package,
     Settings,
     ShoppingCart,
-    Users,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -203,9 +202,20 @@ export default function StoreAccountActions() {
 
                         {user?.role === 'CUSTOMER' && (
                             <>
-                                {/* Order History */}
+                                {/* Orders still awaiting payment or delivery */}
                                 <Link
-                                    to={ROUTES.QUOTES}
+                                    to={ROUTES.ORDERS}
+                                    onClick={() => setOpenDropdown(null)}
+                                    className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-store-ink no-underline transition-colors hover:bg-store-ink/10"
+                                >
+                                    <Package size={15} className="text-store-ink" />
+
+                                    <span>{t('profileDropdown.myOrders')}</span>
+                                </Link>
+
+                                {/* Completed or cancelled orders */}
+                                <Link
+                                    to={`${ROUTES.ORDERS}?view=history`}
                                     onClick={() => setOpenDropdown(null)}
                                     className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-store-ink no-underline transition-colors hover:bg-store-ink/10"
                                 >
@@ -223,28 +233,6 @@ export default function StoreAccountActions() {
                                     <Heart size={15} className="text-store-ink" />
 
                                     <span>{t('profileDropdown.favorites')}</span>
-                                </Link>
-
-                                {/* Recurring Lists */}
-                                <Link
-                                    to={ROUTES.QUOTES}
-                                    onClick={() => setOpenDropdown(null)}
-                                    className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-store-ink no-underline transition-colors hover:bg-store-ink/10"
-                                >
-                                    <ReceiptText size={15} className="text-store-ink" />
-
-                                    <span>{t('profileDropdown.recurringLists')}</span>
-                                </Link>
-
-                                {/* Custom Quotes */}
-                                <Link
-                                    to={ROUTES.QUOTES}
-                                    onClick={() => setOpenDropdown(null)}
-                                    className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-store-ink no-underline transition-colors hover:bg-store-ink/10"
-                                >
-                                    <Users size={15} className="text-store-ink" />
-
-                                    <span>{t('profileDropdown.customQuotes')}</span>
                                 </Link>
                             </>
                         )}

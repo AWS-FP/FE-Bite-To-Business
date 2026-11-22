@@ -278,10 +278,9 @@
         "checkout": "Checkout"
     },
     "profileDropdown": {
+        "myOrders": "Your orders",
         "workspace": "Back to workspace",
-        "orderHistory": "Order History",
-        "recurringLists": "Recurring Shopping Lists",
-        "customQuotes": "Custom Quotes & Discounts",
+        "orderHistory": "Order history",
         "accountSettings": "Account Settings",
         "signOut": "Sign Out",
         "favorites": "My Favorites"

@@ -1,44 +1,38 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
 import OrderStatusBadge from '@/components/customer/order/OrderStatusBadge';
 import { ROUTES } from '@/router/routes';
 import { useAuthStore } from '@/store/admin/authStore';
 import { getCustomerOrders } from '@/services/customer/orderService';
-import type { CustomerOrdersPage, CustomerOrderSummary } from '@/services/customer/orderService';
+import type { CustomerOrderGroup, CustomerOrdersPage } from '@/services/customer/orderService';
 import PageNav from '@/components/common/PageNav';
 
-const labels: Record<CustomerOrderSummary['status'], string> = {
-    CONFIRMED: 'Đã xác nhận',
-    PROCESSING: 'Đang xử lý',
-    COMPLETED: 'Hoàn thành',
-    CANCELLED: 'Đã hủy',
-};
 const formatMoney = (value: number) => `${value.toLocaleString('vi-VN')}đ`;
 
+/** `/orders` = orders still in progress; `/orders?view=history` = completed or cancelled ones. */
+const views = {
+    active: {
+        group: 'ACTIVE' as CustomerOrderGroup,
+        tab: 'Đơn hàng của bạn',
+        title: 'Đơn hàng của bạn',
+        description: 'Các đơn đang chờ thanh toán hoặc chờ giao hàng.',
+        empty: 'Bạn không có đơn hàng nào đang xử lý.',
+        to: ROUTES.ORDERS,
+    },
+    history: {
+        group: 'FINISHED' as CustomerOrderGroup,
+        tab: 'Lịch sử nhập hàng',
+        title: 'Lịch sử nhập hàng',
+        description: 'Các đơn đã giao hoàn tất hoặc đã hủy.',
+        empty: 'Chưa có đơn hàng nào hoàn tất.',
+        to: `${ROUTES.ORDERS}?view=history`,
+    },
+};
+
 export default function OrderHistoryPage() {
-    const session = useAuthStore((state) => state.session);
-    const [page, setPage] = useState(0);
-    const [filter, setFilter] = useState<'ALL' | CustomerOrderSummary['status']>('ALL');
-    const [orders, setOrders] = useState<CustomerOrdersPage | null>(null);
-    const [error, setError] = useState(false);
-
-    useEffect(() => {
-        const abort = new AbortController();
-        if (!session || session.user.role !== 'CUSTOMER') return;
-        getCustomerOrders(page, 10, abort.signal)
-            .then(setOrders)
-            .catch(() => {
-                if (!abort.signal.aborted) setError(true);
-            });
-        return () => abort.abort();
-    }, [page, session]);
-
-    const loading =
-        !!session && session.user.role === 'CUSTOMER' && orders?.page !== page && !error;
-    const visible = (orders?.page === page ? orders.content : []).filter(
-        (order) => filter === 'ALL' || order.status === filter,
-    );
+    const [searchParams] = useSearchParams();
+    const view = searchParams.get('view') === 'history' ? 'history' : 'active';
     return (
         <StorefrontLayout
             rootClassName="flex min-h-screen flex-col bg-store-cream font-body text-store-ink"
@@ -46,103 +40,129 @@ export default function OrderHistoryPage() {
         >
             <div className="mx-auto max-w-[1150px]">
                 <PageNav back={{ label: 'Trang chủ', to: ROUTES.HOME }} />
-                <h1 className="mt-4 font-heading text-5xl">
-                    Lịch sử <em className="text-store-coral">đặt hàng</em>
-                </h1>
-                <div className="mb-6 flex flex-wrap gap-2">
-                    {(['ALL', 'CONFIRMED', 'PROCESSING', 'COMPLETED', 'CANCELLED'] as const).map(
-                        (status) => (
-                            <button
-                                type="button"
-                                key={status}
-                                onClick={() => setFilter(status)}
-                                className={`rounded-lg border px-3 py-2 text-xs font-bold ${filter === status ? 'bg-store-green text-white' : 'bg-white text-store-ink'}`}
-                            >
-                                {status === 'ALL' ? 'Tất cả' : labels[status]}
-                            </button>
-                        ),
-                    )}
-                </div>
-                {loading && <p role="status">Đang tải lịch sử đơn...</p>}
-                {error && (
-                    <p role="alert" className="text-danger">
-                        Không tải được đơn hàng. Vui lòng thử lại.
-                    </p>
-                )}
-                {!loading && !error && visible.length === 0 && (
-                    <div className="rounded-xl border border-dashed bg-white p-8 text-center text-sm">
-                        Chưa có đơn hàng phù hợp.
-                    </div>
-                )}
-                <div className="grid gap-4">
-                    {!loading &&
-                        !error &&
-                        visible.map((order) => (
-                            <article
-                                key={order.orderId}
-                                className="rounded-xl border-2 border-store-ink bg-white p-5 shadow-[4px_4px_0_#14132b]"
-                            >
-                                <div className="flex flex-wrap justify-between gap-4">
-                                    <div>
-                                        <h2 className="m-0 text-lg font-extrabold">
-                                            #{order.orderNumber}
-                                        </h2>
-                                        <p className="mt-1 text-xs text-store-muted">
-                                            {new Date(order.createdAt).toLocaleString('vi-VN')}
-                                        </p>
-                                        <div className="mt-2">
-                                            <OrderStatusBadge
-                                                status={order.status}
-                                                paymentStatus={order.paymentStatus}
-                                                size="sm"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="m-0 text-xl font-black text-store-coral">
-                                            {formatMoney(order.totalAmount)}
-                                        </p>
-                                        <Link
-                                            to={`/orders/${encodeURIComponent(order.orderId)}`}
-                                            className="mt-3 inline-block rounded-lg bg-store-green px-4 py-2 text-xs font-bold text-white no-underline"
-                                        >
-                                            Xem đơn hàng
-                                        </Link>
-                                    </div>
-                                </div>
-                            </article>
-                        ))}
-                </div>
-                {orders && orders.totalPages > 1 && (
-                    <div className="mt-6 flex items-center justify-between text-xs">
-                        <button
-                            type="button"
-                            disabled={page === 0}
-                            onClick={() => {
-                                setError(false);
-                                setPage((p) => p - 1);
-                            }}
-                            className="rounded border px-4 py-2 disabled:opacity-40"
+                <h1 className="mt-4 font-heading text-5xl">{views[view].title}</h1>
+                <p className="mt-2 text-sm text-store-muted">{views[view].description}</p>
+                <div role="tablist" className="mb-6 mt-5 flex flex-wrap gap-2">
+                    {(['active', 'history'] as const).map((key) => (
+                        <Link
+                            key={key}
+                            role="tab"
+                            aria-selected={view === key}
+                            to={views[key].to}
+                            className={`rounded-lg border px-4 py-2 text-sm font-bold no-underline ${view === key ? 'border-store-green bg-store-green text-white' : 'border-store-line bg-white text-store-ink hover:bg-store-cream'}`}
                         >
-                            Trang trước
-                        </button>
-                        <span>
-                            Trang {page + 1} / {orders.totalPages} · {orders.totalElements} đơn
-                        </span>
-                        <button
-                            type="button"
-                            disabled={page + 1 >= orders.totalPages}
-                            onClick={() => {
-                                setError(false);
-                                setPage((p) => p + 1);
-                            }}
-                            className="rounded border px-4 py-2 disabled:opacity-40"
-                        >
-                            Trang sau
-                        </button>
-                    </div>
-                )}
+                            {views[key].tab}
+                        </Link>
+                    ))}
+                </div>
+                {/* Keyed so switching tabs starts again from the first page. */}
+                <OrderList key={view} group={views[view].group} empty={views[view].empty} />
             </div>
         </StorefrontLayout>
+    );
+}
+
+function OrderList({ group, empty }: { group: CustomerOrderGroup; empty: string }) {
+    const session = useAuthStore((state) => state.session);
+    const [page, setPage] = useState(0);
+    const [orders, setOrders] = useState<CustomerOrdersPage | null>(null);
+    const [error, setError] = useState(false);
+
+    useEffect(() => {
+        const abort = new AbortController();
+        if (!session || session.user.role !== 'CUSTOMER') return;
+        getCustomerOrders(page, 10, abort.signal, group)
+            .then(setOrders)
+            .catch(() => {
+                if (!abort.signal.aborted) setError(true);
+            });
+        return () => abort.abort();
+    }, [page, session, group]);
+
+    const loading =
+        !!session && session.user.role === 'CUSTOMER' && orders?.page !== page && !error;
+    const visible = orders?.page === page ? orders.content : [];
+    return (
+        <>
+            {loading && <p role="status">Đang tải đơn hàng...</p>}
+            {error && (
+                <p role="alert" className="text-danger">
+                    Không tải được đơn hàng. Vui lòng thử lại.
+                </p>
+            )}
+            {!loading && !error && visible.length === 0 && (
+                <div className="rounded-xl border border-dashed bg-white p-8 text-center text-sm">
+                    {empty}
+                </div>
+            )}
+            <div className="grid gap-4">
+                {!loading &&
+                    !error &&
+                    visible.map((order) => (
+                        <article
+                            key={order.orderId}
+                            className="rounded-xl border-2 border-store-ink bg-white p-5 shadow-[4px_4px_0_#14132b]"
+                        >
+                            <div className="flex flex-wrap justify-between gap-4">
+                                <div>
+                                    <h2 className="m-0 text-lg font-extrabold">
+                                        #{order.orderNumber}
+                                    </h2>
+                                    <p className="mt-1 text-xs text-store-muted">
+                                        {new Date(order.createdAt).toLocaleString('vi-VN')}
+                                    </p>
+                                    <div className="mt-2">
+                                        <OrderStatusBadge
+                                            status={order.status}
+                                            paymentStatus={order.paymentStatus}
+                                            size="sm"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <p className="m-0 text-xl font-black text-store-coral">
+                                        {formatMoney(order.totalAmount)}
+                                    </p>
+                                    <Link
+                                        to={`/orders/${encodeURIComponent(order.orderId)}`}
+                                        className="mt-3 inline-block rounded-lg bg-store-green px-4 py-2 text-xs font-bold text-white no-underline"
+                                    >
+                                        Xem đơn hàng
+                                    </Link>
+                                </div>
+                            </div>
+                        </article>
+                    ))}
+            </div>
+            {orders && orders.totalPages > 1 && (
+                <div className="mt-6 flex items-center justify-between text-xs">
+                    <button
+                        type="button"
+                        disabled={page === 0}
+                        onClick={() => {
+                            setError(false);
+                            setPage((p) => p - 1);
+                        }}
+                        className="rounded border px-4 py-2 disabled:opacity-40"
+                    >
+                        Trang trước
+                    </button>
+                    <span>
+                        Trang {page + 1} / {orders.totalPages} · {orders.totalElements} đơn
+                    </span>
+                    <button
+                        type="button"
+                        disabled={page + 1 >= orders.totalPages}
+                        onClick={() => {
+                            setError(false);
+                            setPage((p) => p + 1);
+                        }}
+                        className="rounded border px-4 py-2 disabled:opacity-40"
+                    >
+                        Trang sau
+                    </button>
+                </div>
+            )}
+        </>
     );
 }

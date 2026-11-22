@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react';
 import { RotateCw } from 'lucide-react';
-import { useLocation, useParams } from 'react-router-dom';
+import { isAxiosError } from 'axios';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useCartStore } from '@/store/customer/cartStore';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
 import OrderStatusBadge from '@/components/customer/order/OrderStatusBadge';
 import { paymentStatusLabel } from '@/utils/orderStatus';
 import { ROUTES } from '@/router/routes';
 import { useAuthStore } from '@/store/admin/authStore';
 import {
+    cancelCustomerOrder,
     getCustomerInvoice,
     getCustomerOrder,
     getOrderVatPreview,
 } from '@/services/customer/orderService';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import type {
     CustomerInvoice,
     CustomerOrderDetail,
@@ -41,6 +45,11 @@ export default function OrderStatusPage() {
     const [paymentLoading, setPaymentLoading] = useState(false);
     const [paymentError, setPaymentError] = useState('');
     const [qrError, setQrError] = useState(false);
+    // 'edit' cancels the unpaid order too, then puts its products back in the cart for re-ordering.
+    const [cancelMode, setCancelMode] = useState<'cancel' | 'edit' | null>(null);
+    const navigate = useNavigate();
+    const [cancelling, setCancelling] = useState(false);
+    const [cancelError, setCancelError] = useState('');
     // The QR is shown for QR_LIFETIME_MS, then blurred until the customer asks for a fresh one.
     // A fresh one re-checks with BE that the order can still be paid before showing it again.
     const [qrIssuedAt, setQrIssuedAt] = useState<number | null>(null);
@@ -150,6 +159,55 @@ export default function OrderStatusPage() {
             setPaymentError('Không thể tạo mã thanh toán. Đơn có thể đã hết hạn hoặc thanh toán không khả dụng.');
         } finally {
             setPaymentLoading(false);
+        }
+    }
+
+    // Only unpaid orders can be cancelled here; BE re-checks and returns reserved stock.
+    async function confirmCancel() {
+        if (!orderId || cancelling) return;
+        setCancelling(true);
+        setCancelError('');
+        try {
+            const cancelled = await cancelCustomerOrder(orderId);
+            setDetail(cancelled);
+            setPayment(null);
+            setQrIssuedAt(null);
+            if (cancelMode === 'edit') {
+                // Put the order's quantities back in the cart (not added on top of what is there).
+                const cart = useCartStore.getState();
+                for (const item of cancelled.items) {
+                    const quantity = Number(item.quantity);
+                    const existing = cart.items.find((entry) => entry.id === item.productId);
+                    if (existing) {
+                        cart.updateQuantity(item.productId, quantity - existing.quantity);
+                    } else {
+                        cart.addItem(
+                            {
+                                id: item.productId,
+                                name: item.nameVi,
+                                nameVi: item.nameVi,
+                                nameEn: item.nameEn,
+                                spec: item.unitCode,
+                                unitPrice: Number(item.saleUnitPrice),
+                            },
+                            quantity,
+                        );
+                    }
+                }
+                navigate(ROUTES.QUOTES);
+                return;
+            }
+            setCancelMode(null);
+        } catch (error) {
+            const status = isAxiosError(error) ? error.response?.status : undefined;
+            setCancelError(
+                status === 409
+                    ? 'Không thể hủy: đơn đã được thanh toán hoặc không còn ở trạng thái chờ thanh toán. Vui lòng tải lại trang.'
+                    : 'Không hủy được đơn hàng. Vui lòng thử lại.',
+            );
+            if (status === 409) void getCustomerOrder(orderId).then(setDetail).catch(() => undefined);
+        } finally {
+            setCancelling(false);
         }
     }
 
@@ -283,10 +341,37 @@ export default function OrderStatusPage() {
                                                 <p>Nội dung: <strong>{payment.paymentCode}</strong></p>
                                                 <p className="text-store-muted">Giữ nguyên số tiền và nội dung chuyển khoản để hệ thống đối chiếu.</p>
                                             </div>
-                                            <button type="button" disabled={paymentLoading} onClick={() => void refreshPayment()} className="rounded border border-black px-4 py-2 font-semibold disabled:opacity-50">{paymentLoading ? 'Đang kiểm tra...' : 'Kiểm tra thanh toán'}</button>
+                                            <button type="button" disabled={paymentLoading} onClick={() => void refreshPayment()} className="w-full cursor-pointer rounded border border-store-ink bg-white px-4 py-2 font-semibold transition-colors hover:bg-store-ink hover:text-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white disabled:hover:text-store-ink">{paymentLoading ? 'Đang kiểm tra...' : 'Kiểm tra thanh toán'}</button>
                                         </div>}
                                         {payment && payment.status !== 'PENDING' && <p>Trạng thái: {payment.status === 'SUCCESS' ? 'Thanh toán thành công' : payment.status}</p>}
                                         {paymentError && <p role="alert" className="mt-3 text-red-700">{paymentError}</p>}
+                                        {detail.order.status === 'CONFIRMED' && (
+                                            <div className="mt-4 space-y-2 border-t border-store-line pt-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setCancelError('');
+                                                        setCancelMode('edit');
+                                                    }}
+                                                    className="w-full rounded border border-store-ink bg-white px-4 py-2 font-semibold text-store-ink hover:bg-store-cream"
+                                                >
+                                                    Chỉnh sửa đơn hàng
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setCancelError('');
+                                                        setCancelMode('cancel');
+                                                    }}
+                                                    className="w-full rounded border border-red-300 bg-white px-4 py-2 font-semibold text-red-700 hover:bg-red-50"
+                                                >
+                                                    Hủy đơn hàng
+                                                </button>
+                                                <p className="mb-0 text-xs text-store-muted">
+                                                    Chỉ thực hiện được khi đơn chưa thanh toán. Hàng đang giữ sẽ được trả lại kho.
+                                                </p>
+                                            </div>
+                                        )}
                                     </section>
                                 )}
                                 {detail.order.paymentStatus === 'SUCCESS' && (
@@ -353,6 +438,28 @@ export default function OrderStatusPage() {
                     </>
                 )}
             </div>
+            <ConfirmModal
+                open={cancelMode !== null}
+                danger={cancelMode === 'cancel'}
+                title={cancelMode === 'edit' ? 'Chỉnh sửa đơn hàng?' : 'Hủy đơn hàng?'}
+                message={
+                    cancelMode === 'edit'
+                        ? 'Để thêm bớt sản phẩm, đơn hiện tại sẽ được hủy (mã QR này không còn dùng được, hàng đang giữ trả lại kho) và các sản phẩm được đưa lại vào giỏ hàng. Bạn sẽ tạo lại gói giao hàng và đặt đơn mới; giá và ưu đãi được tính lại theo thời điểm đặt.'
+                        : 'Đơn sẽ chuyển sang Đã hủy, mã QR thanh toán không còn dùng được và hàng đang giữ được trả lại kho. Thao tác này không hoàn tác được.'
+                }
+                confirmLabel={
+                    cancelling
+                        ? 'Đang xử lý...'
+                        : cancelMode === 'edit'
+                          ? 'Đưa về giỏ hàng'
+                          : 'Hủy đơn hàng'
+                }
+                cancelLabel="Giữ đơn"
+                busy={cancelling}
+                error={cancelError}
+                onConfirm={() => void confirmCancel()}
+                onCancel={() => !cancelling && setCancelMode(null)}
+            />
         </StorefrontLayout>
     );
 }
