@@ -28,6 +28,7 @@ export const ROUTES = {
     ORDERS: '/orders',
     ORDER_DETAIL: '/orders/:orderId',
     FAVORITES: '/favorites',
+    MY_PRODUCT_REQUESTS: '/product-requests',
     PROFILE: '/profile',
 
     ADMIN: '/admin',

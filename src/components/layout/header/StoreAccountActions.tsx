@@ -9,6 +9,7 @@ import {
     Minus,
     Plus,
     PackageOpen,
+    PackageSearch,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -377,6 +378,17 @@ export default function StoreAccountActions() {
                                     <Heart size={15} className="text-store-ink" />
 
                                     <span>{t('profileDropdown.favorites')}</span>
+                                </Link>
+
+                                {/* Product requests the customer has sent */}
+                                <Link
+                                    to={ROUTES.MY_PRODUCT_REQUESTS}
+                                    onClick={() => setOpenDropdown(null)}
+                                    className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-store-ink no-underline transition-colors hover:bg-store-ink/10"
+                                >
+                                    <PackageSearch size={15} className="text-store-ink" />
+
+                                    <span>{t('profileDropdown.productRequests')}</span>
                                 </Link>
                             </>
                         )}

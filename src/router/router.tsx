@@ -1,4 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import RootLayout from '@/layouts/RootLayout';
+import MyProductRequestsPage from '@/pages/customer/MyProductRequestsPage';
 
 import { AUTH_ROLES } from '@/constants/roles';
 
@@ -66,7 +68,10 @@ import EcommerceRequestsPage from '@/pages/e-commerce/EcommerceRequestsPage';
 import EcommerceReviewsPage from '@/pages/e-commerce/EcommerceReviewsPage';
 import EcommerceRefundsPage from '@/pages/e-commerce/EcommerceRefundsPage';
 
-export const router = createBrowserRouter([
+export const router = createBrowserRouter([{
+    // Bọc mọi route để ScrollRestoration cuộn lên đầu khi chuyển trang.
+    Component: RootLayout,
+    children: [
     // ==========================================
     // 1. AUTHENTICATION
     // ==========================================
@@ -177,6 +182,10 @@ export const router = createBrowserRouter([
             {
                 path: ROUTES.FAVORITES,
                 Component: CustomerFavoritesPage,
+            },
+            {
+                path: ROUTES.MY_PRODUCT_REQUESTS,
+                Component: MyProductRequestsPage,
             },
             {
                 path: ROUTES.PROFILE,
@@ -341,4 +350,4 @@ export const router = createBrowserRouter([
         path: '*',
         element: <Navigate to={ROUTES.HOME} replace />,
     },
-]);
+]}]);

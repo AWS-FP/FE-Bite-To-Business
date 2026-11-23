@@ -297,7 +297,8 @@
         "orderHistory": "Lịch sử nhập hàng",
         "accountSettings": "Cài đặt tài khoản",
         "signOut": "Đăng xuất",
-        "favorites": "Sản phẩm yêu thích"
+        "favorites": "Sản phẩm yêu thích",
+        "productRequests": "Yêu cầu nhập hàng đã gửi"
     },
     "homePage": {
         "productsLoading": "Đang tải sản phẩm…",
