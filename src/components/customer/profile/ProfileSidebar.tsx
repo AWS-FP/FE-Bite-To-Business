@@ -1,4 +1,4 @@
-import { Building2, FileText, MapPin } from 'lucide-react';
+import { Building2, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function ProfileSidebar() {
@@ -13,7 +13,6 @@ export default function ProfileSidebar() {
                 {[
                     { id: 'personal', label: t('personal'), Icon: Building2 },
                     { id: 'delivery', label: t('delivery'), Icon: MapPin },
-                    { id: 'billing', label: t('billing'), Icon: FileText },
                 ].map(({ id, label, Icon }) => (
                     <a
                         key={id}

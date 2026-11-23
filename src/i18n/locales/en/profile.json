@@ -38,11 +38,6 @@
     "locationError": "Address options could not be loaded. You can enter the ward / commune manually.",
     "legacy": "Your old address includes a district: {{district}}. Saving updates it to the two-level address system; please check the city and ward / commune.",
     "legacyConfirm": "I have checked the address under the two-level system.",
-    "billing": "Billing information",
-    "billingHint": "Invoice information is optional. Invoices use your delivery address.",
-    "purchaser": "Purchaser / organization",
-    "taxCode": "Tax ID",
-    "invoiceEmail": "Invoice email",
     "save": "Save changes",
     "saving": "Saving...",
     "discard": "Discard changes",
@@ -51,7 +46,5 @@
     "errorCode": "Error code: {{code}}",
     "required": "Please complete all required fields.",
     "invalidPhone": "Enter a valid Vietnamese phone number.",
-    "invalidTax": "Tax ID must contain 10 digits.",
-    "invalidEmail": "Invoice email must be a valid Gmail address.",
     "requiredMark": "*"
 }

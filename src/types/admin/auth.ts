@@ -23,7 +23,6 @@ export interface RegisterRequest {
     invoicePurchaser?: string | null;
     // MST là chuỗi để giữ đủ 10 chữ số, kể cả khi bắt đầu bằng 0.
     invoiceTaxCode?: string | null;
-    invoiceEmail?: string | null;
     newsletterConsent?: boolean;
 }
 
