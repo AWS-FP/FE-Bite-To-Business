@@ -6,9 +6,11 @@ import LanguageSwitcher from '../components/common/LanguageSwitcher';
 import StoreSearch from '../components/layout/header/StoreSearch';
 import StoreAccountActions from '../components/layout/header/StoreAccountActions';
 import StoreNavigation from '../components/layout/header/StoreNavigation';
+import { useCartRuleBackfill } from '../hooks/useCartRuleBackfill';
 
 export default function Header() {
     const { t } = useTranslation('storefront');
+    useCartRuleBackfill();
     const headerRef = useRef<HTMLElement>(null);
     const spacerRef = useRef<HTMLDivElement>(null);
 

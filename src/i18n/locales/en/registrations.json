@@ -72,11 +72,9 @@
         "district": "District",
         "ward": "Ward",
         "deliveryAddress": "Delivery address",
-        "invoiceSameAsDelivery": "Same as delivery address",
         "invoicePurchaser": "Purchaser",
         "invoiceTaxCode": "Tax code",
         "invoiceEmail": "Invoice email",
-        "invoiceAddress": "Invoice address",
         "reviewNote": "Note / Rejection reason",
         "otpSentAt": "Last OTP sent",
         "activatedAt": "Activated at",
@@ -155,5 +153,31 @@
     "footer": {
         "copyright": "© {{year}} Bite to Business. Connecting you to good food.",
         "adminOnly": "For administrators only"
+    },
+    "duplicates": {
+        "title": "Duplicate registrations – auto-rejected",
+        "description": "The email or phone matches an existing account. The form still confirms the request (so it never reveals which accounts exist); the system emails a rejection after a few minutes, at most one per address per 24 hours.",
+        "loading": "Loading...",
+        "error": "Could not load duplicate registrations.",
+        "empty": "No duplicate registrations.",
+        "columns": {
+            "time": "Time",
+            "name": "Name",
+            "email": "Email",
+            "phone": "Phone",
+            "duplicate": "Duplicate",
+            "mail": "Rejection email"
+        },
+        "field": {
+            "EMAIL": "Duplicate email",
+            "PHONE": "Duplicate phone",
+            "EMAIL_AND_PHONE": "Duplicate email & phone"
+        },
+        "mail": {
+            "PENDING": "Waiting to send",
+            "SENT": "Sent",
+            "SKIPPED": "Skipped (sent within 24h)",
+            "FAILED": "Failed"
+        }
     }
 }

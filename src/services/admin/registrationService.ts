@@ -19,6 +19,28 @@ export async function getRegistrations(params: RegistrationListParams, signal?: 
     return response.data.data;
 }
 
+/** Registrations whose email/phone already had an account; auto-rejected by email. */
+export interface RegistrationDuplicate {
+    id: string;
+    email: string;
+    phone: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    duplicateField: 'EMAIL' | 'PHONE' | 'EMAIL_AND_PHONE';
+    existingUserId: string | null;
+    emailStatus: 'PENDING' | 'SENT' | 'SKIPPED' | 'FAILED';
+    emailSentAt: string | null;
+    createdAt: string;
+}
+
+export async function getRegistrationDuplicates(page: number, size: number, signal?: AbortSignal) {
+    const response = await http.get<ApiResponse<PageResponse<RegistrationDuplicate>>>(
+        `${endpoint}/duplicates`,
+        { params: { page, size }, signal },
+    );
+    return response.data.data;
+}
+
 export async function getRegistrationStats(signal?: AbortSignal) {
     const response = await http.get<ApiResponse<RegistrationStats>>(`${endpoint}/stats`, {
         signal,

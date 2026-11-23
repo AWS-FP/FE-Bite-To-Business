@@ -17,6 +17,11 @@
     "decrease": "Decrease quantity of {{name}}",
     "increase": "Increase quantity of {{name}}",
     "remove": "Remove {{name}}",
+    "quantityRules": "Minimum {{min}} · changes in steps of {{step}}",
+    "atMinimum": "Already at the minimum quantity ({{min}}). Use the remove button to take it out of the cart.",
+    "stockAvailable": "{{stock}} available to order",
+    "stockBelowMinimum": "Only {{stock}} left, below the minimum order. Remove this product or wait for restock.",
+    "atStockLimit": "Reached the stock available to order ({{stock}}).",
     "pricingTitle": "Product prices & discounts",
     "pricingDescription": "Current prices before delivery fees and VAT.",
     "productCoupon": "Product coupon",
@@ -43,7 +48,7 @@
     "productDiscount": "Product discount",
     "shipping": "Delivery fee",
     "vat": "Product VAT",
-    "calculatedLater": "Not final",
+    "calculatedLater": "Not yet",
     "estimatedTotal": "Estimated total",
     "total": "Total",
     "priceNote": "Prices and discounts will be checked again before checkout.",
@@ -82,7 +87,11 @@
         "quantityLabel": "Quantity of {{name}} for this package",
         "addressNote": "The address is located on the map to calculate delivery fees. Please check it before saving.",
         "addressFromDistribution": "Uses the exact location chosen on the Distribution page. Editing the address will locate it again.",
-        "creating": "Creating package..."
+        "creating": "Creating package...",
+        "profileDefault": "Your default delivery details from your profile are filled in. Just enter the quantities and create the package.",
+        "clearProfileDefault": "Clear default details",
+        "pickOnMap": "Pick on map",
+        "defaultPackageName": "Default delivery package"
     },
     "review": {
         "title": "Review before checkout",
@@ -99,7 +108,10 @@
         "quantityInvalid": "Enter a valid quantity with at most 3 decimal places.",
         "quantityMax": "Quantity cannot exceed {{max}} {{unit}}.",
         "quantityStep": "Quantity must be a multiple of {{step}} {{unit}}.",
-        "quantityRequired": "Select a quantity for at least one product."
+        "quantityRequired": "Select a quantity for at least one product.",
+        "noPackage": "No delivery package yet. Fill in the package details and create it.",
+        "unallocatedProducts": "{{count}} product(s) are not yet allocated to a delivery package.",
+        "unallocated": "{{quantity}} {{unit}} not yet allocated to any package."
     },
     "errors": {
         "fallback": "Could not process your request. Please try again.",

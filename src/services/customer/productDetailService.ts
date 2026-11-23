@@ -16,6 +16,14 @@ export interface ProductTechnicalDetails {
     complianceVatContentEn: string | null;
     originContentVi: string | null;
     originContentEn: string | null;
+    // Bảng dinh dưỡng tùy chọn, ví dụ basis "100g" và các dòng thành phần/hàm lượng.
+    nutritionBasis?: string | null;
+    nutritionFacts?: ProductNutritionFact[];
+}
+
+export interface ProductNutritionFact {
+    nutrient: string;
+    amount: string;
 }
 
 export interface CustomerProductDetail {

@@ -128,7 +128,7 @@
 .btb-co-overline {
     display: block;
     color: var(--co-coral);
-    font-family: var(--font-label, Oswald, sans-serif);
+    font-family: var(--font-label);
     letter-spacing: .09em;
     font-size: 12px;
     font-weight: 800;

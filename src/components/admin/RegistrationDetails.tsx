@@ -117,22 +117,11 @@ export default function RegistrationDetails({
                 </DetailField>
             </DetailSection>
             <DetailSection title={t('detail.invoice')} icon="invoice">
-                <DetailField label={t('fields.invoiceSameAsDelivery')} full>
-                    {registration.invoiceSameAsDelivery === null
-                        ? null
-                        : t(registration.invoiceSameAsDelivery ? 'detail.yes' : 'detail.no')}
-                </DetailField>
                 <DetailField label={t('fields.invoicePurchaser')}>
                     {registration.invoicePurchaser}
                 </DetailField>
                 <DetailField label={t('fields.invoiceTaxCode')}>
                     {registration.invoiceTaxCode}
-                </DetailField>
-                <DetailField label={t('fields.invoiceEmail')} full>
-                    {registration.invoiceEmail}
-                </DetailField>
-                <DetailField label={t('fields.invoiceAddress')} full>
-                    {registration.invoiceAddress}
                 </DetailField>
             </DetailSection>
             <DetailSection title={t('detail.processing')} icon="history">

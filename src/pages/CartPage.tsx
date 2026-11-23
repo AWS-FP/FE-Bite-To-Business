@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { ArrowLeft, ArrowRight, Package, Tag, Trash2 } from 'lucide-react';
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { getCustomerProfile } from '@/services/customer/profileService';
 import Footer from '@/layouts/Footer';
 import Header from '@/layouts/Header';
 import QuoteSteps from '@/components/customer/checkout/QuoteSteps';
@@ -112,6 +113,75 @@ export default function CartPage() {
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState('');
     const [packageError, setPackageError] = useState('');
+    const [searchParams, setSearchParams] = useSearchParams();
+    // Counts presses of "Review quote total" while the delivery step is incomplete.
+    const [reviewAttempt, setReviewAttempt] = useState(0);
+
+    // Back from the distribution map (?step=delivery): reopen the quote at the delivery step.
+    const resumeDelivery = searchParams.get('step') === 'delivery';
+    const resumed = useRef(false);
+    useEffect(() => {
+        if (!resumeDelivery || resumed.current) return;
+        resumed.current = true;
+        setSearchParams({}, { replace: true });
+        if (session?.user.role === 'CUSTOMER' && items.length > 0) {
+            void Promise.resolve().then(() => startQuote(2));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- run once when arriving with ?step=delivery
+    }, [resumeDelivery]);
+
+    // First package: prefill it with the delivery details given at registration, so the
+    // customer only enters quantities. Skipped once they clear it or after any package exists.
+    const parcelIsEmpty =
+        !parcel.address.trim() && !parcel.name.trim() && !parcel.recipientName.trim();
+    const shouldPrefill =
+        step === 2 &&
+        !!quote &&
+        packages.length === 0 &&
+        parcelIsEmpty &&
+        !form.profileDefaultDismissed &&
+        session?.user.role === 'CUSTOMER';
+    useEffect(() => {
+        if (!shouldPrefill) return;
+        const controller = new AbortController();
+        getCustomerProfile(controller.signal)
+            .then((profile) => {
+                const province = (profile.province ?? '').toLowerCase();
+                const city = province.includes('hà nội') || province.includes('ha noi')
+                    ? 'HANOI'
+                    : province.includes('hồ chí minh') || province.includes('ho chi minh')
+                      ? 'HCM'
+                      : null;
+                const recipient = `${profile.user.lastName ?? ''} ${profile.user.firstName ?? ''}`.trim();
+                updateForm(owner, (current) => {
+                    const empty =
+                        !current.parcel.address.trim() &&
+                        !current.parcel.name.trim() &&
+                        !current.parcel.recipientName.trim();
+                    if (!empty || current.profileDefaultDismissed) return current;
+                    return {
+                        ...current,
+                        parcel: {
+                            ...current.parcel,
+                            name: profile.businessName?.trim() || t('form.defaultPackageName'),
+                            recipientName: recipient,
+                            recipientPhone: profile.user.phone ?? '',
+                            // Only HCM and Hà Nội are served; elsewhere the address is left for the customer.
+                            address: city ? (profile.fullDeliveryAddress ?? profile.deliveryAddress ?? '') : '',
+                            city: city ?? current.parcel.city,
+                            note: profile.deliveryNote ?? '',
+                            addressRefId: undefined,
+                            latitude: undefined,
+                            longitude: undefined,
+                            fromProfile: true,
+                        },
+                    };
+                });
+            })
+            .catch(() => undefined);
+        return () => controller.abort();
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- updateForm/owner are stable for the session
+    }, [shouldPrefill]);
     const [notice, setNotice] = useState('');
     const [packageTotals, setPackageTotals] = useState<{
         quoteId: string;
@@ -194,7 +264,7 @@ export default function CartPage() {
         return total;
     }
 
-    async function startQuote() {
+    async function startQuote(targetStep = 1) {
         if (!session) {
             navigate(ROUTES.LOGIN, { state: { from: { pathname: ROUTES.QUOTES } } });
             return;
@@ -219,7 +289,7 @@ export default function CartPage() {
             const savedPackages = await getQuotePackages(draft.id);
             setQuote(draft);
             setPackages(savedPackages);
-            setStep(1);
+            setStep(targetStep);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
             setMessage(errorMessage(error, t('errors.fallback')));
@@ -383,6 +453,9 @@ export default function CartPage() {
         quote.items.every(
             (item) => Math.abs(Number(item.quantity) - allocated(item.id)) < 0.000001,
         );
+    const unallocatedCount = quote
+        ? quote.items.filter((item) => Number(item.quantity) - allocated(item.id) > 1e-8).length
+        : 0;
     const duplicatePackages = packages.some((item, index) =>
         packages
             .slice(0, index)
@@ -689,6 +762,17 @@ export default function CartPage() {
                                             setPackageError('');
                                     }}
                                     createPackage={createPackage}
+                                    onPickOnMap={() =>
+                                        navigate(`${ROUTES.DISTRIBUTION_NETWORK}?returnTo=quote-delivery`)
+                                    }
+                                    revealErrors={reviewAttempt}
+                                    onClearProfileDefault={() =>
+                                        updateForm(owner, (current) => ({
+                                            ...current,
+                                            parcel: emptyParcel,
+                                            profileDefaultDismissed: true,
+                                        }))
+                                    }
                                 />
                                 <CouponPicker
                                     quoteId={quote.id}
@@ -786,7 +870,7 @@ export default function CartPage() {
                                 type="button"
                                 className={`${primary} mt-5 w-full`}
                                 disabled={!items.length || busy}
-                                onClick={startQuote}
+                                onClick={() => void startQuote()}
                             >
                                 {busy
                                     ? t('processing')
@@ -811,15 +895,39 @@ export default function CartPage() {
                                 <button
                                     type="button"
                                     className={`${primary} mt-5 w-full`}
-                                    onClick={() => void reviewQuote()}
-                                    disabled={!allAllocated || duplicatePackages || busy}
+                                    onClick={() => {
+                                        if (!allAllocated || duplicatePackages) {
+                                            // Stay here and point at what is missing instead of a disabled button.
+                                            setReviewAttempt((count) => count + 1);
+                                            document
+                                                .getElementById('package-form')
+                                                ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                            return;
+                                        }
+                                        setReviewAttempt(0);
+                                        void reviewQuote();
+                                    }}
+                                    disabled={busy}
                                 >
                                     {busy ? t('processing') : t('viewTotal')} <ArrowRight size={17} />
                                 </button>
-                                {!allAllocated && (
-                                    <p className="mb-0 mt-3 text-xs text-store-muted">
-                                        {t('allocateAll')}
-                                    </p>
+                                {reviewAttempt > 0 && (!allAllocated || duplicatePackages) ? (
+                                    <ul
+                                        role="alert"
+                                        className="mb-0 mt-3 list-disc space-y-1 pl-5 text-xs font-semibold text-red-700"
+                                    >
+                                        {packages.length === 0 && <li>{t('validation.noPackage')}</li>}
+                                        {unallocatedCount > 0 && (
+                                            <li>{t('validation.unallocatedProducts', { count: unallocatedCount })}</li>
+                                        )}
+                                        {duplicatePackages && <li>{t('validation.duplicatePackages')}</li>}
+                                    </ul>
+                                ) : (
+                                    !allAllocated && (
+                                        <p className="mb-0 mt-3 text-xs text-store-muted">
+                                            {t('allocateAll')}
+                                        </p>
+                                    )
                                 )}
                             </>
                         )}

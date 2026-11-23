@@ -138,7 +138,13 @@
         "previousImage": "Ảnh trước",
         "nextImage": "Ảnh tiếp theo",
         "reviewRatingUnit": "sao",
-        "unitClarification": "Số lượng đặt hàng tính theo đơn vị bán bên trên. Khối lượng tịnh chỉ là thông số sản phẩm, không phải đơn vị tính số lượng đặt."
+        "unitClarification": "Số lượng đặt hàng tính theo đơn vị bán bên trên. Khối lượng tịnh chỉ là thông số sản phẩm, không phải đơn vị tính số lượng đặt.",
+        "nutritionTitle": "Thông tin dinh dưỡng của {{name}}",
+        "nutritionBasis": "Giá trị ước tính trên {{basis}}:",
+        "nutrient": "Thành phần dinh dưỡng",
+        "nutrientAmount": "Hàm lượng",
+        "nutritionNoteLabel": "Lưu ý",
+        "nutritionNote": "Các giá trị chỉ mang tính tham khảo. Hàm lượng thực tế có thể khác tùy từng lô hàng và cách chế biến."
     },
     "distribution": {
         "title": "Hệ thống phân phối",
@@ -180,7 +186,9 @@
             "search": "Không tìm được địa chỉ. Vui lòng thử lại.",
             "estimate": "Không tính được quãng đường. Vui lòng chọn lại địa chỉ.",
             "geocode": "Không tìm được tọa độ cho địa chỉ này. Vui lòng chọn gợi ý hoặc điểm trên bản đồ."
-        }
+        },
+        "useAddressBackToPackage": "Dùng địa chỉ này cho gói giao hàng",
+        "useAddressHintBackToPackage": "Bạn sẽ quay lại bước Gói giao hàng với địa chỉ này đã được điền sẵn."
     },
     "home": "Trang chủ Bite to Business",
     "main": "Nội dung trang chủ",

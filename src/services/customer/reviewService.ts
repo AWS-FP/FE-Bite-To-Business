@@ -1,5 +1,6 @@
 import { http, publicHttp } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
+import { createBatchLoader } from '@/services/batchLoader';
 
 export interface CustomerReview {
     id: string;
@@ -34,6 +35,28 @@ export async function getProductReviews(productId: string, page = 0, size = 10) 
     );
     return data.data;
 }
+export interface ReviewSummary {
+    productId: string;
+    reviewCount: number;
+    averageRating: number | null;
+}
+
+/** Rating summary for a whole grid of products in one request (instead of one per card). */
+export const reviewSummaries = createBatchLoader<ReviewSummary>({
+    fetchMany: async (ids) => {
+        const { data } = await publicHttp.get<ApiResponse<ReviewSummary[]>>(
+            '/api/catalog/products/review-summaries',
+            { params: { ids: ids.join(',') } },
+        );
+        return new Map(data.data.map((item) => [item.productId, item]));
+    },
+    // Older server without the batch endpoint: fall back to the per-product page (size 1).
+    fetchOne: async (id) => {
+        const page = await getProductReviews(id, 0, 1);
+        return { productId: id, reviewCount: page.totalElements, averageRating: page.averageRating };
+    },
+});
+
 export async function createReview(productId: string, input: ReviewInput, images: File[] = []) {
     const form = new FormData();
     form.append('productId', productId);

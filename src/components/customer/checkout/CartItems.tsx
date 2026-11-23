@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
 import { ROUTES } from '@/router/routes';
-import type { CartItem } from '@/store/customer/cartStore';
+import { cartRules, useCartStore, type CartItem } from '@/store/customer/cartStore';
 
 const productPath = (id: string) =>
     ROUTES.PRODUCT_DETAIL.replace(':productId', encodeURIComponent(id));
@@ -16,6 +16,7 @@ interface CartItemsProps {
 export default function CartItems({ items, updateQuantity }: CartItemsProps) {
     const { t, i18n } = useTranslation('quote');
     const english = i18n.resolvedLanguage === 'en';
+    const setQuantity = useCartStore((state) => state.setQuantity);
     return (
         <section className="overflow-hidden rounded-2xl border border-store-ink/20 bg-white">
             <div className="flex items-center justify-between border-b border-store-ink/10 px-6 py-5">
@@ -70,14 +71,43 @@ export default function CartItems({ items, updateQuantity }: CartItemsProps) {
                                 {(english ? item.specEn : item.specVi) || item.spec}
                             </p>
                             <span className="font-bold">{formatCurrencyVnd(item.unitPrice)}</span>
+                            {(() => {
+                                const { min, step, max, cap } = cartRules(item);
+                                return (
+                                    <>
+                                        {(min > 1 || step > 1) && (
+                                            <p className="mb-0 mt-1 text-xs text-store-muted">
+                                                {t('quantityRules', { min, step })}
+                                            </p>
+                                        )}
+                                        {max != null &&
+                                            (cap != null && cap < min ? (
+                                                <p role="alert" className="mb-0 mt-1 text-xs font-bold text-red-700">
+                                                    {t('stockBelowMinimum', { stock: max })}
+                                                </p>
+                                            ) : (
+                                                <p className="mb-0 mt-1 text-xs text-store-muted">
+                                                    {t('stockAvailable', { stock: max })}
+                                                </p>
+                                            ))}
+                                    </>
+                                );
+                            })()}
                         </div>
                         <div className="flex items-center rounded-lg border border-store-ink/25">
+                            {/* At the MOQ "-" is disabled; the trash button at the end removes the line. */}
                             <button
                                 type="button"
                                 aria-label={t('decrease', {
                                     name: (english ? item.nameEn : item.nameVi) || item.name,
                                 })}
-                                className="grid size-9 place-items-center border-0 bg-transparent"
+                                disabled={item.quantity <= cartRules(item).min}
+                                title={
+                                    item.quantity <= cartRules(item).min
+                                        ? t('atMinimum', { min: cartRules(item).min })
+                                        : undefined
+                                }
+                                className="grid size-9 place-items-center border-0 bg-transparent hover:bg-store-cream disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
                                 onClick={() => updateQuantity(item.id, -1)}
                             >
                                 <Minus size={16} />
@@ -88,7 +118,17 @@ export default function CartItems({ items, updateQuantity }: CartItemsProps) {
                                 aria-label={t('increase', {
                                     name: (english ? item.nameEn : item.nameVi) || item.name,
                                 })}
-                                className="grid size-9 place-items-center border-0 bg-transparent"
+                                disabled={(() => {
+                                    const { step, cap } = cartRules(item);
+                                    return cap != null && item.quantity + step > cap + 1e-9;
+                                })()}
+                                title={(() => {
+                                    const { step, max, cap } = cartRules(item);
+                                    return cap != null && item.quantity + step > cap + 1e-9
+                                        ? t('atStockLimit', { stock: max })
+                                        : undefined;
+                                })()}
+                                className="grid size-9 place-items-center border-0 bg-transparent hover:bg-store-cream disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
                                 onClick={() => updateQuantity(item.id, 1)}
                             >
                                 <Plus size={16} />
@@ -103,7 +143,7 @@ export default function CartItems({ items, updateQuantity }: CartItemsProps) {
                                 name: (english ? item.nameEn : item.nameVi) || item.name,
                             })}
                             className="border-0 bg-transparent p-2 text-store-muted hover:text-danger"
-                            onClick={() => updateQuantity(item.id, -item.quantity)}
+                            onClick={() => setQuantity(item.id, 0)}
                         >
                             <Trash2 size={18} />
                         </button>

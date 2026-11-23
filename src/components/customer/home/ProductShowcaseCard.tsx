@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/admin/authStore';
 import {
     addFavorite,
-    getFavoriteStatus,
+    favoriteStatuses,
     removeFavorite,
 } from '@/services/customer/favoriteService';
 import { formatCurrencyVnd } from '../../../constants/customer/homeData';
@@ -32,9 +32,11 @@ export default function ProductShowcaseCard({
     useEffect(() => {
         if (!isCustomer) return;
         let mounted = true;
-        getFavoriteStatus(product.id)
-            .then((result) => {
-                if (mounted) setFavorite(result.favorite);
+        // Batched: every card on the page shares one /favorites/status request.
+        favoriteStatuses
+            .get(product.id)
+            .then((liked) => {
+                if (mounted) setFavorite(liked);
             })
             .catch(() => {});
         return () => {
@@ -94,6 +96,9 @@ export default function ProductShowcaseCard({
                 spec: product.spec,
                 unitPrice,
                 imageUrl: product.imageUrl,
+                minOrderQuantity: minQuantity,
+                quantityStep: step,
+                maxQuantity: available ?? null,
             },
             quantity,
         );

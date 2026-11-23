@@ -20,11 +20,9 @@ export interface RegistrationResponse {
     deliveryAddress: string | null;
     fullDeliveryAddress: string | null;
     deliveryNote: string | null;
-    invoiceSameAsDelivery: boolean | null;
     invoicePurchaser: string | null;
     invoiceTaxCode: string | null;
     invoiceEmail: string | null;
-    invoiceAddress: string | null;
     status: RegistrationStatus;
     reviewNote: string | null;
     submittedAt: string;

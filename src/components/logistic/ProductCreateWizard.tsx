@@ -55,6 +55,11 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState('');
     const [tiers, setTiers] = useState<{ min: string; max: string; price: string }[]>([]);
+    // Bảng thông tin dinh dưỡng (tùy chọn): null = chưa tạo bảng.
+    const [nutrition, setNutrition] = useState<{
+        basis: string;
+        rows: { nutrient: string; amount: string }[];
+    } | null>(null);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
     const [created, setCreated] = useState<{ id: string; sku: string } | null>(null);
@@ -162,6 +167,18 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 (!Number.isFinite(Number(values.tareWeight)) || Number(values.tareWeight) < 0)
             )
                 return tr("Khối lượng bao bì không được âm.");
+            if (nutrition) {
+                const rows = nutrition.rows.filter((row) => row.nutrient.trim() || row.amount.trim());
+                if (rows.some((row) => !row.nutrient.trim() || !row.amount.trim()))
+                    return tr("Mỗi dòng dinh dưỡng cần đủ thành phần và hàm lượng.");
+                if (rows.length > 0 && !nutrition.basis.trim())
+                    return tr("Vui lòng nhập lượng tham chiếu cho bảng dinh dưỡng, ví dụ 100g.");
+                const names = rows.map((row) => row.nutrient.trim().toLowerCase());
+                if (new Set(names).size !== names.length)
+                    return tr("Mỗi thành phần dinh dưỡng chỉ được nhập một lần.");
+                if (rows.length > 40)
+                    return tr("Bảng dinh dưỡng tối đa 40 dòng.");
+            }
         }
         if (index === 2) {
             if (
@@ -236,6 +253,9 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             }
         }
         const optionalNumber = (key: string) => (values[key]?.trim() ? Number(values[key]) : null);
+        const nutritionFacts = (nutrition?.rows ?? [])
+            .map((row) => ({ nutrient: row.nutrient.trim(), amount: row.amount.trim() }))
+            .filter((row) => row.nutrient && row.amount);
         const payload = {
             nameVi: values.nameVi.trim(),
             nameEn: values.nameEn.trim(),
@@ -272,6 +292,8 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 max: tier.max.trim() ? Number(tier.max) : null,
                 price: Number(tier.price),
             })),
+            nutritionBasis: nutritionFacts.length ? nutrition?.basis.trim() || null : null,
+            nutritionFacts,
         };
         const body = new FormData();
         body.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
@@ -610,8 +632,12 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                         {step === 1 && (
                             <div className="mt-5 space-y-6">
                                 <div className="grid grid-cols-2 gap-4">
-                                    {field('specVi', tr("Quy cách · Tiếng Việt"))}
-                                    {field('specEn', tr("Quy cách · Tiếng Anh"))}
+                                    {field('specVi', tr("Quy cách đóng gói · Tiếng Việt"), {
+                                        placeholder: tr("Ví dụ: Bao 10kg"),
+                                    })}
+                                    {field('specEn', tr("Quy cách đóng gói · Tiếng Anh"), {
+                                        placeholder: tr("Ví dụ: 10kg bag"),
+                                    })}
                                     {field('netWeight', tr("Khối lượng tịnh (kg)"), { type: 'number' })}
                                     {field('tareWeight', tr("Khối lượng bao bì (kg)"), {
                                         type: 'number',
@@ -631,12 +657,139 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                         <div key={key} className="grid grid-cols-2 gap-4">
                                             {field(`${key}Vi`, `${label} · ${tr('Tiếng Việt')}`, {
                                                 area: true,
+                                                placeholder:
+                                                    key === 'technical'
+                                                        ? tr("Ví dụ: Quy cách bán: thùng 10 gói. Không nhập lại đơn vị bán, số lượng tối thiểu, khối lượng hay kích thước vì đã có ô riêng.")
+                                                        : undefined,
                                             })}
                                             {field(`${key}En`, `${label} · ${tr('Tiếng Anh')}`, {
                                                 area: true,
+                                                placeholder:
+                                                    key === 'technical'
+                                                        ? tr("Ví dụ: Selling spec: case of 10 packs.")
+                                                        : undefined,
                                             })}
                                         </div>
                                     ))}
+                                </div>
+                                <div className="space-y-4 border-t border-store-line pt-5">
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div>
+                                            <h3 className="font-semibold">{tr("Thông tin dinh dưỡng")}</h3>
+                                            <p className="mt-1 text-sm text-store-muted">
+                                                {tr("Tùy chọn. Bảng gồm 2 cột: thành phần dinh dưỡng và hàm lượng.")}
+                                            </p>
+                                        </div>
+                                        {nutrition ? (
+                                            <button
+                                                type="button"
+                                                onClick={() => setNutrition(null)}
+                                                className="shrink-0 px-2 py-2 text-sm text-red-700"
+                                            >
+                                                {tr("Xóa bảng")}
+                                            </button>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setNutrition({
+                                                        basis: '100g',
+                                                        rows: [{ nutrient: '', amount: '' }],
+                                                    })
+                                                }
+                                                className="shrink-0 rounded border border-black px-3 py-2 text-sm font-semibold"
+                                            >
+                                                {tr("+ Tạo bảng dinh dưỡng")}
+                                            </button>
+                                        )}
+                                    </div>
+                                    {nutrition && (
+                                        <>
+                                            <label className="block text-sm font-semibold">
+                                                {tr("Giá trị ước tính trên")}
+                                                <input
+                                                    value={nutrition.basis}
+                                                    onChange={(e) =>
+                                                        setNutrition({ ...nutrition, basis: e.target.value })
+                                                    }
+                                                    maxLength={100}
+                                                    placeholder="100g"
+                                                    className={inputClass}
+                                                />
+                                            </label>
+                                            <div className="overflow-hidden rounded border border-black/40">
+                                                <table className="w-full table-fixed border-collapse text-sm">
+                                                    <thead className="bg-store-cream">
+                                                        <tr>
+                                                            <th scope="col" className="px-3 py-2 text-left font-semibold">
+                                                                {tr("Thành phần dinh dưỡng")}
+                                                            </th>
+                                                            <th scope="col" className="px-3 py-2 text-left font-semibold">
+                                                                {tr("Hàm lượng")}
+                                                            </th>
+                                                            <th scope="col" className="w-16">
+                                                                <span className="sr-only">{tr("Xóa")}</span>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {nutrition.rows.map((row, index) => (
+                                                            <tr key={index} className="border-t border-black/10">
+                                                                {(['nutrient', 'amount'] as const).map((key) => (
+                                                                    <td key={key} className="px-3 py-2">
+                                                                        <input
+                                                                            aria-label={`${key === 'nutrient' ? tr("Thành phần dinh dưỡng") : tr("Hàm lượng")} ${index + 1}`}
+                                                                            value={row[key]}
+                                                                            maxLength={key === 'nutrient' ? 100 : 50}
+                                                                            placeholder={key === 'nutrient' ? tr("Ví dụ: Protein") : tr("Ví dụ: 20g")}
+                                                                            onChange={(e) =>
+                                                                                setNutrition({
+                                                                                    ...nutrition,
+                                                                                    rows: nutrition.rows.map((item, i) =>
+                                                                                        i === index
+                                                                                            ? { ...item, [key]: e.target.value }
+                                                                                            : item,
+                                                                                    ),
+                                                                                })
+                                                                            }
+                                                                            className={inputClass.replace('mt-2 ', '')}
+                                                                        />
+                                                                    </td>
+                                                                ))}
+                                                                <td className="px-2 text-center">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() =>
+                                                                            setNutrition({
+                                                                                ...nutrition,
+                                                                                rows: nutrition.rows.filter((_, i) => i !== index),
+                                                                            })
+                                                                        }
+                                                                        className="text-sm text-red-700"
+                                                                    >
+                                                                        {tr("Xóa")}
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                disabled={nutrition.rows.length >= 40}
+                                                onClick={() =>
+                                                    setNutrition({
+                                                        ...nutrition,
+                                                        rows: [...nutrition.rows, { nutrient: '', amount: '' }],
+                                                    })
+                                                }
+                                                className="rounded border border-black px-3 py-2 text-sm font-semibold disabled:opacity-50"
+                                            >
+                                                {tr("+ Thêm thành phần")}
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -742,11 +895,17 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                 <div className="rounded-lg bg-store-cream p-4">
                                     <p className="font-semibold">{tr("Chi tiết sản phẩm")}</p>
                                     <p className="mt-2">
-                                        {tr("Quy cách:") + ' '}{values.specVi || tr("Chưa nhập")} {tr("· Xuất xứ:")}{' '}
+                                        {tr("Quy cách đóng gói:") + ' '}{values.specVi || tr("Chưa nhập")} {tr("· Xuất xứ:")}{' '}
                                         {values.origin || tr("Chưa nhập")}
                                     </p>
                                     <p className="mt-1 text-store-muted">
                                         {tr("Bảo quản:") + ' '}{values.storageVi || tr("Chưa nhập")}
+                                    </p>
+                                    <p className="mt-1 text-store-muted">
+                                        {tr("Thông tin dinh dưỡng:") + ' '}
+                                        {nutrition?.rows.some((row) => row.nutrient.trim() && row.amount.trim())
+                                            ? `${nutrition.rows.filter((row) => row.nutrient.trim() && row.amount.trim()).length} ${tr("thành phần")} · ${nutrition.basis}`
+                                            : tr("Chưa nhập")}
                                     </p>
                                 </div>
                                 <div className="rounded-lg bg-store-cream p-4">

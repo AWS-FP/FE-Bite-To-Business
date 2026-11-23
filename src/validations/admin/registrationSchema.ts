@@ -2,7 +2,7 @@ import { z } from 'zod';
 import type { RegisterRequest } from '@/types/admin/auth';
 import type { DeliveryCity } from '@/types/location';
 import { normalizePhone } from '@/utils/phone';
-import { gmailSchema, optionalGmailSchema } from './authSchema';
+import { gmailSchema } from './authSchema';
 
 const nameSchema = z
     .string()
@@ -43,7 +43,6 @@ export function createRegistrationSchema(cities: DeliveryCity[]): z.ZodType<Regi
             ward: requiredText(100),
             deliveryAddress: requiredText(1000),
             deliveryNote: optionalText(1000),
-            invoiceSameAsDelivery: z.boolean(),
             invoicePurchaser: optionalText(200),
             invoiceTaxCode: z
                 .string()
@@ -51,8 +50,6 @@ export function createRegistrationSchema(cities: DeliveryCity[]): z.ZodType<Regi
                 .regex(/^(?:[0-9]{10})?$/, 'errors.taxCode')
                 .nullish()
                 .transform((value) => value || null),
-            invoiceEmail: optionalGmailSchema,
-            invoiceAddress: optionalText(1000),
         })
         .superRefine((values, context) => {
             const city = cities.find((item) => item.name === values.province);
@@ -70,6 +67,5 @@ export function createRegistrationSchema(cities: DeliveryCity[]): z.ZodType<Regi
         .transform((values) => ({
             ...values,
             district: null,
-            invoiceAddress: values.invoiceSameAsDelivery ? null : values.invoiceAddress,
         }));
 }

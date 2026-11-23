@@ -138,7 +138,13 @@
         "previousImage": "Previous photo",
         "nextImage": "Next photo",
         "reviewRatingUnit": "stars",
-        "unitClarification": "Order quantities refer to the selling unit above. Net weight is a separate product specification, not the selling unit."
+        "unitClarification": "Order quantities refer to the selling unit above. Net weight is a separate product specification, not the selling unit.",
+        "nutritionTitle": "Nutritional information of {{name}}",
+        "nutritionBasis": "Estimated values per {{basis}}:",
+        "nutrient": "Nutrient",
+        "nutrientAmount": "Amount",
+        "nutritionNoteLabel": "Note",
+        "nutritionNote": "These values are for reference only. Actual nutritional content may vary depending on each batch and processing method."
     },
     "distribution": {
         "title": "Distribution network",
@@ -180,7 +186,9 @@
             "search": "Could not search for addresses. Please try again.",
             "estimate": "Could not calculate the route. Please select the address again.",
             "geocode": "Could not find coordinates for this address. Select a suggestion or a point on the map."
-        }
+        },
+        "useAddressBackToPackage": "Use this address for the delivery package",
+        "useAddressHintBackToPackage": "You will return to the Delivery packages step with this address filled in."
     },
     "home": "Bite to Business home",
     "main": "Homepage content",
