@@ -20,11 +20,9 @@ type ProfileFields = {
     ward: string;
     deliveryAddress: string;
     deliveryNote: string;
-    invoiceSameAsDelivery: boolean;
     invoicePurchaser: string;
     invoiceTaxCode: string;
     invoiceEmail: string;
-    invoiceAddress: string;
 };
 
 function toFields(profile: CustomerProfile): ProfileFields {
@@ -37,11 +35,9 @@ function toFields(profile: CustomerProfile): ProfileFields {
         ward: profile.ward || '',
         deliveryAddress: profile.deliveryAddress || '',
         deliveryNote: profile.deliveryNote || '',
-        invoiceSameAsDelivery: profile.invoiceSameAsDelivery ?? false,
         invoicePurchaser: profile.invoicePurchaser || '',
         invoiceTaxCode: profile.invoiceTaxCode || '',
         invoiceEmail: profile.invoiceEmail || '',
-        invoiceAddress: profile.invoiceAddress || '',
     };
 }
 
@@ -176,9 +172,6 @@ export default function ProfileForm({ initialProfile }: { initialProfile: Custom
             invoicePurchaser: fields.invoicePurchaser.trim() || null,
             invoiceTaxCode: fields.invoiceTaxCode.trim() || null,
             invoiceEmail: fields.invoiceEmail.trim() || null,
-            invoiceAddress: fields.invoiceSameAsDelivery
-                ? null
-                : fields.invoiceAddress.trim() || null,
         };
         const sessionVersion = useAuthStore.getState().sessionVersion;
         setSaving(true);
@@ -375,15 +368,6 @@ export default function ProfileForm({ initialProfile }: { initialProfile: Custom
                     )}
                 </Section>
                 <Section id="billing" title={t('billing')} description={t('billingHint')}>
-                    <label className="mb-4 flex items-center gap-2 text-sm font-semibold">
-                        <input
-                            type="checkbox"
-                            checked={fields.invoiceSameAsDelivery}
-                            onChange={(e) => setField('invoiceSameAsDelivery', e.target.checked)}
-                            className="accent-store-green"
-                        />
-                        {t('sameAddress')}
-                    </label>
                     <div className="grid grid-cols-2 gap-4">
                         <Field label={t('purchaser')}>
                             <input
@@ -409,19 +393,6 @@ export default function ProfileForm({ initialProfile }: { initialProfile: Custom
                                 value={fields.invoiceEmail}
                                 onChange={(e) => setField('invoiceEmail', e.target.value)}
                                 maxLength={254}
-                            />
-                        </Field>
-                        <Field label={t('invoiceAddress')}>
-                            <input
-                                className={controlClass}
-                                value={
-                                    fields.invoiceSameAsDelivery
-                                        ? fullAddress
-                                        : fields.invoiceAddress
-                                }
-                                onChange={(e) => setField('invoiceAddress', e.target.value)}
-                                disabled={fields.invoiceSameAsDelivery}
-                                maxLength={1000}
                             />
                         </Field>
                     </div>

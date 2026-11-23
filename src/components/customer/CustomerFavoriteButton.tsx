@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/admin/authStore';
 import {
     addFavorite,
-    getFavoriteStatus,
+    favoriteStatuses,
     removeFavorite,
 } from '@/services/customer/favoriteService';
 
@@ -20,9 +20,10 @@ export default function CustomerFavoriteButton({ productId }: { productId: strin
     useEffect(() => {
         if (!customer) return;
         let current = true;
-        getFavoriteStatus(productId)
-            .then((status) => {
-                if (current) setFavorite(status.favorite);
+        favoriteStatuses
+            .get(productId)
+            .then((liked) => {
+                if (current) setFavorite(liked);
             })
             .catch(() => {});
         return () => {

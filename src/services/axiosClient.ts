@@ -10,7 +10,8 @@ const clientConfig = {
 };
 
 // Các feature gọi API qua hai client này, không tạo Axios instance riêng.
-export const http = axios.create(clientConfig);
+// http = API cần đăng nhập: trình duyệt tự gửi cookie HttpOnly btb_access (JS không đọc/gắn token).
+export const http = axios.create({ ...clientConfig, withCredentials: true });
 export const publicHttp = axios.create(clientConfig);
 
 // Tách client refresh để lỗi 401 của refresh không chạy lại interceptor vô hạn.
@@ -19,8 +20,12 @@ const refreshClient = axios.create(clientConfig);
 interface AuthRequestConfig extends InternalAxiosRequestConfig {
     _retry?: boolean;
     _sessionVersion?: number;
-    _accessToken?: string;
+    /** Value of refreshGeneration when the request was sent. */
+    _generation?: number;
 }
+
+// Bumped after every successful refresh: a 401 from a request sent before it just needs a retry.
+let refreshGeneration = 0;
 
 let refreshing: { version: number; promise: Promise<AuthResponse> } | null = null;
 
@@ -36,13 +41,14 @@ async function refreshSession(version: number) {
         const response = await requestRefresh();
         const session = response.data.data;
 
-        if (!session.accessToken || !session.user) {
+        if (!session.user) {
             throw new Error('Backend returned an invalid authentication session.');
         }
 
         if (!useAuthStore.getState().updateSession(version, session)) {
             throw new axios.CanceledError('Authentication session changed.');
         }
+        refreshGeneration++;
 
         return session;
     } catch (error: unknown) {
@@ -65,12 +71,8 @@ http.interceptors.request.use((config: AuthRequestConfig) => {
     }
 
     config._sessionVersion = state.sessionVersion;
-    config._accessToken = state.session?.accessToken;
-
-    if (state.session) {
-        config.headers.set('Authorization', `Bearer ${state.session.accessToken}`);
-    }
-
+    config._generation = refreshGeneration;
+    // No Authorization header: the access token travels only in the HttpOnly btb_access cookie.
     return config;
 });
 
@@ -90,14 +92,14 @@ http.interceptors.response.use(
         const session = state.session;
 
         // Chỉ refresh request đã dùng phiên đăng nhập này, không tự đăng nhập lại cho Guest.
-        if (!session || !request._accessToken || request._sessionVersion !== state.sessionVersion) {
+        if (!session || request._sessionVersion !== state.sessionVersion) {
             throw error;
         }
 
         request._retry = true;
 
         // Một request khác có thể đã refresh xong trước khi lỗi 401 này trả về.
-        if (request._accessToken !== session.accessToken) {
+        if (request._generation !== refreshGeneration) {
             return http(request);
         }
 
@@ -136,8 +138,7 @@ export function restoreSession() {
             const session = response.data.data;
             // A login that finished meanwhile wins over the restored session.
             if (
-                session?.accessToken &&
-                session.user &&
+                session?.user &&
                 useAuthStore.getState().sessionVersion === version
             ) {
                 useAuthStore.getState().setSession(session);

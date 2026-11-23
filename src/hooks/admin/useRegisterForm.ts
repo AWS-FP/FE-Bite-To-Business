@@ -7,7 +7,11 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/router/routes';
 import type { ApiErrorResponse } from '@/types/api';
-import { DEFAULT_REGISTRATION, REGISTRATION_STEP_FIELDS } from '@/constants/admin/registration';
+import {
+    DEFAULT_REGISTRATION,
+    REGISTRATION_STEP_COUNT,
+    REGISTRATION_STEP_FIELDS,
+} from '@/constants/admin/registration';
 import { register as sendRegistration } from '@/services/admin/authService';
 import type { RegisterRequest } from '@/types/admin/auth';
 import { getAuthError, type AuthError } from '@/utils/admin/authError';
@@ -42,12 +46,6 @@ export default function useRegisterForm() {
         setStep(step - 1);
     }
 
-    function editStep(nextStep: number) {
-        if (submittingRef.current) return;
-        setServerError(null);
-        setStep(nextStep);
-    }
-
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         if (submittingRef.current) return;
@@ -60,7 +58,7 @@ export default function useRegisterForm() {
             });
             if (!valid) return;
 
-            if (step < 3) {
+            if (step < REGISTRATION_STEP_COUNT) {
                 setStep(step + 1);
                 return;
             }
@@ -94,7 +92,7 @@ export default function useRegisterForm() {
 
             if (axios.isAxiosError<ApiErrorResponse>(error)) {
                 const fieldErrors = error.response?.data?.errors;
-                let firstErrorStep = 3;
+                let firstErrorStep = REGISTRATION_STEP_COUNT;
                 if (Array.isArray(fieldErrors)) {
                     for (const fieldError of fieldErrors) {
                         for (let index = 0; index < REGISTRATION_STEP_FIELDS.length; index++) {
@@ -125,7 +123,6 @@ export default function useRegisterForm() {
         form,
         step,
         goBack,
-        editStep,
         handleSubmit,
         isSubmitting,
         serverError,

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import {
+    Apple,
     ChevronDown,
     FileText,
     ImageOff,
@@ -85,6 +86,7 @@ export default function CustomerProductInfo({
             .toLowerCase()
             .replace(/[^a-z0-9]/g, '');
     // These are schema labels, not hardcoded product information.
+    // "Trọng lượng bì" is the same value as the tare weight column, so it is never shown twice.
     const knownTechnicalLabels = [
         tr('netWeight'),
         'Net weight',
@@ -93,6 +95,8 @@ export default function CustomerProductInfo({
         'Tare weight',
         'Packaging weight',
         'Khối lượng bao bì',
+        'Trọng lượng bì',
+        'Khối lượng bì',
         tr('dimensions'),
         'Dimensions',
         'Dimensions (L×W×H)',
@@ -115,14 +119,20 @@ export default function CustomerProductInfo({
                   !knownTechnicalLabels.some((label) => normalizeKey(pair.label).startsWith(label)),
           )
         : [];
+    // Order: selling unit, minimum order, selling spec, then physical measurements.
+    const sellingSpecKeys = ['Quy cách bán', 'Selling spec', 'Sales spec'].map(normalizeKey);
+    const isSellingSpec = (fact: Fact) =>
+        sellingSpecKeys.some((key) => normalizeKey(fact.label).startsWith(key));
     const technicalFacts = [
-        ...facts,
         ...(product.unitCode ? [{ label: tr('sellingUnit'), value: product.unitCode }] : []),
         ...(product.minOrderQuantity != null
             ? [{ label: tr('moq'), value: String(product.minOrderQuantity) }]
             : []),
-        ...extraFacts,
+        ...extraFacts.filter(isSellingSpec),
+        ...facts,
+        ...extraFacts.filter((fact) => !isSellingSpec(fact)),
     ];
+    const nutritionFacts = details?.nutritionFacts ?? [];
 
     const sections: Section[] = [
         {
@@ -131,6 +141,9 @@ export default function CustomerProductInfo({
             text: isTabularContent ? null : technicalContent,
             facts: technicalFacts,
         },
+        ...(nutritionFacts.length > 0
+            ? [{ key: 'nutrition', icon: Apple, text: null, facts: [] }]
+            : []),
         {
             key: 'storage',
             icon: Warehouse,
@@ -274,7 +287,9 @@ export default function CustomerProductInfo({
                             >
                                 <span className="flex items-center gap-3">
                                     <Icon size={19} className="text-[#28734e]" />
-                                    {tr(section.key)}
+                                    {section.key === 'nutrition'
+                                        ? t('productDetail.nutritionTitle', { name })
+                                        : tr(section.key)}
                                 </span>
                                 <ChevronDown
                                     size={19}
@@ -300,6 +315,59 @@ export default function CustomerProductInfo({
                                         className="overflow-hidden"
                                     >
                                         <div className="border-t border-[#e4ece2] px-5 py-5 sm:px-6">
+                                            {section.key === 'nutrition' && (
+                                                <>
+                                                    {details?.nutritionBasis && (
+                                                        <p className="mb-3 mt-0 text-sm text-[#476456]">
+                                                            {t('productDetail.nutritionBasis', {
+                                                                basis: details.nutritionBasis,
+                                                            })}
+                                                        </p>
+                                                    )}
+                                                    <div className="overflow-x-auto rounded-xl border border-[#d7e2d2]">
+                                                        <table className="w-full table-fixed border-collapse text-left text-sm">
+                                                            <thead className="bg-[#e6eee1] text-[#173d2b]">
+                                                                <tr>
+                                                                    <th
+                                                                        scope="col"
+                                                                        className="w-[58%] px-4 py-3 font-bold"
+                                                                    >
+                                                                        {tr('nutrient')}
+                                                                    </th>
+                                                                    <th
+                                                                        scope="col"
+                                                                        className="px-4 py-3 text-center font-bold"
+                                                                    >
+                                                                        {tr('nutrientAmount')}
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {nutritionFacts.map((fact, index) => (
+                                                                    <tr
+                                                                        key={`${fact.nutrient}-${index}`}
+                                                                        className="border-t border-[#e4ebdf] odd:bg-[#fffdf7] even:bg-[#f3f6ed]"
+                                                                    >
+                                                                        <th
+                                                                            scope="row"
+                                                                            className="break-words px-4 py-3 align-top font-medium text-[#587362]"
+                                                                        >
+                                                                            {fact.nutrient}
+                                                                        </th>
+                                                                        <td className="break-words px-4 py-3 text-center align-top font-bold tabular-nums text-[#173d2b]">
+                                                                            {fact.amount}
+                                                                        </td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <p className="mb-0 mt-4 text-sm leading-6 text-[#476456]">
+                                                        <strong>{tr('nutritionNoteLabel')}</strong>:{' '}
+                                                        {tr('nutritionNote')}
+                                                    </p>
+                                                </>
+                                            )}
                                             {section.facts.length > 0 && (
                                                 <div className="overflow-x-auto rounded-xl border border-[#d7e2d2]">
                                                     <table className="w-full table-fixed border-collapse text-left text-sm">
@@ -347,7 +415,7 @@ export default function CustomerProductInfo({
                                                     {section.text}
                                                 </p>
                                             )}
-                                            {!section.text && section.facts.length === 0 && (
+                                            {section.key !== 'nutrition' && !section.text && section.facts.length === 0 && (
                                                 <p className="m-0 text-sm text-[#7b8f82]">
                                                     {tr('notProvided')}
                                                 </p>

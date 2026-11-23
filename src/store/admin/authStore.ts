@@ -19,10 +19,14 @@ try {
     /* Storage may be unavailable (private mode); nothing to clean. */
 }
 
-/** Tokens stay in memory only and the refresh token is never kept in JS at all: it lives in
- * the HttpOnly `btb_refresh` cookie set by BE. A reload or a new tab restores the session by
- * calling /api/auth/refresh with that cookie (see restoreSession in axiosClient). */
-const withoutRefreshToken = (session: AuthResponse): AuthResponse => ({ ...session, refreshToken: '' });
+/** No token is ever kept in JS: the access token lives in the HttpOnly `btb_access` cookie and the
+ * refresh token in `btb_refresh`, both set by BE. The store keeps only the user and expiry. A reload
+ * or a new tab restores the session by calling /api/auth/refresh with the cookie (restoreSession). */
+const withoutRefreshToken = (session: AuthResponse): AuthResponse => ({
+    ...session,
+    accessToken: '',
+    refreshToken: '',
+});
 
 // Axios và route guard cùng đọc một nguồn trạng thái.
 export const useAuthStore = create<AuthState>()((set, get) => ({

@@ -6,8 +6,8 @@ import { ROUTES } from '@/router/routes';
 import useRegisterForm from '@/hooks/admin/useRegisterForm';
 import CustomerInformationStep from './CustomerInformationStep';
 import DeliveryAddressStep from './DeliveryAddressStep';
-import InvoiceInformationStep from './InvoiceInformationStep';
 import PageNav from '@/components/common/PageNav';
+import { REGISTRATION_STEP_COUNT } from '@/constants/admin/registration';
 
 export default function RegisterForm() {
     const { t } = useTranslation();
@@ -15,7 +15,6 @@ export default function RegisterForm() {
         form,
         step,
         goBack,
-        editStep,
         handleSubmit,
         isSubmitting,
         serverError,
@@ -42,9 +41,6 @@ export default function RegisterForm() {
             <h1 id="auth-title" ref={titleRef} tabIndex={-1}>
                 {t('register.title')}
             </h1>
-            <p className="auth-introduction mt-2.5 mb-0 font-subtext text-[16px] leading-[1.6] text-auth-muted">
-                {t('register.description')}
-            </p>
 
             <ol
                 className="auth-progress mt-6 mb-0 flex list-none gap-2 p-0"
@@ -66,23 +62,12 @@ export default function RegisterForm() {
                     />
                     <span>2. {t('register.deliveryStep')}</span>
                 </li>
-                <li
-                    className={`group/step min-w-0 flex-1 font-label text-[11px] leading-[1.5] font-bold ${step === 3 ? 'is-reached text-auth-ink' : 'text-store-placeholder'}`}
-                    aria-current={step === 3 ? 'step' : undefined}
-                >
-                    <span
-                        className={`auth-progress-bar mb-[9px] block h-1.5 rounded group-aria-[current=step]/step:bg-auth-ink ${step === 3 ? 'bg-auth-green' : 'bg-auth-ink/10'}`}
-                    />
-                    <span>3. {t('register.invoiceStep')}</span>
-                </li>
             </ol>
             <p className="auth-sr-only sr-only" aria-live="polite">
                 {step === 1 &&
                     t('register.currentStep', { step: 1, label: t('register.customerStep') })}
                 {step === 2 &&
                     t('register.currentStep', { step: 2, label: t('register.deliveryStep') })}
-                {step === 3 &&
-                    t('register.currentStep', { step: 3, label: t('register.invoiceStep') })}
             </p>
 
             <form
@@ -111,13 +96,16 @@ export default function RegisterForm() {
                     <legend className="auth-sr-only sr-only">
                         {step === 1 && t('register.customerStep')}
                         {step === 2 && t('register.deliveryStep')}
-                        {step === 3 && t('register.invoiceStep')}
                     </legend>
                     {step === 1 && <CustomerInformationStep form={form} />}
                     {step === 2 && <DeliveryAddressStep form={form} />}
-                    {step === 3 && <InvoiceInformationStep form={form} onEdit={editStep} />}
                 </fieldset>
-                {step === 3 && (
+                {step === REGISTRATION_STEP_COUNT && (
+                    <p className="auth-submit-note mt-5 mb-0 font-subtext text-[12px] leading-[1.6] text-auth-muted">
+                        {t('register.submitNote')}
+                    </p>
+                )}
+                {step === REGISTRATION_STEP_COUNT && (
                     <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl border border-solid border-auth-ink/15 bg-white p-4 text-sm text-auth-ink">
                         <input
                             type="checkbox"
@@ -160,8 +148,8 @@ export default function RegisterForm() {
                             />
                         )}
                         {isSubmitting && t('register.submitting')}
-                        {!isSubmitting && step < 3 && t('register.continue')}
-                        {!isSubmitting && step === 3 && t('register.submit')}
+                        {!isSubmitting && step < REGISTRATION_STEP_COUNT && t('register.continue')}
+                        {!isSubmitting && step === REGISTRATION_STEP_COUNT && t('register.submit')}
                     </button>
                 </div>
             </form>
