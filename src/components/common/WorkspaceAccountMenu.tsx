@@ -1,12 +1,15 @@
 import { Camera, X } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
-import type { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import type { AuthUser } from '@/types/admin/auth';
-import { uploadWorkspaceAvatar } from '@/services/workspaceProfileService';
+import {
+    getWorkspaceAvatarHistory,
+    restoreWorkspaceAvatar,
+    uploadWorkspaceAvatar,
+} from '@/services/workspaceProfileService';
+import AvatarPhotoDialog from '@/components/common/profile/AvatarPhotoDialog';
 import { useAuthStore } from '@/store/admin/authStore';
-import { getAuthError } from '@/utils/admin/authError';
 
 interface WorkspaceAccountMenuProps {
     user: AuthUser | null;
@@ -18,30 +21,28 @@ export default function WorkspaceAccountMenu({ user, roleLabel }: WorkspaceAccou
     const { t: profileText } = useTranslation('profile');
     const location = useLocation();
     const [isOpen, setIsOpen] = useState(location.state?.openAccountSettings === true);
-    const [uploading, setUploading] = useState(false);
+    const [photoOpen, setPhotoOpen] = useState(false);
+    const [recent, setRecent] = useState<string[]>([]);
+    const [loadingHistory, setLoadingHistory] = useState(false);
+    const [historyError, setHistoryError] = useState(false);
     const [message, setMessage] = useState('');
-    const [error, setError] = useState(false);
     const accountRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
     const detailsId = useId();
 
     useEffect(() => {
         if (!isOpen) return;
-
         function handleOutsideClick(event: PointerEvent) {
             if (event.target instanceof Node && !accountRef.current?.contains(event.target)) {
                 setIsOpen(false);
             }
         }
-
         function handleEscape(event: KeyboardEvent) {
             if (event.key === 'Escape') {
                 setIsOpen(false);
                 buttonRef.current?.focus();
             }
         }
-
         document.addEventListener('pointerdown', handleOutsideClick);
         document.addEventListener('keydown', handleEscape);
         return () => {
@@ -50,34 +51,50 @@ export default function WorkspaceAccountMenu({ user, roleLabel }: WorkspaceAccou
         };
     }, [isOpen]);
 
-    async function changeAvatar(event: ChangeEvent<HTMLInputElement>) {
-        const file = event.target.files?.[0];
-        event.target.value = '';
-        if (!file || !user) return;
+    const userId = user?.id;
+    useEffect(() => {
+        if (!photoOpen || !userId) return;
+        let active = true;
+        getWorkspaceAvatarHistory()
+            .then((urls) => {
+                if (active) setRecent(urls);
+            })
+            .catch(() => {
+                if (active) {
+                    setRecent([]);
+                    setHistoryError(true);
+                }
+            })
+            .finally(() => {
+                if (active) setLoadingHistory(false);
+            });
+        return () => {
+            active = false;
+        };
+    }, [photoOpen, userId]);
 
-        setMessage('');
-        setError(false);
-        if (!['image/jpeg', 'image/png'].includes(file.type) || !file.size || file.size > 5 * 1024 * 1024) {
-            setError(true);
-            setMessage(profileText('avatarInvalid'));
-            return;
+    function applyUpdatedUser(updated: AuthUser, sessionVersion: number) {
+        const state = useAuthStore.getState();
+        if (
+            state.session &&
+            state.sessionVersion === sessionVersion &&
+            state.session.user.id === updated.id
+        ) {
+            state.updateSession(sessionVersion, { ...state.session, user: updated });
+            setMessage(profileText('avatarSaved'));
         }
+    }
 
+    async function upload(file: File) {
         const sessionVersion = useAuthStore.getState().sessionVersion;
-        setUploading(true);
-        try {
-            const updated = await uploadWorkspaceAvatar(file);
-            const state = useAuthStore.getState();
-            if (state.session && state.sessionVersion === sessionVersion && state.session.user.id === updated.id) {
-                state.updateSession(sessionVersion, { ...state.session, user: updated });
-                setMessage(profileText('avatarSaved'));
-            }
-        } catch (uploadError) {
-            setError(true);
-            setMessage(`${profileText('avatarError')} ${profileText('errorCode', { code: getAuthError(uploadError).code })}`);
-        } finally {
-            setUploading(false);
-        }
+        const updated = await uploadWorkspaceAvatar(file);
+        applyUpdatedUser(updated, sessionVersion);
+    }
+
+    async function restore(url: string) {
+        const sessionVersion = useAuthStore.getState().sessionVersion;
+        const updated = await restoreWorkspaceAvatar(url);
+        applyUpdatedUser(updated, sessionVersion);
     }
 
     if (!user) return null;
@@ -102,7 +119,11 @@ export default function WorkspaceAccountMenu({ user, roleLabel }: WorkspaceAccou
                     className="admin-avatar grid size-[35px] shrink-0 place-items-center overflow-hidden rounded-full border border-black bg-store-mint text-[11px] leading-[16.5px] font-bold"
                     aria-hidden="true"
                 >
-                    {user.avatarUrl ? <img src={user.avatarUrl} alt="" className="size-full object-cover" /> : initials}
+                    {user.avatarUrl ? (
+                        <img src={user.avatarUrl} alt="" className="size-full object-cover" />
+                    ) : (
+                        initials
+                    )}
                 </span>
                 <span className="admin-account-label flex flex-col gap-[2px]">
                     <strong className="max-w-40 overflow-hidden text-[13px] leading-[19.5px] font-bold text-ellipsis whitespace-nowrap">
@@ -142,19 +163,33 @@ export default function WorkspaceAccountMenu({ user, roleLabel }: WorkspaceAccou
                     </div>
                     <button
                         type="button"
-                        className="relative mx-auto mb-3 grid size-20 place-items-center overflow-hidden rounded-full border-2 border-store-yellow bg-store-mint text-lg font-bold disabled:opacity-60"
+                        className="group relative mx-auto mb-3 grid size-20 place-items-center overflow-hidden rounded-full border-2 border-store-yellow bg-store-mint text-lg font-bold"
                         aria-label={profileText('changeAvatar')}
-                        disabled={uploading}
-                        onClick={() => inputRef.current?.click()}
+                        onClick={() => {
+                            setMessage('');
+                            setLoadingHistory(true);
+                            setHistoryError(false);
+                            setIsOpen(false);
+                            setPhotoOpen(true);
+                        }}
                     >
-                        {user.avatarUrl ? <img src={user.avatarUrl} alt="" className="size-full object-cover" /> : initials}
-                        <span className="absolute inset-0 grid place-items-center bg-black/25 text-gray-200">
+                        {user.avatarUrl ? (
+                            <img src={user.avatarUrl} alt="" className="size-full object-cover" />
+                        ) : (
+                            initials
+                        )}
+                        <span className="absolute inset-0 grid place-items-center bg-black/25 text-gray-200 opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
                             <Camera size={20} aria-hidden="true" />
                         </span>
                     </button>
-                    <input ref={inputRef} type="file" accept="image/jpeg,image/png" className="sr-only" onChange={changeAvatar} />
-                    {uploading && <p role="status" className="mb-2 text-xs">{profileText('avatarUploading')}</p>}
-                    {message && <p role={error ? 'alert' : 'status'} className={`mb-2 text-xs ${error ? 'text-danger' : 'text-store-green'}`}>{message}</p>}
+                    <p className="mb-1 text-center text-xs text-store-muted">
+                        {profileText('changeAvatar')}
+                    </p>
+                    {message && (
+                        <p role="status" className="mb-2 text-xs text-store-green">
+                            {message}
+                        </p>
+                    )}
                     <p>{displayName}</p>
                     <p className="admin-account-email font-subtext text-[12px] text-store-muted wrap-anywhere">
                         {user.email}
@@ -163,6 +198,17 @@ export default function WorkspaceAccountMenu({ user, roleLabel }: WorkspaceAccou
                         {roleLabel}
                     </span>
                 </div>
+            )}
+            {photoOpen && (
+                <AvatarPhotoDialog
+                    currentUrl={user.avatarUrl}
+                    recentUrls={recent}
+                    loadingHistory={loadingHistory}
+                    historyError={historyError}
+                    onClose={() => setPhotoOpen(false)}
+                    onUpload={upload}
+                    onRestore={restore}
+                />
             )}
         </div>
     );

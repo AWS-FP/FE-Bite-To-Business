@@ -27,8 +27,8 @@ export default function CustomerCollectionPage() {
     <StorefrontLayout rootClassName="min-h-screen bg-store-cream text-store-ink">
       <main className="mx-auto max-w-[1320px] px-4 py-9 sm:px-6">
         <PageNav back={{ label: t("home"), to: ROUTES.HOME }} />
-        <div className="mt-5 rounded-[24px] bg-store-green p-7 text-white">
-          <h1 className="m-0 font-subheading text-3xl font-bold">{heading}</h1>
+        <div className="mt-4 rounded-[18px] bg-store-green px-5 py-4 text-white sm:px-7 sm:py-5">
+          <h1 className="m-0 font-subheading text-2xl font-bold sm:text-3xl">{heading}</h1>
         </div>
         {loading && (
           <p role="status" className="mt-6">

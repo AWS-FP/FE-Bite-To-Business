@@ -583,7 +583,7 @@ export default function PromotionProductManager({
                                 </option>
                             ))}
                         </select>
-                        <label className="flex items-center gap-1 text-xs text-[#173f30]">
+                        <label className="flex h-11 items-center gap-2 whitespace-nowrap rounded-xl border border-[#d3dfd5] bg-white px-3 text-xs font-medium text-[#173f30]">
                             <input
                                 type="checkbox"
                                 checked={inStockOnly}
@@ -594,7 +594,7 @@ export default function PromotionProductManager({
                             />
                             {tr('Đủ tồn kho', 'In stock')}
                         </label>
-                        <label className="flex items-center gap-1 text-xs text-[#173f30]">
+                        <label className="flex h-11 items-center gap-2 whitespace-nowrap rounded-xl border border-[#d3dfd5] bg-white px-3 text-xs font-medium text-[#173f30]">
                             <input
                                 type="checkbox"
                                 checked={discountOnly}
@@ -607,12 +607,12 @@ export default function PromotionProductManager({
                         </label>
                     </div>
                     <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex rounded-xl bg-white p-1 text-xs">
+                        <div className="flex flex-wrap rounded-xl bg-white p-1 text-xs">
                             <button
                                 type="button"
                                 aria-pressed={tab === 'browse'}
                                 onClick={() => setTab('browse')}
-                                className={`rounded-lg px-3 py-2 font-bold ${tab === 'browse' ? 'bg-[#15543b] text-white' : 'text-[#15543b] hover:bg-[#edf4e9]'}`}
+                                className={`min-w-[155px] rounded-lg px-5 py-2.5 text-center font-bold sm:min-w-[205px] ${tab === 'browse' ? 'bg-[#15543b] text-white' : 'text-[#15543b] hover:bg-[#edf4e9]'}`}
                             >
                                 {tr('Danh sách sản phẩm', 'Browse products')}
                             </button>
@@ -620,7 +620,7 @@ export default function PromotionProductManager({
                                 type="button"
                                 aria-pressed={tab === 'selected'}
                                 onClick={() => setTab('selected')}
-                                className={`rounded-lg px-3 py-2 font-bold ${tab === 'selected' ? 'bg-[#15543b] text-white' : 'text-[#15543b] hover:bg-[#edf4e9]'}`}
+                                className={`min-w-[155px] rounded-lg px-5 py-2.5 text-center font-bold sm:min-w-[205px] ${tab === 'selected' ? 'bg-[#15543b] text-white' : 'text-[#15543b] hover:bg-[#edf4e9]'}`}
                             >
                                 {tr('Sản phẩm đã chọn', 'Selected products')} ({selected.length})
                             </button>

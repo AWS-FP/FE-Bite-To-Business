@@ -24,11 +24,11 @@ export default function CustomerCatalogPage() {
             <div className="mx-auto w-full max-w-[1440px] px-5 pb-16 pt-7 sm:pt-9">
                 <PageNav back={{ label: t('home'), to: ROUTES.HOME }} />
 
-                <header className="mt-5 rounded-[22px] bg-store-green px-6 py-7 text-white sm:px-9 sm:py-9">
-                    <h1 className="m-0 font-subheading text-3xl font-bold sm:text-4xl">
+                <header className="mt-4 rounded-[18px] bg-store-green px-5 py-4 text-white sm:px-7 sm:py-5">
+                    <h1 className="m-0 font-subheading text-2xl font-bold sm:text-3xl">
                         {t('customerUI.catalogTitle')}
                     </h1>
-                    <p className="mb-0 mt-2 text-sm text-white/80">
+                    <p className="mb-0 mt-1 text-[13px] leading-5 text-white/80 sm:text-sm">
                         {t('customerUI.catalogIntro')}
                     </p>
                 </header>

@@ -21,6 +21,9 @@ export default function ProductShowcaseCard({
         : product.categoryLabel;
     const unit = t(`homePage.units.${product.unit.toLowerCase()}`, product.unit);
     const image = product.imageUrl?.trim();
+    // Presentation-only fallback: unrated products still show five empty stars.
+    const reviewCount = product.reviewCount ?? 0;
+    const rating = reviewCount > 0 ? (product.rating ?? 0) : 0;
     const { favorite, pending: savingFavorite, toggle: toggleFavorite } = useFavoriteToggle(product.id);
     const {
         quantity,
@@ -96,27 +99,22 @@ export default function ProductShowcaseCard({
                 </Link>
 
                 <div className="mt-1.5 flex h-5 items-center gap-1.5">
-                    {product.rating != null && product.reviewCount != null ? (
-                        <>
-                            <div className="flex shrink-0 items-center gap-px" aria-hidden="true">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                    <Star
-                                        key={star}
-                                        size={12}
-                                        className={
-                                            star <= Math.round(product.rating ?? 0)
-                                                ? 'fill-store-yellow text-store-ink'
-                                                : 'fill-transparent text-store-ink/45'
-                                        }
-                                    />
-                                ))}
-                            </div>
-                            <span className="truncate text-[10px] text-store-muted">
-                                {product.rating} (
-                                {t('homePage.reviewCount', { count: product.reviewCount })})
-                            </span>
-                        </>
-                    ) : null}
+                    <div className="flex shrink-0 items-center gap-px" aria-hidden="true">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                                key={star}
+                                size={12}
+                                className={
+                                    star <= Math.round(rating)
+                                        ? 'fill-store-yellow text-store-ink'
+                                        : 'fill-transparent text-store-ink/45'
+                                }
+                            />
+                        ))}
+                    </div>
+                    <span className="truncate text-[10px] text-store-muted">
+                        {rating} ({t('homePage.reviewCount', { count: reviewCount })})
+                    </span>
                 </div>
 
                 <div className="mt-auto pt-2.5">

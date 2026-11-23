@@ -56,6 +56,7 @@ import PendingPage from '@/components/common/PendingPage';
 
 // Router
 import ProtectedRoute from './ProtectedRoute';
+import StorefrontRoleGuard from './StorefrontRoleGuard';
 import { ROUTES } from './routes';
 import EcommerceDashboardPage from '@/pages/e-commerce/EcommerceDashboardPage';
 import EcommerceQuotesPage from '@/pages/e-commerce/EcommerceQuotesPage';
@@ -92,58 +93,63 @@ export const router = createBrowserRouter([
 
     // ==========================================
     // 2. PUBLIC CUSTOMER PAGES
-    // Không cần đăng nhập
+    // Guests/Customers may browse; E-commerce staff stay in their workspace.
     // ==========================================
     {
-        path: ROUTES.HOME,
-        Component: HomePage,
-    },
-    {
-        path: ROUTES.LANDING,
-        Component: LandingPage,
-    },
-    {
-        path: ROUTES.WHY_BTB,
-        Component: WhyBTBPage,
-    },
-    {
-        path: ROUTES.BTB_MODEL,
-        Component: BTBModelPage,
-    },
-    {
-        path: ROUTES.BRANDS,
-        Component: BrandsPage,
-    },
-    {
-        path: ROUTES.BRAND_DETAIL,
-        Component: BrandDetailPage,
-    },
-    {
-        path: ROUTES.BRAND_DETAIL_LEGACY,
-        Component: BrandDetailPage,
-    },
-    {
-        path: ROUTES.CATALOG,
-        Component: CustomerCatalogPage,
-    },
-    {
-        path: ROUTES.CUSTOMER_COLLECTION,
-        Component: CustomerCollectionPage,
-    },
-    {
-        path: ROUTES.PRODUCT_DETAIL,
-        Component: CustomerProductDetailPage,
-    },
-    {
-        path: ROUTES.QUOTES,
-        Component: CartPage,
-    },
-    {
-        element: <ProtectedRoute allowedRoles={Object.values(AUTH_ROLES)} />,
+        element: <StorefrontRoleGuard />,
         children: [
             {
-                path: ROUTES.DISTRIBUTION_NETWORK,
-                Component: DistributionNetworkPage,
+                path: ROUTES.HOME,
+                Component: HomePage,
+            },
+            {
+                path: ROUTES.LANDING,
+                Component: LandingPage,
+            },
+            {
+                path: ROUTES.WHY_BTB,
+                Component: WhyBTBPage,
+            },
+            {
+                path: ROUTES.BTB_MODEL,
+                Component: BTBModelPage,
+            },
+            {
+                path: ROUTES.BRANDS,
+                Component: BrandsPage,
+            },
+            {
+                path: ROUTES.BRAND_DETAIL,
+                Component: BrandDetailPage,
+            },
+            {
+                path: ROUTES.BRAND_DETAIL_LEGACY,
+                Component: BrandDetailPage,
+            },
+            {
+                path: ROUTES.CATALOG,
+                Component: CustomerCatalogPage,
+            },
+            {
+                path: ROUTES.CUSTOMER_COLLECTION,
+                Component: CustomerCollectionPage,
+            },
+            {
+                path: ROUTES.PRODUCT_DETAIL,
+                Component: CustomerProductDetailPage,
+            },
+            {
+                path: ROUTES.QUOTES,
+                Component: CartPage,
+            },
+            {
+                element: <ProtectedRoute allowedRoles={Object.values(AUTH_ROLES)} />,
+                children: [
+                    {
+                        path: ROUTES.DISTRIBUTION_NETWORK,
+                        Component: DistributionNetworkPage,
+                    },
+                ],
             },
         ],
     },

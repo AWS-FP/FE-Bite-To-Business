@@ -122,6 +122,7 @@ function EcommerceWorkspace() {
             >
                 <WorkspaceSidebar
                     sidebarId="ecommerce-sidebar"
+                    homePath={ROUTES.ECOMMERCE_DASHBOARD}
                     className="!relative !h-full !min-h-0 [&_.admin-navigation-link]:transition-[box-shadow,background-color] [&_.admin-navigation-link]:duration-100 [&_.admin-navigation-link[aria-current=page]]:!bg-[#ffe146] [&_.admin-navigation-link[aria-current=page]]:!shadow-[3px_3px_0_#173a2a]"
                     workspaceLabel={tr('KHÔNG GIAN E-COMMERCE', 'E-COMMERCE WORKSPACE')}
                     isCollapsed={collapsed}

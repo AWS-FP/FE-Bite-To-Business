@@ -15,6 +15,7 @@ interface NavigationItem {
 interface WorkspaceSidebarProps {
     workspaceLabel: string;
     logoSrc?: string;
+    homePath?: string;
     groups: { label: string; items: NavigationItem[] }[];
     isCollapsed: boolean;
     onToggleCollapse: () => void;
@@ -26,6 +27,7 @@ interface WorkspaceSidebarProps {
 export default function WorkspaceSidebar({
     workspaceLabel,
     logoSrc = '/images/admin/brand-logo.png',
+    homePath = ROUTES.HOME,
     groups,
     isCollapsed,
     onToggleCollapse,
@@ -42,8 +44,24 @@ export default function WorkspaceSidebar({
             aria-label={workspaceLabel}
         >
             <Link
-                className="admin-brand flex min-h-[98px] items-center gap-2 px-1 py-3 text-black no-underline [.is-collapsed_&]:justify-center [.is-collapsed_&]:px-0"
-                to={ROUTES.HOME}
+                className="
+                    admin-brand
+                    flex min-h-[98px] items-center gap-2
+                    px-1 py-3
+                    text-black no-underline
+
+                    focus:border-0!
+                    focus:shadow-none!
+
+                    focus-visible:outline-solid!
+                    focus-visible:outline-2!
+                    focus-visible:outline-offset-2!
+                    focus-visible:outline-emerald-600!
+
+                    [.is-collapsed_&]:justify-center
+                    [.is-collapsed_&]:px-0
+                "
+                to={homePath}
                 onClick={onNavigate}
                 aria-label={t('common:home')}
             >
@@ -54,17 +72,21 @@ export default function WorkspaceSidebar({
                     width={88}
                     height={68}
                 />
+
                 <span className="admin-brand-name brand-name flex flex-col text-[24px] leading-[28.8px] tracking-[-0.3px] [.is-collapsed_&]:hidden">
                     <span>Bite to</span>
                     <span>Business</span>
                 </span>
             </Link>
+
             <p className="admin-sidebar-workspace flex min-h-[35px] items-center gap-[7px] px-[5px] pt-5 text-[10px] leading-[15px] font-bold tracking-[1px] [.is-collapsed_&]:justify-center [.is-collapsed_&]:px-0">
                 <span className="size-[6px] shrink-0 rounded-full bg-black" aria-hidden="true" />
+
                 <span className="admin-sidebar-text [.is-collapsed_&]:hidden">
                     {workspaceLabel}
                 </span>
             </p>
+
             <div className="admin-sidebar-divider my-[22px] h-[2px] shrink-0 bg-black" />
 
             {groups.map((group, index) => (
@@ -72,6 +94,7 @@ export default function WorkspaceSidebar({
                     <p className="admin-sidebar-group admin-sidebar-text pb-[13px] pl-[5px] text-[10px] leading-[15px] font-bold tracking-[1px] [.is-collapsed_&]:hidden">
                         {group.label}
                     </p>
+
                     <nav
                         className="admin-sidebar-navigation flex flex-col gap-[7px]"
                         aria-label={group.label}
@@ -88,9 +111,11 @@ export default function WorkspaceSidebar({
                                 <span className="flex shrink-0" aria-hidden="true">
                                     {item.icon}
                                 </span>
+
                                 <span className="admin-sidebar-text min-w-0 flex-1 [.is-collapsed_&]:hidden">
                                     {item.label}
                                 </span>
+
                                 {item.count !== undefined && (
                                     <span
                                         className="admin-pending-count ml-auto shrink-0 rounded-[2px] border border-black bg-white px-[5px] py-px text-[11px] leading-[16.5px] font-bold [.is-collapsed_&]:absolute [.is-collapsed_&]:-top-[6px] [.is-collapsed_&]:-right-[6px] [.is-collapsed_&]:px-[3px] [.is-collapsed_&]:py-0 [.is-collapsed_&]:text-[9px] [.is-collapsed_&]:leading-[14px]"
@@ -107,7 +132,11 @@ export default function WorkspaceSidebar({
 
             <div className="admin-sidebar-bottom mt-auto pt-12 before:mb-[15px] before:block before:border-t before:border-black before:content-['']">
                 <div className="ml-auto w-fit [.is-collapsed_&]:mr-auto">
-                    <SidebarCollapseButton sidebarId={sidebarId} isCollapsed={isCollapsed} onToggle={onToggleCollapse} />
+                    <SidebarCollapseButton
+                        sidebarId={sidebarId}
+                        isCollapsed={isCollapsed}
+                        onToggle={onToggleCollapse}
+                    />
                 </div>
             </div>
         </aside>
