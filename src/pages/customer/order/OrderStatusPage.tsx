@@ -8,18 +8,9 @@ import OrderStatusBadge from '@/components/customer/order/OrderStatusBadge';
 import { paymentStatusLabel } from '@/utils/orderStatus';
 import { ROUTES } from '@/router/routes';
 import { useAuthStore } from '@/store/admin/authStore';
-import {
-    cancelCustomerOrder,
-    getCustomerInvoice,
-    getCustomerOrder,
-    getOrderVatPreview,
-} from '@/services/customer/orderService';
+import { cancelCustomerOrder, getCustomerOrder } from '@/services/customer/orderService';
 import ConfirmModal from '@/components/common/ConfirmModal';
-import type {
-    CustomerInvoice,
-    CustomerOrderDetail,
-    OrderVatPreview,
-} from '@/services/customer/orderService';
+import type { CustomerOrderDetail } from '@/services/customer/orderService';
 import { createBankPayment, getBankPayment, type BankPayment } from '@/services/customer/paymentService';
 import PageNav from '@/components/common/PageNav';
 
@@ -37,10 +28,7 @@ export default function OrderStatusPage() {
           session.user.email
         : '';
     const [detail, setDetail] = useState<CustomerOrderDetail | null>(null);
-    const [invoice, setInvoice] = useState<CustomerInvoice | null>(null);
-    const [vat, setVat] = useState<OrderVatPreview | null>(null);
     const [error, setError] = useState(false);
-    const [extraError, setExtraError] = useState('');
     const [payment, setPayment] = useState<BankPayment | null>(null);
     const [paymentLoading, setPaymentLoading] = useState(false);
     const [paymentError, setPaymentError] = useState('');
@@ -125,25 +113,6 @@ export default function OrderStatusPage() {
     const openingPayment = openPaymentOnLoad && awaitingPayment && !payment && !paymentError;
     const loading = !!orderId && detail?.order.orderId !== orderId && !error;
     const canShowDetail = detail?.order.orderId === orderId && !error;
-
-    async function loadInvoice() {
-        if (!orderId) return;
-        setExtraError('');
-        try {
-            setInvoice(await getCustomerInvoice(orderId));
-        } catch {
-            setExtraError('Không lấy được hóa đơn.');
-        }
-    }
-    async function loadVat() {
-        if (!orderId) return;
-        setExtraError('');
-        try {
-            setVat(await getOrderVatPreview(orderId));
-        } catch {
-            setExtraError('Không lấy được bản tính VAT.');
-        }
-    }
 
     async function showPayment() {
         if (!orderId || paymentLoading) return;
@@ -380,59 +349,6 @@ export default function OrderStatusPage() {
                                         <p className="mb-0">SePay đã xác nhận giao dịch. Đơn hàng sẽ được chuyển cho bộ phận giao hàng.</p>
                                     </section>
                                 )}
-                                <section className="rounded-xl border-2 border-store-ink bg-white p-5 text-sm">
-                                    <h2 className="mt-0 text-lg font-bold">Hóa đơn và VAT</h2>
-                                    <div className="flex flex-wrap gap-2">
-                                        <button
-                                            onClick={loadInvoice}
-                                            type="button"
-                                            className="rounded bg-store-green px-3 py-2 text-xs font-bold text-white"
-                                        >
-                                            Kiểm tra hóa đơn
-                                        </button>
-                                        <button
-                                            onClick={loadVat}
-                                            type="button"
-                                            className="rounded bg-store-yellow px-3 py-2 text-xs font-bold"
-                                        >
-                                            Xem VAT
-                                        </button>
-                                    </div>
-                                    {extraError && (
-                                        <p role="alert" className="text-danger">
-                                            {extraError}
-                                        </p>
-                                    )}
-                                    {invoice && invoice.orderId === orderId && (
-                                        <div className="mt-3">
-                                            <p>
-                                                Trạng thái hóa đơn:{' '}
-                                                <strong>{invoice.invoiceStatus}</strong>
-                                            </p>
-                                            {invoice.downloadable && invoice.pdfUrl && (
-                                                <a
-                                                    href={invoice.pdfUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-store-green underline"
-                                                >
-                                                    Xem PDF chính thức
-                                                </a>
-                                            )}
-                                        </div>
-                                    )}
-                                    {vat && vat.orderId === orderId && (
-                                        <div className="mt-3">
-                                            <p>
-                                                Tổng VAT theo snapshot:{' '}
-                                                <strong>{money(vat.vatAmount)}</strong>
-                                            </p>
-                                            <p className="text-xs text-store-muted">
-                                                {vat.disclaimer}
-                                            </p>
-                                        </div>
-                                    )}
-                                </section>
                             </aside>
                         </div>
                     </>

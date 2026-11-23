@@ -123,9 +123,6 @@ export default function RegistrationDetails({
                 <DetailField label={t('fields.invoiceTaxCode')}>
                     {registration.invoiceTaxCode}
                 </DetailField>
-                <DetailField label={t('fields.invoiceEmail')} full>
-                    {registration.invoiceEmail}
-                </DetailField>
             </DetailSection>
             <DetailSection title={t('detail.processing')} icon="history">
                 <DetailField label={t('fields.reviewStatus')}>

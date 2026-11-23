@@ -51,35 +51,6 @@ export interface CustomerOrdersPage {
     totalElements: number;
     totalPages: number;
 }
-export interface CustomerInvoice {
-    orderId: string;
-    orderNumber: string;
-    invoiceStatus: string;
-    invoiceNumber: string | null;
-    vatAmount: number;
-    totalAmount: number;
-    pdfUrl: string | null;
-    issuedAt: string | null;
-    downloadable: boolean;
-}
-export interface VatLine {
-    productId: string;
-    sku: string;
-    nameVi: string;
-    quantity: number;
-    vatRate: number;
-    amountExcludingVat: number;
-    vatAmount: number;
-    lineTotal: number;
-}
-export interface OrderVatPreview {
-    orderId: string;
-    orderNumber: string;
-    vatAmount: number;
-    totalAmount: number;
-    items: VatLine[];
-    disclaimer: string;
-}
 
 /** All endpoints require a logged-in CUSTOMER; http handles Bearer/refresh. */
 /** ACTIVE = awaiting payment or delivery; FINISHED = completed or cancelled. */
@@ -107,18 +78,6 @@ export async function getCustomerOrder(orderId: string, signal?: AbortSignal) {
 export async function cancelCustomerOrder(orderId: string) {
     const { data } = await http.post<ApiResponse<CustomerOrderDetail>>(
         `/api/customer/orders/${encodeURIComponent(orderId)}/cancel`,
-    );
-    return data.data;
-}
-export async function getCustomerInvoice(orderId: string) {
-    const { data } = await http.get<ApiResponse<CustomerInvoice>>(
-        `/api/customer/orders/${encodeURIComponent(orderId)}/invoice`,
-    );
-    return data.data;
-}
-export async function getOrderVatPreview(orderId: string) {
-    const { data } = await http.get<ApiResponse<OrderVatPreview>>(
-        `/api/customer/orders/${encodeURIComponent(orderId)}/vat-preview`,
     );
     return data.data;
 }
