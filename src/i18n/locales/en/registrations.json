@@ -74,7 +74,6 @@
         "deliveryAddress": "Delivery address",
         "invoicePurchaser": "Purchaser",
         "invoiceTaxCode": "Tax code",
-        "invoiceEmail": "Invoice email",
         "reviewNote": "Note / Rejection reason",
         "otpSentAt": "Last OTP sent",
         "activatedAt": "Activated at",

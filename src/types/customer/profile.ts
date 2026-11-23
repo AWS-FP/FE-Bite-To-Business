@@ -10,9 +10,6 @@ export interface CustomerProfile {
     deliveryAddress: string | null;
     fullDeliveryAddress: string | null;
     deliveryNote: string | null;
-    invoicePurchaser: string | null;
-    invoiceTaxCode: string | null;
-    invoiceEmail: string | null;
     createdAt: string;
     updatedAt: string;
 }
@@ -27,7 +24,4 @@ export interface UpdateCustomerProfile {
     ward: string;
     deliveryAddress: string;
     deliveryNote: string | null;
-    invoicePurchaser: string | null;
-    invoiceTaxCode: string | null;
-    invoiceEmail: string | null;
 }

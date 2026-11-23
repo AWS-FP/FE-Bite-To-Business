@@ -22,7 +22,6 @@ export interface RegistrationResponse {
     deliveryNote: string | null;
     invoicePurchaser: string | null;
     invoiceTaxCode: string | null;
-    invoiceEmail: string | null;
     status: RegistrationStatus;
     reviewNote: string | null;
     submittedAt: string;

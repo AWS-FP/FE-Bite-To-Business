@@ -20,9 +20,6 @@ type ProfileFields = {
     ward: string;
     deliveryAddress: string;
     deliveryNote: string;
-    invoicePurchaser: string;
-    invoiceTaxCode: string;
-    invoiceEmail: string;
 };
 
 function toFields(profile: CustomerProfile): ProfileFields {
@@ -35,9 +32,6 @@ function toFields(profile: CustomerProfile): ProfileFields {
         ward: profile.ward || '',
         deliveryAddress: profile.deliveryAddress || '',
         deliveryNote: profile.deliveryNote || '',
-        invoicePurchaser: profile.invoicePurchaser || '',
-        invoiceTaxCode: profile.invoiceTaxCode || '',
-        invoiceEmail: profile.invoiceEmail || '',
     };
 }
 
@@ -149,17 +143,6 @@ export default function ProfileForm({ initialProfile }: { initialProfile: Custom
             setMessage(t('invalidPhone'));
             return;
         }
-        if (fields.invoiceTaxCode && !/^[0-9]{10}$/.test(fields.invoiceTaxCode.trim())) {
-            setMessage(t('invalidTax'));
-            return;
-        }
-        if (
-            fields.invoiceEmail &&
-            !/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@gmail\.com$/i.test(fields.invoiceEmail.trim())
-        ) {
-            setMessage(t('invalidEmail'));
-            return;
-        }
         if (savedProfile.district && !legacyConfirmed) {
             setMessage(t('legacyConfirm'));
             return;
@@ -169,9 +152,6 @@ export default function ProfileForm({ initialProfile }: { initialProfile: Custom
             phone,
             avatarUrl: savedProfile.user.avatarUrl,
             deliveryNote: fields.deliveryNote.trim() || null,
-            invoicePurchaser: fields.invoicePurchaser.trim() || null,
-            invoiceTaxCode: fields.invoiceTaxCode.trim() || null,
-            invoiceEmail: fields.invoiceEmail.trim() || null,
         };
         const sessionVersion = useAuthStore.getState().sessionVersion;
         setSaving(true);
@@ -366,36 +346,6 @@ export default function ProfileForm({ initialProfile }: { initialProfile: Custom
                             <strong>{t('fullAddress')}:</strong> {fullAddress}
                         </p>
                     )}
-                </Section>
-                <Section id="billing" title={t('billing')} description={t('billingHint')}>
-                    <div className="grid grid-cols-2 gap-4">
-                        <Field label={t('purchaser')}>
-                            <input
-                                className={controlClass}
-                                value={fields.invoicePurchaser}
-                                onChange={(e) => setField('invoicePurchaser', e.target.value)}
-                                maxLength={200}
-                            />
-                        </Field>
-                        <Field label={t('taxCode')}>
-                            <input
-                                className={controlClass}
-                                inputMode="numeric"
-                                value={fields.invoiceTaxCode}
-                                onChange={(e) => setField('invoiceTaxCode', e.target.value)}
-                                maxLength={10}
-                            />
-                        </Field>
-                        <Field label={t('invoiceEmail')}>
-                            <input
-                                className={controlClass}
-                                type="email"
-                                value={fields.invoiceEmail}
-                                onChange={(e) => setField('invoiceEmail', e.target.value)}
-                                maxLength={254}
-                            />
-                        </Field>
-                    </div>
                 </Section>
             </fieldset>
             {message && (

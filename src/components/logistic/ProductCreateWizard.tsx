@@ -12,6 +12,7 @@ import type { ProductRequest } from '@/hooks/logistic/useLogisticsData';
 import { http } from '@/services/axiosClient';
 import axios from 'axios';
 import PageNav from '@/components/common/PageNav';
+import KeyValueTableEditor, { type KeyValueRow } from './KeyValueTableEditor';
 
 const inputClass =
     'mt-2 w-full rounded border border-black/40 bg-white px-3 py-3 text-sm font-normal text-black outline-none focus:border-black focus:ring-0';
@@ -21,7 +22,6 @@ const BILINGUAL_FIELDS: [string, TranslationField][] = [
     ['name', 'NAME'],
     ['description', 'DESCRIPTION'],
     ['spec', 'SPEC'],
-    ['technical', 'TECHNICAL'],
     ['storage', 'STORAGE'],
     ['compliance', 'COMPLIANCE'],
     ['originDetail', 'ORIGIN_DETAIL'],
@@ -35,6 +35,25 @@ const bilingual: Record<string, { counterpart: string; lang: TranslationLanguage
     );
 
 type Suggestion = { status: 'loading' | 'ready' | 'error'; sourceText: string; text?: string; error?: string };
+
+// Trang sản phẩm đọc chuỗi "Thông số: giá trị | ..." và hiển thị lại thành từng dòng của bảng.
+function technicalText(rows: KeyValueRow[] | undefined): string | null {
+    return (
+        (rows ?? [])
+            .filter((row) => row.key.trim() && row.value.trim())
+            .map((row) => `${row.key.trim()}: ${row.value.trim()}`)
+            .join(' | ') || null
+    );
+}
+
+// Đọc lại chuỗi "Thông số: giá trị | ..." (ví dụ bản dịch AI) thành các dòng của bảng.
+function technicalRows(text: string): KeyValueRow[] {
+    return text
+        .split('|')
+        .map((part) => part.trim().match(/^([^:：]+)[:：]\s*(.+)$/u))
+        .filter((match): match is RegExpMatchArray => match != null)
+        .map((match) => ({ key: match[1].trim(), value: match[2].trim() }));
+}
 
 type Props = {
     request?: ProductRequest;
@@ -55,11 +74,17 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState('');
     const [tiers, setTiers] = useState<{ min: string; max: string; price: string }[]>([]);
-    // Bảng thông tin dinh dưỡng (tùy chọn): null = chưa tạo bảng.
-    const [nutrition, setNutrition] = useState<{
-        basis: string;
-        rows: { nutrient: string; amount: string }[];
+    // Bảng thông số kỹ thuật (tùy chọn, mỗi thông số một dòng): null = chưa tạo bảng.
+    const [technical, setTechnical] = useState<{ vi: KeyValueRow[]; en: KeyValueRow[] } | null>(null);
+    // Dịch cả bảng thông số sang ngôn ngữ còn lại bằng AI.
+    const [technicalTranslation, setTechnicalTranslation] = useState<{
+        target: TranslationLanguage;
+        status: 'loading' | 'error';
+        error?: string;
     } | null>(null);
+    const technicalTranslationRequest = useRef<AbortController | null>(null);
+    // Bảng thông tin dinh dưỡng (tùy chọn): null = chưa tạo bảng.
+    const [nutrition, setNutrition] = useState<{ basis: string; rows: KeyValueRow[] } | null>(null);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
     const [created, setCreated] = useState<{ id: string; sku: string } | null>(null);
@@ -68,7 +93,11 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
 
     useEffect(() => {
         const pending = suggestionRequests.current;
-        return () => Object.values(pending).forEach((controller) => controller.abort());
+        const technicalRequest = technicalTranslationRequest;
+        return () => {
+            Object.values(pending).forEach((controller) => controller.abort());
+            technicalRequest.current?.abort();
+        };
     }, []);
 
     function dropSuggestion(targetKey: string) {
@@ -125,6 +154,47 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         void requestSuggestion(target);
     }
 
+    // Dịch bảng thông số của ngôn ngữ kia sang `target`, rồi thay các dòng của bảng `target`.
+    async function translateTechnical(target: TranslationLanguage) {
+        if (!technical) return;
+        const source: TranslationLanguage = target === 'en' ? 'vi' : 'en';
+        const text = technicalText(technical[source]);
+        if (!text) return;
+        technicalTranslationRequest.current?.abort();
+        const controller = new AbortController();
+        technicalTranslationRequest.current = controller;
+        setTechnicalTranslation({ target, status: 'loading' });
+        try {
+            const translated = technicalRows(await suggestTranslation(text, source, 'TECHNICAL', controller.signal));
+            if (controller.signal.aborted) return;
+            if (translated.length === 0) {
+                setTechnicalTranslation({
+                    target,
+                    status: 'error',
+                    error: tr("Chưa lấy được gợi ý dịch. Bạn có thể tự nhập hoặc thử lại."),
+                });
+                return;
+            }
+            setTechnical((current) => (current ? { ...current, [target]: translated } : current));
+            setTechnicalTranslation(null);
+        } catch (err) {
+            if (controller.signal.aborted || axios.isCancel(err)) return;
+            const status = axios.isAxiosError(err) ? err.response?.status : undefined;
+            setTechnicalTranslation({
+                target,
+                status: 'error',
+                error:
+                    status === 429
+                        ? tr("Bạn đã dùng hết lượt gợi ý dịch trong giờ này. Vui lòng thử lại sau.")
+                        : status === 403
+                          ? tr("Tài khoản không có quyền dùng gợi ý dịch.")
+                          : tr("Chưa lấy được gợi ý dịch. Bạn có thể tự nhập hoặc thử lại."),
+            });
+        } finally {
+            if (technicalTranslationRequest.current === controller) technicalTranslationRequest.current = null;
+        }
+    }
+
     function acceptSuggestion(targetKey: string) {
         const text = suggestions[targetKey]?.text;
         if (!text) return;
@@ -167,13 +237,23 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 (!Number.isFinite(Number(values.tareWeight)) || Number(values.tareWeight) < 0)
             )
                 return tr("Khối lượng bao bì không được âm.");
+            if (technical) {
+                for (const rows of [technical.vi, technical.en]) {
+                    const filled = rows.filter((row) => row.key.trim() || row.value.trim());
+                    if (filled.some((row) => !row.key.trim() || !row.value.trim()))
+                        return tr("Mỗi dòng thông số cần đủ tên thông số và giá trị.");
+                    // Bảng được lưu dạng "Thông số: giá trị | ..." nên tên không chứa ":" và không dòng nào chứa "|".
+                    if (filled.some((row) => /[:：|]/.test(row.key) || row.value.includes('|')))
+                        return tr("Tên thông số không được chứa dấu hai chấm hoặc dấu |; giá trị không được chứa dấu |.");
+                }
+            }
             if (nutrition) {
-                const rows = nutrition.rows.filter((row) => row.nutrient.trim() || row.amount.trim());
-                if (rows.some((row) => !row.nutrient.trim() || !row.amount.trim()))
+                const rows = nutrition.rows.filter((row) => row.key.trim() || row.value.trim());
+                if (rows.some((row) => !row.key.trim() || !row.value.trim()))
                     return tr("Mỗi dòng dinh dưỡng cần đủ thành phần và hàm lượng.");
                 if (rows.length > 0 && !nutrition.basis.trim())
                     return tr("Vui lòng nhập lượng tham chiếu cho bảng dinh dưỡng, ví dụ 100g.");
-                const names = rows.map((row) => row.nutrient.trim().toLowerCase());
+                const names = rows.map((row) => row.key.trim().toLowerCase());
                 if (new Set(names).size !== names.length)
                     return tr("Mỗi thành phần dinh dưỡng chỉ được nhập một lần.");
                 if (rows.length > 40)
@@ -254,7 +334,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         }
         const optionalNumber = (key: string) => (values[key]?.trim() ? Number(values[key]) : null);
         const nutritionFacts = (nutrition?.rows ?? [])
-            .map((row) => ({ nutrient: row.nutrient.trim(), amount: row.amount.trim() }))
+            .map((row) => ({ nutrient: row.key.trim(), amount: row.value.trim() }))
             .filter((row) => row.nutrient && row.amount);
         const payload = {
             nameVi: values.nameVi.trim(),
@@ -274,8 +354,8 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             length: optionalNumber('length'),
             width: optionalNumber('width'),
             height: optionalNumber('height'),
-            technicalVi: values.technicalVi || null,
-            technicalEn: values.technicalEn || null,
+            technicalVi: technicalText(technical?.vi),
+            technicalEn: technicalText(technical?.en),
             storageVi: values.storageVi || null,
             storageEn: values.storageEn || null,
             complianceVi: values.complianceVi || null,
@@ -647,9 +727,87 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     {field('width', tr("Chiều rộng (cm)"), { type: 'number' })}
                                     {field('height', tr("Chiều cao (cm)"), { type: 'number' })}
                                 </div>
+                                <div className="space-y-4 border-t border-store-line pt-5">
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div>
+                                            <h3 className="font-semibold">{tr("Thông số kỹ thuật")}</h3>
+                                            <p className="mt-1 text-sm text-store-muted">
+                                                {tr("Tùy chọn. Mỗi thông số là một dòng; không nhập lại đơn vị bán, số lượng tối thiểu, khối lượng, kích thước vì đã có ô riêng.")}
+                                            </p>
+                                        </div>
+                                        {technical ? (
+                                            <button
+                                                type="button"
+                                                onClick={() => setTechnical(null)}
+                                                className="shrink-0 px-2 py-2 text-sm text-red-700"
+                                            >
+                                                {tr("Xóa bảng")}
+                                            </button>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setTechnical({
+                                                        vi: [{ key: '', value: '' }],
+                                                        en: [{ key: '', value: '' }],
+                                                    })
+                                                }
+                                                className="shrink-0 rounded border border-black px-3 py-2 text-sm font-semibold"
+                                            >
+                                                {tr("+ Tạo bảng thông số")}
+                                            </button>
+                                        )}
+                                    </div>
+                                    {technical && (
+                                        <div className="grid grid-cols-2 gap-4">
+                                            {(['vi', 'en'] as const).map((lang) => {
+                                                const source = lang === 'en' ? 'vi' : 'en';
+                                                const canTranslate = !!technicalText(technical[source]);
+                                                const translation =
+                                                    technicalTranslation?.target === lang ? technicalTranslation : null;
+                                                return (
+                                                    <div key={lang} className="space-y-2">
+                                                        <div className="flex items-center justify-between gap-3 text-sm font-semibold">
+                                                            <span>{lang === 'vi' ? tr('Tiếng Việt') : tr('Tiếng Anh')}</span>
+                                                            {translation?.status === 'loading' ? (
+                                                                <span className="inline-flex items-center gap-1 text-xs font-normal text-store-muted">
+                                                                    <Loader2 size={13} className="animate-spin" aria-hidden="true" />
+                                                                    {tr("AI đang gợi ý bản dịch…")}
+                                                                </span>
+                                                            ) : (
+                                                                canTranslate && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => void translateTechnical(lang)}
+                                                                        className="inline-flex shrink-0 items-center gap-1 border-0 bg-transparent p-0 text-xs font-semibold text-store-green underline underline-offset-2"
+                                                                    >
+                                                                        <Sparkles size={13} aria-hidden="true" />
+                                                                        {lang === 'en' ? tr("Dịch từ tiếng Việt") : tr("Dịch từ tiếng Anh")}
+                                                                    </button>
+                                                                )
+                                                            )}
+                                                        </div>
+                                                        {translation?.status === 'error' && (
+                                                            <p role="alert" className="m-0 text-xs text-red-700">
+                                                                {translation.error}
+                                                            </p>
+                                                        )}
+                                                        <KeyValueTableEditor
+                                                            rows={technical[lang]}
+                                                            onChange={(rows) => setTechnical({ ...technical, [lang]: rows })}
+                                                            columns={[tr("Thông số"), tr("Giá trị")]}
+                                                            maxLengths={[85, 300]}
+                                                            addLabel={tr("+ Thêm dòng")}
+                                                            removeLabel={tr("Xóa")}
+                                                        />
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
                                 <div className="space-y-5 border-t border-store-line pt-5">
                                     {[
-                                        ['technical', tr("Thông số kỹ thuật")],
                                         ['storage', tr("Bảo quản và sơ chế")],
                                         ['compliance', tr("An toàn thực phẩm và hóa đơn")],
                                         ['originDetail', tr("Thông tin nguồn gốc")],
@@ -657,17 +815,9 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                         <div key={key} className="grid grid-cols-2 gap-4">
                                             {field(`${key}Vi`, `${label} · ${tr('Tiếng Việt')}`, {
                                                 area: true,
-                                                placeholder:
-                                                    key === 'technical'
-                                                        ? tr("Ví dụ: Quy cách bán: thùng 10 gói. Không nhập lại đơn vị bán, số lượng tối thiểu, khối lượng hay kích thước vì đã có ô riêng.")
-                                                        : undefined,
                                             })}
                                             {field(`${key}En`, `${label} · ${tr('Tiếng Anh')}`, {
                                                 area: true,
-                                                placeholder:
-                                                    key === 'technical'
-                                                        ? tr("Ví dụ: Selling spec: case of 10 packs.")
-                                                        : undefined,
                                             })}
                                         </div>
                                     ))}
@@ -694,7 +844,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                                 onClick={() =>
                                                     setNutrition({
                                                         basis: '100g',
-                                                        rows: [{ nutrient: '', amount: '' }],
+                                                        rows: [{ key: '', value: '' }],
                                                     })
                                                 }
                                                 className="shrink-0 rounded border border-black px-3 py-2 text-sm font-semibold"
@@ -717,77 +867,15 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                                     className={inputClass}
                                                 />
                                             </label>
-                                            <div className="overflow-hidden rounded border border-black/40">
-                                                <table className="w-full table-fixed border-collapse text-sm">
-                                                    <thead className="bg-store-cream">
-                                                        <tr>
-                                                            <th scope="col" className="px-3 py-2 text-left font-semibold">
-                                                                {tr("Thành phần dinh dưỡng")}
-                                                            </th>
-                                                            <th scope="col" className="px-3 py-2 text-left font-semibold">
-                                                                {tr("Hàm lượng")}
-                                                            </th>
-                                                            <th scope="col" className="w-16">
-                                                                <span className="sr-only">{tr("Xóa")}</span>
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {nutrition.rows.map((row, index) => (
-                                                            <tr key={index} className="border-t border-black/10">
-                                                                {(['nutrient', 'amount'] as const).map((key) => (
-                                                                    <td key={key} className="px-3 py-2">
-                                                                        <input
-                                                                            aria-label={`${key === 'nutrient' ? tr("Thành phần dinh dưỡng") : tr("Hàm lượng")} ${index + 1}`}
-                                                                            value={row[key]}
-                                                                            maxLength={key === 'nutrient' ? 100 : 50}
-                                                                            placeholder={key === 'nutrient' ? tr("Ví dụ: Protein") : tr("Ví dụ: 20g")}
-                                                                            onChange={(e) =>
-                                                                                setNutrition({
-                                                                                    ...nutrition,
-                                                                                    rows: nutrition.rows.map((item, i) =>
-                                                                                        i === index
-                                                                                            ? { ...item, [key]: e.target.value }
-                                                                                            : item,
-                                                                                    ),
-                                                                                })
-                                                                            }
-                                                                            className={inputClass.replace('mt-2 ', '')}
-                                                                        />
-                                                                    </td>
-                                                                ))}
-                                                                <td className="px-2 text-center">
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() =>
-                                                                            setNutrition({
-                                                                                ...nutrition,
-                                                                                rows: nutrition.rows.filter((_, i) => i !== index),
-                                                                            })
-                                                                        }
-                                                                        className="text-sm text-red-700"
-                                                                    >
-                                                                        {tr("Xóa")}
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <button
-                                                type="button"
-                                                disabled={nutrition.rows.length >= 40}
-                                                onClick={() =>
-                                                    setNutrition({
-                                                        ...nutrition,
-                                                        rows: [...nutrition.rows, { nutrient: '', amount: '' }],
-                                                    })
-                                                }
-                                                className="rounded border border-black px-3 py-2 text-sm font-semibold disabled:opacity-50"
-                                            >
-                                                {tr("+ Thêm thành phần")}
-                                            </button>
+                                            <KeyValueTableEditor
+                                                rows={nutrition.rows}
+                                                onChange={(rows) => setNutrition({ ...nutrition, rows })}
+                                                columns={[tr("Thành phần dinh dưỡng"), tr("Hàm lượng")]}
+                                                placeholders={[tr("Ví dụ: Protein"), tr("Ví dụ: 20g")]}
+                                                maxLengths={[100, 50]}
+                                                addLabel={tr("+ Thêm thành phần")}
+                                                removeLabel={tr("Xóa")}
+                                            />
                                         </>
                                     )}
                                 </div>
@@ -902,9 +990,15 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                         {tr("Bảo quản:") + ' '}{values.storageVi || tr("Chưa nhập")}
                                     </p>
                                     <p className="mt-1 text-store-muted">
+                                        {tr("Thông số kỹ thuật:") + ' '}
+                                        {technical?.vi.some((row) => row.key.trim() && row.value.trim())
+                                            ? `${technical.vi.filter((row) => row.key.trim() && row.value.trim()).length} ${tr("dòng")}`
+                                            : tr("Chưa nhập")}
+                                    </p>
+                                    <p className="mt-1 text-store-muted">
                                         {tr("Thông tin dinh dưỡng:") + ' '}
-                                        {nutrition?.rows.some((row) => row.nutrient.trim() && row.amount.trim())
-                                            ? `${nutrition.rows.filter((row) => row.nutrient.trim() && row.amount.trim()).length} ${tr("thành phần")} · ${nutrition.basis}`
+                                        {nutrition?.rows.some((row) => row.key.trim() && row.value.trim())
+                                            ? `${nutrition.rows.filter((row) => row.key.trim() && row.value.trim()).length} ${tr("thành phần")} · ${nutrition.basis}`
                                             : tr("Chưa nhập")}
                                     </p>
                                 </div>

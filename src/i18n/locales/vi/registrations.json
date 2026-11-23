@@ -73,7 +73,6 @@
         "deliveryAddress": "Địa chỉ giao hàng chi tiết",
         "invoicePurchaser": "Người mua hàng",
         "invoiceTaxCode": "Mã số thuế",
-        "invoiceEmail": "Email nhận hóa đơn",
         "reviewNote": "Ghi chú / Lý do từ chối",
         "otpSentAt": "Lần gửi OTP gần nhất",
         "activatedAt": "Thời điểm kích hoạt",
