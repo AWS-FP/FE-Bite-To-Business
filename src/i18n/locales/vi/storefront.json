@@ -144,7 +144,13 @@
         "nutrient": "Thành phần dinh dưỡng",
         "nutrientAmount": "Hàm lượng",
         "nutritionNoteLabel": "Lưu ý",
-        "nutritionNote": "Các giá trị chỉ mang tính tham khảo. Hàm lượng thực tế có thể khác tùy từng lô hàng và cách chế biến."
+        "nutritionNote": "Các giá trị chỉ mang tính tham khảo. Hàm lượng thực tế có thể khác tùy từng lô hàng và cách chế biến.",
+        "distributor": "Nhà phân phối",
+        "originFrom": "Xuất xứ: {{origin}}",
+        "originBrand": "Thương hiệu: {{brand}}",
+        "originDistributor": "Phân phối trực tiếp bởi {{distributor}}.",
+        "safetyVat": "Thuế suất GTGT (VAT) tham chiếu: {{vat}}%.",
+        "safetyTemplate": "Sản phẩm được cung cấp theo các yêu cầu hiện hành về vệ sinh an toàn thực phẩm (VSATTP), chất lượng và truy xuất nguồn gốc phù hợp với từng nhóm hàng. Các mặt hàng thực phẩm tươi sống, thịt, thủy hải sản, rau củ quả, thực phẩm đông lạnh, thực phẩm chế biến, đồ khô, gia vị, sữa, sản phẩm từ sữa, bánh kẹo và đồ uống được kiểm soát về nguồn gốc xuất xứ, điều kiện bảo quản, bao bì, nhãn hàng hóa và thời hạn sử dụng theo đặc tính sản phẩm. Đối với các mặt hàng cần bảo quản lạnh hoặc đông lạnh, việc lưu trữ và vận chuyển phải đáp ứng yêu cầu nhiệt độ phù hợp nhằm duy trì chất lượng và hạn chế nguy cơ mất an toàn thực phẩm. Hồ sơ pháp lý và chứng từ chất lượng tương ứng, bao gồm bản tự công bố hoặc đăng ký bản công bố sản phẩm, giấy chứng nhận kiểm dịch, chứng từ nguồn gốc và các tài liệu liên quan khác (nếu thuộc diện áp dụng), được cung cấp theo khả năng đáp ứng của nhà cung cấp. Hóa đơn giá trị gia tăng (VAT) được xuất theo quy định hiện hành, với thuế suất xác định theo từng loại hàng hóa và chính sách thuế có hiệu lực tại thời điểm giao dịch, nhằm hỗ trợ khách hàng doanh nghiệp trong công tác mua hàng, kiểm soát chất lượng, kế toán và lưu trữ chứng từ."
     },
     "distribution": {
         "title": "Hệ thống phân phối",

@@ -1,66 +1,17 @@
-import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, Heart, ImageOff, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
 import { ROUTES, routePaths } from '@/router/routes';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
-import {
-    getMyFavorites,
-    removeFavorite,
-    type FavoritePage,
-} from '@/services/customer/favoriteService';
+import { useMyFavorites } from '@/hooks/customer/useMyFavorites';
 import PageNav from '@/components/common/PageNav';
-
-const PAGE_SIZE = 12;
 
 export default function CustomerFavoritesPage() {
     const { t, i18n } = useTranslation('storefront');
     const english = i18n.resolvedLanguage?.startsWith('en') ?? false;
     const tr = (key: string) => t(`customerUI.favoritesPage.${key}`);
-    const [page, setPage] = useState(0);
-    const [revision, setRevision] = useState(0);
-    const [result, setResult] = useState<FavoritePage | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
-    const [removing, setRemoving] = useState<string | null>(null);
-
-    useEffect(() => {
-        let alive = true;
-        getMyFavorites(page, PAGE_SIZE)
-            .then((data) => {
-                if (!alive) return;
-                // Removing the only product on a non-first page can empty it.
-                if (data.content.length === 0 && page > 0) {
-                    setPage(page - 1);
-                } else {
-                    setResult(data);
-                    setError(false);
-                }
-            })
-            .catch(() => {
-                if (alive) setError(true);
-            })
-            .finally(() => {
-                if (alive) setLoading(false);
-            });
-        return () => {
-            alive = false;
-        };
-    }, [page, revision]);
-
-    async function remove(productId: string) {
-        setRemoving(productId);
-        try {
-            await removeFavorite(productId);
-            setLoading(true);
-            setRevision((value) => value + 1);
-        } catch {
-            setError(true);
-        } finally {
-            setRemoving(null);
-        }
-    }
+    const { page, setPage, setLoading, result, loading, error, removing, remove, retry } = useMyFavorites();
 
     return (
         <StorefrontLayout rootClassName="min-h-screen bg-store-cream text-store-ink">
@@ -89,11 +40,7 @@ export default function CustomerFavoritesPage() {
                         <button
                             type="button"
                             className="ml-4 font-bold underline"
-                            onClick={() => {
-                                setError(false);
-                                setLoading(true);
-                                setRevision((n) => n + 1);
-                            }}
+                            onClick={retry}
                         >
                             {tr('retry')}
                         </button>

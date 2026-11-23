@@ -1,64 +1,24 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { PackageOpen } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import StorefrontLayout from "@/layouts/StorefrontLayout";
-import { getHomeProducts } from "@/services/customer/homeService";
-import type { HomeResponse } from "@/services/customer/homeService";
+import { COLLECTIONS, useHomeCollection, type Collection } from "@/hooks/customer/useHomeCollection";
 import ProductShowcaseCard from "@/components/customer/home/ProductShowcaseCard";
-import { toCard } from "@/components/customer/home/homeProductMapper";
 import SectionPaginationBar from "@/components/customer/home/SectionPaginationBar";
 import { formatCurrencyVnd } from "@/constants/customer/homeData";
 import { ROUTES } from "@/router/routes";
 import PageNav from "@/components/common/PageNav";
 
-type Collection =
-  "deals" | "best-selling" | "deep-discount" | "top-rated" | "combos";
-const GROUPS: Collection[] = [
-  "deals",
-  "best-selling",
-  "deep-discount",
-  "top-rated",
-  "combos",
-];
-
 export default function CustomerCollectionPage() {
   const { kind } = useParams();
   const { t, i18n } = useTranslation("storefront");
-  const group: Collection = GROUPS.includes(kind as Collection)
+  const group: Collection = COLLECTIONS.includes(kind as Collection)
     ? (kind as Collection)
     : "deals";
-  const [data, setData] = useState<HomeResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const { data, loading, error, products } = useHomeCollection(group);
   const [page, setPage] = useState(1);
   const pageSize = 12;
-  useEffect(() => {
-    const controller = new AbortController();
-    getHomeProducts(controller.signal)
-      .then(setData)
-      .catch(() => {
-        if (!controller.signal.aborted) setError(true);
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
-      });
-    return () => controller.abort();
-  }, []);
-  const products = useMemo(() => {
-    if (!data) return [];
-    const source =
-      group === "deals"
-        ? data.flashSaleProducts
-        : group === "best-selling"
-          ? data.bestSellingProducts
-          : group === "deep-discount"
-            ? data.deepDiscountProducts
-            : data.topRatedProducts;
-    return source
-      .map(toCard)
-      .filter((item): item is NonNullable<typeof item> => item !== null);
-  }, [data, group]);
   const total =
     group === "combos" ? (data?.combos.length ?? 0) : products.length;
   const pages = Math.ceil(total / pageSize);

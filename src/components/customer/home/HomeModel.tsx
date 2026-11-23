@@ -2,14 +2,9 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getHomeProducts, getHomeCategories } from '@/services/customer/homeService';
-import type {
-    HomeProduct,
-    HomeBanner,
-    HomeCategory,
-    HomeCombo,
-} from '@/services/customer/homeService';
-import type { HomeProductCardItem } from '@/constants/customer/homeData';
-import { toCard } from './homeProductMapper';
+import type { HomeProduct, HomeBanner, HomeCategory, HomeCombo } from '@/types/customer/home';
+import type { HomeProductCardItem } from '@/types/customer/homeData';
+import { toCard } from '@/utils/customer/homeProductMapper';
 
 function useHomePageState() {
     const { t } = useTranslation('storefront');

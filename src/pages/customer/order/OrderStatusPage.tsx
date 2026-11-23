@@ -10,8 +10,9 @@ import { ROUTES } from '@/router/routes';
 import { useAuthStore } from '@/store/admin/authStore';
 import { cancelCustomerOrder, getCustomerOrder } from '@/services/customer/orderService';
 import ConfirmModal from '@/components/common/ConfirmModal';
-import type { CustomerOrderDetail } from '@/services/customer/orderService';
-import { createBankPayment, getBankPayment, type BankPayment } from '@/services/customer/paymentService';
+import type { CustomerOrderDetail } from '@/types/customer/order';
+import { createBankPayment, getBankPayment } from '@/services/customer/paymentService';
+import type { BankPayment } from '@/types/customer/payment';
 import PageNav from '@/components/common/PageNav';
 
 const money = (value: number) => `${value.toLocaleString('vi-VN')}đ`;

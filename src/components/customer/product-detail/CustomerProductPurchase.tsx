@@ -3,11 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
 import { useCartStore } from '@/store/customer/cartStore';
-import type {
-    CustomerProductDetail,
-    CustomerProductPricing,
-    ProductPriceTier,
-} from '@/services/customer/productDetailService';
+import type { CustomerProductDetail, CustomerProductPricing, ProductPriceTier } from '@/types/customer/productDetail';
 
 type Props = {
     product: CustomerProductDetail;

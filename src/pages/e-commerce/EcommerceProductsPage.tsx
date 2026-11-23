@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ClipboardList, Package, RefreshCw, Search, X, Plus, Trash2, Save } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import { executiveUi, useExecutiveText } from '@/components/e-commerce/executiveTokens';
+import { executiveUi } from '@/constants/e-commerce/executiveUi';
+import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 import {
     ExecutiveBadge,
     ExecutiveFeedback,
@@ -16,11 +17,8 @@ import {
     ExecutivePanel,
     LoadingRows,
 } from '@/components/e-commerce/ExecutiveUI';
-import {
-    executiveApi,
-    type AdminProduct,
-    type PricingWrite,
-} from '@/services/e-commerce/executiveAdminService';
+import { executiveApi } from '@/services/e-commerce/executiveAdminService';
+import type { AdminProduct, PricingWrite } from '@/types/e-commerce/executiveAdmin';
 import {
     formatVnd,
     getExecutiveVat,
@@ -28,7 +26,8 @@ import {
 } from '@/services/e-commerce/executiveReadService';
 import { getCatalogBrands } from '@/services/customer/catalogReadService';
 import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
-import { getHomeCategories, type HomeCategory } from '@/services/customer/homeService';
+import { getHomeCategories } from '@/services/customer/homeService';
+import type { HomeCategory } from '@/types/customer/home';
 
 function ProductDrawer({
     product,

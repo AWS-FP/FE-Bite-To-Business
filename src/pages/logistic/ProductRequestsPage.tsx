@@ -5,7 +5,8 @@ import Pagination from '@/components/common/Pagination';
 import LogisticsPageShell, { ListStatus } from '@/components/logistic/LogisticsPageShell';
 import ProductCreateWizard from '@/components/logistic/ProductCreateWizard';
 import { useLogisticsList, type ProductRequest } from '@/hooks/logistic/useLogisticsData';
-import { getCatalogProducts, type CatalogProduct } from '@/services/customer/catalogReadService';
+import { getCatalogProducts } from '@/services/customer/catalogReadService';
+import type { CatalogProduct } from '@/types/customer/catalog';
 import { http } from '@/services/axiosClient';
 
 type ResponseStep = 'choice' | 'reject' | 'confirm';

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MessageCircle, Star } from 'lucide-react';
-import { executiveUi, useExecutiveText } from '@/components/e-commerce/executiveTokens';
+import { executiveUi } from '@/constants/e-commerce/executiveUi';
+import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 import {
     ExecutiveBadge,
     ExecutiveFeedback,

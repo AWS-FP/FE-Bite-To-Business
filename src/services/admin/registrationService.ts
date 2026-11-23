@@ -8,6 +8,7 @@ import type {
     RegistrationStats,
     ReviewRegistrationRequest,
 } from '@/types/admin/registration';
+import type { RegistrationDuplicate } from '@/types/admin/registration';
 
 const endpoint = '/api/admin/registration-requests';
 
@@ -17,20 +18,6 @@ export async function getRegistrations(params: RegistrationListParams, signal?: 
         signal,
     });
     return response.data.data;
-}
-
-/** Registrations whose email/phone already had an account; auto-rejected by email. */
-export interface RegistrationDuplicate {
-    id: string;
-    email: string;
-    phone: string | null;
-    firstName: string | null;
-    lastName: string | null;
-    duplicateField: 'EMAIL' | 'PHONE' | 'EMAIL_AND_PHONE';
-    existingUserId: string | null;
-    emailStatus: 'PENDING' | 'SENT' | 'SKIPPED' | 'FAILED';
-    emailSentAt: string | null;
-    createdAt: string;
 }
 
 export async function getRegistrationDuplicates(page: number, size: number, signal?: AbortSignal) {

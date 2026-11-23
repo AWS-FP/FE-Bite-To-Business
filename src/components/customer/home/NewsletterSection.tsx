@@ -1,31 +1,10 @@
-import { useState, type FormEvent } from 'react';
 import { ArrowRight, CheckCircle2, LockKeyhole, Mail, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { subscribeNewsletter } from '@/services/customer/newsletterService';
+import { useNewsletterSignup } from '@/hooks/customer/useNewsletterSignup';
 
 export default function NewsletterSection() {
     const { t } = useTranslation('storefront');
-    const [email, setEmail] = useState('');
-    const [consent, setConsent] = useState(false);
-    const [submitting, setSubmitting] = useState(false);
-    const [result, setResult] = useState<'success' | 'error' | null>(null);
-
-    async function submit(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault();
-        if (!consent || submitting || !email.trim()) return;
-        setSubmitting(true);
-        setResult(null);
-        try {
-            await subscribeNewsletter(email.trim());
-            setResult('success');
-            setEmail('');
-            setConsent(false);
-        } catch {
-            setResult('error');
-        } finally {
-            setSubmitting(false);
-        }
-    }
+    const { email, setEmail, consent, setConsent, submitting, result, setResult, submit } = useNewsletterSignup();
 
     return (
         <section

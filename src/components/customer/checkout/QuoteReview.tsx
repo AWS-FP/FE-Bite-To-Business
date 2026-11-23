@@ -1,7 +1,7 @@
 import { Truck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
-import type { Quote, QuotePackage, QuotePackageAmount } from '@/services/customer/quoteService';
+import type { Quote, QuotePackage, QuotePackageAmount } from '@/types/customer/quote';
 
 interface QuoteReviewProps {
     quote: Quote;

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Check, ChevronDown, ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
-import { executiveUi, useExecutiveText } from './executiveTokens';
-import type { Promotion } from '@/services/e-commerce/executiveAdminService';
+import { executiveUi } from '@/constants/e-commerce/executiveUi';
+import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
+import type { Promotion } from '@/types/e-commerce/executiveAdmin';
 
 type Props = {
     value: string;

@@ -3,11 +3,8 @@ import { createPortal } from 'react-dom';
 import { Check, ChevronRight, Ticket, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
-import {
-    getAvailableCoupons,
-    type AvailableCoupon,
-    type CouponScope,
-} from '@/services/customer/quoteService';
+import { getAvailableCoupons } from '@/services/customer/quoteService';
+import type { AvailableCoupon, CouponScope } from '@/types/customer/quote';
 
 interface CouponPickerProps {
     quoteId: string;

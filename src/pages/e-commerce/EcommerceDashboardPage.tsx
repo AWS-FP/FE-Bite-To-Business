@@ -7,7 +7,7 @@ import {
     ShoppingBag,
     TrendingUp,
 } from 'lucide-react';
-import { useExecutiveText } from '@/components/e-commerce/executiveTokens';
+import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 import { ExecutiveBadge, ExecutiveFeedback } from '@/components/e-commerce/ExecutiveControls';
 import {
     ExecutiveHeading,

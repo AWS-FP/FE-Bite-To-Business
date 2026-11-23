@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import {
     ArrowRight,
     PackageSearch,
@@ -11,185 +11,35 @@ import StorefrontLayout from '@/layouts/StorefrontLayout';
 import CatalogShowcaseCard from '@/components/customer/CatalogShowcaseCard';
 import CustomerBrandTile from '@/components/brand/CustomerBrandTile';
 import BrandSortDropdown from '@/components/brand/BrandSortDropdown';
-import { getHomeCategories, type HomeCategory } from '@/services/customer/homeService';
-import type { CatalogBrand, CatalogProduct } from '@/services/customer/catalogReadService';
-import {
-    brandPath,
-    findBrandBySlug,
-    getBrandDirectory,
-    getBrandsInSameCategories,
-    getProductsOfBrand,
-    type CustomerBrand,
-} from '@/services/customer/brandService';
+import { useBrandDetail } from '@/hooks/customer/useBrandDetail';
 import { ROUTES } from '@/router/routes';
 import PageNav from '@/components/common/PageNav';
-
-const PRODUCT_BATCH = 12;
 
 /** Public brand storefront. The product cards are exactly the Customer/Homepage product cards. */
 export default function BrandDetailPage() {
     const { brandSlug: slug } = useParams<{ brandSlug: string }>();
     const { t, i18n } = useTranslation('storefront');
     const english = i18n.resolvedLanguage?.startsWith('en') ?? false;
-    const location = useLocation();
-    const navigate = useNavigate();
-    const [directory, setDirectory] = useState<CustomerBrand[]>([]);
-    const [categories, setCategories] = useState<HomeCategory[]>([]);
-    const [brandsLoading, setBrandsLoading] = useState(true);
-    const [brandsError, setBrandsError] = useState(false);
-    const [productResult, setProductResult] = useState<{
-        brandId: string;
-        items: CatalogProduct[];
-        error: boolean;
-    } | null>(null);
-    const [relatedResult, setRelatedResult] = useState<{
-        brandId: string;
-        items: CatalogBrand[];
-        error: boolean;
-    } | null>(null);
-    const [productLimit, setProductLimit] = useState<{ brandId: string; count: number } | null>(
-        null,
-    );
-    const [sort, setSort] = useState<'name_asc' | 'name_desc'>('name_asc');
-    const [reload, setReload] = useState(0);
+    const {
+        directory, brandsLoading, brandsError, brand, products, productsLoading, productsError,
+        relatedLoading, sort, shownProducts, hasMoreProducts,
+        categoryNames, matchedBrands, description, showRelated, retry, changeSort, showMoreProducts,
+    } = useBrandDetail(slug, english);
     const productSentinel = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const controller = new AbortController();
-        getBrandDirectory(controller.signal)
-            .then((items) => {
-                if (!controller.signal.aborted) setDirectory(items);
-            })
-            .catch(() => {
-                if (!controller.signal.aborted) setBrandsError(true);
-            })
-            .finally(() => {
-                if (!controller.signal.aborted) setBrandsLoading(false);
-            });
-        getHomeCategories(controller.signal)
-            .then((items) => {
-                if (!controller.signal.aborted) setCategories(items);
-            })
-            .catch(() => {
-                /* Product cards can still show without category labels. */
-            });
-        return () => controller.abort();
-    }, [reload]);
-
-    const brand = useMemo(() => findBrandBySlug(directory, slug), [directory, slug]);
-    const brandId = brand?.id;
-    const products = useMemo(
-        () => (productResult && productResult.brandId === brandId ? productResult.items : []),
-        [productResult, brandId],
-    );
-    const productsLoaded = Boolean(brandId && productResult?.brandId === brandId);
-    const productsLoading = Boolean(brandId && !productsLoaded);
-    const productsError = Boolean(productsLoaded && productResult?.error);
-    const related = useMemo(
-        () => (relatedResult && relatedResult.brandId === brandId ? relatedResult.items : []),
-        [relatedResult, brandId],
-    );
-    const relatedLoading = Boolean(brandId && relatedResult?.brandId !== brandId);
-    const relatedError = Boolean(
-        brandId && relatedResult && relatedResult.brandId === brandId && relatedResult.error,
-    );
-    const productCount =
-        productLimit && productLimit.brandId === brandId ? productLimit.count : PRODUCT_BATCH;
-
-    useEffect(() => {
-        if (!brand || !location.pathname.startsWith('/brands/')) return;
-        // Old share links remain functional, while canonical URLs use /brand/:slug.
-        navigate(brandPath(brand, directory), { replace: true });
-    }, [brand, directory, location.pathname, navigate]);
-
-    useEffect(() => {
-        if (!brandId) return;
-        const controller = new AbortController();
-        getProductsOfBrand(brandId, controller.signal)
-            .then((items) => {
-                if (!controller.signal.aborted) setProductResult({ brandId, items, error: false });
-            })
-            .catch(() => {
-                if (!controller.signal.aborted)
-                    setProductResult({ brandId, items: [], error: true });
-            });
-        getBrandsInSameCategories(brandId, controller.signal)
-            .then((items) => {
-                if (!controller.signal.aborted) setRelatedResult({ brandId, items, error: false });
-            })
-            .catch(() => {
-                if (!controller.signal.aborted)
-                    setRelatedResult({ brandId, items: [], error: true });
-            });
-        return () => controller.abort();
-    }, [brandId]);
-
-    const sortedProducts = useMemo(() => {
-        return [...products].sort((a, b) => {
-            const left = (english ? a.nameEn : a.nameVi) || a.nameVi;
-            const right = (english ? b.nameEn : b.nameVi) || b.nameVi;
-            return (
-                (sort === 'name_asc' ? 1 : -1) * left.localeCompare(right, english ? 'en' : 'vi')
-            );
-        });
-    }, [products, sort, english]);
-    const shownProducts = sortedProducts.slice(0, productCount);
-    const hasMoreProducts = productCount < sortedProducts.length;
-
+    // Cuộn tới cuối danh sách thì hiển thị thêm sản phẩm (UI); việc tính toán nằm trong hook.
     useEffect(() => {
         const target = productSentinel.current;
         if (!hasMoreProducts || !target || typeof IntersectionObserver === 'undefined') return;
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries.some((item) => item.isIntersecting)) {
-                    if (brandId)
-                        setProductLimit((previous) => ({
-                            brandId,
-                            count: Math.min(
-                                (previous?.brandId === brandId ? previous.count : PRODUCT_BATCH) +
-                                    PRODUCT_BATCH,
-                                sortedProducts.length,
-                            ),
-                        }));
-                }
+                if (entries.some((item) => item.isIntersecting)) showMoreProducts();
             },
             { rootMargin: '280px' },
         );
         observer.observe(target);
         return () => observer.disconnect();
-    }, [hasMoreProducts, sortedProducts.length, productCount, brandId]);
-
-    const categoryNames = useMemo(() => {
-        const map = new Map<string, HomeCategory>();
-        const visit = (category: HomeCategory) => {
-            map.set(category.id, category);
-            category.children.forEach(visit);
-        };
-        categories.forEach(visit);
-        return map;
-    }, [categories]);
-
-    // If the optional related endpoint is not installed yet, derive exact matches
-    // from the directory's published-product category IDs, never from brand names.
-    const matchedBrands = useMemo(() => {
-        if (!brand) return [];
-        if (!relatedError) return related;
-        const active = new Set(brand.categoryIds);
-        return directory
-            .filter((item) => item.id !== brand.id && item.categoryIds.some((id) => active.has(id)))
-            .sort((a, b) => {
-                const aCount = a.categoryIds.filter((id) => active.has(id)).length;
-                const bCount = b.categoryIds.filter((id) => active.has(id)).length;
-                return bCount - aCount || a.name.localeCompare(b.name);
-            })
-            .slice(0, 12);
-    }, [brand, relatedError, related, directory]);
-
-    const description = brand
-        ? (english ? brand.descriptionEn : brand.descriptionVi)?.trim() ||
-          (english ? brand.descriptionVi : brand.descriptionEn)?.trim()
-        : '';
-    const showRelated = productsLoaded && !productsLoading && !productsError && !hasMoreProducts;
+    }, [hasMoreProducts, showMoreProducts]);
 
     return (
         <StorefrontLayout rootClassName="min-h-screen bg-[#fcf6e9] text-store-ink">
@@ -227,11 +77,7 @@ export default function BrandDetailPage() {
                             {brandsError && (
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        setBrandsLoading(true);
-                                        setBrandsError(false);
-                                        setReload((value) => value + 1);
-                                    }}
+                                    onClick={retry}
                                     className="rounded-full border border-store-green px-6 py-3 text-sm font-bold text-store-green"
                                 >
                                     {t('brandPage.retry')}
@@ -315,15 +161,7 @@ export default function BrandDetailPage() {
                                 </div>
                                 <BrandSortDropdown
                                     value={sort}
-                                    onChange={(nextSort) => {
-                                        setSort(nextSort);
-                                        if (brandId) {
-                                            setProductLimit({
-                                                brandId,
-                                                count: PRODUCT_BATCH,
-                                            });
-                                        }
-                                    }}
+                                    onChange={changeSort}
                                 />
                             </div>
                             {productsLoading && (
@@ -378,16 +216,7 @@ export default function BrandDetailPage() {
                                 >
                                     <button
                                         type="button"
-                                        onClick={() => {
-                                            if (brandId)
-                                                setProductLimit({
-                                                    brandId,
-                                                    count: Math.min(
-                                                        productCount + PRODUCT_BATCH,
-                                                        sortedProducts.length,
-                                                    ),
-                                                });
-                                        }}
+                                        onClick={showMoreProducts}
                                         className="rounded-full border-2 border-store-green bg-white px-7 py-3 text-sm font-bold text-store-green hover:bg-[#eaf3e8]"
                                     >
                                         {t('brandPage.moreProducts')}
