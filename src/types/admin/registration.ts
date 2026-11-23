@@ -56,3 +56,17 @@ export interface RegistrationStats {
     approved: number;
     rejected: number;
 }
+
+/** Registrations whose email/phone already had an account; auto-rejected by email. */
+export interface RegistrationDuplicate {
+    id: string;
+    email: string;
+    phone: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    duplicateField: 'EMAIL' | 'PHONE' | 'EMAIL_AND_PHONE';
+    existingUserId: string | null;
+    emailStatus: 'PENDING' | 'SENT' | 'SKIPPED' | 'FAILED';
+    emailSentAt: string | null;
+    createdAt: string;
+}

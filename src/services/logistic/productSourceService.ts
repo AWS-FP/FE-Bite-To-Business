@@ -1,19 +1,7 @@
 import axios from 'axios';
 import { http } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
-
-export interface DistributorOption {
-    id: string;
-    name: string;
-}
-
-export interface CountryOption {
-    code: string;
-    nameVi: string;
-    nameEn: string;
-    // Giá trị lưu vào products.origin, cùng định dạng dữ liệu hiện có, ví dụ "Thái Lan (Thailand)".
-    value: string;
-}
+import type { CountryOption, DistributorOption } from '@/types/logistic/productSource';
 
 /** Danh sách nhà phân phối (bảng distributors) cho dropdown của form tạo sản phẩm. */
 export async function getDistributors(signal?: AbortSignal): Promise<DistributorOption[]> {

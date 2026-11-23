@@ -1,25 +1,6 @@
 import { http } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
-
-export interface CustomerNotification {
-    id: string;
-    notificationType: string;
-    titleVi: string;
-    titleEn: string;
-    contentVi: string;
-    contentEn: string;
-    actionUrl: string | null;
-    isRead: boolean;
-    readAt: string | null;
-    createdAt: string;
-}
-export interface NotificationsPage {
-    content: CustomerNotification[];
-    page: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
-}
+import type { CustomerNotificationPreferences, NotificationsPage } from '@/types/customer/notification';
 export async function getCustomerNotifications(page = 0, size = 20, unreadOnly = false) {
     const { data } = await http.get<ApiResponse<NotificationsPage>>('/api/customer/notifications', {
         params: { page, size, unreadOnly },
@@ -43,14 +24,6 @@ export async function markAllNotificationsRead() {
         '/api/customer/notifications/read-all',
     );
     return data.data;
-}
-
-// Choices are stored server-side per authenticated customer, not in browser memory.
-export interface CustomerNotificationPreferences {
-    quoteApproval: boolean;
-    quoteExpiry: boolean;
-    deliveryEta: boolean;
-    sourcingReply: boolean;
 }
 export async function getNotificationPreferences() {
     const { data } = await http.get<ApiResponse<CustomerNotificationPreferences>>(

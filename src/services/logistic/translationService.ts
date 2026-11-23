@@ -1,17 +1,7 @@
 import axios from 'axios';
 import { http } from '@/services/axiosClient';
 import type { ApiErrorResponse } from '@/types/api';
-
-export type TranslationField =
-    | 'NAME'
-    | 'DESCRIPTION'
-    | 'SPEC'
-    | 'TECHNICAL'
-    | 'STORAGE'
-    | 'COMPLIANCE'
-    | 'ORIGIN_DETAIL';
-
-export type TranslationLanguage = 'vi' | 'en';
+import type { TranslationField, TranslationLanguage } from '@/types/logistic/translation';
 
 type TranslateResponse = { translation: string; source: TranslationLanguage; target: TranslationLanguage };
 

@@ -20,7 +20,7 @@ import WorkspaceSidebar from '@/layouts/WorkspaceSidebar';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 import WorkspaceAccountMenu from '@/components/common/WorkspaceAccountMenu';
 import LogoutConfirmation from '@/components/common/LogoutConfirmation';
-import { useExecutiveText } from '@/components/e-commerce/executiveTokens';
+import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 
 function EcommerceWorkspace() {
     const tr = useExecutiveText();

@@ -1,8 +1,9 @@
 import { ArrowUpRight, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import type { CatalogBrand } from '@/services/customer/catalogReadService';
-import { brandPath, type CustomerBrand } from '@/services/customer/brandService';
+import type { CatalogBrand } from '@/types/customer/catalog';
+import { brandPath } from '@/utils/customer/brandPath';
+import type { CustomerBrand } from '@/types/customer/brand';
 
 export default function CustomerBrandTile({
     brand, brands,

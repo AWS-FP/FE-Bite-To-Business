@@ -1,4 +1,4 @@
-import type { HomeCategory } from '@/services/customer/homeService';
+import type { HomeCategory } from '@/types/customer/home';
 
 const ICONS: { match: RegExp; file: string }[] = [
     { match: /bakery|dessert|cake|bánh|banh/, file: 'cake' },

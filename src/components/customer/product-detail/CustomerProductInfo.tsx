@@ -13,7 +13,7 @@ import {
     Warehouse,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { CustomerProductDetail } from '@/services/customer/productDetailService';
+import type { CustomerProductDetail } from '@/types/customer/productDetail';
 import CustomerFavoriteButton from '@/components/customer/CustomerFavoriteButton';
 
 type Fact = { label: string; value: string };

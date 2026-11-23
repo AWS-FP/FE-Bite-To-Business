@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { HomeProductCardItem } from '@/constants/customer/homeData';
+import type { HomeProductCardItem } from '@/types/customer/homeData';
 import ProductShowcaseCard from './ProductShowcaseCard';
 
 /** Horizontal product row with buttons only: no slider track or page-number navigation. */

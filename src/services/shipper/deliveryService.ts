@@ -1,39 +1,6 @@
 import { http } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
-
-export interface Page<T> {
-    content: T[];
-    page: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
-}
-
-export interface ReadyOrder {
-    orderId: string;
-    orderNumber: string;
-    customerName: string;
-    packages: { id: string; number: string; name: string; deliveryDate: string; address: string }[];
-}
-
-export interface ClaimedPackage {
-    packageId: string;
-    packageNumber: string;
-    packageName: string;
-    orderId: string;
-    orderNumber: string;
-    deliveryDate: string;
-    deliveryTimeSlot: string | null;
-    address: string;
-    recipientName: string | null;
-    recipientPhone: string | null;
-    note: string | null;
-    city: string | null;
-    latitude: number | null;
-    longitude: number | null;
-    claimedAt: string;
-    cancelled: boolean;
-}
+import type { ClaimedPackage, Page, ReadyOrder } from '@/types/shipper/delivery';
 
 export async function getReadyOrders(page: number, signal?: AbortSignal) {
     const response = await http.get<ApiResponse<Page<ReadyOrder>>>('/api/delivery/ready-orders', {

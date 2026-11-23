@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getCatalogProducts, type CatalogProduct } from '@/services/customer/catalogReadService';
+import { useRelatedProducts } from '@/hooks/customer/useRelatedProducts';
 import CatalogShowcaseCard from '@/components/customer/CatalogShowcaseCard';
 
 export default function CustomerRelatedProducts({
@@ -17,43 +16,7 @@ export default function CustomerRelatedProducts({
     categoryNameEn?: string;
 }) {
     const { t } = useTranslation('storefront');
-    const [products, setProducts] = useState<CatalogProduct[]>([]);
-    useEffect(() => {
-        const controller = new AbortController();
-        let alive = true;
-        const sameCategory = getCatalogProducts({
-            page: 0,
-            size: 24,
-            categoryId,
-            signal: controller.signal,
-        });
-        // API supports intersection of categoryId + brandId; order these first.
-        const sameBrand = brandId
-            ? getCatalogProducts({
-                  page: 0,
-                  size: 16,
-                  categoryId,
-                  brandId,
-                  signal: controller.signal,
-              })
-            : Promise.resolve(null);
-        Promise.allSettled([sameBrand, sameCategory]).then(([brand, category]) => {
-            if (!alive) return;
-            const preferred = brand.status === 'fulfilled' ? (brand.value?.items ?? []) : [];
-            const fallback = category.status === 'fulfilled' ? category.value.items : [];
-            const seen = new Set<string>([productId]);
-            const distinct = [...preferred, ...fallback].filter((item) => {
-                if (seen.has(item.id)) return false;
-                seen.add(item.id);
-                return true;
-            });
-            setProducts(distinct.slice(0, 4));
-        });
-        return () => {
-            alive = false;
-            controller.abort();
-        };
-    }, [categoryId, brandId, productId]);
+    const products = useRelatedProducts(categoryId, brandId, productId);
     if (!products.length) return null;
     return (
         <section

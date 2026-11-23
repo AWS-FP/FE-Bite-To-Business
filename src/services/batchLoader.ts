@@ -1,3 +1,4 @@
+import type { BatchLoader } from '@/types/batchLoader';
 /**
  * Turns many "one id at a time" calls made in the same tick into ONE batch request, with a short
  * cache. Used where every card on a page used to ask the server separately (N+1 requests).
@@ -14,15 +15,6 @@ interface BatchLoaderOptions<T> {
     missing?: () => T;
     cacheMs?: number;
     maxBatch?: number;
-}
-
-export interface BatchLoader<T> {
-    get: (id: string) => Promise<T>;
-    /** Cached value if still fresh. */
-    peek: (id: string) => T | undefined;
-    /** Overwrite the cached value (e.g. after the user toggles a favorite). */
-    set: (id: string, value: T) => void;
-    clear: () => void;
 }
 
 export function createBatchLoader<T>({

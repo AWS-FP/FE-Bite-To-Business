@@ -1,25 +1,19 @@
 import { useLogisticsText } from '@/hooks/logistic/useLogisticsText';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ArrowLeft, ArrowRight, Check, ImagePlus, Loader2, PackagePlus, Sparkles } from 'lucide-react';
-import {
-    suggestTranslation,
-    translationErrorKey,
-    type TranslationField,
-    type TranslationLanguage,
-} from '@/services/logistic/translationService';
-import { getHomeCategories, type HomeCategory } from '@/services/customer/homeService';
-import { getCatalogBrands, type CatalogBrand } from '@/services/customer/catalogReadService';
+import { suggestTranslation, translationErrorKey } from '@/services/logistic/translationService';
+import type { TranslationField, TranslationLanguage } from '@/types/logistic/translation';
+import { getHomeCategories } from '@/services/customer/homeService';
+import type { HomeCategory } from '@/types/customer/home';
+import { getCatalogBrands } from '@/services/customer/catalogReadService';
+import type { CatalogBrand } from '@/types/customer/catalog';
 import type { ProductRequest } from '@/hooks/logistic/useLogisticsData';
 import { http } from '@/services/axiosClient';
 import axios from 'axios';
 import PageNav from '@/components/common/PageNav';
 import BilingualNutritionEditor, { type NutritionRow } from './BilingualNutritionEditor';
-import {
-    getCountries,
-    getDistributors,
-    type CountryOption,
-    type DistributorOption,
-} from '@/services/logistic/productSourceService';
+import { getCountries, getDistributors } from '@/services/logistic/productSourceService';
+import type { CountryOption, DistributorOption } from '@/types/logistic/productSource';
 
 const inputClass =
     'mt-2 w-full rounded border border-black/40 bg-white px-3 py-3 text-sm font-normal text-black outline-none focus:border-black focus:ring-0';

@@ -2,7 +2,7 @@ import { Children, isValidElement, useEffect, useRef, useState } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Check, ChevronDown, Search, X } from 'lucide-react';
-import { executiveUi } from './executiveTokens';
+import { executiveUi } from '@/constants/e-commerce/executiveUi';
 
 type OptionProps = {
     value?: string;

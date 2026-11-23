@@ -1,17 +1,6 @@
 import { http } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
-
-export interface BankPayment {
-    id: string;
-    orderId: string;
-    paymentCode: string;
-    amount: number;
-    currency: string;
-    status: string;
-    bank: string;
-    virtualAccount: string;
-    qrUrl: string | null;
-}
+import type { BankPayment } from '@/types/customer/payment';
 export async function createBankPayment(orderId: string) {
     const { data } = await http.post<ApiResponse<BankPayment>>(`/api/customer/orders/${encodeURIComponent(orderId)}/bank-payment`);
     return data.data;

@@ -1,43 +1,10 @@
 import { http, publicHttp } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
-import {
-    getCatalogProducts,
-    type CatalogProductPage,
-} from '@/services/customer/catalogReadService';
-import { getHomeProducts, type HomeResponse } from '@/services/customer/homeService';
+import { getCatalogProducts } from '@/services/customer/catalogReadService';
+import { getHomeProducts } from '@/services/customer/homeService';
+import type { ExecutivePricing, ExecutiveVat } from '@/types/e-commerce/executiveRead';
 
-export type { CatalogProductPage, HomeResponse };
 export { getCatalogProducts, getHomeProducts };
-
-export interface ExecutivePriceTier {
-    id: string;
-    minQuantity: number;
-    maxQuantity: number | null;
-    unitPrice: number;
-}
-
-export interface ExecutivePricing {
-    productId: string;
-    sku: string;
-    unitCode: string;
-    currency: string;
-    minOrderQuantity: number;
-    quantityStep: number;
-    priceAvailable: boolean;
-    listPrice: number | null;
-    salePrice: number | null;
-    saleActive: boolean;
-    inventoryAvailable: boolean;
-    availableQuantity: number | null;
-    priceTiers: ExecutivePriceTier[];
-}
-
-export interface ExecutiveVat {
-    productId: string;
-    sku: string;
-    vatRate: number | null;
-    vatUpdatedAt: string | null;
-}
 
 export async function getExecutivePricing(productId: string): Promise<ExecutivePricing> {
     const { data } = await publicHttp.get<ApiResponse<ExecutivePricing>>(

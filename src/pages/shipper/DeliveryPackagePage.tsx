@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import DeliveryMap from '@/components/shipper/DeliveryMap';
 import { getPackageDetail } from '@/services/shipper/deliveryService';
-import type { ClaimedPackage } from '@/services/shipper/deliveryService';
+import type { ClaimedPackage } from '@/types/shipper/delivery';
 import { ROUTES } from '@/router/routes';
 import PageNav from '@/components/common/PageNav';
 
