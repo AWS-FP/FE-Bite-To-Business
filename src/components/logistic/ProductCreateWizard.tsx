@@ -12,7 +12,13 @@ import type { ProductRequest } from '@/hooks/logistic/useLogisticsData';
 import { http } from '@/services/axiosClient';
 import axios from 'axios';
 import PageNav from '@/components/common/PageNav';
-import KeyValueTableEditor, { type KeyValueRow } from './KeyValueTableEditor';
+import BilingualNutritionEditor, { type NutritionRow } from './BilingualNutritionEditor';
+import {
+    getCountries,
+    getDistributors,
+    type CountryOption,
+    type DistributorOption,
+} from '@/services/logistic/productSourceService';
 
 const inputClass =
     'mt-2 w-full rounded border border-black/40 bg-white px-3 py-3 text-sm font-normal text-black outline-none focus:border-black focus:ring-0';
@@ -23,8 +29,6 @@ const BILINGUAL_FIELDS: [string, TranslationField][] = [
     ['description', 'DESCRIPTION'],
     ['spec', 'SPEC'],
     ['storage', 'STORAGE'],
-    ['compliance', 'COMPLIANCE'],
-    ['originDetail', 'ORIGIN_DETAIL'],
 ];
 const bilingual: Record<string, { counterpart: string; lang: TranslationLanguage; field: TranslationField }> =
     Object.fromEntries(
@@ -36,23 +40,32 @@ const bilingual: Record<string, { counterpart: string; lang: TranslationLanguage
 
 type Suggestion = { status: 'loading' | 'ready' | 'error'; sourceText: string; text?: string; error?: string };
 
-// Trang sản phẩm đọc chuỗi "Thông số: giá trị | ..." và hiển thị lại thành từng dòng của bảng.
-function technicalText(rows: KeyValueRow[] | undefined): string | null {
-    return (
-        (rows ?? [])
-            .filter((row) => row.key.trim() && row.value.trim())
-            .map((row) => `${row.key.trim()}: ${row.value.trim()}`)
-            .join(' | ') || null
-    );
+type Lang = TranslationLanguage;
+
+const TRANSLATION_ERRORS = {
+    429: "Bạn đã dùng hết lượt gợi ý dịch trong giờ này. Vui lòng thử lại sau.",
+    403: "Tài khoản không có quyền dùng gợi ý dịch.",
+    other: "Chưa lấy được gợi ý dịch. Bạn có thể tự nhập hoặc thử lại.",
+};
+
+// Nhãn "Quy cách bán" trong chuỗi technical_content; trang sản phẩm tách chuỗi này thành một dòng của bảng.
+const SELLING_SPEC_LABEL: Record<Lang, string> = { vi: 'Quy cách bán', en: 'Selling spec' };
+
+// Ô văn bản tự do tối đa 150 chữ (đếm theo khoảng trắng) để đoạn hiển thị không phá bố cục.
+const MAX_TEXT_WORDS = 150;
+const FREE_TEXT_FIELDS: Record<number, string[]> = { 0: ['descriptionVi', 'descriptionEn', 'note'], 1: ['storageVi', 'storageEn'] };
+function countWords(text: string | undefined): number {
+    return text?.trim() ? text.trim().split(/\s+/).length : 0;
 }
 
-// Đọc lại chuỗi "Thông số: giá trị | ..." (ví dụ bản dịch AI) thành các dòng của bảng.
-function technicalRows(text: string): KeyValueRow[] {
-    return text
-        .split('|')
-        .map((part) => part.trim().match(/^([^:：]+)[:：]\s*(.+)$/u))
-        .filter((match): match is RegExpMatchArray => match != null)
-        .map((match) => ({ key: match[1].trim(), value: match[2].trim() }));
+// Tô đỏ dấu * của ô bắt buộc, kể cả khi nhãn đã được dịch.
+function requiredLabel(text: string): ReactNode {
+    const parts = text.split(' *');
+    return parts.flatMap((part, i) =>
+        i < parts.length - 1
+            ? [part, <span key={i} className="text-red-600"> *</span>]
+            : [part],
+    );
 }
 
 type Props = {
@@ -63,6 +76,7 @@ type Props = {
 
 export default function ProductCreateWizard({ request, onClose, onCreated }: Props) {
     const { tr, english } = useLogisticsText();
+    const staffLang: Lang = english ? 'en' : 'vi';
     const steps = [tr("Thông tin cơ bản"), tr("Chi tiết sản phẩm"), tr("Giá & bán hàng"), tr("Xem lại")];
     const [step, setStep] = useState(0);
     const [values, setValues] = useState<Record<string, string>>({
@@ -70,21 +84,25 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
     });
     const [categories, setCategories] = useState<HomeCategory[]>([]);
     const [brands, setBrands] = useState<CatalogBrand[]>([]);
+    const [distributors, setDistributors] = useState<DistributorOption[]>([]);
+    const [countries, setCountries] = useState<CountryOption[]>([]);
+    const [countriesError, setCountriesError] = useState(false);
     const [catalogError, setCatalogError] = useState(false);
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState('');
     const [tiers, setTiers] = useState<{ min: string; max: string; price: string }[]>([]);
-    // Bảng thông số kỹ thuật (tùy chọn, mỗi thông số một dòng): null = chưa tạo bảng.
-    const [technical, setTechnical] = useState<{ vi: KeyValueRow[]; en: KeyValueRow[] } | null>(null);
-    // Dịch cả bảng thông số sang ngôn ngữ còn lại bằng AI.
-    const [technicalTranslation, setTechnicalTranslation] = useState<{
-        target: TranslationLanguage;
+    // Bảng dinh dưỡng (bắt buộc): lượng tham chiếu + các dòng VI/EN đồng bộ.
+    const [nutrition, setNutrition] = useState<{ basis: string; rows: NutritionRow[] }>({
+        basis: '100g',
+        rows: [{ vi: '', en: '', amount: '' }],
+    });
+    // Dịch tên thành phần dinh dưỡng sang ngôn ngữ còn lại bằng AI.
+    const [nutritionTranslation, setNutritionTranslation] = useState<{
+        target: Lang;
         status: 'loading' | 'error';
         error?: string;
     } | null>(null);
-    const technicalTranslationRequest = useRef<AbortController | null>(null);
-    // Bảng thông tin dinh dưỡng (tùy chọn): null = chưa tạo bảng.
-    const [nutrition, setNutrition] = useState<{ basis: string; rows: KeyValueRow[] } | null>(null);
+    const nutritionTranslationRequest = useRef<AbortController | null>(null);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
     const [created, setCreated] = useState<{ id: string; sku: string } | null>(null);
@@ -93,12 +111,17 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
 
     useEffect(() => {
         const pending = suggestionRequests.current;
-        const technicalRequest = technicalTranslationRequest;
+        const nutritionRequest = nutritionTranslationRequest;
         return () => {
             Object.values(pending).forEach((controller) => controller.abort());
-            technicalRequest.current?.abort();
+            nutritionRequest.current?.abort();
         };
     }, []);
+
+    function translationError(err: unknown): string {
+        const status = axios.isAxiosError(err) ? err.response?.status : undefined;
+        return tr(status === 429 ? TRANSLATION_ERRORS[429] : status === 403 ? TRANSLATION_ERRORS[403] : TRANSLATION_ERRORS.other);
+    }
 
     function dropSuggestion(targetKey: string) {
         suggestionRequests.current[targetKey]?.abort();
@@ -129,13 +152,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             setSuggestions((current) => ({ ...current, [targetKey]: { status: 'ready', sourceText, text } }));
         } catch (err) {
             if (controller.signal.aborted || axios.isCancel(err)) return;
-            const status = axios.isAxiosError(err) ? err.response?.status : undefined;
-            const message =
-                status === 429
-                    ? tr("Bạn đã dùng hết lượt gợi ý dịch trong giờ này. Vui lòng thử lại sau.")
-                    : status === 403
-                      ? tr("Tài khoản không có quyền dùng gợi ý dịch.")
-                      : tr("Chưa lấy được gợi ý dịch. Bạn có thể tự nhập hoặc thử lại.");
+            const message = translationError(err);
             setSuggestions((current) => ({ ...current, [targetKey]: { status: 'error', sourceText, error: message } }));
         } finally {
             if (suggestionRequests.current[targetKey] === controller) delete suggestionRequests.current[targetKey];
@@ -154,45 +171,51 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         void requestSuggestion(target);
     }
 
-    // Dịch bảng thông số của ngôn ngữ kia sang `target`, rồi thay các dòng của bảng `target`.
-    async function translateTechnical(target: TranslationLanguage) {
-        if (!technical) return;
-        const source: TranslationLanguage = target === 'en' ? 'vi' : 'en';
-        const text = technicalText(technical[source]);
-        if (!text) return;
-        technicalTranslationRequest.current?.abort();
+    // Dịch tên các thành phần dinh dưỡng từ bảng kia sang `target` (một lần gọi cho cả bảng).
+    async function translateNutrition(target: Lang) {
+        const source: Lang = target === 'en' ? 'vi' : 'en';
+        const names = nutrition.rows.map((row) => row[source].trim());
+        if (!names.some(Boolean)) return;
+        nutritionTranslationRequest.current?.abort();
         const controller = new AbortController();
-        technicalTranslationRequest.current = controller;
-        setTechnicalTranslation({ target, status: 'loading' });
+        nutritionTranslationRequest.current = controller;
+        setNutritionTranslation({ target, status: 'loading' });
         try {
-            const translated = technicalRows(await suggestTranslation(text, source, 'TECHNICAL', controller.signal));
+            const text = await suggestTranslation(names.join(' | '), source, 'TECHNICAL', controller.signal);
             if (controller.signal.aborted) return;
-            if (translated.length === 0) {
-                setTechnicalTranslation({
-                    target,
-                    status: 'error',
-                    error: tr("Chưa lấy được gợi ý dịch. Bạn có thể tự nhập hoặc thử lại."),
-                });
+            const translated = text.split('|').map((name) => name.trim());
+            if (translated.length !== names.length) {
+                setNutritionTranslation({ target, status: 'error', error: tr(TRANSLATION_ERRORS.other) });
                 return;
             }
-            setTechnical((current) => (current ? { ...current, [target]: translated } : current));
-            setTechnicalTranslation(null);
+            setNutrition((current) => ({
+                ...current,
+                rows: current.rows.map((row, i) => (names[i] ? { ...row, [target]: translated[i] } : row)),
+            }));
+            setNutritionTranslation(null);
         } catch (err) {
             if (controller.signal.aborted || axios.isCancel(err)) return;
-            const status = axios.isAxiosError(err) ? err.response?.status : undefined;
-            setTechnicalTranslation({
-                target,
-                status: 'error',
-                error:
-                    status === 429
-                        ? tr("Bạn đã dùng hết lượt gợi ý dịch trong giờ này. Vui lòng thử lại sau.")
-                        : status === 403
-                          ? tr("Tài khoản không có quyền dùng gợi ý dịch.")
-                          : tr("Chưa lấy được gợi ý dịch. Bạn có thể tự nhập hoặc thử lại."),
-            });
+            setNutritionTranslation({ target, status: 'error', error: translationError(err) });
         } finally {
-            if (technicalTranslationRequest.current === controller) technicalTranslationRequest.current = null;
+            if (nutritionTranslationRequest.current === controller) nutritionTranslationRequest.current = null;
         }
+    }
+
+    // "Quy cách bán" nhập một lần theo ngôn ngữ của staff; khi tạo sản phẩm, AI dịch sang ngôn ngữ còn lại.
+    async function sellingSpecTexts(): Promise<Record<Lang, string>> {
+        const value = values.sellingSpec.trim();
+        const other: Lang = staffLang === 'vi' ? 'en' : 'vi';
+        let translated = value;
+        try {
+            translated = (await suggestTranslation(value, staffLang, 'TECHNICAL')).trim() || value;
+        } catch {
+            // Không dịch được thì dùng nguyên văn để không chặn việc tạo sản phẩm.
+        }
+        const texts = { [staffLang]: value, [other]: translated } as Record<Lang, string>;
+        return {
+            vi: `${SELLING_SPEC_LABEL.vi}: ${texts.vi.replace(/\|/g, '/')}`,
+            en: `${SELLING_SPEC_LABEL.en}: ${texts.en.replace(/\|/g, '/')}`,
+        };
     }
 
     function acceptSuggestion(targetKey: string) {
@@ -203,14 +226,21 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
     }
 
     function validate(index: number): string {
+        if ((FREE_TEXT_FIELDS[index] ?? []).some((key) => countWords(values[key]) > MAX_TEXT_WORDS))
+            return tr("Mỗi ô mô tả, ghi chú hoặc bảo quản tối đa 150 chữ.");
         if (index === 0) {
             if (
                 !values.nameVi?.trim() ||
                 !values.nameEn?.trim() ||
                 !values.sku?.trim() ||
-                !values.category
+                !values.category ||
+                !values.origin ||
+                !values.distributor ||
+                !values.brand ||
+                !values.descriptionVi?.trim() ||
+                !values.descriptionEn?.trim()
             )
-                return tr("Vui lòng nhập tên tiếng Việt, tên tiếng Anh, SKU và danh mục.");
+                return tr("Vui lòng nhập tên, SKU, danh mục, thương hiệu, xuất xứ, nhà phân phối và mô tả (tiếng Việt và tiếng Anh).");
             if (
                 values.nameVi.trim().length > 200 ||
                 values.nameEn.trim().length > 200 ||
@@ -225,65 +255,48 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 return tr("Ảnh phải là JPG, PNG hoặc WebP và không vượt quá 5 MB.");
         }
         if (index === 1) {
-            for (const key of ['netWeight', 'volume', 'length', 'width', 'height']) {
-                if (
-                    values[key] &&
-                    (!Number.isFinite(Number(values[key])) || Number(values[key]) <= 0)
-                )
-                    return tr("Khối lượng, kích thước và thể tích phải lớn hơn 0.");
+            // Bước "Chi tiết sản phẩm": mọi thông tin đều bắt buộc.
+            const required = [
+                'specVi', 'specEn', 'unit', 'minOrder', 'sellingSpec', 'netWeight', 'tareWeight',
+                'length', 'width', 'height', 'volume', 'storageVi', 'storageEn', 'vat',
+            ];
+            if (required.some((key) => !values[key]?.trim()))
+                return tr("Vui lòng nhập đủ mọi thông tin ở bước Chi tiết sản phẩm.");
+            for (const key of ['netWeight', 'volume', 'length', 'width', 'height', 'minOrder']) {
+                if (!Number.isFinite(Number(values[key])) || Number(values[key]) <= 0)
+                    return tr("Khối lượng, kích thước, thể tích và số lượng tối thiểu phải lớn hơn 0.");
             }
-            if (
-                values.tareWeight &&
-                (!Number.isFinite(Number(values.tareWeight)) || Number(values.tareWeight) < 0)
-            )
+            if (!Number.isFinite(Number(values.tareWeight)) || Number(values.tareWeight) < 0)
                 return tr("Khối lượng bao bì không được âm.");
-            if (technical) {
-                for (const rows of [technical.vi, technical.en]) {
-                    const filled = rows.filter((row) => row.key.trim() || row.value.trim());
-                    if (filled.some((row) => !row.key.trim() || !row.value.trim()))
-                        return tr("Mỗi dòng thông số cần đủ tên thông số và giá trị.");
-                    // Bảng được lưu dạng "Thông số: giá trị | ..." nên tên không chứa ":" và không dòng nào chứa "|".
-                    if (filled.some((row) => /[:：|]/.test(row.key) || row.value.includes('|')))
-                        return tr("Tên thông số không được chứa dấu hai chấm hoặc dấu |; giá trị không được chứa dấu |.");
-                }
-            }
-            if (nutrition) {
-                const rows = nutrition.rows.filter((row) => row.key.trim() || row.value.trim());
-                if (rows.some((row) => !row.key.trim() || !row.value.trim()))
-                    return tr("Mỗi dòng dinh dưỡng cần đủ thành phần và hàm lượng.");
-                if (rows.length > 0 && !nutrition.basis.trim())
-                    return tr("Vui lòng nhập lượng tham chiếu cho bảng dinh dưỡng, ví dụ 100g.");
-                const names = rows.map((row) => row.key.trim().toLowerCase());
+            if (!Number.isFinite(Number(values.vat)) || Number(values.vat) < 0 || Number(values.vat) > 100)
+                return tr("Thuế suất VAT phải từ 0 đến 100%.");
+            if (!nutrition.basis.trim())
+                return tr("Vui lòng nhập lượng tham chiếu cho bảng dinh dưỡng, ví dụ 100g.");
+            if (nutrition.rows.length === 0)
+                return tr("Bảng dinh dưỡng cần ít nhất một thành phần.");
+            if (nutrition.rows.some((row) => !row.vi.trim() || !row.en.trim() || !row.amount.trim()))
+                return tr("Mỗi dòng dinh dưỡng cần đủ tên tiếng Việt, tên tiếng Anh và hàm lượng.");
+            for (const lang of ['vi', 'en'] as const) {
+                const names = nutrition.rows.map((row) => row[lang].trim().toLowerCase());
                 if (new Set(names).size !== names.length)
                     return tr("Mỗi thành phần dinh dưỡng chỉ được nhập một lần.");
-                if (rows.length > 40)
-                    return tr("Bảng dinh dưỡng tối đa 40 dòng.");
             }
         }
         if (index === 2) {
-            if (
-                !values.unit ||
-                !values.price?.trim() ||
-                !values.vat?.trim() ||
-                !values.minOrder?.trim() ||
-                !values.quantityStep?.trim()
-            )
-                return tr("Vui lòng nhập đơn vị, giá, VAT, số lượng tối thiểu và bước số lượng.");
+            if (!values.price?.trim() || !values.quantityStep?.trim())
+                return tr("Vui lòng nhập giá và số lượng tăng thêm mỗi lần đặt.");
             const price = Number(values.price),
-                vat = Number(values.vat),
                 min = Number(values.minOrder),
                 stepSize = Number(values.quantityStep);
             if (
-                ![price, vat, min, stepSize].every(Number.isFinite) ||
+                ![price, min, stepSize].every(Number.isFinite) ||
                 price < 0 ||
                 !Number.isInteger(price) ||
-                vat < 0 ||
-                vat > 100 ||
                 min <= 0 ||
                 stepSize <= 0 ||
                 Math.abs(min / stepSize - Math.round(min / stepSize)) > 1e-8
             )
-                return tr("Giá phải là số nguyên không âm, VAT từ 0 đến 100 và số lượng tối thiểu phải chia hết cho bước số lượng.");
+                return tr("Giá phải là số nguyên không âm và số lượng tối thiểu phải chia hết cho số lượng tăng thêm mỗi lần đặt.");
             const sorted = [...tiers].sort((a, b) => Number(a.min) - Number(b.min));
             for (let i = 0; i < sorted.length; i++) {
                 const tier = sorted[i],
@@ -333,18 +346,24 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             }
         }
         const optionalNumber = (key: string) => (values[key]?.trim() ? Number(values[key]) : null);
-        const nutritionFacts = (nutrition?.rows ?? [])
-            .map((row) => ({ nutrient: row.key.trim(), amount: row.value.trim() }))
-            .filter((row) => row.nutrient && row.amount);
+        const nutritionFacts = nutrition.rows.map((row) => ({
+            nutrient: row.vi.trim(),
+            nutrientEn: row.en.trim(),
+            amount: row.amount.trim(),
+        }));
+        setBusy(true);
+        setError('');
+        const sellingSpec = await sellingSpecTexts();
         const payload = {
             nameVi: values.nameVi.trim(),
             nameEn: values.nameEn.trim(),
             sku: values.sku.trim(),
             categoryId: values.category,
-            brandId: values.brand || null,
-            origin: values.origin || null,
-            descriptionVi: values.descriptionVi || null,
-            descriptionEn: values.descriptionEn || null,
+            brandId: values.brand,
+            distributorId: values.distributor,
+            origin: values.origin,
+            descriptionVi: values.descriptionVi.trim(),
+            descriptionEn: values.descriptionEn.trim(),
             note: values.note || null,
             specVi: values.specVi || null,
             specEn: values.specEn || null,
@@ -354,14 +373,10 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             length: optionalNumber('length'),
             width: optionalNumber('width'),
             height: optionalNumber('height'),
-            technicalVi: technicalText(technical?.vi),
-            technicalEn: technicalText(technical?.en),
+            technicalVi: sellingSpec.vi,
+            technicalEn: sellingSpec.en,
             storageVi: values.storageVi || null,
             storageEn: values.storageEn || null,
-            complianceVi: values.complianceVi || null,
-            complianceEn: values.complianceEn || null,
-            originDetailVi: values.originDetailVi || null,
-            originDetailEn: values.originDetailEn || null,
             unit: values.unit,
             price: Number(values.price),
             vat: Number(values.vat),
@@ -372,14 +387,12 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 max: tier.max.trim() ? Number(tier.max) : null,
                 price: Number(tier.price),
             })),
-            nutritionBasis: nutritionFacts.length ? nutrition?.basis.trim() || null : null,
+            nutritionBasis: nutrition.basis.trim(),
             nutritionFacts,
         };
         const body = new FormData();
         body.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
         if (image) body.append('image', image);
-        setBusy(true);
-        setError('');
         try {
             const result = await http.post<{ data: { id: string; sku: string } }>(
                 '/api/logistics/products',
@@ -399,13 +412,28 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
 
     useEffect(() => {
         const controller = new AbortController();
-        Promise.all([getHomeCategories(controller.signal), getCatalogBrands(controller.signal)])
-            .then(([categoryData, brandData]) => {
+        Promise.all([
+            getHomeCategories(controller.signal),
+            getCatalogBrands(controller.signal),
+            getDistributors(controller.signal),
+        ])
+            .then(([categoryData, brandData, distributorData]) => {
                 setCategories(categoryData);
                 setBrands(brandData);
+                setDistributors(distributorData);
             })
             .catch(() => {
                 if (!controller.signal.aborted) setCatalogError(true);
+            });
+        return () => controller.abort();
+    }, []);
+    // Danh sách quốc gia cho ô Xuất xứ (API bên ngoài, tải riêng để lỗi không chặn phần còn lại).
+    useEffect(() => {
+        const controller = new AbortController();
+        getCountries(controller.signal)
+            .then(setCountries)
+            .catch(() => {
+                if (!controller.signal.aborted) setCountriesError(true);
             });
         return () => controller.abort();
     }, []);
@@ -441,7 +469,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         return (
             <div className="block text-sm font-semibold">
                 <div className="flex items-center justify-between gap-3">
-                    <label htmlFor={key}>{label}</label>
+                    <label htmlFor={key}>{requiredLabel(label)}</label>
                     {canSuggest && suggestion?.status !== 'loading' && (
                         <button
                             type="button"
@@ -454,7 +482,14 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                     )}
                 </div>
                 {options?.area ? (
-                    <textarea {...props} className={`${inputClass} resize-none`} rows={3} />
+                    <>
+                        <textarea {...props} className={`${inputClass} resize-none`} rows={3} />
+                        <span
+                            className={`mt-1 block text-right text-xs font-normal ${countWords(values[key]) > MAX_TEXT_WORDS ? 'text-red-600' : 'text-store-muted'}`}
+                        >
+                            {countWords(values[key])}/{MAX_TEXT_WORDS} {tr("chữ")}
+                        </span>
+                    </>
                 ) : (
                     <input
                         {...props}
@@ -545,6 +580,67 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         TUB: tr("hộp nhựa"),
         CASE: tr("thùng"),
     };
+    const cellInputClass =
+        'w-full rounded border border-black/40 bg-white px-3 py-2 text-sm font-normal text-black outline-none focus:border-black focus:ring-0';
+    const numberCell = (key: string, label: string, placeholder?: string) => (
+        <input
+            type="number"
+            min="0"
+            aria-label={label}
+            placeholder={placeholder}
+            value={values[key] || ''}
+            onChange={(e) => setValues((current) => ({ ...current, [key]: e.target.value }))}
+            className={cellInputClass}
+        />
+    );
+    // 7 thông số kỹ thuật cố định; nhãn theo ngôn ngữ staff đang chọn ở language switcher.
+    const specRows: { label: string; input: ReactNode }[] = [
+        {
+            label: tr("Đơn vị bán"),
+            input: (
+                <select
+                    aria-label={tr("Đơn vị bán")}
+                    value={values.unit || ''}
+                    onChange={(e) => setValues((current) => ({ ...current, unit: e.target.value }))}
+                    className={cellInputClass}
+                >
+                    <option value="">{tr("Chọn đơn vị")}</option>
+                    {Object.entries(unitNames).map(([code, label]) => (
+                        <option key={code} value={code}>
+                            {label}
+                        </option>
+                    ))}
+                </select>
+            ),
+        },
+        { label: tr("Số lượng đặt tối thiểu"), input: numberCell('minOrder', tr("Số lượng đặt tối thiểu")) },
+        {
+            label: tr("Quy cách bán"),
+            input: (
+                <input
+                    aria-label={tr("Quy cách bán")}
+                    maxLength={200}
+                    placeholder={tr("Ví dụ: Thùng 24 lon")}
+                    value={values.sellingSpec || ''}
+                    onChange={(e) => setValues((current) => ({ ...current, sellingSpec: e.target.value }))}
+                    className={cellInputClass}
+                />
+            ),
+        },
+        { label: tr("Khối lượng tịnh (kg)"), input: numberCell('netWeight', tr("Khối lượng tịnh (kg)")) },
+        { label: tr("Khối lượng bao bì (kg)"), input: numberCell('tareWeight', tr("Khối lượng bao bì (kg)")) },
+        {
+            label: tr("Kích thước D × R × C (cm)"),
+            input: (
+                <div className="grid grid-cols-3 gap-2">
+                    {numberCell('length', tr("Chiều dài (cm)"), tr("Dài"))}
+                    {numberCell('width', tr("Chiều rộng (cm)"), tr("Rộng"))}
+                    {numberCell('height', tr("Chiều cao (cm)"), tr("Cao"))}
+                </div>
+            ),
+        },
+        { label: tr("Thể tích (m³)"), input: numberCell('volume', tr("Thể tích (m³)")) },
+    ];
 
     return (
         <div className="mx-auto max-w-[1200px] space-y-6 text-black">
@@ -615,10 +711,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                         </div>
                     )}
                     <section className="rounded-xl border-2 border-black bg-white p-7">
-                        <p className="text-xs font-bold uppercase tracking-widest text-store-green">
-                            {tr("Bước") + ' '}{step + 1} / 4
-                        </p>
-                        <h2 className="mt-2 font-subheading text-2xl font-bold">{steps[step]}</h2>
+                        <h2 className="font-subheading text-2xl font-bold">{steps[step]}</h2>
                         <p className="mt-1 border-b border-store-line pb-5 text-sm text-store-muted">
                             {
                                 [
@@ -636,7 +729,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     {field('nameEn', tr("Tên sản phẩm · Tiếng Anh *"))}
                                     {field('sku', tr("Mã SKU *"))}
                                     <label className="block text-sm font-semibold">
-                                        {tr("Danh mục con *") + ' '}<select
+                                        {requiredLabel(tr("Danh mục con *"))}{' '}<select
                                             value={values.category || ''}
                                             onChange={(e) =>
                                                 setValues({ ...values, category: e.target.value })
@@ -648,14 +741,14 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                         </select>
                                     </label>
                                     <label className="block text-sm font-semibold">
-                                        {tr("Thương hiệu") + ' '}<select
+                                        {requiredLabel(tr("Thương hiệu *"))}{' '}<select
                                             value={values.brand || ''}
                                             onChange={(e) =>
                                                 setValues({ ...values, brand: e.target.value })
                                             }
                                             className={inputClass}
                                         >
-                                            <option value="">{tr("Không chọn")}</option>
+                                            <option value="">{tr("Chọn thương hiệu")}</option>
                                             {brands.map((brand) => (
                                                 <option key={brand.id} value={brand.id}>
                                                     {brand.name}
@@ -663,7 +756,47 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                             ))}
                                         </select>
                                     </label>
-                                    {field('origin', tr("Xuất xứ"))}
+                                    <label className="block text-sm font-semibold">
+                                        {requiredLabel(tr("Xuất xứ *"))}{' '}<select
+                                            value={values.origin || ''}
+                                            onChange={(e) =>
+                                                setValues({ ...values, origin: e.target.value })
+                                            }
+                                            className={inputClass}
+                                        >
+                                            <option value="">
+                                                {countries.length || countriesError
+                                                    ? tr("Chọn quốc gia")
+                                                    : tr("Đang tải danh sách quốc gia…")}
+                                            </option>
+                                            {countries.map((country) => (
+                                                <option key={country.code} value={country.value}>
+                                                    {english ? country.nameEn : country.nameVi}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {countriesError && (
+                                            <span role="alert" className="mt-1 block text-xs font-normal text-red-700">
+                                                {tr("Không tải được danh sách quốc gia. Vui lòng tải lại trang.")}
+                                            </span>
+                                        )}
+                                    </label>
+                                    <label className="block text-sm font-semibold">
+                                        {requiredLabel(tr("Nhà phân phối *"))}{' '}<select
+                                            value={values.distributor || ''}
+                                            onChange={(e) =>
+                                                setValues({ ...values, distributor: e.target.value })
+                                            }
+                                            className={inputClass}
+                                        >
+                                            <option value="">{tr("Chọn nhà phân phối")}</option>
+                                            {distributors.map((distributor) => (
+                                                <option key={distributor.id} value={distributor.id}>
+                                                    {distributor.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </label>
                                 </div>
                                 {catalogError && (
                                     <p role="alert" className="text-sm text-red-700">
@@ -703,8 +836,8 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     />
                                 </label>
                                 <div className="grid grid-cols-2 gap-4">
-                                    {field('descriptionVi', tr("Mô tả · Tiếng Việt"), { area: true })}
-                                    {field('descriptionEn', tr("Mô tả · Tiếng Anh"), { area: true })}
+                                    {field('descriptionVi', tr("Mô tả · Tiếng Việt *"), { area: true })}
+                                    {field('descriptionEn', tr("Mô tả · Tiếng Anh *"), { area: true })}
                                 </div>
                                 {field('note', tr("Ghi chú"), { area: true })}
                             </div>
@@ -712,205 +845,141 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                         {step === 1 && (
                             <div className="mt-5 space-y-6">
                                 <div className="grid grid-cols-2 gap-4">
-                                    {field('specVi', tr("Quy cách đóng gói · Tiếng Việt"), {
+                                    {field('specVi', tr("Quy cách đóng gói · Tiếng Việt *"), {
                                         placeholder: tr("Ví dụ: Bao 10kg"),
                                     })}
-                                    {field('specEn', tr("Quy cách đóng gói · Tiếng Anh"), {
+                                    {field('specEn', tr("Quy cách đóng gói · Tiếng Anh *"), {
                                         placeholder: tr("Ví dụ: 10kg bag"),
                                     })}
-                                    {field('netWeight', tr("Khối lượng tịnh (kg)"), { type: 'number' })}
-                                    {field('tareWeight', tr("Khối lượng bao bì (kg)"), {
-                                        type: 'number',
-                                    })}
-                                    {field('volume', tr("Thể tích (m³)"), { type: 'number' })}
-                                    {field('length', tr("Chiều dài (cm)"), { type: 'number' })}
-                                    {field('width', tr("Chiều rộng (cm)"), { type: 'number' })}
-                                    {field('height', tr("Chiều cao (cm)"), { type: 'number' })}
                                 </div>
-                                <div className="space-y-4 border-t border-store-line pt-5">
-                                    <div className="flex items-center justify-between gap-4">
-                                        <div>
-                                            <h3 className="font-semibold">{tr("Thông số kỹ thuật")}</h3>
-                                            <p className="mt-1 text-sm text-store-muted">
-                                                {tr("Tùy chọn. Mỗi thông số là một dòng; không nhập lại đơn vị bán, số lượng tối thiểu, khối lượng, kích thước vì đã có ô riêng.")}
-                                            </p>
-                                        </div>
-                                        {technical ? (
-                                            <button
-                                                type="button"
-                                                onClick={() => setTechnical(null)}
-                                                className="shrink-0 px-2 py-2 text-sm text-red-700"
-                                            >
-                                                {tr("Xóa bảng")}
-                                            </button>
-                                        ) : (
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    setTechnical({
-                                                        vi: [{ key: '', value: '' }],
-                                                        en: [{ key: '', value: '' }],
-                                                    })
-                                                }
-                                                className="shrink-0 rounded border border-black px-3 py-2 text-sm font-semibold"
-                                            >
-                                                {tr("+ Tạo bảng thông số")}
-                                            </button>
-                                        )}
+                                <div className="space-y-3 border-t border-store-line pt-5">
+                                    <h3 className="font-semibold">{requiredLabel(tr("Thông số kỹ thuật *"))}</h3>
+                                    {/* Bảng cố định 7 dòng: cột thông số theo ngôn ngữ đang chọn, staff chỉ nhập cột giá trị. */}
+                                    <div className="overflow-hidden rounded border border-black/40">
+                                        <table className="w-full table-fixed border-collapse text-sm">
+                                            <thead className="bg-store-cream">
+                                                <tr>
+                                                    <th scope="col" className="w-[38%] px-3 py-2 text-left font-semibold">
+                                                        {tr("Thông số")}
+                                                    </th>
+                                                    <th scope="col" className="px-3 py-2 text-left font-semibold">
+                                                        {tr("Giá trị")}
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {specRows.map((row) => (
+                                                    <tr key={row.label} className="border-t border-black/10">
+                                                        <th scope="row" className="px-3 py-2 text-left align-middle font-medium">
+                                                            {row.label}
+                                                        </th>
+                                                        <td className="px-2 py-2">{row.input}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
                                     </div>
-                                    {technical && (
-                                        <div className="grid grid-cols-2 gap-4">
-                                            {(['vi', 'en'] as const).map((lang) => {
-                                                const source = lang === 'en' ? 'vi' : 'en';
-                                                const canTranslate = !!technicalText(technical[source]);
-                                                const translation =
-                                                    technicalTranslation?.target === lang ? technicalTranslation : null;
-                                                return (
-                                                    <div key={lang} className="space-y-2">
-                                                        <div className="flex items-center justify-between gap-3 text-sm font-semibold">
-                                                            <span>{lang === 'vi' ? tr('Tiếng Việt') : tr('Tiếng Anh')}</span>
-                                                            {translation?.status === 'loading' ? (
-                                                                <span className="inline-flex items-center gap-1 text-xs font-normal text-store-muted">
-                                                                    <Loader2 size={13} className="animate-spin" aria-hidden="true" />
-                                                                    {tr("AI đang gợi ý bản dịch…")}
-                                                                </span>
-                                                            ) : (
-                                                                canTranslate && (
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => void translateTechnical(lang)}
-                                                                        className="inline-flex shrink-0 items-center gap-1 border-0 bg-transparent p-0 text-xs font-semibold text-store-green underline underline-offset-2"
-                                                                    >
-                                                                        <Sparkles size={13} aria-hidden="true" />
-                                                                        {lang === 'en' ? tr("Dịch từ tiếng Việt") : tr("Dịch từ tiếng Anh")}
-                                                                    </button>
-                                                                )
-                                                            )}
-                                                        </div>
-                                                        {translation?.status === 'error' && (
-                                                            <p role="alert" className="m-0 text-xs text-red-700">
-                                                                {translation.error}
-                                                            </p>
-                                                        )}
-                                                        <KeyValueTableEditor
-                                                            rows={technical[lang]}
-                                                            onChange={(rows) => setTechnical({ ...technical, [lang]: rows })}
-                                                            columns={[tr("Thông số"), tr("Giá trị")]}
-                                                            maxLengths={[85, 300]}
-                                                            addLabel={tr("+ Thêm dòng")}
-                                                            removeLabel={tr("Xóa")}
-                                                        />
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    )}
                                 </div>
                                 <div className="space-y-5 border-t border-store-line pt-5">
                                     {[
                                         ['storage', tr("Bảo quản và sơ chế")],
-                                        ['compliance', tr("An toàn thực phẩm và hóa đơn")],
-                                        ['originDetail', tr("Thông tin nguồn gốc")],
                                     ].map(([key, label]) => (
                                         <div key={key} className="grid grid-cols-2 gap-4">
-                                            {field(`${key}Vi`, `${label} · ${tr('Tiếng Việt')}`, {
+                                            {field(`${key}Vi`, `${label} · ${tr('Tiếng Việt')} *`, {
                                                 area: true,
                                             })}
-                                            {field(`${key}En`, `${label} · ${tr('Tiếng Anh')}`, {
+                                            {field(`${key}En`, `${label} · ${tr('Tiếng Anh')} *`, {
                                                 area: true,
                                             })}
                                         </div>
                                     ))}
                                 </div>
-                                <div className="space-y-4 border-t border-store-line pt-5">
-                                    <div className="flex items-center justify-between gap-4">
-                                        <div>
-                                            <h3 className="font-semibold">{tr("Thông tin dinh dưỡng")}</h3>
-                                            <p className="mt-1 text-sm text-store-muted">
-                                                {tr("Tùy chọn. Bảng gồm 2 cột: thành phần dinh dưỡng và hàm lượng.")}
-                                            </p>
-                                        </div>
-                                        {nutrition ? (
-                                            <button
-                                                type="button"
-                                                onClick={() => setNutrition(null)}
-                                                className="shrink-0 px-2 py-2 text-sm text-red-700"
-                                            >
-                                                {tr("Xóa bảng")}
-                                            </button>
-                                        ) : (
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    setNutrition({
-                                                        basis: '100g',
-                                                        rows: [{ key: '', value: '' }],
-                                                    })
-                                                }
-                                                className="shrink-0 rounded border border-black px-3 py-2 text-sm font-semibold"
-                                            >
-                                                {tr("+ Tạo bảng dinh dưỡng")}
-                                            </button>
-                                        )}
+                                <div className="space-y-3 border-t border-store-line pt-5">
+                                    <h3 className="font-semibold">{tr("An toàn thực phẩm và VAT")}</h3>
+                                    <div className="max-w-xs">
+                                        {field('vat', tr("Thuế suất VAT (%) *"), { type: 'number', placeholder: '8' })}
                                     </div>
-                                    {nutrition && (
-                                        <>
-                                            <label className="block text-sm font-semibold">
-                                                {tr("Giá trị ước tính trên")}
-                                                <input
-                                                    value={nutrition.basis}
-                                                    onChange={(e) =>
-                                                        setNutrition({ ...nutrition, basis: e.target.value })
-                                                    }
-                                                    maxLength={100}
-                                                    placeholder="100g"
-                                                    className={inputClass}
-                                                />
-                                            </label>
-                                            <KeyValueTableEditor
-                                                rows={nutrition.rows}
-                                                onChange={(rows) => setNutrition({ ...nutrition, rows })}
-                                                columns={[tr("Thành phần dinh dưỡng"), tr("Hàm lượng")]}
-                                                placeholders={[tr("Ví dụ: Protein"), tr("Ví dụ: 20g")]}
-                                                maxLengths={[100, 50]}
-                                                addLabel={tr("+ Thêm thành phần")}
-                                                removeLabel={tr("Xóa")}
-                                            />
-                                        </>
-                                    )}
+                                    <p className="m-0 text-sm text-store-muted">
+                                        {tr("Trang sản phẩm hiển thị đoạn an toàn thực phẩm và VAT theo mẫu chuẩn, chỉ thay số % này.")}
+                                    </p>
+                                </div>
+                                <div className="space-y-4 border-t border-store-line pt-5">
+                                    <div>
+                                        <h3 className="font-semibold">{requiredLabel(tr("Thông tin dinh dưỡng *"))}</h3>
+                                        <p className="mt-1 text-sm text-store-muted">
+                                            {tr("Hai bảng tiếng Việt và tiếng Anh luôn cùng số dòng; hàm lượng dùng chung cho cả hai.")}
+                                        </p>
+                                    </div>
+                                    <label className="block text-sm font-semibold">
+                                        {tr("Giá trị ước tính trên")}
+                                        <input
+                                            value={nutrition.basis}
+                                            onChange={(e) => setNutrition({ ...nutrition, basis: e.target.value })}
+                                            maxLength={100}
+                                            placeholder="100g"
+                                            className={inputClass}
+                                        />
+                                    </label>
+                                    <BilingualNutritionEditor
+                                        rows={nutrition.rows}
+                                        onChange={(rows) => setNutrition({ ...nutrition, rows })}
+                                        labels={{
+                                            heading: { vi: tr('Tiếng Việt'), en: tr('Tiếng Anh') },
+                                            nutrient: { vi: 'Thành phần dinh dưỡng', en: 'Nutrient' },
+                                            amount: { vi: 'Hàm lượng', en: 'Amount' },
+                                            addRow: tr("+ Thêm thành phần"),
+                                            remove: tr("Xóa"),
+                                            nutrientPlaceholder: { vi: 'Ví dụ: Chất đạm', en: 'e.g. Protein' },
+                                            amountPlaceholder: '20g',
+                                        }}
+                                        headerExtra={(lang) => {
+                                            const source = lang === 'en' ? 'vi' : 'en';
+                                            const translation =
+                                                nutritionTranslation?.target === lang ? nutritionTranslation : null;
+                                            if (translation?.status === 'loading')
+                                                return (
+                                                    <span className="inline-flex items-center gap-1 text-xs font-normal text-store-muted">
+                                                        <Loader2 size={13} className="animate-spin" aria-hidden="true" />
+                                                        {tr("AI đang gợi ý bản dịch…")}
+                                                    </span>
+                                                );
+                                            return (
+                                                <span className="flex flex-col items-end gap-1">
+                                                    {nutrition.rows.some((row) => row[source].trim()) && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => void translateNutrition(lang)}
+                                                            className="inline-flex shrink-0 items-center gap-1 border-0 bg-transparent p-0 text-xs font-semibold text-store-green underline underline-offset-2"
+                                                        >
+                                                            <Sparkles size={13} aria-hidden="true" />
+                                                            {lang === 'en' ? tr("Dịch từ tiếng Việt") : tr("Dịch từ tiếng Anh")}
+                                                        </button>
+                                                    )}
+                                                    {translation?.status === 'error' && (
+                                                        <span role="alert" className="text-xs font-normal text-red-700">
+                                                            {translation.error}
+                                                        </span>
+                                                    )}
+                                                </span>
+                                            );
+                                        }}
+                                    />
                                 </div>
                             </div>
                         )}
                         {step === 2 && (
                             <div className="mt-5 space-y-5">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <label className="block text-sm font-semibold">
-                                        {tr("Đơn vị bán *") + ' '}<select
-                                            value={values.unit || ''}
-                                            onChange={(e) =>
-                                                setValues({ ...values, unit: e.target.value })
-                                            }
-                                            className={inputClass}
-                                        >
-                                            <option value="">{tr("Chọn đơn vị")}</option>
-                                            {Object.entries(unitNames).map(([code, label]) => (
-                                                <option key={code} value={code}>
-                                                    {label}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </label>
                                     {field('price', tr("Giá niêm yết (đ) *"), { type: 'number' })}
-                                    {field('vat', tr("Thuế suất VAT (%) *"), { type: 'number' })}
-                                    {field('minOrder', tr("Số lượng đặt tối thiểu *"), {
-                                        type: 'number',
-                                    })}
-                                    {field('quantityStep', tr("Bước số lượng đặt *"), {
-                                        type: 'number',
-                                    })}
+                                    <div>
+                                        {field('quantityStep', tr("Số lượng tăng thêm mỗi lần đặt *"), {
+                                            type: 'number',
+                                        })}
+                                        <p className="mt-1 text-xs text-store-muted">
+                                            {tr("Ví dụ: tối thiểu 5, tăng thêm 5 thì khách đặt được 5, 10, 15…")}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div className="rounded-lg bg-store-cream p-4 text-sm text-store-muted">
-                                    {tr("Giá niêm yết chưa bao gồm VAT. Giá sỉ được áp dụng theo số lượng đủ điều kiện.") + ' '}</div>
                                 <div className="flex items-center justify-between border-t border-store-line pt-5">
                                     <h3 className="font-semibold">{tr("Bậc giá sỉ")}</h3>
                                     <button
@@ -990,16 +1059,12 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                         {tr("Bảo quản:") + ' '}{values.storageVi || tr("Chưa nhập")}
                                     </p>
                                     <p className="mt-1 text-store-muted">
-                                        {tr("Thông số kỹ thuật:") + ' '}
-                                        {technical?.vi.some((row) => row.key.trim() && row.value.trim())
-                                            ? `${technical.vi.filter((row) => row.key.trim() && row.value.trim()).length} ${tr("dòng")}`
-                                            : tr("Chưa nhập")}
+                                        {tr("Quy cách bán:") + ' '}{values.sellingSpec || tr("Chưa nhập")} {tr("· Nhà phân phối:")}{' '}
+                                        {distributors.find((item) => item.id === values.distributor)?.name || tr("Chưa chọn")}
                                     </p>
                                     <p className="mt-1 text-store-muted">
                                         {tr("Thông tin dinh dưỡng:") + ' '}
-                                        {nutrition?.rows.some((row) => row.key.trim() && row.value.trim())
-                                            ? `${nutrition.rows.filter((row) => row.key.trim() && row.value.trim()).length} ${tr("thành phần")} · ${nutrition.basis}`
-                                            : tr("Chưa nhập")}
+                                        {`${nutrition.rows.length} ${tr("thành phần")} · ${nutrition.basis}`}
                                     </p>
                                 </div>
                                 <div className="rounded-lg bg-store-cream p-4">

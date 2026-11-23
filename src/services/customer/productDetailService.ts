@@ -23,6 +23,7 @@ export interface ProductTechnicalDetails {
 
 export interface ProductNutritionFact {
     nutrient: string;
+    nutrientEn?: string | null;
     amount: string;
 }
 
@@ -41,11 +42,13 @@ export interface CustomerProductDetail {
     descriptionEn: string | null;
     note: string | null;
     origin: string | null;
+    distributorName?: string | null;
     packageSpecVi: string | null;
     packageSpecEn: string | null;
     unitCode: string;
     minOrderQuantity: number | null;
     quantityStep: number | null;
+    vatRate?: number | null;
     imageUrl: string | null;
     cloudinaryPublicId: string | null;
     details: ProductTechnicalDetails | null;

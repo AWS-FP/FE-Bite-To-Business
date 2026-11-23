@@ -134,6 +134,32 @@ export default function CustomerProductInfo({
     ];
     const nutritionFacts = details?.nutritionFacts ?? [];
 
+    // Nguồn gốc ghép từ 3 thông tin đã có (xuất xứ, thương hiệu, nhà phân phối); không lưu thêm văn bản.
+    const originParts = [
+        product.origin ? t('productDetail.originFrom', { origin: product.origin }) : '',
+        product.brandName ? t('productDetail.originBrand', { brand: product.brandName }) : '',
+    ].filter(Boolean);
+    const originText =
+        [
+            originParts.length ? `${originParts.join(' — ')}.` : '',
+            product.distributorName
+                ? t('productDetail.originDistributor', { distributor: product.distributorName })
+                : '',
+        ]
+            .filter(Boolean)
+            .join(' ') || null;
+    // An toàn thực phẩm & VAT: đoạn mẫu chuẩn, chỉ thay thuế suất VAT của sản phẩm.
+    const safetyText = [
+        product.vatRate != null
+            ? t('productDetail.safetyVat', {
+                  vat: Number(product.vatRate).toLocaleString(english ? 'en-US' : 'vi-VN'),
+              })
+            : '',
+        tr('safetyTemplate'),
+    ]
+        .filter(Boolean)
+        .join(' ');
+
     const sections: Section[] = [
         {
             key: 'technical',
@@ -156,15 +182,13 @@ export default function CustomerProductInfo({
         {
             key: 'safety',
             icon: ShieldCheck,
-            text: translatedText(details?.complianceVatContentEn, details?.complianceVatContentVi),
+            text: safetyText,
             facts: [],
         },
         {
             key: 'origin',
             icon: Leaf,
-            text:
-                translatedText(details?.originContentEn, details?.originContentVi) ||
-                product.origin,
+            text: originText,
             facts: [],
         },
     ];
@@ -207,6 +231,12 @@ export default function CustomerProductInfo({
                             <span>
                                 {tr('origin')}:{' '}
                                 <strong className="text-[#173d2b]">{product.origin}</strong>
+                            </span>
+                        )}
+                        {product.distributorName && (
+                            <span>
+                                {tr('distributor')}:{' '}
+                                <strong className="text-[#173d2b]">{product.distributorName}</strong>
                             </span>
                         )}
                     </div>
@@ -262,7 +292,7 @@ export default function CustomerProductInfo({
                             <FileText size={19} />
                             {tr('description')}
                         </h2>
-                        <p className="m-0 whitespace-pre-line text-sm leading-7 text-[#526d60]">
+                        <p className="m-0 whitespace-pre-line break-words [overflow-wrap:anywhere] text-sm leading-7 text-[#526d60]">
                             {description || tr('noDescription')}
                         </p>
                     </div>
@@ -352,7 +382,7 @@ export default function CustomerProductInfo({
                                                                             scope="row"
                                                                             className="break-words px-4 py-3 align-top font-medium text-[#587362]"
                                                                         >
-                                                                            {fact.nutrient}
+                                                                            {english ? fact.nutrientEn || fact.nutrient : fact.nutrient}
                                                                         </th>
                                                                         <td className="break-words px-4 py-3 text-center align-top font-bold tabular-nums text-[#173d2b]">
                                                                             {fact.amount}
@@ -410,7 +440,7 @@ export default function CustomerProductInfo({
                                             )}
                                             {section.text && (
                                                 <p
-                                                    className={`${section.facts.length ? 'mt-4' : 'mt-0'} mb-0 whitespace-pre-line text-sm leading-7 text-[#476456]`}
+                                                    className={`${section.facts.length ? 'mt-4' : 'mt-0'} mb-0 whitespace-pre-line break-words [overflow-wrap:anywhere] text-sm leading-7 text-[#476456]`}
                                                 >
                                                     {section.text}
                                                 </p>
