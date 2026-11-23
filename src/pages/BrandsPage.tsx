@@ -1,98 +1,38 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Search, Store, X } from 'lucide-react';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
 import CustomerBrandTile from '@/components/brand/CustomerBrandTile';
-import { getBrandDirectory, type CustomerBrand } from '@/services/customer/brandService';
-import { getHomeCategories, type HomeCategory } from '@/services/customer/homeService';
+import { useBrandDirectory } from '@/hooks/customer/useBrandDirectory';
 import { ROUTES } from '@/router/routes';
 import PageNav from '@/components/common/PageNav';
-
-const BATCH_SIZE = 24;
 
 /** Customer storefront, powered exclusively by published catalog/brand data. */
 export default function BrandsPage() {
     const { t, i18n } = useTranslation('storefront');
     const english = i18n.resolvedLanguage?.startsWith('en') ?? false;
-    const [brands, setBrands] = useState<CustomerBrand[]>([]);
-    const [categories, setCategories] = useState<HomeCategory[]>([]);
-    const [search, setSearch] = useState('');
-    const [categoryId, setCategoryId] = useState<string | null>(null);
-    const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
-    const [reload, setReload] = useState(0);
+    const {
+        brands, categories, search, categoryId, loading, error, filteredBrands, visibleBrands,
+        visibleCount, hasMore, enriched, featuredLogos, changeSearch, chooseCategory, showMore, retry,
+    } = useBrandDirectory(english);
     const loadMoreRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const controller = new AbortController();
-        getBrandDirectory(controller.signal)
-            .then((data) => {
-                if (controller.signal.aborted) return;
-                setBrands(data);
-                setError(false);
-            })
-            .catch(() => {
-                if (!controller.signal.aborted) setError(true);
-            })
-            .finally(() => {
-                if (!controller.signal.aborted) setLoading(false);
-            });
-        getHomeCategories(controller.signal)
-            .then((data) => {
-                if (!controller.signal.aborted) setCategories(data);
-            })
-            .catch(() => {
-                /* Brand search remains usable if categories are unavailable. */
-            });
-        return () => controller.abort();
-    }, [reload]);
-
-    const selectedCategory = categories.find((category) => category.id === categoryId);
-    const matchingCategoryIds = useMemo(() => {
-        if (!selectedCategory) return new Set<string>();
-        const gather = (item: HomeCategory): string[] => [
-            item.id,
-            ...item.children.flatMap(gather),
-        ];
-        return new Set(gather(selectedCategory));
-    }, [selectedCategory]);
-
-    const filteredBrands = useMemo(() => {
-        const query = search.trim().toLocaleLowerCase(english ? 'en' : 'vi');
-        return brands.filter((brand) => {
-            if (selectedCategory && !brand.categoryIds.some((id) => matchingCategoryIds.has(id)))
-                return false;
-            return (
-                !query ||
-                [brand.name, brand.descriptionVi, brand.descriptionEn].some((value) =>
-                    value?.toLocaleLowerCase(english ? 'en' : 'vi').includes(query),
-                )
-            );
-        });
-    }, [brands, search, selectedCategory, matchingCategoryIds, english]);
-
-    const visibleBrands = filteredBrands.slice(0, visibleCount);
-    const hasMore = visibleCount < filteredBrands.length;
-
+    // Cuộn tới cuối danh sách thì hiển thị thêm (chỉ là UI, việc tính toán nằm trong hook).
     useEffect(() => {
         const target = loadMoreRef.current;
         if (!hasMore || !target || typeof IntersectionObserver === 'undefined') return;
         const observer = new IntersectionObserver(
             (entries) => {
                 if (entries.some((entry) => entry.isIntersecting)) {
-                    setVisibleCount((count) => Math.min(count + BATCH_SIZE, filteredBrands.length));
+                    showMore();
                 }
             },
             { rootMargin: '350px' },
         );
         observer.observe(target);
         return () => observer.disconnect();
-    }, [hasMore, filteredBrands.length, visibleCount]);
-
-    const enriched = brands.some((brand) => brand.productCount !== null);
-    const featuredLogos = brands.filter((brand) => Boolean(brand.logoUrl)).slice(0, 6);
+    }, [hasMore, filteredBrands.length, visibleCount, showMore]);
 
     return (
         <StorefrontLayout rootClassName="min-h-screen bg-[#fcf6e9] text-store-ink">
@@ -161,10 +101,7 @@ export default function BrandsPage() {
                         />
                         <input
                             value={search}
-                            onChange={(event) => {
-                                setSearch(event.target.value);
-                                setVisibleCount(BATCH_SIZE);
-                            }}
+                            onChange={(event) => changeSearch(event.target.value)}
                             type="search"
                             placeholder={t('brandPage.searchPlaceholder')}
                             aria-label={t('brandPage.searchPlaceholder')}
@@ -173,10 +110,7 @@ export default function BrandsPage() {
                         {search && (
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setSearch('');
-                                    setVisibleCount(BATCH_SIZE);
-                                }}
+                                onClick={() => changeSearch('')}
                                 aria-label={t('brandPage.clearSearch')}
                                 className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1.5 hover:bg-[#e8efe8]"
                             >
@@ -192,10 +126,7 @@ export default function BrandsPage() {
                             <button
                                 type="button"
                                 aria-pressed={!categoryId}
-                                onClick={() => {
-                                    setCategoryId(null);
-                                    setVisibleCount(BATCH_SIZE);
-                                }}
+                                onClick={() => chooseCategory(null)}
                                 className={`rounded-full border px-4 py-2 text-xs font-bold transition ${!categoryId ? 'border-store-green bg-store-green text-white' : 'border-[#d6e0d6] bg-white text-store-ink hover:bg-[#eef5ec]'}`}
                             >
                                 {t('brandPage.allCategories')}
@@ -205,10 +136,7 @@ export default function BrandsPage() {
                                     key={category.id}
                                     type="button"
                                     aria-pressed={category.id === categoryId}
-                                    onClick={() => {
-                                        setCategoryId(category.id);
-                                        setVisibleCount(BATCH_SIZE);
-                                    }}
+                                    onClick={() => chooseCategory(category.id)}
                                     className={`rounded-full border px-4 py-2 text-xs font-bold transition ${category.id === categoryId ? 'border-store-green bg-store-green text-white' : 'border-[#d6e0d6] bg-white text-store-ink hover:bg-[#eef5ec]'}`}
                                 >
                                     {english ? category.nameEn : category.nameVi}
@@ -256,11 +184,7 @@ export default function BrandsPage() {
                             <p>{t('brandPage.loadError')}</p>
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setLoading(true);
-                                    setError(false);
-                                    setReload((value) => value + 1);
-                                }}
+                                onClick={retry}
                                 className="rounded-lg bg-store-green px-4 py-2 font-bold text-white"
                             >
                                 {t('brandPage.retry')}
@@ -286,11 +210,7 @@ export default function BrandsPage() {
                         >
                             <button
                                 type="button"
-                                onClick={() =>
-                                    setVisibleCount((count) =>
-                                        Math.min(count + BATCH_SIZE, filteredBrands.length),
-                                    )
-                                }
+                                onClick={showMore}
                                 className="rounded-full border-2 border-store-green bg-white px-7 py-3 text-sm font-bold text-store-green hover:bg-[#eaf3e8]"
                             >
                                 {t('brandPage.loadMore')}

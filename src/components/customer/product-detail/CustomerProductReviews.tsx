@@ -2,11 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { MessageCircle, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import {
-    getProductReviews,
-    type CustomerReview,
-    type ProductReviewsPage,
-} from '@/services/customer/reviewService';
+import { getProductReviews } from '@/services/customer/reviewService';
+import type { CustomerReview, ProductReviewsPage } from '@/types/customer/review';
 import CustomerWriteReview from '@/components/customer/product-detail/CustomerWriteReview';
 import ReviewImageLightbox from '@/components/customer/product-detail/ReviewImageLightbox';
 

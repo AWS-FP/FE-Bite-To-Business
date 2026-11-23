@@ -7,12 +7,7 @@ import CustomerProductInfo from '@/components/customer/product-detail/CustomerPr
 import CustomerProductPurchase from '@/components/customer/product-detail/CustomerProductPurchase';
 import CustomerProductReviews from '@/components/customer/product-detail/CustomerProductReviews';
 import CustomerRelatedProducts from '@/components/customer/product-detail/CustomerRelatedProducts';
-import {
-    getCustomerProductDetail,
-    getCustomerProductPricing,
-    type CustomerProductDetail,
-    type CustomerProductPricing,
-} from '@/services/customer/productDetailService';
+import { useProductDetail } from '@/hooks/customer/useProductDetail';
 import { ROUTES } from '@/router/routes';
 import PageNav from '@/components/common/PageNav';
 
@@ -25,10 +20,7 @@ function CustomerProductDetailContent({ productId }: { productId?: string }) {
     const { t, i18n } = useTranslation('storefront');
     const english = i18n.resolvedLanguage?.startsWith('en') ?? false;
     const tr = (key: string) => t(`productDetail.${key}`);
-    const [product, setProduct] = useState<CustomerProductDetail | null>(null);
-    const [pricing, setPricing] = useState<CustomerProductPricing | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [failed, setFailed] = useState(false);
+    const { product, pricing, loading, failed } = useProductDetail(productId);
     const [headerHeight, setHeaderHeight] = useState(180);
     const [stickyFits, setStickyFits] = useState(false);
     const purchaseRef = useRef<HTMLDivElement>(null);
@@ -64,26 +56,6 @@ function CustomerProductDetailContent({ productId }: { productId?: string }) {
             window.removeEventListener('resize', measure);
         };
     }, [product, pricing, headerHeight]);
-
-    useEffect(() => {
-        if (!productId) return;
-        const controller = new AbortController();
-        let active = true;
-        Promise.allSettled([
-            getCustomerProductDetail(productId, controller.signal),
-            getCustomerProductPricing(productId, controller.signal),
-        ]).then(([detailResult, pricingResult]) => {
-            if (!active) return;
-            if (detailResult.status === 'fulfilled') setProduct(detailResult.value);
-            else setFailed(true);
-            if (pricingResult.status === 'fulfilled') setPricing(pricingResult.value);
-            setLoading(false);
-        });
-        return () => {
-            active = false;
-            controller.abort();
-        };
-    }, [productId]);
 
     const name = product
         ? (english ? product.nameEn || product.nameVi : product.nameVi || product.nameEn) ||

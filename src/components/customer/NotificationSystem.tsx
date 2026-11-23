@@ -26,11 +26,8 @@ import {
     markAllNotificationsRead,
     markNotificationRead,
 } from '@/services/customer/notificationService';
-import type {
-    CustomerNotification,
-    CustomerNotificationPreferences,
-} from '@/services/customer/notificationService';
-import type { NotificationItemData } from '../../constants/customer/homeData';
+import type { CustomerNotification, CustomerNotificationPreferences } from '@/types/customer/notification';
+import type { NotificationItemData } from '@/types/customer/homeData';
 
 export interface NotificationSystemProps {
     isOpen?: boolean;

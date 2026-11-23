@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { PointerEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { Check, Move, RotateCcw, X, ZoomIn } from 'lucide-react';
-import { useExecutiveText } from './executiveTokens';
+import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 
 type Dimension = { width: number; height: number };
 type Point = { x: number; y: number };

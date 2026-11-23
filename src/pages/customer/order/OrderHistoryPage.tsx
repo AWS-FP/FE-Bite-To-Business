@@ -1,11 +1,9 @@
-import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
 import OrderStatusBadge from '@/components/customer/order/OrderStatusBadge';
 import { ROUTES } from '@/router/routes';
-import { useAuthStore } from '@/store/admin/authStore';
-import { getCustomerOrders } from '@/services/customer/orderService';
-import type { CustomerOrderGroup, CustomerOrdersPage } from '@/services/customer/orderService';
+import { useCustomerOrders } from '@/hooks/customer/useCustomerOrders';
+import type { CustomerOrderGroup } from '@/types/customer/order';
 import PageNav from '@/components/common/PageNav';
 
 const formatMoney = (value: number) => `${value.toLocaleString('vi-VN')}đ`;
@@ -63,25 +61,7 @@ export default function OrderHistoryPage() {
 }
 
 function OrderList({ group, empty }: { group: CustomerOrderGroup; empty: string }) {
-    const session = useAuthStore((state) => state.session);
-    const [page, setPage] = useState(0);
-    const [orders, setOrders] = useState<CustomerOrdersPage | null>(null);
-    const [error, setError] = useState(false);
-
-    useEffect(() => {
-        const abort = new AbortController();
-        if (!session || session.user.role !== 'CUSTOMER') return;
-        getCustomerOrders(page, 10, abort.signal, group)
-            .then(setOrders)
-            .catch(() => {
-                if (!abort.signal.aborted) setError(true);
-            });
-        return () => abort.abort();
-    }, [page, session, group]);
-
-    const loading =
-        !!session && session.user.role === 'CUSTOMER' && orders?.page !== page && !error;
-    const visible = orders?.page === page ? orders.content : [];
+    const { page, goToPage, orders, error, loading, visible } = useCustomerOrders(group);
     return (
         <>
             {loading && <p role="status">Đang tải đơn hàng...</p>}
@@ -139,10 +119,7 @@ function OrderList({ group, empty }: { group: CustomerOrderGroup; empty: string 
                     <button
                         type="button"
                         disabled={page === 0}
-                        onClick={() => {
-                            setError(false);
-                            setPage((p) => p - 1);
-                        }}
+                        onClick={() => goToPage(page - 1)}
                         className="rounded border px-4 py-2 disabled:opacity-40"
                     >
                         Trang trước
@@ -153,10 +130,7 @@ function OrderList({ group, empty }: { group: CustomerOrderGroup; empty: string 
                     <button
                         type="button"
                         disabled={page + 1 >= orders.totalPages}
-                        onClick={() => {
-                            setError(false);
-                            setPage((p) => p + 1);
-                        }}
+                        onClick={() => goToPage(page + 1)}
                         className="rounded border px-4 py-2 disabled:opacity-40"
                     >
                         Trang sau

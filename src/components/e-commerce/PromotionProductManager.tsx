@@ -1,17 +1,14 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, ChevronLeft, ChevronRight, Filter, Package, Search, Tag, X } from 'lucide-react';
-import { executiveUi, useExecutiveText } from './executiveTokens';
-import {
-    executiveApi,
-    type Promotion,
-    type PromotionPriceUpdate,
-    type PromotionProductChoice,
-    type PromotionProductFilter,
-} from '@/services/e-commerce/executiveAdminService';
+import { executiveUi } from '@/constants/e-commerce/executiveUi';
+import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
+import { executiveApi } from '@/services/e-commerce/executiveAdminService';
+import type { Promotion, PromotionPriceUpdate, PromotionProductChoice, PromotionProductFilter } from '@/types/e-commerce/executiveAdmin';
 import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
 import { getCatalogBrands } from '@/services/customer/catalogReadService';
-import { getHomeCategories, type HomeCategory } from '@/services/customer/homeService';
+import { getHomeCategories } from '@/services/customer/homeService';
+import type { HomeCategory } from '@/types/customer/home';
 
 const PAGE_SIZE = 20;
 const MAX_ASSIGNED = 2000;

@@ -7,7 +7,7 @@ import Pagination from '@/components/common/Pagination';
 import { SectionHeading } from '@/components/shipper/DeliveryUI';
 import { useDelivery } from '@/components/shipper/DeliveryModel';
 import { claimPackage, getMyPackages, getReadyOrders } from '@/services/shipper/deliveryService';
-import type { ClaimedPackage, Page, ReadyOrder } from '@/services/shipper/deliveryService';
+import type { ClaimedPackage, Page, ReadyOrder } from '@/types/shipper/delivery';
 
 function errorMessage(error: unknown) {
     if (axios.isAxiosError(error)) {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { CheckCircle2, Search, X } from 'lucide-react';
-import { useExecutiveText } from '@/components/e-commerce/executiveTokens';
+import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 
 interface CouponProductPickerProps {

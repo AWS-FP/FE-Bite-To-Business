@@ -11,7 +11,8 @@ import {
     UploadCloud,
     PackageCheck,
 } from 'lucide-react';
-import { executiveUi, useExecutiveText } from '@/components/e-commerce/executiveTokens';
+import { executiveUi } from '@/constants/e-commerce/executiveUi';
+import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 import {
     ExecutiveBadge,
     ExecutiveFeedback,
@@ -25,11 +26,8 @@ import {
     ExecutivePanel,
     LoadingRows,
 } from '@/components/e-commerce/ExecutiveUI';
-import {
-    executiveApi,
-    type Promotion,
-    type PromotionWrite,
-} from '@/services/e-commerce/executiveAdminService';
+import { executiveApi } from '@/services/e-commerce/executiveAdminService';
+import type { Promotion, PromotionWrite } from '@/types/e-commerce/executiveAdmin';
 import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
 import PromotionProductManager from '@/components/e-commerce/PromotionProductManager';
 import PromotionImageCropper from '@/components/e-commerce/PromotionImageCropper';

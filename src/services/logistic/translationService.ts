@@ -1,15 +1,7 @@
+import axios from 'axios';
 import { http } from '@/services/axiosClient';
-
-export type TranslationField =
-    | 'NAME'
-    | 'DESCRIPTION'
-    | 'SPEC'
-    | 'TECHNICAL'
-    | 'STORAGE'
-    | 'COMPLIANCE'
-    | 'ORIGIN_DETAIL';
-
-export type TranslationLanguage = 'vi' | 'en';
+import type { ApiErrorResponse } from '@/types/api';
+import type { TranslationField, TranslationLanguage } from '@/types/logistic/translation';
 
 type TranslateResponse = { translation: string; source: TranslationLanguage; target: TranslationLanguage };
 
@@ -26,4 +18,19 @@ export async function suggestTranslation(
         { signal },
     );
     return response.data.data.translation;
+}
+
+// Thông điệp BE trả về bằng tiếng Anh; FE ánh xạ theo ErrorCode của BE sang câu hiển thị (như authError/executiveError).
+const translationErrorMessages: Record<string, string> = {
+    AI_TRANSLATION_LIMIT_EXCEEDED: 'Bạn đã dùng hết lượt gợi ý dịch trong giờ này. Vui lòng thử lại sau.',
+    AI_RATE_LIMIT_EXCEEDED: 'Bạn đã dùng hết lượt gợi ý dịch trong giờ này. Vui lòng thử lại sau.',
+    TOO_MANY_REQUESTS: 'Bạn đã dùng hết lượt gợi ý dịch trong giờ này. Vui lòng thử lại sau.',
+    ACCESS_DENIED: 'Tài khoản không có quyền dùng gợi ý dịch.',
+};
+const TRANSLATION_FALLBACK = 'Chưa lấy được gợi ý dịch. Bạn có thể tự nhập hoặc thử lại.';
+
+/** Câu báo lỗi (tiếng Việt, làm key cho `tr`) theo ErrorCode BE trả về khi gọi /api/ai/translate. */
+export function translationErrorKey(error: unknown): string {
+    const code = axios.isAxiosError<ApiErrorResponse>(error) ? error.response?.data?.code : undefined;
+    return (code && translationErrorMessages[code]) || TRANSLATION_FALLBACK;
 }

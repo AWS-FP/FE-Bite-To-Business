@@ -1,53 +1,11 @@
 import { Heart } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@/store/admin/authStore';
-import {
-    addFavorite,
-    favoriteStatuses,
-    removeFavorite,
-} from '@/services/customer/favoriteService';
+import { useFavoriteToggle } from '@/hooks/customer/useFavoriteToggle';
 
 /** Customer favorite action for public product tiles; logged-out visitors go to login. */
 export default function CustomerFavoriteButton({ productId }: { productId: string }) {
     const { t } = useTranslation('storefront');
-    const navigate = useNavigate();
-    const customer = useAuthStore((state) => state.session?.user.role === 'CUSTOMER');
-    const [favorite, setFavorite] = useState(false);
-    const [pending, setPending] = useState(false);
-
-    useEffect(() => {
-        if (!customer) return;
-        let current = true;
-        favoriteStatuses
-            .get(productId)
-            .then((liked) => {
-                if (current) setFavorite(liked);
-            })
-            .catch(() => {});
-        return () => {
-            current = false;
-        };
-    }, [customer, productId]);
-
-    const toggle = async () => {
-        if (!customer) {
-            navigate('/login');
-            return;
-        }
-        if (pending) return;
-        setPending(true);
-        try {
-            if (favorite) await removeFavorite(productId);
-            else await addFavorite(productId);
-            setFavorite((current) => !current);
-        } catch {
-            // Preserve the last confirmed server state.
-        } finally {
-            setPending(false);
-        }
-    };
+    const { favorite, pending, toggle } = useFavoriteToggle(productId);
 
     return (
         <button

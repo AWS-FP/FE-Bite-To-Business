@@ -1,48 +1,16 @@
-import { useState, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { http } from '@/services/axiosClient';
-import { useAuthStore } from '@/store/admin/authStore';
-import { ROUTES } from '@/router/routes';
+import { useProductRequestForm } from '@/hooks/customer/useProductRequestForm';
 
 export default function ProductRequestSection({ onOpenChange }: { onOpenChange?: (open: boolean) => void }) {
     const { i18n } = useTranslation();
     const english = i18n.resolvedLanguage === 'en';
-    const session = useAuthStore(state => state.session);
-    const navigate = useNavigate();
-    const [open, setOpen] = useState(false);
-    const [name, setName] = useState('');
-    const [brand, setBrand] = useState('');
-    const [url, setUrl] = useState('');
-    const [note, setNote] = useState('');
-    const [notify, setNotify] = useState(true);
-    const [busy, setBusy] = useState(false);
-    const [error, setError] = useState('');
-    const [sent, setSent] = useState(false);
-    function setDialogOpen(value: boolean) { setOpen(value); onOpenChange?.(value); }
-
-    function start() {
-        if (!session) { navigate(ROUTES.LOGIN, { state: { from: { pathname: ROUTES.HOME } } }); return; }
-        setDialogOpen(true);
-        setError('');
-        setSent(false);
-    }
-    async function submit(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault();
-        if (!name.trim()) return;
-        setBusy(true);
-        setError('');
-        try {
-            const details = [brand.trim() && `Thương hiệu: ${brand.trim()}`, note.trim()].filter(Boolean).join('\n');
-            await http.post('/api/customer/product-requests', { productName: name.trim(), referenceUrl: url.trim() || null, note: details || null, notifyByEmail: notify });
-            setName(''); setBrand(''); setUrl(''); setNote(''); setSent(true);
-        } catch {
-            setError(english ? 'Unable to send your request. Please try again.' : 'Không gửi được yêu cầu. Vui lòng thử lại.');
-        } finally { setBusy(false); }
-    }
-    if (session && session.user.role !== 'CUSTOMER') return null;
+    const {
+        hidden, open, setDialogOpen, start, submit, busy, error, sent,
+        name, setName, brand, setBrand, url, setUrl, note, setNote, notify, setNotify,
+    } = useProductRequestForm(english, onOpenChange);
+    if (hidden) return null;
     return <>
         <button type="button" onClick={start} aria-expanded={open} className={`shrink-0 rounded-lg border-0 px-2.5 py-1.5 font-bold transition-colors ${open ? 'bg-store-yellow text-store-ink' : 'bg-transparent text-store-cream hover:bg-white/10 hover:text-store-yellow'}`}>{english ? 'Request a product' : 'Yêu cầu thêm sản phẩm'}</button>
         {open && createPortal(

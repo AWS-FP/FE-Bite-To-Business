@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CheckCircle2, ImagePlus, Pencil, UploadCloud } from 'lucide-react';
-import { executiveUi, useExecutiveText } from '@/components/e-commerce/executiveTokens';
+import { executiveUi } from '@/constants/e-commerce/executiveUi';
+import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 import { ExecutiveFeedback, ExecutiveSelect } from '@/components/e-commerce/ExecutiveControls';
 import {
     ExecutiveEmpty,
@@ -12,7 +13,7 @@ import {
 import PromotionImageCropper from '@/components/e-commerce/PromotionImageCropper';
 import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
-import type { Promotion } from '@/services/e-commerce/executiveAdminService';
+import type { Promotion } from '@/types/e-commerce/executiveAdmin';
 
 const MAX_BYTES = 5 * 1024 * 1024;
 

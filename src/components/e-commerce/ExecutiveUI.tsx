@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import { AlertCircle, ArrowRight, Inbox, LockKeyhole, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { executiveUi, useExecutiveText } from './executiveTokens';
+import { executiveUi } from '@/constants/e-commerce/executiveUi';
+import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 
 export function ExecutiveHeading({ number, eyebrow, title, description, action }: {
     number: string; eyebrow: string; title: string; description: string; action?: ReactNode;

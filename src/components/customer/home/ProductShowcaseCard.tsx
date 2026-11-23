@@ -1,16 +1,10 @@
 import { Heart, Minus, Plus, Star } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@/store/admin/authStore';
-import {
-    addFavorite,
-    favoriteStatuses,
-    removeFavorite,
-} from '@/services/customer/favoriteService';
-import { formatCurrencyVnd } from '../../../constants/customer/homeData';
-import type { HomeProductCardItem } from '../../../constants/customer/homeData';
-import { useCartStore } from '../../../store/customer/cartStore';
+import { Link } from 'react-router-dom';
+import { formatCurrencyVnd } from '@/constants/customer/homeData';
+import type { HomeProductCardItem } from '@/types/customer/homeData';
+import { useFavoriteToggle } from '@/hooks/customer/useFavoriteToggle';
+import { useProductCardPurchase } from '@/hooks/customer/useProductCardPurchase';
 
 /** Only the customer API supplies product, price and promotion values. */
 export default function ProductShowcaseCard({
@@ -20,64 +14,6 @@ export default function ProductShowcaseCard({
     section?: 'flash' | 'standard';
 }) {
     const { t, i18n } = useTranslation('storefront');
-    const navigate = useNavigate();
-    const session = useAuthStore((state) => state.session);
-    const isCustomer = session?.user.role === 'CUSTOMER';
-    const addItemToCart = useCartStore((state) => state.addItem);
-
-    const [requestedQuantity, setQuantity] = useState(product.minOrderQuantity ?? 1);
-    const [favorite, setFavorite] = useState(false);
-    const [savingFavorite, setSavingFavorite] = useState(false);
-
-    useEffect(() => {
-        if (!isCustomer) return;
-        let mounted = true;
-        // Batched: every card on the page shares one /favorites/status request.
-        favoriteStatuses
-            .get(product.id)
-            .then((liked) => {
-                if (mounted) setFavorite(liked);
-            })
-            .catch(() => {});
-        return () => {
-            mounted = false;
-        };
-    }, [isCustomer, product.id]);
-
-    const toggleFavorite = async () => {
-        if (!isCustomer) {
-            navigate('/login');
-            return;
-        }
-        if (savingFavorite) return;
-        setSavingFavorite(true);
-        try {
-            if (favorite) await removeFavorite(product.id);
-            else await addFavorite(product.id);
-            setFavorite((current) => !current);
-        } catch {
-            // The server owns the favorite state. Do not show a false success.
-        } finally {
-            setSavingFavorite(false);
-        }
-    };
-
-    const minQuantity = product.minOrderQuantity ?? 1;
-    const quantity = Math.max(minQuantity, requestedQuantity);
-    const step = product.quantityStep ?? 1;
-    const inStock = product.availableQuantity == null || product.availableQuantity > 0;
-    const available = product.availableQuantity;
-    const validSale =
-        product.salePrice != null &&
-        product.salePrice >= 0 &&
-        product.listPrice != null &&
-        product.listPrice > 0 &&
-        product.salePrice < product.listPrice;
-    const unitPrice = validSale ? product.salePrice! : product.listPrice;
-    const discountPercent = validSale
-        ? Math.round(((product.listPrice! - unitPrice!) / product.listPrice!) * 100)
-        : 0;
-
     const english = i18n.resolvedLanguage?.startsWith('en');
     const name = english ? (product.nameEn ?? product.name) : (product.nameVi ?? product.name);
     const category = english
@@ -85,26 +21,20 @@ export default function ProductShowcaseCard({
         : product.categoryLabel;
     const unit = t(`homePage.units.${product.unit.toLowerCase()}`, product.unit);
     const image = product.imageUrl?.trim();
-    const totalPrice = unitPrice == null ? null : unitPrice * quantity;
-    const reviewCount = product.reviewCount ?? 0;
-    const rating = reviewCount > 0 ? Math.max(0, Math.min(5, product.rating ?? 0)) : 0;
-
-    function handleAddToOrder() {
-        if (!inStock || unitPrice == null || (available != null && quantity > available)) return;
-        addItemToCart(
-            {
-                id: product.id,
-                name,
-                spec: product.spec,
-                unitPrice,
-                imageUrl: product.imageUrl,
-                minOrderQuantity: minQuantity,
-                quantityStep: step,
-                maxQuantity: available ?? null,
-            },
-            quantity,
-        );
-    }
+    const { favorite, pending: savingFavorite, toggle: toggleFavorite } = useFavoriteToggle(product.id);
+    const {
+        quantity,
+        setQuantity,
+        minQuantity,
+        step,
+        available,
+        inStock,
+        validSale,
+        unitPrice,
+        discountPercent,
+        totalPrice,
+        handleAddToOrder,
+    } = useProductCardPurchase(product, name);
 
     return (
         <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-none border border-store-line/90 bg-white shadow-[0_6px_0_-2px_rgba(9,51,36,0.26),0_10px_17px_rgba(9,51,36,0.12)] transition-[box-shadow,border-color] duration-300 hover:border-store-sage hover:shadow-[0_7px_0_-2px_rgba(9,51,36,0.34),0_13px_22px_rgba(9,51,36,0.18)]">
@@ -165,36 +95,28 @@ export default function ProductShowcaseCard({
                     {name}
                 </Link>
 
-                <div
-                    className="mt-1.5 flex h-5 min-w-0 items-center gap-1.5"
-                    aria-label={
-                        product.reviewLoading
-                            ? t('homePage.reviewsLoading')
-                            : product.reviewUnavailable
-                              ? t('homePage.reviewsUnavailable')
-                              : `${rating} / 5, ${t('homePage.reviewCount', { count: reviewCount })}`
-                    }
-                >
-                    <div className="flex shrink-0 items-center gap-px" aria-hidden="true">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                            <Star
-                                key={star}
-                                size={12}
-                                className={
-                                    star <= Math.round(rating)
-                                        ? 'fill-store-yellow text-store-ink'
-                                        : 'fill-transparent text-store-ink/45'
-                                }
-                            />
-                        ))}
-                    </div>
-                    <span className="min-w-0 truncate text-[10px] text-store-muted">
-                        {product.reviewLoading
-                            ? t('homePage.reviewsLoading')
-                            : product.reviewUnavailable
-                              ? t('homePage.reviewsUnavailable')
-                              : `${rating} (${t('homePage.reviewCount', { count: reviewCount })})`}
-                    </span>
+                <div className="mt-1.5 flex h-5 items-center gap-1.5">
+                    {product.rating != null && product.reviewCount != null ? (
+                        <>
+                            <div className="flex shrink-0 items-center gap-px" aria-hidden="true">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star
+                                        key={star}
+                                        size={12}
+                                        className={
+                                            star <= Math.round(product.rating ?? 0)
+                                                ? 'fill-store-yellow text-store-ink'
+                                                : 'fill-transparent text-store-ink/45'
+                                        }
+                                    />
+                                ))}
+                            </div>
+                            <span className="truncate text-[10px] text-store-muted">
+                                {product.rating} (
+                                {t('homePage.reviewCount', { count: product.reviewCount })})
+                            </span>
+                        </>
+                    ) : null}
                 </div>
 
                 <div className="mt-auto pt-2.5">
@@ -275,10 +197,10 @@ export default function ProductShowcaseCard({
                             {product.priceLoading
                                 ? t('customerUI.checkingStock')
                                 : unitPrice == null
-                                  ? t('customerUI.priceUnavailable')
-                                  : inStock
-                                    ? t('homePage.addToOrder', 'Add to Order')
-                                    : t('customerUI.outOfStock')}
+                                ? t('customerUI.priceUnavailable')
+                                : inStock
+                                  ? t('homePage.addToOrder', 'Add to Order')
+                                  : t('customerUI.outOfStock')}
                         </button>
                     </div>
                 </div>

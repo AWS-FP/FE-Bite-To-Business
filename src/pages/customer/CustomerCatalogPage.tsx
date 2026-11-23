@@ -1,13 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
 import { ChevronDown, ChevronRight, PackageSearch } from 'lucide-react';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
-import { getHomeCategories, type HomeCategory } from '@/services/customer/homeService';
-import {
-    getCatalogProducts,
-    type CatalogProductPage,
-} from '@/services/customer/catalogReadService';
+import type { HomeCategory } from '@/types/customer/home';
+import { useCatalogBrowser } from '@/hooks/customer/useCatalogBrowser';
 import SectionPaginationBar from '@/components/customer/home/SectionPaginationBar';
 import CatalogShowcaseCard from '@/components/customer/CatalogShowcaseCard';
 import CategoryIcon from '@/components/customer/CategoryIcon';
@@ -17,74 +13,10 @@ import PageNav from '@/components/common/PageNav';
 export default function CustomerCatalogPage() {
     const { t, i18n } = useTranslation('storefront');
     const english = i18n.resolvedLanguage?.startsWith('en') ?? false;
-    const [params, setParams] = useSearchParams();
-    const [categories, setCategories] = useState<HomeCategory[]>([]);
-    const [categoryError, setCategoryError] = useState(false);
-    const [pageData, setPageData] = useState<CatalogProductPage | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
+    const { categories, categoryError, pageData, loading, error, categoryId, page, size, selected, categoryLookup, setFilter } =
+        useCatalogBrowser();
     const [expanded, setExpanded] = useState<string | null>(null);
-
-    const categoryId = params.get('category');
-    // Search still works when the header passes ?q=, without an extra search bar here.
-    const query = params.get('q') ?? '';
-    const page = Math.max(1, Number(params.get('page') || 1) || 1);
-    const size = 12;
     const title = (item: HomeCategory) => (english ? item.nameEn : item.nameVi);
-
-    useEffect(() => {
-        const controller = new AbortController();
-        getHomeCategories(controller.signal)
-            .then((data) => {
-                setCategories(data);
-                setCategoryError(false);
-            })
-            .catch(() => {
-                if (!controller.signal.aborted) setCategoryError(true);
-            });
-        return () => controller.abort();
-    }, []);
-
-    useEffect(() => {
-        const controller = new AbortController();
-        getCatalogProducts({
-            page: page - 1,
-            size,
-            q: query.trim() || undefined,
-            categoryId: categoryId ?? undefined,
-            signal: controller.signal,
-        })
-            .then((result) => {
-                if (controller.signal.aborted) return;
-                setPageData(result);
-                setError(false);
-            })
-            .catch(() => {
-                if (!controller.signal.aborted) setError(true);
-            })
-            .finally(() => {
-                if (!controller.signal.aborted) setLoading(false);
-            });
-        return () => controller.abort();
-    }, [page, query, categoryId]);
-
-    const categoryLookup = new Map(
-        categories
-            .flatMap((parent) => [parent, ...parent.children])
-            .map((category) => [category.id, category]),
-    );
-    const selected = categoryId ? categoryLookup.get(categoryId) : undefined;
-
-    function setFilter(key: 'category' | 'page', value?: string) {
-        setLoading(true);
-        setParams((previous) => {
-            const next = new URLSearchParams(previous);
-            if (value) next.set(key, value);
-            else next.delete(key);
-            if (key !== 'page') next.delete('page');
-            return next;
-        });
-    }
 
     return (
         <StorefrontLayout rootClassName="min-h-screen bg-store-cream text-store-ink">

@@ -10,7 +10,7 @@ import QuoteSteps from '@/components/customer/checkout/QuoteSteps';
 import QuoteReview from '@/components/customer/checkout/QuoteReview';
 import CartItems from '@/components/customer/checkout/CartItems';
 import PackageForm from '@/components/customer/checkout/PackageForm';
-import { sameDeliveryAddress } from '@/components/customer/checkout/deliveryAddress';
+import { sameDeliveryAddress } from '@/utils/customer/sameDeliveryAddress';
 import type { PackageDraft } from '@/components/customer/checkout/PackageForm';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
 import { ROUTES } from '@/router/routes';
@@ -28,12 +28,7 @@ import {
     saveQuoteContact,
     validateQuotePricing,
 } from '@/services/customer/quoteService';
-import type {
-    CouponScope,
-    Quote,
-    QuotePackage,
-    QuotePackageAmount,
-} from '@/services/customer/quoteService';
+import type { CouponScope, Quote, QuotePackage, QuotePackageAmount } from '@/types/customer/quote';
 import CouponPicker from '@/components/customer/checkout/CouponPicker';
 import { useAuthStore } from '@/store/admin/authStore';
 import { useCartStore } from '@/store/customer/cartStore';

@@ -2,9 +2,10 @@ import { MapPinned, Plus, Trash2, UserRoundCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Dispatch, FormEvent, SetStateAction } from 'react';
-import type { Quote, QuotePackage } from '@/services/customer/quoteService';
-import { searchDeliveryAddresses, type AddressSuggestion } from '@/services/geocodingService';
-import { sameDeliveryAddress } from './deliveryAddress';
+import type { Quote, QuotePackage } from '@/types/customer/quote';
+import { searchDeliveryAddresses } from '@/services/geocodingService';
+import type { AddressSuggestion } from '@/types/geocoding';
+import { sameDeliveryAddress } from '@/utils/customer/sameDeliveryAddress';
 
 export interface PackageDraft {
     name: string;

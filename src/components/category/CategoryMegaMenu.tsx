@@ -3,7 +3,7 @@ import { ChevronRight, FolderOpen, RefreshCw, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { getHomeCategories } from '@/services/customer/homeService';
-import type { HomeCategory } from '@/services/customer/homeService';
+import type { HomeCategory } from '@/types/customer/home';
 import { ROUTES } from '@/router/routes';
 
 interface CategoryMegaMenuProps {

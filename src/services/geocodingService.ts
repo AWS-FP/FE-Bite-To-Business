@@ -1,7 +1,5 @@
 import { publicHttp } from './axiosClient';
-
-export type MapLocation = { address: string; lat: number; lng: number };
-export type AddressSuggestion = { refId: string; display: string };
+import type { AddressSuggestion, MapLocation } from '@/types/geocoding';
 
 export async function searchDeliveryAddresses(
     address: string,

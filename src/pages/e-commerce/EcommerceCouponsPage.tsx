@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Save, TicketPercent } from 'lucide-react';
-import { executiveUi, useExecutiveText } from '@/components/e-commerce/executiveTokens';
+import { executiveUi } from '@/constants/e-commerce/executiveUi';
+import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 import {
     ExecutiveBadge,
     ExecutiveFeedback,
@@ -15,7 +16,8 @@ import {
     ExecutivePanel,
     LoadingRows,
 } from '@/components/e-commerce/ExecutiveUI';
-import { executiveApi, type CouponWrite } from '@/services/e-commerce/executiveAdminService';
+import { executiveApi } from '@/services/e-commerce/executiveAdminService';
+import type { CouponWrite } from '@/types/e-commerce/executiveAdmin';
 import { formatVnd } from '@/services/e-commerce/executiveReadService';
 import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
 import CouponProductPicker from '@/components/e-commerce/CouponProductPicker';

@@ -1,30 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { ROUTES } from '@/router/routes';
-import { getCatalogBrands } from '@/services/customer/catalogReadService';
-import type { CatalogBrand } from '@/services/customer/catalogReadService';
+import { usePartnerBrands } from '@/hooks/customer/usePartnerBrands';
 
 export default function PartnerStrip() {
     const { t } = useTranslation('storefront');
-    const [brands, setBrands] = useState<CatalogBrand[]>([]);
-    const [error, setError] = useState(false);
+    const { brands, error } = usePartnerBrands();
     const trackRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const controller = new AbortController();
-        getCatalogBrands(controller.signal)
-            .then((items) => {
-                if (!controller.signal.aborted)
-                    setBrands(items.filter((item) => Boolean(item.logoUrl?.trim())));
-            })
-            .catch(() => {
-                if (!controller.signal.aborted) setError(true);
-            });
-        return () => controller.abort();
-    }, []);
-
+    // Chỉ là hiệu ứng cuộn của dải logo (UI), dữ liệu lấy từ usePartnerBrands.
     useEffect(() => {
         if (
             !brands.length ||

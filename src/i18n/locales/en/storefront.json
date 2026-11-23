@@ -144,7 +144,13 @@
         "nutrient": "Nutrient",
         "nutrientAmount": "Amount",
         "nutritionNoteLabel": "Note",
-        "nutritionNote": "These values are for reference only. Actual nutritional content may vary depending on each batch and processing method."
+        "nutritionNote": "These values are for reference only. Actual nutritional content may vary depending on each batch and processing method.",
+        "distributor": "Distributor",
+        "originFrom": "Origin: {{origin}}",
+        "originBrand": "Brand: {{brand}}",
+        "originDistributor": "Distributed directly by {{distributor}}.",
+        "safetyVat": "Reference value-added tax (VAT) rate: {{vat}}%.",
+        "safetyTemplate": "Products are supplied in line with current food hygiene and safety, quality and traceability requirements for each product group. Fresh food, meat, seafood, fruit and vegetables, frozen food, processed food, dry goods, spices, milk and dairy products, confectionery and beverages are checked for origin, storage conditions, packaging, labelling and shelf life according to their characteristics. Chilled or frozen items are stored and transported at suitable temperatures to maintain quality and limit food safety risks. Relevant legal and quality documents, including self-declarations or product declaration registrations, quarantine certificates, certificates of origin and other related documents (where applicable), are provided according to the supplier’s availability. VAT invoices are issued under current regulations, with the tax rate determined by product type and the tax policy in force at the time of the transaction, to support business customers with purchasing, quality control, accounting and record keeping."
     },
     "distribution": {
         "title": "Distribution network",
