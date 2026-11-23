@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ArrowLeft, ArrowRight, Check, ImagePlus, Loader2, PackagePlus, Sparkles } from 'lucide-react';
 import {
     suggestTranslation,
+    translationErrorKey,
     type TranslationField,
     type TranslationLanguage,
 } from '@/services/logistic/translationService';
@@ -41,12 +42,6 @@ const bilingual: Record<string, { counterpart: string; lang: TranslationLanguage
 type Suggestion = { status: 'loading' | 'ready' | 'error'; sourceText: string; text?: string; error?: string };
 
 type Lang = TranslationLanguage;
-
-const TRANSLATION_ERRORS = {
-    429: "Bạn đã dùng hết lượt gợi ý dịch trong giờ này. Vui lòng thử lại sau.",
-    403: "Tài khoản không có quyền dùng gợi ý dịch.",
-    other: "Chưa lấy được gợi ý dịch. Bạn có thể tự nhập hoặc thử lại.",
-};
 
 // Nhãn "Quy cách bán" trong chuỗi technical_content; trang sản phẩm tách chuỗi này thành một dòng của bảng.
 const SELLING_SPEC_LABEL: Record<Lang, string> = { vi: 'Quy cách bán', en: 'Selling spec' };
@@ -118,10 +113,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         };
     }, []);
 
-    function translationError(err: unknown): string {
-        const status = axios.isAxiosError(err) ? err.response?.status : undefined;
-        return tr(status === 429 ? TRANSLATION_ERRORS[429] : status === 403 ? TRANSLATION_ERRORS[403] : TRANSLATION_ERRORS.other);
-    }
+    const translationError = (err: unknown): string => tr(translationErrorKey(err));
 
     function dropSuggestion(targetKey: string) {
         suggestionRequests.current[targetKey]?.abort();
@@ -185,7 +177,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             if (controller.signal.aborted) return;
             const translated = text.split('|').map((name) => name.trim());
             if (translated.length !== names.length) {
-                setNutritionTranslation({ target, status: 'error', error: tr(TRANSLATION_ERRORS.other) });
+                setNutritionTranslation({ target, status: 'error', error: tr(translationErrorKey(null)) });
                 return;
             }
             setNutrition((current) => ({
