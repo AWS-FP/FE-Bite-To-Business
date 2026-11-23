@@ -99,29 +99,32 @@ export default function BrandsPage() {
             <div className="mx-auto w-full max-w-[1440px] px-5 pb-20 pt-6">
                 <PageNav
                     className="mb-5"
-                    items={[{ label: t('home'), to: ROUTES.HOME }, { label: t('brandPage.brands') }]}
+                    items={[
+                        { label: t('home'), to: ROUTES.HOME },
+                        { label: t('brandPage.brands') },
+                    ]}
                 />
 
-                <section className="relative isolate grid min-h-[260px] overflow-hidden rounded-[28px] bg-[#103c2c] text-white lg:grid-cols-[1fr_0.8fr]">
-                    <div className="relative z-10 flex flex-col justify-center p-7 sm:p-10 lg:p-12">
-                        <span className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs font-bold tracking-wide text-[#fce46b]">
+                <section className="relative isolate grid min-h-[185px] overflow-hidden rounded-[20px] bg-[#103c2c] text-white lg:grid-cols-[1fr_0.8fr]">
+                    <div className="relative z-10 flex flex-col justify-center p-5 sm:p-7 lg:p-8">
+                        <span className="mb-2.5 inline-flex w-fit items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[11px] font-bold tracking-wide text-[#fce46b]">
                             <Store size={15} /> {t('brandPage.eyebrow')}
                         </span>
-                        <h1 className="m-0 max-w-[640px] font-subheading text-[34px] font-black leading-[1.15] sm:text-[46px]">
+                        <h1 className="m-0 max-w-[640px] font-subheading text-[27px] font-black leading-tight sm:text-[34px]">
                             {t('brandPage.heroTitle')}
                         </h1>
-                        <p className="mb-0 mt-4 max-w-[550px] text-sm leading-7 text-white/80 sm:text-base">
+                        <p className="mb-0 mt-2 max-w-[550px] text-[13px] leading-5 text-white/80 sm:text-sm">
                             {t('brandPage.heroDescription')}
                         </p>
                     </div>
-                    <div className="relative hidden min-h-[260px] items-center justify-center overflow-hidden bg-[#d8f1b8] p-6 lg:flex">
+                    <div className="relative hidden min-h-[185px] items-center justify-center overflow-hidden bg-[#d8f1b8] p-4 lg:flex">
                         <div className="pointer-events-none absolute -left-16 -top-20 h-52 w-52 rounded-full bg-[#f3d85e]/50 blur-3xl" />
                         <div className="pointer-events-none absolute -bottom-28 right-0 h-64 w-64 rounded-full bg-white/40 blur-3xl" />
-                        <div className="relative grid w-full max-w-[490px] grid-cols-3 gap-3 -rotate-3">
+                        <div className="relative grid w-full max-w-[330px] grid-cols-3 gap-2 -rotate-3">
                             {featuredLogos.map((brand, index) => (
                                 <div
                                     key={brand.id}
-                                    className={`flex aspect-[1.15] items-center justify-center rounded-2xl border-2 border-white bg-white p-3 shadow-lg ${index % 3 === 1 ? 'translate-y-4' : ''}`}
+                                    className={`flex aspect-[1.4] items-center justify-center rounded-xl border-2 border-white bg-white p-2 shadow-lg ${index % 3 === 1 ? 'translate-y-2' : ''}`}
                                 >
                                     <img
                                         src={brand.logoUrl!}

@@ -45,7 +45,7 @@ export default function Header() {
                 </a>
                 <div className="mx-auto flex min-h-[100px] max-w-[1440px] items-center gap-4 px-5 py-3">
                     <Link
-                        className="flex w-fit shrink-0 items-center gap-2 text-white no-underline"
+                        className="flex w-fit shrink-0 items-center gap-2 !border-0 text-white no-underline focus:!border-0 focus:!outline-none focus:!shadow-none focus-visible:!outline-2 focus-visible:!outline-offset-2 focus-visible:!outline-store-yellow"
                         to={ROUTES.HOME}
                         aria-label={t('home')}
                     >

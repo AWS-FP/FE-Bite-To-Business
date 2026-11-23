@@ -10,3 +10,16 @@ export async function uploadWorkspaceAvatar(file: File) {
     });
     return response.data.data;
 }
+
+export async function getWorkspaceAvatarHistory(): Promise<string[]> {
+    const response = await http.get<ApiResponse<string[]>>('/api/workspace/profile/avatars');
+    return response.data.data;
+}
+
+export async function restoreWorkspaceAvatar(avatarUrl: string): Promise<AuthUser> {
+    const response = await http.put<ApiResponse<AuthUser>>(
+        '/api/workspace/profile/avatar/restore',
+        { avatarUrl },
+    );
+    return response.data.data;
+}

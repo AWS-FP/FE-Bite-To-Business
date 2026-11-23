@@ -27,6 +27,10 @@ export interface HomeProductCardItem {
     spec: string;
     rating?: number;
     reviewCount?: number;
+    /** True before the catalog reviews request has resolved. */
+    reviewLoading?: boolean;
+    /** A failed reviews request is not equivalent to zero reviews. */
+    reviewUnavailable?: boolean;
     listPrice: number | null;
     /** True while the price is still being fetched; the card shows a placeholder, not "unavailable". */
     priceLoading?: boolean;

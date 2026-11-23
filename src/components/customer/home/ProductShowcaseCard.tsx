@@ -86,6 +86,8 @@ export default function ProductShowcaseCard({
     const unit = t(`homePage.units.${product.unit.toLowerCase()}`, product.unit);
     const image = product.imageUrl?.trim();
     const totalPrice = unitPrice == null ? null : unitPrice * quantity;
+    const reviewCount = product.reviewCount ?? 0;
+    const rating = reviewCount > 0 ? Math.max(0, Math.min(5, product.rating ?? 0)) : 0;
 
     function handleAddToOrder() {
         if (!inStock || unitPrice == null || (available != null && quantity > available)) return;
@@ -163,28 +165,36 @@ export default function ProductShowcaseCard({
                     {name}
                 </Link>
 
-                <div className="mt-1.5 flex h-5 items-center gap-1.5">
-                    {product.rating != null && product.reviewCount != null ? (
-                        <>
-                            <div className="flex shrink-0 items-center gap-px" aria-hidden="true">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                    <Star
-                                        key={star}
-                                        size={12}
-                                        className={
-                                            star <= Math.round(product.rating ?? 0)
-                                                ? 'fill-store-yellow text-store-ink'
-                                                : 'fill-transparent text-store-ink/45'
-                                        }
-                                    />
-                                ))}
-                            </div>
-                            <span className="truncate text-[10px] text-store-muted">
-                                {product.rating} (
-                                {t('homePage.reviewCount', { count: product.reviewCount })})
-                            </span>
-                        </>
-                    ) : null}
+                <div
+                    className="mt-1.5 flex h-5 min-w-0 items-center gap-1.5"
+                    aria-label={
+                        product.reviewLoading
+                            ? t('homePage.reviewsLoading')
+                            : product.reviewUnavailable
+                              ? t('homePage.reviewsUnavailable')
+                              : `${rating} / 5, ${t('homePage.reviewCount', { count: reviewCount })}`
+                    }
+                >
+                    <div className="flex shrink-0 items-center gap-px" aria-hidden="true">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                                key={star}
+                                size={12}
+                                className={
+                                    star <= Math.round(rating)
+                                        ? 'fill-store-yellow text-store-ink'
+                                        : 'fill-transparent text-store-ink/45'
+                                }
+                            />
+                        ))}
+                    </div>
+                    <span className="min-w-0 truncate text-[10px] text-store-muted">
+                        {product.reviewLoading
+                            ? t('homePage.reviewsLoading')
+                            : product.reviewUnavailable
+                              ? t('homePage.reviewsUnavailable')
+                              : `${rating} (${t('homePage.reviewCount', { count: reviewCount })})`}
+                    </span>
                 </div>
 
                 <div className="mt-auto pt-2.5">
@@ -265,10 +275,10 @@ export default function ProductShowcaseCard({
                             {product.priceLoading
                                 ? t('customerUI.checkingStock')
                                 : unitPrice == null
-                                ? t('customerUI.priceUnavailable')
-                                : inStock
-                                  ? t('homePage.addToOrder', 'Add to Order')
-                                  : t('customerUI.outOfStock')}
+                                  ? t('customerUI.priceUnavailable')
+                                  : inStock
+                                    ? t('homePage.addToOrder', 'Add to Order')
+                                    : t('customerUI.outOfStock')}
                         </button>
                     </div>
                 </div>

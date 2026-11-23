@@ -66,10 +66,10 @@ export default function CustomerFavoritesPage() {
         <StorefrontLayout rootClassName="min-h-screen bg-store-cream text-store-ink">
             <div className="mx-auto max-w-[1320px] px-4 pb-16 pt-8 sm:px-6">
                 <PageNav back={{ label: tr('browse'), to: ROUTES.CATALOG }} />
-                <div className="mt-5 flex items-center gap-4 rounded-xl bg-store-green px-6 py-6 text-white">
-                    <Heart size={28} className="text-store-yellow" />
+                <div className="mt-4 flex items-center gap-3 rounded-[18px] bg-store-green px-5 py-4 text-white sm:px-7 sm:py-5">
+                    <Heart size={24} className="shrink-0 text-store-yellow" />
                     <div>
-                        <h1 className="m-0 font-subheading text-2xl font-bold sm:text-3xl">
+                        <h1 className="m-0 font-subheading text-xl font-bold sm:text-2xl">
                             {tr('title')}
                         </h1>
                         <p className="m-0 mt-1 text-sm text-white/80">{tr('subtitle')}</p>
