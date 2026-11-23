@@ -45,6 +45,7 @@ export const ROUTES = {
     ECOMMERCE_COUPONS: '/e-commerce/coupons',
     ECOMMERCE_REQUESTS: '/e-commerce/product-requests',
     ECOMMERCE_REVIEWS: '/e-commerce/reviews',
+    ECOMMERCE_REFUNDS: '/e-commerce/cancellations',
 
     LOGISTICS: '/logistics',
     LOGISTICS_INVENTORY: '/logistics/inventory',

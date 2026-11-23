@@ -31,5 +31,6 @@ export interface ClaimedPackage {
     latitude: number | null;
     longitude: number | null;
     claimedAt: string;
+    deliveredAt: string | null;
     cancelled: boolean;
 }

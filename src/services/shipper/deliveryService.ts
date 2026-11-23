@@ -32,3 +32,12 @@ export async function getPackageDetail(packageId: string) {
     const response = await http.get<ApiResponse<ClaimedPackage>>(`/api/delivery/packages/${encodeURIComponent(packageId)}`);
     return response.data.data;
 }
+
+/** Xác nhận đã giao package; giao xong package cuối cùng thì đơn hàng hoàn thành. */
+export async function completePackage(packageId: string) {
+    const response = await http.post<ApiResponse<ClaimedPackage>>(
+        `/api/delivery/packages/${encodeURIComponent(packageId)}/complete`,
+    );
+    return response.data.data;
+}
+
