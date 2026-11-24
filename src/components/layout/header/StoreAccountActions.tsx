@@ -21,6 +21,7 @@ import { useAuthStore } from '../../../store/admin/authStore';
 import { useCartStore } from '../../../store/customer/cartStore';
 import GuestHeaderActions from './GuestHeaderActions';
 import LogoutConfirmation from '@/components/common/LogoutConfirmation';
+import { logout } from '@/services/admin/authService';
 
 export default function StoreAccountActions() {
     const { t, i18n } = useTranslation('storefront');
@@ -90,11 +91,15 @@ export default function StoreAccountActions() {
         return () => document.removeEventListener('mousedown', handleOutsideClick);
     }, []);
 
-    function handleSignOut() {
+    async function handleSignOut() {
         setOpenDropdown(null);
 
         if (user) {
-            clearSession();
+            try {
+                await logout();
+            } finally {
+                clearSession();
+            }
         }
     }
 
@@ -427,7 +432,7 @@ export default function StoreAccountActions() {
                 onCancel={() => setConfirmLogout(false)}
                 onConfirm={() => {
                     setConfirmLogout(false);
-                    handleSignOut();
+                    void handleSignOut().catch(() => undefined);
                 }}
             />
         </div>
