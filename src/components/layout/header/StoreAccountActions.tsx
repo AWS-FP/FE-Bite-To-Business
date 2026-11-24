@@ -143,6 +143,7 @@ export default function StoreAccountActions() {
 
                     {/* Notification Bell */}
                     <NotificationSystem
+                        key={`${user?.id}-${user?.role}`}
                         isOpen={openDropdown === 'notifications'}
                         onToggle={() =>
                             setOpenDropdown((prev) =>
