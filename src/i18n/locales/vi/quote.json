@@ -1,5 +1,6 @@
 {
     "savedDeliveryAddress": "Địa chỉ giao đã chọn ở trang Phân phối: {{address}}. Địa chỉ này sẽ được điền sẵn ở bước Gói giao hàng.",
+    "mapTitle": "Chọn địa chỉ giao hàng",
     "steps": {
         "cart": "Giỏ hàng",
         "pricing": "Giá & ưu đãi",
@@ -10,6 +11,8 @@
     "title": "Giỏ hàng & báo giá",
     "subtitle": "Chọn sản phẩm, chia gói giao và kiểm tra tổng tiền.",
     "cartTitle": "Sản phẩm trong giỏ",
+    "selectAll": "Chọn tất cả",
+    "selectProduct": "Chọn {{name}}",
     "productCount": "{{count}} sản phẩm",
     "emptyCart": "Giỏ hàng của bạn đang trống.",
     "browse": "Xem sản phẩm",
@@ -68,13 +71,9 @@
         "namePlaceholder": "Ví dụ: Bếp quận 1",
         "city": "Thành phố",
         "hcm": "TP. Hồ Chí Minh",
-        "hanoi": "Hà Nội",
         "recipient": "Người nhận",
         "phone": "Số điện thoại",
         "date": "Ngày giao",
-        "time": "Khung giờ giao",
-        "startTime": "Giờ bắt đầu",
-        "endTime": "Giờ kết thúc",
         "address": "Địa chỉ giao hàng",
         "addressPlaceholder": "Số nhà, đường, phường/xã",
         "suggestionUnavailable": "Không thể tải gợi ý địa chỉ. Bạn vẫn có thể nhập địa chỉ thủ công.",
@@ -87,23 +86,19 @@
         "addressNote": "Địa chỉ được tìm tọa độ để tính phí; vui lòng kiểm tra lại địa chỉ trước khi lưu.",
         "addressFromDistribution": "Dùng đúng vị trí đã chọn ở trang Phân phối. Sửa địa chỉ sẽ tìm lại tọa độ.",
         "creating": "Đang tạo gói...",
-        "profileDefault": "Đã điền sẵn thông tin giao hàng mặc định từ hồ sơ của bạn. Chỉ cần nhập số lượng rồi tạo gói.",
-        "clearProfileDefault": "Xóa thông tin mặc định",
         "pickOnMap": "Chọn trên bản đồ",
         "defaultPackageName": "Gói giao hàng mặc định"
     },
     "review": {
         "title": "Kiểm tra trước khi thanh toán",
         "counts": "{{packages}} gói giao hàng · {{products}} sản phẩm",
-        "shipping": "Phí giao:",
-        "note": "Giá, ưu đãi, VAT, phí giao và tồn kho đã được kiểm tra lại. Khi bấm Đặt hàng & thanh toán, hệ thống tạo đơn, giữ hàng trong 6 giờ và hiển thị mã QR chuyển khoản."
+        "shipping": "Phí giao:"
     },
     "validation": {
         "required": "Vui lòng điền thông tin này.",
         "duplicateAddress": "Địa chỉ này đã được dùng cho một gói khác. Vui lòng chọn địa chỉ khác.",
         "duplicatePackages": "Có các gói trùng địa chỉ. Vui lòng xóa gói trùng trước khi tiếp tục.",
         "datePast": "Ngày giao không được ở trong quá khứ.",
-        "timeRequired": "Vui lòng chọn giờ bắt đầu và kết thúc.",
         "quantityInvalid": "Vui lòng nhập số lượng hợp lệ, tối đa 3 chữ số thập phân.",
         "quantityMax": "Số lượng không được vượt quá {{max}} {{unit}}.",
         "quantityStep": "Số lượng phải là bội số của {{step}} {{unit}}.",
@@ -117,7 +112,6 @@
         "customer": "Vui lòng đăng nhập bằng tài khoản customer để tiếp tục.",
         "savedCoupon": "Báo giá đang có mã đã lưu. Nhập lại mã đang dùng để giữ mã khi cập nhật.",
         "invalidQuantity": "Chọn số lượng hợp lệ, không vượt quá số lượng còn lại của từng sản phẩm.",
-        "invalidTime": "Giờ kết thúc phải sau giờ bắt đầu.",
         "invalidAddress": "Địa chỉ không hợp lệ. Vui lòng kiểm tra lại địa chỉ và thành phố.",
         "geocode": "Không thể tìm tọa độ địa chỉ lúc này. Vui lòng kiểm tra địa chỉ và thử lại; nếu vẫn lỗi, dịch vụ bản đồ có thể đang gián đoạn.",
         "shippingUnavailable": "Không thể tính phí giao hàng lúc này. Vui lòng thử lại sau.",

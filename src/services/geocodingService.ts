@@ -3,7 +3,7 @@ import type { AddressSuggestion, MapLocation } from '@/types/geocoding';
 
 export async function searchDeliveryAddresses(
     address: string,
-    city: 'hcm' | 'hanoi',
+    city: 'hcm',
     signal: AbortSignal,
 ) {
     const response = await publicHttp.get<{ data: AddressSuggestion[] }>(
@@ -24,7 +24,7 @@ export async function placeToCoordinates(refId: string) {
     return response.data.data;
 }
 
-export async function addressToCoordinates(address: string, city: 'hcm' | 'hanoi') {
+export async function addressToCoordinates(address: string, city: 'hcm') {
     const response = await publicHttp.get<{ data: MapLocation }>('/api/delivery-estimate/geocode', {
         params: { address, city },
         timeout: 35_000,

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Map, Marker } from '@vietmap/vietmap-gl-js/dist/vietmap-gl';
 import { loadVietMap } from '@/services/shipper/vietmapService';
-import { useCurrentPosition } from '@/hooks/shipper/useCurrentPosition';
 import { useDeliveryRoute } from '@/hooks/shipper/useDeliveryRoute';
 import { deliveryMapCities } from '@/utils/deliveryMapCities';
 import '@vietmap/vietmap-gl-js/dist/vietmap-gl.css';
@@ -16,25 +15,21 @@ export default function DeliveryMap({
     longitude,
     city,
     packageId,
-    showRouteFromCurrentPosition = false,
 }: {
     latitude?: number | null;
     longitude?: number | null;
     city?: string | null;
     // Package đã nhận; dùng để hỏi BE đường đi thật tới điểm giao.
     packageId?: string;
-    // Hiện vị trí hiện tại của nhân viên và đường nối tới điểm giao.
-    showRouteFromCurrentPosition?: boolean;
 }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<Map | null>(null);
     const currentMarkerRef = useRef<Marker | null>(null);
-    const { position, denied } = useCurrentPosition(showRouteFromCurrentPosition);
-    const { route, failed: routeFailed } = useDeliveryRoute(showRouteFromCurrentPosition ? packageId : undefined, position);
-    const [selectedCity, setSelectedCity] = useState<'hcm' | 'hanoi'>(city === 'hanoi' ? 'hanoi' : 'hcm');
+    const { route, failed: routeFailed } = useDeliveryRoute(packageId);
     const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
     const [attempt, setAttempt] = useState(0);
-    const branch = deliveryMapCities[selectedCity];
+    // Chỉ phục vụ TP. Hồ Chí Minh.
+    const branch = deliveryMapCities.hcm;
     const hasPoint = latitude != null && longitude != null
         && longitude >= branch.bounds[0][0] && longitude <= branch.bounds[1][0]
         && latitude >= branch.bounds[0][1] && latitude <= branch.bounds[1][1];
@@ -68,8 +63,6 @@ export default function DeliveryMap({
                         'NavigationControl.ResetBearing': 'Hướng Bắc',
                         'FullscreenControl.Enter': 'Toàn màn hình',
                         'FullscreenControl.Exit': 'Thoát toàn màn hình',
-                        'GeolocateControl.FindMyLocation': 'Vị trí của tôi',
-                        'GeolocateControl.LocationNotAvailable': 'Không lấy được vị trí',
                     },
                 });
 
@@ -81,7 +74,7 @@ export default function DeliveryMap({
                 map.once('load', () => {
                     clearTimeout(timeout);
                     if (cancelled || failed || !map) return;
-                    // Đường nối vị trí hiện tại tới điểm giao; dữ liệu được cập nhật khi vị trí thay đổi.
+                    // Đường đi từ Bitexco tới điểm giao.
                     map.addSource(ROUTE_SOURCE, {
                         type: 'geojson',
                         data: { type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [] } },
@@ -107,13 +100,6 @@ export default function DeliveryMap({
                     if (containerRef.current && !document.fullscreenElement) void containerRef.current.requestFullscreen();
                 });
                 map.addControl(new vietmap.FullscreenControl(), 'top-right');
-                map.addControl(
-                    new vietmap.GeolocateControl({
-                        positionOptions: { enableHighAccuracy: true },
-                        trackUserLocation: true,
-                    }),
-                    'top-right',
-                );
 
                 observer = new ResizeObserver(() => map?.resize());
                 observer.observe(containerRef.current);
@@ -138,12 +124,12 @@ export default function DeliveryMap({
         };
     }, [attempt, latitude, longitude, branch, hasPoint]);
 
-    // Cập nhật marker vị trí hiện tại và đường nối mỗi khi vị trí thay đổi.
+    // Hiển thị điểm xuất phát và đường đi từ Bitexco tới địa chỉ giao hàng.
     useEffect(() => {
         const map = mapRef.current;
         const marker = currentMarkerRef.current;
-        if (!showRouteFromCurrentPosition || status !== 'ready' || !map || !marker || !position) return;
-        const here: [number, number] = [position.longitude, position.latitude];
+        if (!packageId || status !== 'ready' || !map || !marker) return;
+        const here = branch.origin;
         marker.setLngLat(here).addTo(map);
         const source = map.getSource(ROUTE_SOURCE) as { setData?: (data: unknown) => void } | undefined;
         if (hasPoint && source?.setData) {
@@ -166,7 +152,7 @@ export default function DeliveryMap({
                 { padding: 60, maxZoom: 16, duration: 600 },
             );
         }
-    }, [position, route, status, showRouteFromCurrentPosition, hasPoint, latitude, longitude]);
+    }, [branch, packageId, route, status, hasPoint, latitude, longitude]);
 
     function retry() {
         setStatus('loading');
@@ -178,12 +164,8 @@ export default function DeliveryMap({
             <div className="dl-panel-heading">
                 <div>
                     <h2>Bản đồ giao hàng</h2>
-                    <p>Kéo bản đồ, phóng to hoặc xem vị trí của bạn.</p>
+                    <p>Đường đi từ Bitexco đến địa chỉ giao hàng.</p>
                 </div>
-                {!city && <select aria-label="Chọn thành phố" value={selectedCity} onChange={(event) => setSelectedCity(event.target.value as 'hcm' | 'hanoi')}>
-                    <option value="hcm">TP. Hồ Chí Minh</option>
-                    <option value="hanoi">Hà Nội</option>
-                </select>}
             </div>
             <div className="dl-map-frame" aria-busy={!!apiKey && status === 'loading'}>
                 <div ref={containerRef} className="dl-map-canvas" aria-label="Bản đồ VietMap" />
@@ -208,20 +190,14 @@ export default function DeliveryMap({
             </div>
             <p className="dl-map-note">Nhấp đúp vào bản đồ để xem toàn màn hình. Nhấn Esc để thoát.</p>
             {city && !hasPoint && <p className="dl-map-note">Chưa có tọa độ giao hàng hợp lệ trong khu vực bản đồ.</p>}
-            {showRouteFromCurrentPosition && denied && (
-                <p className="dl-map-note">Bạn chưa cho phép truy cập vị trí nên chưa vẽ được đường tới điểm giao.</p>
-            )}
-            {showRouteFromCurrentPosition && position && (
+            {packageId && route && hasPoint && (
                 <p className="dl-map-note">
-                    Vị trí hiện tại: <strong>{position.latitude.toFixed(6)}, {position.longitude.toFixed(6)}</strong>
-                    {route && hasPoint && (
-                        <> · Còn khoảng <strong>{(route.distanceMetres / 1000).toFixed(1)} km</strong>, đi xe máy khoảng{' '}
-                            <strong>{Math.max(1, Math.round(route.durationMs / 60000))} phút</strong></>
-                    )}
+                    Từ Bitexco đến điểm giao: <strong>{(route.distanceMetres / 1000).toFixed(1)} km</strong>, đi xe máy khoảng{' '}
+                    <strong>{Math.max(1, Math.round(route.durationMs / 60000))} phút</strong>.
                 </p>
             )}
-            {showRouteFromCurrentPosition && position && hasPoint && !route && (
-                <p className="dl-map-note">{routeFailed ? 'Không tìm được đường đi từ VietMap. Hệ thống sẽ thử lại khi vị trí thay đổi.' : 'Đang tìm đường đi tới điểm giao…'}</p>
+            {packageId && hasPoint && !route && (
+                <p className="dl-map-note">{routeFailed ? 'Không tìm được đường đi từ Bitexco. Vui lòng tải lại trang để thử lại.' : 'Đang tìm đường đi tới điểm giao…'}</p>
             )}
         </section>
     );

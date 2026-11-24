@@ -9,6 +9,8 @@ export interface QuoteFormDraft {
     parcel: PackageDraft;
     /** The customer cleared the default package filled from their profile; do not fill it again. */
     profileDefaultDismissed?: boolean;
+    /** Profile defaults are applied only once per checkout draft. */
+    profilePrefillApplied?: boolean;
 }
 
 export const emptyParcel: PackageDraft = {
@@ -16,7 +18,6 @@ export const emptyParcel: PackageDraft = {
     recipientName: '',
     recipientPhone: '',
     deliveryDate: '',
-    deliveryTimeSlot: '',
     address: '',
     note: '',
     city: 'HCM',

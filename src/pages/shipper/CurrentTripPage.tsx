@@ -99,10 +99,7 @@ export default function CurrentTripPage() {
                                                 {parcel.recipientPhone || 'Chưa có số điện thoại'}
                                             </p>
                                             <p className="mb-0 mt-1 text-sm text-store-muted">
-                                                {parcel.deliveryDate}
-                                                {parcel.deliveryTimeSlot
-                                                    ? ` · ${parcel.deliveryTimeSlot}`
-                                                    : ''}
+                                                {parcel.deliveryDate}
                                             </p>
                                             {parcel.note && (
                                                 <p className="mb-0 mt-1 text-sm text-store-muted">

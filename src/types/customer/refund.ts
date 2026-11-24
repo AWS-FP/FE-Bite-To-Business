@@ -24,3 +24,11 @@ export interface RefundRecord {
     reviewedAt: string | null;
     refundedAt: string | null;
 }
+
+/** Form trả hàng; tiền hàng được Admin hoàn thủ công vào tài khoản này. */
+export interface PackageReturnRequest {
+    reason: string;
+    bank: string;
+    accountNumber: string;
+    accountName: string;
+}

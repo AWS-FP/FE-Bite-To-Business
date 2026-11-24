@@ -17,6 +17,8 @@ export default function CartItems({ items, updateQuantity }: CartItemsProps) {
     const { t, i18n } = useTranslation('quote');
     const english = i18n.resolvedLanguage === 'en';
     const setQuantity = useCartStore((state) => state.setQuantity);
+    const setSelected = useCartStore((state) => state.setSelected);
+    const selectAll = useCartStore((state) => state.selectAll);
     return (
         <section className="overflow-hidden rounded-2xl border border-store-ink/20 bg-white">
             <div className="flex items-center justify-between border-b border-store-ink/10 px-6 py-5">
@@ -25,6 +27,7 @@ export default function CartItems({ items, updateQuantity }: CartItemsProps) {
                     <p className="mb-0 mt-1 text-sm text-store-muted">
                         {t('productCount', { count: items.length })}
                     </p>
+                    {items.length > 0 && <label className="mt-2 inline-flex cursor-pointer items-center gap-2 text-sm font-semibold"><input type="checkbox" className="size-4 accent-store-green" checked={items.every((item) => item.selected)} onChange={(event) => selectAll(event.target.checked)} />{t('selectAll')}</label>}
                 </div>
                 <ShoppingBasket className="text-store-green" />
             </div>
@@ -42,6 +45,7 @@ export default function CartItems({ items, updateQuantity }: CartItemsProps) {
                         key={item.id}
                         className="flex items-center gap-4 border-b border-store-ink/10 p-5 last:border-b-0"
                     >
+                        <input type="checkbox" className="size-5 shrink-0 cursor-pointer accent-store-green" checked={item.selected === true} onChange={(event) => setSelected(item.id, event.target.checked)} aria-label={t('selectProduct', { name: (english ? item.nameEn : item.nameVi) || item.name })} />
                         <Link
                             to={productPath(item.id)}
                             tabIndex={-1}
@@ -72,24 +76,15 @@ export default function CartItems({ items, updateQuantity }: CartItemsProps) {
                             </p>
                             <span className="font-bold">{formatCurrencyVnd(item.unitPrice)}</span>
                             {(() => {
-                                const { min, step, max, cap } = cartRules(item);
+                                const { min, max, cap } = cartRules(item);
                                 return (
                                     <>
-                                        {(min > 1 || step > 1) && (
-                                            <p className="mb-0 mt-1 text-xs text-store-muted">
-                                                {t('quantityRules', { min, step })}
+                                        <p className="mb-0 mt-1 text-xs text-store-muted">MOQ: {min}</p>
+                                        {max != null && cap != null && cap < min && (
+                                            <p role="alert" className="mb-0 mt-1 text-xs font-bold text-red-700">
+                                                {t('stockBelowMinimum', { stock: max })}
                                             </p>
                                         )}
-                                        {max != null &&
-                                            (cap != null && cap < min ? (
-                                                <p role="alert" className="mb-0 mt-1 text-xs font-bold text-red-700">
-                                                    {t('stockBelowMinimum', { stock: max })}
-                                                </p>
-                                            ) : (
-                                                <p className="mb-0 mt-1 text-xs text-store-muted">
-                                                    {t('stockAvailable', { stock: max })}
-                                                </p>
-                                            ))}
                                     </>
                                 );
                             })()}

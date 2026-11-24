@@ -885,16 +885,10 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     <div className="max-w-xs">
                                         {field('vat', tr("Thuế suất VAT (%) *"), { type: 'number', placeholder: '8' })}
                                     </div>
-                                    <p className="m-0 text-sm text-store-muted">
-                                        {tr("Trang sản phẩm hiển thị đoạn an toàn thực phẩm và VAT theo mẫu chuẩn, chỉ thay số % này.")}
-                                    </p>
                                 </div>
                                 <div className="space-y-4 border-t border-store-line pt-5">
                                     <div>
                                         <h3 className="font-semibold">{requiredLabel(tr("Thông tin dinh dưỡng *"))}</h3>
-                                        <p className="mt-1 text-sm text-store-muted">
-                                            {tr("Hai bảng tiếng Việt và tiếng Anh luôn cùng số dòng; hàm lượng dùng chung cho cả hai.")}
-                                        </p>
                                     </div>
                                     <label className="block text-sm font-semibold">
                                         {tr("Giá trị ước tính trên")}

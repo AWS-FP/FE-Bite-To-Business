@@ -22,7 +22,6 @@ export interface ClaimedPackage {
     orderId: string;
     orderNumber: string;
     deliveryDate: string;
-    deliveryTimeSlot: string | null;
     address: string;
     recipientName: string | null;
     recipientPhone: string | null;

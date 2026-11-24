@@ -42,7 +42,7 @@ import DeliveryPackagePage from '@/pages/shipper/DeliveryPackagePage';
 import LogisticsLayout from '@/layouts/logistic/LogisticsLayout';
 import InventoryPage from '@/pages/logistic/InventoryPage';
 import ReceivePage from '@/pages/logistic/ReceivePage';
-import PackingPage from '@/pages/logistic/PackingPage';
+import PackageReturnsPage from '@/pages/admin/PackageReturnsPage';
 import ProductRequestsPage from '@/pages/logistic/ProductRequestsPage';
 
 // Admin Pages
@@ -232,6 +232,10 @@ export const router = createBrowserRouter([{
                         Component: StaffPage,
                     },
                     {
+                        path: ROUTES.ADMIN_PACKAGE_RETURNS,
+                        Component: PackageReturnsPage,
+                    },
+                    {
                         path: ROUTES.ADMIN_SYSTEM,
                         Component: SystemMetricsPage,
                     },
@@ -302,10 +306,6 @@ export const router = createBrowserRouter([{
                     {
                         path: ROUTES.LOGISTICS_RECEIVE,
                         Component: ReceivePage,
-                    },
-                    {
-                        path: ROUTES.LOGISTICS_PACKING,
-                        Component: PackingPage,
                     },
                     {
                         path: ROUTES.LOGISTICS_PRODUCT_REQUESTS,

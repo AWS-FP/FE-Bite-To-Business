@@ -1,4 +1,4 @@
-import { ArrowUpRight, BriefcaseBusiness, ChevronDown, Info, Network } from 'lucide-react';
+import { ArrowUpRight, BriefcaseBusiness, ChevronDown, Info } from 'lucide-react';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -109,19 +109,6 @@ export default function AboutBusinessDropdown({
                         </span>
                     </Link>
 
-                    <div className="mx-2 border-t border-solid border-store-line" />
-
-                    <Link
-                        role="menuitem"
-                        to={ROUTES.DISTRIBUTION_NETWORK}
-                        onClick={() => setMenuOpen(false)}
-                        className="flex items-center gap-2 rounded-xl px-3 py-3 text-[12px] font-semibold text-store-green no-underline hover:bg-surface-green"
-                    >
-                        <span className="inline-flex items-center gap-2">
-                            <Network size={16} aria-hidden="true" />
-                            {t('header.distributionPage')}
-                        </span>
-                    </Link>
                 </div>
             )}
         </div>

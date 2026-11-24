@@ -11,6 +11,7 @@ export interface CartItem {
     specEn?: string | null
     unitPrice: number
     quantity: number
+    selected?: boolean
     imageUrl?: string
     /** MOQ: the smallest quantity that can be ordered. */
     minOrderQuantity?: number
@@ -38,6 +39,9 @@ interface CartStoreState {
         maxQuantity?: number | null,
     ) => void
     clear: () => void
+    setSelected: (id: string, selected: boolean) => void
+    selectAll: (selected: boolean) => void
+    removePurchased: (ids: string[]) => void
 }
 
 const round = (value: number) => Number(value.toFixed(3))
@@ -128,6 +132,9 @@ export const useCartStore = create<CartStoreState>()(persist((set) => ({
             }),
         })),
     clear: () => set({ items: [] }),
+    setSelected: (id, selected) => set((state) => ({ items: state.items.map((item) => item.id === id ? { ...item, selected } : item) })),
+    selectAll: (selected) => set((state) => ({ items: state.items.map((item) => ({ ...item, selected })) })),
+    removePurchased: (ids) => set((state) => ({ items: state.items.filter((item) => !ids.includes(item.id)) })),
 }), {
     name: 'bitetobusiness.guest-cart',
     storage: createJSONStorage(() => localStorage),

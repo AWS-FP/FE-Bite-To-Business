@@ -8,6 +8,7 @@ import { ROUTES } from '../../router/routes';
 import { useAuthStore } from '../../store/admin/authStore';
 import { useDelivery } from './DeliveryModel.tsx';
 import { DeliveryMenuButton } from './DeliverySidebar.tsx';
+import { logout } from '@/services/admin/authService';
 
 export default function DeliveryTopbar({ onOpenMenu }: { onOpenMenu: () => void }) {
     const { language } = useDelivery();
@@ -16,9 +17,11 @@ export default function DeliveryTopbar({ onOpenMenu }: { onOpenMenu: () => void 
     const clearSession = useAuthStore((state) => state.clearSession);
     const [confirmLogout, setConfirmLogout] = useState(false);
 
-    function signOut() {
-        clearSession();
-        navigate(ROUTES.LOGIN, { replace: true });
+    async function signOut() {
+        try { await logout(); } finally {
+            clearSession();
+            navigate(ROUTES.LOGIN, { replace: true });
+        }
     }
     return (
         <header className="dl-topbar">
@@ -47,7 +50,7 @@ export default function DeliveryTopbar({ onOpenMenu }: { onOpenMenu: () => void 
                     <LogOut size={16} />
                     <span>{language === 'vi' ? 'Đăng xuất' : 'Sign out'}</span>
                 </button>
-                <LogoutConfirmation open={confirmLogout} onCancel={() => setConfirmLogout(false)} onConfirm={() => { setConfirmLogout(false); signOut(); }} />
+                <LogoutConfirmation open={confirmLogout} onCancel={() => setConfirmLogout(false)} onConfirm={() => { setConfirmLogout(false); void signOut().catch(() => undefined); }} />
             </div>
         </header>
     );
