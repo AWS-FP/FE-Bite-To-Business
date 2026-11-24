@@ -78,7 +78,7 @@ export default function LandingPainPoints() {
                             {/* Card content */}
                             <div className="flex flex-1 flex-col p-6">
                                 <h3 className="mb-3.5 font-subheading text-[22px] text-store-ink">
-                                    {item.title}
+                                    {t(item.title)}
                                 </h3>
 
                                 <ul className="flex list-none flex-col gap-3 p-0 text-sm text-store-ink">
@@ -97,7 +97,7 @@ export default function LandingPainPoints() {
                                             </span>
 
                                             <span className="leading-relaxed">
-                                                {problem}
+                                                {t(problem)}
                                             </span>
                                         </li>
                                     ))}

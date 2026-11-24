@@ -459,7 +459,8 @@ export default function LandingCatalog({
                                     category === 'all' || category === 'bakery' ? 'flex' : 'none',
                             }}
                         >
-                            <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[50px] after:absolute after:inset-0 after:flex after:items-center after:justify-center after:bg-store-ink/72 after:text-[13px] after:font-extrabold after:text-store-yellow after:backdrop-blur-[2px] after:content-['H?t_h?ng_(Available_=_0)']">
+
+                            <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[50px]">
                                 <div className="svg-bg-watermark watermark-center">
                                     <svg
                                         viewBox="0 0 24 24"
@@ -473,6 +474,10 @@ export default function LandingCatalog({
                                         <path d="M8.5 7C9.5 9.5 9.5 12 8.8 14.5" />
                                         <path d="M15.5 7C14.5 9.5 14.5 12 15.2 14.5" />
                                     </svg>
+                                </div>
+
+                                <div className="absolute inset-0 z-10 flex items-center justify-center bg-store-ink/72 px-3 text-center text-[13px] font-extrabold text-store-yellow backdrop-blur-[2px]">
+                                    {t('landing.catalog.outOfStock')}
                                 </div>
                             </div>
                             <div className="flex flex-1 flex-col gap-2 p-4">
