@@ -9,7 +9,6 @@ export function useDeliveryPackage(packageId?: string) {
     const [error, setError] = useState('');
     const [confirming, setConfirming] = useState(false);
     const [acting, setActing] = useState(false);
-    const [notice, setNotice] = useState('');
 
     useEffect(() => {
         let active = true;
@@ -32,8 +31,8 @@ export function useDeliveryPackage(packageId?: string) {
         setActing(true);
         setError('');
         try {
+            // Trang tự hiện "Đã giao xong package này." từ deliveredAt nên không cần thêm thông báo.
             setParcel(await completePackage(parcel.packageId));
-            setNotice('Đã xác nhận giao package.');
             setConfirming(false);
         } catch (err) {
             setConfirming(false);
@@ -43,5 +42,5 @@ export function useDeliveryPackage(packageId?: string) {
         }
     }
 
-    return { parcel, error, notice, confirming, setConfirming, acting, confirmAction };
+    return { parcel, error, confirming, setConfirming, acting, confirmAction };
 }

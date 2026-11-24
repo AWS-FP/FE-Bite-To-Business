@@ -34,3 +34,10 @@ export interface ClaimedPackage {
     deliveredAt: string | null;
     cancelled: boolean;
 }
+
+/** Đường đi xe máy từ VietMap; coordinates là [lng, lat]. */
+export interface DeliveryRoute {
+    distanceMetres: number;
+    durationMs: number;
+    coordinates: [number, number][];
+}

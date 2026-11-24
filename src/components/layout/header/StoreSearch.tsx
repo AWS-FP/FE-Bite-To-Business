@@ -6,9 +6,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { getCatalogSearchPath } from '../../../constants/catalogNavigation';
 import useSearchHistory from '../../../hooks/useSearchHistory';
 import SearchModeDropdown from './SearchModeDropdown';
+import { useAssistantStore } from '@/a2ui/runtime/assistantStore';
+import { trackEvent } from '@/a2ui/telemetry/interactionTracker';
 
 export default function StoreSearch() {
-    const { t } = useTranslation('storefront');
+    const { t, i18n } = useTranslation('storefront');
     const navigate = useNavigate();
     const [keyword, setKeyword] = useState('');
     const [searchMode, setSearchMode] = useState<'products' | 'ai'>('products');
@@ -85,13 +87,18 @@ export default function StoreSearch() {
         if (!searchText) return;
 
         if (searchMode === 'ai') {
-            setShowAINotice(true);
+            // Chế độ AI: mở trợ lý mua hàng và gửi câu hỏi để AI dựng giao diện kết quả.
+            const assistant = useAssistantStore.getState();
+            assistant.setOpen(true);
+            setKeyword('');
+            void assistant.send(searchText, i18n.resolvedLanguage?.startsWith('en') ? 'en' : 'vi');
             return;
         }
 
         if (isSearching) return;
         setIsSearching(true);
         try {
+            trackEvent('search', { value: { q: searchText } });
             const shouldNavigate = await recordSearch(searchText);
             if (shouldNavigate) navigate(getCatalogSearchPath(searchText));
         } finally {

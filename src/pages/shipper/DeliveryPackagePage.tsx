@@ -8,7 +8,7 @@ import { isDeliveryOverdue } from '@/utils/shipper/deliveryDeadline';
 
 export default function DeliveryPackagePage() {
     const { tripId } = useParams();
-    const { parcel, error, notice, confirming, setConfirming, acting, confirmAction } = useDeliveryPackage(tripId);
+    const { parcel, error, confirming, setConfirming, acting, confirmAction } = useDeliveryPackage(tripId);
     const delivered = !!parcel?.deliveredAt;
 
     return (
@@ -16,7 +16,6 @@ export default function DeliveryPackagePage() {
             <PageNav back={{ label: 'Quay lại', to: ROUTES.DELIVERY_TRIPS }} />
             <h1 className="font-subheading text-3xl font-bold">Chi tiết package</h1>
             {error && <p role="alert">{error}</p>}
-            {notice && <p role="status" className="rounded-xl border border-green-300 bg-green-50 p-4 text-sm text-store-green">{notice}</p>}
             {!parcel && !error && <p>Đang tải thông tin...</p>}
             {parcel && <div className="grid grid-cols-[minmax(260px,1fr)_2fr] gap-6">
                 <section className="space-y-5 rounded-2xl border border-store-ink/15 bg-white p-6">
@@ -38,7 +37,7 @@ export default function DeliveryPackagePage() {
                         </button>
                     )}
                 </section>
-                <DeliveryMap latitude={parcel.latitude} longitude={parcel.longitude} city={parcel.city} showRouteFromCurrentPosition={!delivered} />
+                <DeliveryMap latitude={parcel.latitude} longitude={parcel.longitude} city={parcel.city} packageId={parcel.packageId} showRouteFromCurrentPosition={!delivered} />
             </div>}
             <ConfirmModal
                 open={confirming}
