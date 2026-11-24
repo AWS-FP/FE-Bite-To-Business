@@ -13,7 +13,7 @@ import PageNav from '@/components/common/PageNav';
 export default function CustomerCatalogPage() {
     const { t, i18n } = useTranslation('storefront');
     const english = i18n.resolvedLanguage?.startsWith('en') ?? false;
-    const { categories, categoryError, pageData, loading, error, categoryId, page, size, selected, categoryLookup, setFilter } =
+    const { categories, categoryError, pageData, loading, error, categoryId, query, page, size, selected, categoryLookup, setFilter } =
         useCatalogBrowser();
     const [expanded, setExpanded] = useState<string | null>(null);
     const title = (item: HomeCategory) => (english ? item.nameEn : item.nameVi);
@@ -26,10 +26,10 @@ export default function CustomerCatalogPage() {
 
                 <header className="mt-4 rounded-[18px] bg-store-green px-5 py-4 text-white sm:px-7 sm:py-5">
                     <h1 className="m-0 font-subheading text-2xl font-bold sm:text-3xl">
-                        {t('customerUI.catalogTitle')}
+                        {query.trim() ? t('search.resultsFor', { query: query.trim() }) : t('customerUI.catalogTitle')}
                     </h1>
                     <p className="mb-0 mt-1 text-[13px] leading-5 text-white/80 sm:text-sm">
-                        {t('customerUI.catalogIntro')}
+                        {query.trim() ? t('search.resultsIntro') : t('customerUI.catalogIntro')}
                     </p>
                 </header>
 
@@ -164,8 +164,13 @@ export default function CustomerCatalogPage() {
 
                     <section className="min-w-0">
                         <h2 className="m-0 mt-2 font-subheading text-xl font-bold">
-                            {selected ? title(selected) : t('customerUI.catalogShowing')}
+                            {query.trim() ? t('search.matchingProducts') : selected ? title(selected) : t('customerUI.catalogShowing')}
                         </h2>
+                        {query.trim() && !loading && !error && pageData && (
+                            <p className="mt-2 text-sm text-store-muted" role="status">
+                                {t('search.resultCount', { count: pageData.totalElements })}
+                            </p>
+                        )}
                         {loading && (
                             <p role="status" className="mt-6">
                                 {t('homePage.productsLoading')}

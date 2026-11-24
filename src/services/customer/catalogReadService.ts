@@ -1,6 +1,11 @@
 import { publicHttp } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
-import type { CatalogBrand, CatalogProductPage } from '@/types/customer/catalog';
+import type {
+    CatalogBrand,
+    CatalogProductPage,
+    CatalogProduct,
+    CatalogSuggestion,
+} from '@/types/customer/catalog';
 export async function getCatalogBrands(signal?: AbortSignal): Promise<CatalogBrand[]> {
     const response = await publicHttp.get<ApiResponse<CatalogBrand[]>>('/api/catalog/brands', {
         signal,
@@ -22,6 +27,22 @@ export async function getCatalogProducts(options: {
             signal,
             params,
         },
+    );
+    return response.data.data;
+}
+
+export async function getCatalogSuggestions(q: string, signal: AbortSignal) {
+    const response = await publicHttp.get<ApiResponse<CatalogSuggestion[]>>(
+        '/api/catalog/products/suggestions',
+        { params: { q }, signal },
+    );
+    return response.data.data;
+}
+
+export async function getRelatedProducts(id: string, signal: AbortSignal) {
+    const response = await publicHttp.get<ApiResponse<CatalogProduct[]>>(
+        `/api/catalog/products/${encodeURIComponent(id)}/related`,
+        { signal },
     );
     return response.data.data;
 }
