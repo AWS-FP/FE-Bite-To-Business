@@ -5,6 +5,8 @@ import { getCatalogSearchPath } from '../../../constants/catalogNavigation';
 import { useStoreSearch } from '@/hooks/customer/useStoreSearch';
 import { SEARCH_MAX_LENGTH } from '@/constants/catalogSearch';
 import SearchModeDropdown from './SearchModeDropdown';
+import { useAssistantStore } from '@/a2ui/runtime/assistantStore';
+import { trackEvent } from '@/a2ui/telemetry/interactionTracker';
 
 export default function StoreSearch() {
     const { t } = useTranslation('storefront');

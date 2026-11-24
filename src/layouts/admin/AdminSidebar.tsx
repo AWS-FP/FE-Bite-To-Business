@@ -1,10 +1,11 @@
-import { Activity } from 'lucide-react';
+import { Activity, RotateCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import WorkspaceSidebar from '../WorkspaceSidebar';
 
 interface AdminSidebarProps {
     registrationsPath: string;
     staffPath: string;
+    returnsPath: string;
     systemPath: string;
     pendingCount?: number;
     isCollapsed: boolean;
@@ -14,6 +15,7 @@ interface AdminSidebarProps {
 export default function AdminSidebar({
     registrationsPath,
     staffPath,
+    returnsPath,
     systemPath,
     pendingCount,
     isCollapsed,
@@ -53,6 +55,11 @@ export default function AdminSidebar({
                             icon: (
                                 <img src="/images/admin/staff.svg" alt="" width={18} height={18} />
                             ),
+                        },
+                        {
+                            path: returnsPath,
+                            label: t('navigation.returns'),
+                            icon: <RotateCcw size={18} aria-hidden="true" />,
                         },
                     ],
                 },

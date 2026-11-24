@@ -9,6 +9,7 @@ import {
     Minus,
     Plus,
     PackageOpen,
+    PackageSearch,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +21,7 @@ import { useAuthStore } from '../../../store/admin/authStore';
 import { useCartStore } from '../../../store/customer/cartStore';
 import GuestHeaderActions from './GuestHeaderActions';
 import LogoutConfirmation from '@/components/common/LogoutConfirmation';
+import { logout } from '@/services/admin/authService';
 
 export default function StoreAccountActions() {
     const { t, i18n } = useTranslation('storefront');
@@ -89,11 +91,15 @@ export default function StoreAccountActions() {
         return () => document.removeEventListener('mousedown', handleOutsideClick);
     }, []);
 
-    function handleSignOut() {
+    async function handleSignOut() {
         setOpenDropdown(null);
 
         if (user) {
-            clearSession();
+            try {
+                await logout();
+            } finally {
+                clearSession();
+            }
         }
     }
 
@@ -378,6 +384,17 @@ export default function StoreAccountActions() {
 
                                     <span>{t('profileDropdown.favorites')}</span>
                                 </Link>
+
+                                {/* Product requests the customer has sent */}
+                                <Link
+                                    to={ROUTES.MY_PRODUCT_REQUESTS}
+                                    onClick={() => setOpenDropdown(null)}
+                                    className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-store-ink no-underline transition-colors hover:bg-store-ink/10"
+                                >
+                                    <PackageSearch size={15} className="text-store-ink" />
+
+                                    <span>{t('profileDropdown.productRequests')}</span>
+                                </Link>
                             </>
                         )}
                     </div>
@@ -415,7 +432,7 @@ export default function StoreAccountActions() {
                 onCancel={() => setConfirmLogout(false)}
                 onConfirm={() => {
                     setConfirmLogout(false);
-                    handleSignOut();
+                    void handleSignOut().catch(() => undefined);
                 }}
             />
         </div>

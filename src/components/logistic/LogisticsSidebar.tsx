@@ -1,4 +1,4 @@
-import { Box, ClipboardList, Mail, Menu, PackagePlus } from 'lucide-react';
+import { Box, Mail, Menu, PackagePlus } from 'lucide-react';
 import WorkspaceSidebar from '@/layouts/WorkspaceSidebar';
 import { ROUTES } from '@/router/routes';
 import { useTranslation } from 'react-i18next';
@@ -35,7 +35,6 @@ export default function LogisticsSidebar({ open, onClose, isCollapsed, onToggleC
                     {
                         label: vietnamese ? 'ĐIỀU PHỐI & YÊU CẦU KHÁCH' : 'DISPATCH & REQUESTS',
                         items: [
-                            { path: ROUTES.LOGISTICS_PACKING, label: vietnamese ? 'Package đã hủy' : 'Cancelled packages', icon: <ClipboardList size={18} /> },
                             { path: ROUTES.LOGISTICS_PRODUCT_REQUESTS, label: vietnamese ? 'Yêu cầu thêm SP' : 'Product requests', icon: <Mail size={18} /> },
                         ],
                     },

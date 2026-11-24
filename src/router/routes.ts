@@ -28,12 +28,14 @@ export const ROUTES = {
     ORDERS: '/orders',
     ORDER_DETAIL: '/orders/:orderId',
     FAVORITES: '/favorites',
+    MY_PRODUCT_REQUESTS: '/product-requests',
     PROFILE: '/profile',
 
     ADMIN: '/admin',
     ADMIN_REGISTRATIONS: '/admin/registration-requests',
     ADMIN_REGISTRATION_DETAIL: '/admin/registration-requests/:requestId',
     ADMIN_STAFF: '/admin/staff',
+    ADMIN_PACKAGE_RETURNS: '/admin/package-returns',
     ADMIN_SYSTEM: '/admin/system',
 
     ECOMMERCE: '/e-commerce',
@@ -45,11 +47,11 @@ export const ROUTES = {
     ECOMMERCE_COUPONS: '/e-commerce/coupons',
     ECOMMERCE_REQUESTS: '/e-commerce/product-requests',
     ECOMMERCE_REVIEWS: '/e-commerce/reviews',
+    ECOMMERCE_REFUNDS: '/e-commerce/cancellations',
 
     LOGISTICS: '/logistics',
     LOGISTICS_INVENTORY: '/logistics/inventory',
     LOGISTICS_RECEIVE: '/logistics/receive',
-    LOGISTICS_PACKING: '/logistics/packing',
     LOGISTICS_PRODUCT_REQUESTS: '/logistics/product-requests',
 
     DELIVERY: '/delivery',

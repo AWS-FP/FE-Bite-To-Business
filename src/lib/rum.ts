@@ -17,7 +17,7 @@ export function startRum() {
                 'errors',
                 ['http', {
                     recordAllRequests: true,
-                    urlsToInclude: [/^https:\/\/api\.bite2business\.cloud\//],
+                    urlsToInclude: [/^https:\/\/bite2business\.cloud\/api\//],
                 }],
             ],
             allowCookies: false,

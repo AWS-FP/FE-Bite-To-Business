@@ -271,7 +271,6 @@ export default function ProfileForm({ initialProfile }: { initialProfile: Custom
                                 required
                             >
                                 <option value="">{t('chooseCity')}</option>
-                                <option value="Thành phố Hà Nội">Thành phố Hà Nội</option>
                                 <option value="Thành phố Hồ Chí Minh">Thành phố Hồ Chí Minh</option>
                             </select>
                         </Field>

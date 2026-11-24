@@ -1,4 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import RootLayout from '@/layouts/RootLayout';
+import MyProductRequestsPage from '@/pages/customer/MyProductRequestsPage';
 
 import { AUTH_ROLES } from '@/constants/roles';
 
@@ -40,7 +42,7 @@ import DeliveryPackagePage from '@/pages/shipper/DeliveryPackagePage';
 import LogisticsLayout from '@/layouts/logistic/LogisticsLayout';
 import InventoryPage from '@/pages/logistic/InventoryPage';
 import ReceivePage from '@/pages/logistic/ReceivePage';
-import PackingPage from '@/pages/logistic/PackingPage';
+import PackageReturnsPage from '@/pages/admin/PackageReturnsPage';
 import ProductRequestsPage from '@/pages/logistic/ProductRequestsPage';
 
 // Admin Pages
@@ -65,8 +67,12 @@ import EcommercePromotionsPage from '@/pages/e-commerce/EcommercePromotionsPage'
 import EcommerceCouponsPage from '@/pages/e-commerce/EcommerceCouponsPage';
 import EcommerceRequestsPage from '@/pages/e-commerce/EcommerceRequestsPage';
 import EcommerceReviewsPage from '@/pages/e-commerce/EcommerceReviewsPage';
+import EcommerceRefundsPage from '@/pages/e-commerce/EcommerceRefundsPage';
 
-export const router = createBrowserRouter([
+export const router = createBrowserRouter([{
+    // Bọc mọi route để ScrollRestoration cuộn lên đầu khi chuyển trang.
+    Component: RootLayout,
+    children: [
     // ==========================================
     // 1. AUTHENTICATION
     // ==========================================
@@ -184,6 +190,10 @@ export const router = createBrowserRouter([
                 Component: CustomerFavoritesPage,
             },
             {
+                path: ROUTES.MY_PRODUCT_REQUESTS,
+                Component: MyProductRequestsPage,
+            },
+            {
                 path: ROUTES.PROFILE,
                 Component: ProfilePage,
             },
@@ -220,6 +230,10 @@ export const router = createBrowserRouter([
                     {
                         path: ROUTES.ADMIN_STAFF,
                         Component: StaffPage,
+                    },
+                    {
+                        path: ROUTES.ADMIN_PACKAGE_RETURNS,
+                        Component: PackageReturnsPage,
                     },
                     {
                         path: ROUTES.ADMIN_SYSTEM,
@@ -263,6 +277,7 @@ export const router = createBrowserRouter([
                     },
                     { path: ROUTES.ECOMMERCE_REQUESTS, Component: EcommerceRequestsPage },
                     { path: ROUTES.ECOMMERCE_REVIEWS, Component: EcommerceReviewsPage },
+                    { path: ROUTES.ECOMMERCE_REFUNDS, Component: EcommerceRefundsPage },
                 ],
             },
         ],
@@ -291,10 +306,6 @@ export const router = createBrowserRouter([
                     {
                         path: ROUTES.LOGISTICS_RECEIVE,
                         Component: ReceivePage,
-                    },
-                    {
-                        path: ROUTES.LOGISTICS_PACKING,
-                        Component: PackingPage,
                     },
                     {
                         path: ROUTES.LOGISTICS_PRODUCT_REQUESTS,
@@ -345,4 +356,4 @@ export const router = createBrowserRouter([
         path: '*',
         element: <Navigate to={ROUTES.HOME} replace />,
     },
-]);
+]}]);

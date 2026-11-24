@@ -8,6 +8,7 @@ import { ROUTES } from '../../router/routes';
 import { useAuthStore } from '../../store/admin/authStore';
 import { useTranslation } from 'react-i18next';
 import { LogisticsMenuButton } from './LogisticsSidebar.tsx';
+import { logout } from '@/services/admin/authService';
 
 export default function LogisticsTopbar({ onOpenMenu }: { onOpenMenu: () => void }) {
     const { i18n } = useTranslation();
@@ -16,6 +17,12 @@ export default function LogisticsTopbar({ onOpenMenu }: { onOpenMenu: () => void
     const clearSession = useAuthStore((x) => x.clearSession);
     const session = useAuthStore((x) => x.session);
     const [confirmLogout, setConfirmLogout] = useState(false);
+    async function signOut() {
+        try { await logout(); } finally {
+            clearSession();
+            navigate(ROUTES.LOGIN, { replace: true });
+        }
+    }
     return (
         <header className="lg-topbar">
             <div className="lg-topbar-title">
@@ -47,7 +54,7 @@ export default function LogisticsTopbar({ onOpenMenu }: { onOpenMenu: () => void
                     <LogOut size={16} />
                     <span>{language === 'vi' ? 'Đăng xuất' : 'Sign out'}</span>
                 </button>
-                <LogoutConfirmation open={confirmLogout} onCancel={() => setConfirmLogout(false)} onConfirm={() => { setConfirmLogout(false); clearSession(); navigate(ROUTES.LOGIN); }} />
+                <LogoutConfirmation open={confirmLogout} onCancel={() => setConfirmLogout(false)} onConfirm={() => { setConfirmLogout(false); void signOut().catch(() => undefined); }} />
             </div>
         </header>
     );

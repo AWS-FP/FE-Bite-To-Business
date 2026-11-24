@@ -216,3 +216,32 @@ export type DashboardMetrics = {
     couponOrders: number;
     couponConversionRate: number | null;
 };
+
+/** Yêu cầu hủy package của khách (một dòng package_refunds). */
+export interface ExecutiveRefund {
+    id: string;
+    requestGroupId: string | null;
+    status: 'REQUESTED' | 'APPROVED' | 'REJECTED' | 'PROCESSING' | 'REFUNDED';
+    reason: string;
+    recipientBank: string | null;
+    recipientAccount: string | null;
+    recipientName: string | null;
+    refundAmount: number | null;
+    reviewNote: string | null;
+    transferReference: string | null;
+    createdAt: string;
+    reviewedAt: string | null;
+    refundedAt: string | null;
+    packageId: string;
+    packageName: string;
+    cancelledAt: string | null;
+    deliveryDate: string;
+    deliveryAddress: string;
+    orderId: string;
+    orderNumber: string;
+    customerId: string;
+    companyName: string | null;
+    contactName: string;
+    contactPhone: string;
+    packageAmount: number;
+}

@@ -1,5 +1,6 @@
 {
     "savedDeliveryAddress": "Delivery address chosen on the Distribution page: {{address}}. It will be prefilled at the Delivery packages step.",
+    "mapTitle": "Choose a delivery address",
     "steps": {
         "cart": "Cart",
         "pricing": "Prices & discounts",
@@ -10,6 +11,8 @@
     "title": "Cart & quote",
     "subtitle": "Select products, arrange deliveries and review your total.",
     "cartTitle": "Items in your cart",
+    "selectAll": "Select all",
+    "selectProduct": "Select {{name}}",
     "productCount_one": "{{count}} product",
     "productCount_other": "{{count}} products",
     "emptyCart": "Your cart is empty.",
@@ -69,13 +72,9 @@
         "namePlaceholder": "e.g. District 1 kitchen",
         "city": "City",
         "hcm": "Ho Chi Minh City",
-        "hanoi": "Hanoi",
         "recipient": "Recipient",
         "phone": "Phone number",
         "date": "Delivery date",
-        "time": "Delivery time slot",
-        "startTime": "Start time",
-        "endTime": "End time",
         "address": "Delivery address",
         "addressPlaceholder": "House number, street, ward/commune",
         "suggestionUnavailable": "Address suggestions are unavailable. You can still enter the address manually.",
@@ -88,23 +87,19 @@
         "addressNote": "The address is located on the map to calculate delivery fees. Please check it before saving.",
         "addressFromDistribution": "Uses the exact location chosen on the Distribution page. Editing the address will locate it again.",
         "creating": "Creating package...",
-        "profileDefault": "Your default delivery details from your profile are filled in. Just enter the quantities and create the package.",
-        "clearProfileDefault": "Clear default details",
         "pickOnMap": "Pick on map",
         "defaultPackageName": "Default delivery package"
     },
     "review": {
         "title": "Review before checkout",
         "counts": "{{packages}} delivery packages · {{products}} products",
-        "shipping": "Delivery fee:",
-        "note": "Prices, discounts, VAT, delivery fees and stock have been rechecked. Placing the order holds stock for 6 hours and shows a bank transfer QR code."
+        "shipping": "Delivery fee:"
     },
     "validation": {
         "required": "Please fill out this field.",
         "duplicateAddress": "This address is already used by another package. Please choose a different address.",
         "duplicatePackages": "Some packages have the same address. Please remove the duplicate before continuing.",
         "datePast": "The delivery date cannot be in the past.",
-        "timeRequired": "Please select a start and end time.",
         "quantityInvalid": "Enter a valid quantity with at most 3 decimal places.",
         "quantityMax": "Quantity cannot exceed {{max}} {{unit}}.",
         "quantityStep": "Quantity must be a multiple of {{step}} {{unit}}.",
@@ -118,7 +113,6 @@
         "customer": "Please sign in with a customer account to continue.",
         "savedCoupon": "This quote has saved coupons. Re-enter the current codes to keep them when updating.",
         "invalidQuantity": "Choose a valid quantity that does not exceed the remaining quantity for each product.",
-        "invalidTime": "The end time must be later than the start time.",
         "invalidAddress": "Invalid address. Please check the address and city.",
         "geocode": "Could not locate the address. Check it and try again; the map service may be temporarily unavailable.",
         "shippingUnavailable": "Could not calculate the delivery fee. Please try again later.",

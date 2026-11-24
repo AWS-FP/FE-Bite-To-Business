@@ -19,7 +19,7 @@ const statusTone: Record<string, string> = {
  * and the system emails them a rejection automatically.
  */
 export default function RegistrationDuplicates() {
-    const { t, i18n } = useTranslation('registrations');
+    const { t, i18n } = useTranslation('admin');
     const [page, setPage] = useState(0);
     const query = useQuery({
         queryKey: ['admin-registration-duplicates', page],

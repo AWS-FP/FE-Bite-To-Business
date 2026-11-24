@@ -22,7 +22,6 @@ export interface ClaimedPackage {
     orderId: string;
     orderNumber: string;
     deliveryDate: string;
-    deliveryTimeSlot: string | null;
     address: string;
     recipientName: string | null;
     recipientPhone: string | null;
@@ -31,5 +30,13 @@ export interface ClaimedPackage {
     latitude: number | null;
     longitude: number | null;
     claimedAt: string;
+    deliveredAt: string | null;
     cancelled: boolean;
+}
+
+/** Đường đi xe máy từ VietMap; coordinates là [lng, lat]. */
+export interface DeliveryRoute {
+    distanceMetres: number;
+    durationMs: number;
+    coordinates: [number, number][];
 }

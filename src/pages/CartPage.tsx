@@ -9,6 +9,7 @@ import Header from '@/layouts/Header';
 import QuoteSteps from '@/components/customer/checkout/QuoteSteps';
 import QuoteReview from '@/components/customer/checkout/QuoteReview';
 import CartItems from '@/components/customer/checkout/CartItems';
+import DistributionExplorer from '@/components/distribution/DistributionExplorer';
 import PackageForm from '@/components/customer/checkout/PackageForm';
 import { sameDeliveryAddress } from '@/utils/customer/sameDeliveryAddress';
 import type { PackageDraft } from '@/components/customer/checkout/PackageForm';
@@ -82,7 +83,8 @@ export default function CartPage() {
     const session = useAuthStore((state) => state.session);
     const items = useCartStore((state) => state.items);
     const updateQuantity = useCartStore((state) => state.updateQuantity);
-    const clearCart = useCartStore((state) => state.clear);
+    const removePurchased = useCartStore((state) => state.removePurchased);
+    const selectedItems = items.filter((item) => item.selected);
     const resetForm = useQuoteDraftStore((state) => state.resetForm);
     const [step, setStep] = useState(0);
     const [quote, setQuote] = useState<Quote | null>(null);
@@ -108,6 +110,7 @@ export default function CartPage() {
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState('');
     const [packageError, setPackageError] = useState('');
+    const [mapOpen, setMapOpen] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
     // Counts presses of "Review quote total" while the delivery step is incomplete.
     const [reviewAttempt, setReviewAttempt] = useState(0);
@@ -119,7 +122,7 @@ export default function CartPage() {
         if (!resumeDelivery || resumed.current) return;
         resumed.current = true;
         setSearchParams({}, { replace: true });
-        if (session?.user.role === 'CUSTOMER' && items.length > 0) {
+        if (session?.user.role === 'CUSTOMER' && selectedItems.length > 0) {
             void Promise.resolve().then(() => startQuote(2));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps -- run once when arriving with ?step=delivery
@@ -127,14 +130,12 @@ export default function CartPage() {
 
     // First package: prefill it with the delivery details given at registration, so the
     // customer only enters quantities. Skipped once they clear it or after any package exists.
-    const parcelIsEmpty =
-        !parcel.address.trim() && !parcel.name.trim() && !parcel.recipientName.trim();
     const shouldPrefill =
         step === 2 &&
         !!quote &&
         packages.length === 0 &&
-        parcelIsEmpty &&
         !form.profileDefaultDismissed &&
+        !form.profilePrefillApplied &&
         session?.user.role === 'CUSTOMER';
     useEffect(() => {
         if (!shouldPrefill) return;
@@ -142,33 +143,28 @@ export default function CartPage() {
         getCustomerProfile(controller.signal)
             .then((profile) => {
                 const province = (profile.province ?? '').toLowerCase();
-                const city = province.includes('hà nội') || province.includes('ha noi')
-                    ? 'HANOI'
-                    : province.includes('hồ chí minh') || province.includes('ho chi minh')
-                      ? 'HCM'
-                      : null;
+                const city = province.includes('hồ chí minh') || province.includes('ho chi minh') ? 'HCM' : null;
                 const recipient = `${profile.user.lastName ?? ''} ${profile.user.firstName ?? ''}`.trim();
                 updateForm(owner, (current) => {
-                    const empty =
-                        !current.parcel.address.trim() &&
-                        !current.parcel.name.trim() &&
-                        !current.parcel.recipientName.trim();
-                    if (!empty || current.profileDefaultDismissed) return current;
+                    if (current.profileDefaultDismissed || current.profilePrefillApplied) return current;
+                    const profileAddress = city ? (profile.fullDeliveryAddress ?? profile.deliveryAddress ?? '').trim() : '';
+                    const useProfileAddress = !current.parcel.address.trim() && !!profileAddress;
                     return {
                         ...current,
+                        profilePrefillApplied: true,
                         parcel: {
                             ...current.parcel,
-                            name: profile.businessName?.trim() || t('form.defaultPackageName'),
-                            recipientName: recipient,
-                            recipientPhone: profile.user.phone ?? '',
-                            // Only HCM and Hà Nội are served; elsewhere the address is left for the customer.
-                            address: city ? (profile.fullDeliveryAddress ?? profile.deliveryAddress ?? '') : '',
-                            city: city ?? current.parcel.city,
-                            note: profile.deliveryNote ?? '',
-                            addressRefId: undefined,
-                            latitude: undefined,
-                            longitude: undefined,
-                            fromProfile: true,
+                            name: current.parcel.name || profile.businessName?.trim() || t('form.defaultPackageName'),
+                            recipientName: current.parcel.recipientName || recipient,
+                            recipientPhone: current.parcel.recipientPhone || profile.user.phone || '',
+                            // Chỉ phục vụ TP. Hồ Chí Minh; địa chỉ nơi khác để khách tự nhập.
+                            address: useProfileAddress ? profileAddress : current.parcel.address,
+                            city: useProfileAddress ? city! : current.parcel.city,
+                            note: current.parcel.note || profile.deliveryNote || '',
+                            addressRefId: useProfileAddress ? undefined : current.parcel.addressRefId,
+                            latitude: useProfileAddress ? undefined : current.parcel.latitude,
+                            longitude: useProfileAddress ? undefined : current.parcel.longitude,
+                            fromProfile: useProfileAddress ? true : current.parcel.fromProfile,
                         },
                     };
                 });
@@ -184,7 +180,7 @@ export default function CartPage() {
         values: Record<string, QuotePackageAmount>;
     } | null>(null);
     const [packageTotalsError, setPackageTotalsError] = useState(false);
-    const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+    const subtotal = selectedItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
     function go(next: number) {
         setMessage('');
@@ -236,7 +232,7 @@ export default function CartPage() {
         setMessage('');
         try {
             const order = await placeOrderFromQuote(quote.id, quote.revision);
-            clearCart();
+            removePurchased(quote.items.map((item) => item.productId));
             resetForm(owner);
             navigate(ROUTES.ORDER_DETAIL.replace(':orderId', order.orderId), {
                 state: { showPayment: true },
@@ -260,6 +256,7 @@ export default function CartPage() {
     }
 
     async function startQuote(targetStep = 1) {
+        if (selectedItems.length === 0) return;
         if (!session) {
             navigate(ROUTES.LOGIN, { state: { from: { pathname: ROUTES.QUOTES } } });
             return;
@@ -272,7 +269,7 @@ export default function CartPage() {
         setMessage('');
         try {
             let draft = await createQuoteFromCart(
-                items.map((item) => ({ productId: item.id, quantity: item.quantity })),
+                selectedItems.map((item) => ({ productId: item.id, quantity: item.quantity })),
             );
             if (!draft.contactName) {
                 draft = await saveQuoteContact(draft.id, {
@@ -351,11 +348,6 @@ export default function CartPage() {
         event.preventDefault();
         if (!quote) return;
         setPackageError('');
-        const [startTime, endTime] = parcel.deliveryTimeSlot.split(' - ');
-        if (!startTime || !endTime || endTime <= startTime) {
-            setPackageError('errors.invalidTime');
-            return;
-        }
         const selected: { quoteItemId: string; quantity: number }[] = [];
         for (const item of quote.items) {
             const quantity = Number(quantities[item.productId] || 0);
@@ -383,7 +375,7 @@ export default function CartPage() {
                       ? await placeToCoordinates(parcel.addressRefId)
                       : await addressToCoordinates(
                             parcel.address,
-                            parcel.city === 'HCM' ? 'hcm' : 'hanoi',
+                            'hcm',
                         );
         } catch (error) {
             setPackageError(
@@ -400,7 +392,6 @@ export default function CartPage() {
                 recipientName: parcel.recipientName,
                 recipientPhone: parcel.recipientPhone,
                 deliveryDate: parcel.deliveryDate,
-                deliveryTimeSlot: parcel.deliveryTimeSlot,
                 address: parcel.address,
                 city: parcel.city,
                 note: parcel.note || null,
@@ -517,14 +508,6 @@ export default function CartPage() {
                 )}
                 <div className="grid grid-cols-[minmax(0,1fr)_340px] items-start gap-6">
                     <div className="min-w-0 space-y-5">
-                        {step < 2 && parcel.address.trim() && parcel.latitude != null && (
-                            <p
-                                role="status"
-                                className="rounded-xl border border-store-green/30 bg-white px-4 py-3 text-sm text-store-ink"
-                            >
-                                {t('savedDeliveryAddress', { address: parcel.address })}
-                            </p>
-                        )}
                         {step === 0 && <CartItems items={items} updateQuantity={updateQuantity} />}
                         {step === 1 && quote && (
                             <>
@@ -679,7 +662,7 @@ export default function CartPage() {
                                                     {item.address}
                                                 </p>
                                                 <p className="my-1 text-sm text-store-muted">
-                                                    {item.deliveryDate} · {item.deliveryTimeSlot}
+                                                    {item.deliveryDate}
                                                 </p>
                                             </div>
                                             <button
@@ -757,17 +740,8 @@ export default function CartPage() {
                                             setPackageError('');
                                     }}
                                     createPackage={createPackage}
-                                    onPickOnMap={() =>
-                                        navigate(`${ROUTES.DISTRIBUTION_NETWORK}?returnTo=quote-delivery`)
-                                    }
+                                    onPickOnMap={() => setMapOpen(true)}
                                     revealErrors={reviewAttempt}
-                                    onClearProfileDefault={() =>
-                                        updateForm(owner, (current) => ({
-                                            ...current,
-                                            parcel: emptyParcel,
-                                            profileDefaultDismissed: true,
-                                        }))
-                                    }
                                 />
                                 <CouponPicker
                                     quoteId={quote.id}
@@ -864,7 +838,7 @@ export default function CartPage() {
                             <button
                                 type="button"
                                 className={`${primary} mt-5 w-full`}
-                                disabled={!items.length || busy}
+                                disabled={!selectedItems.length || busy}
                                 onClick={() => void startQuote()}
                             >
                                 {busy
@@ -956,6 +930,17 @@ export default function CartPage() {
                 </div>
             </main>
             <Footer />
+            {mapOpen && (
+                <div role="dialog" aria-modal="true" aria-labelledby="delivery-map-title" className="fixed inset-0 z-[100] overflow-y-auto bg-store-cream text-store-ink">
+                    <div className="mx-auto max-w-[1440px] px-8 py-8">
+                        <button type="button" className={secondary} onClick={() => setMapOpen(false)}>
+                            <ArrowLeft size={17} /> {t('back')}
+                        </button>
+                        <h2 id="delivery-map-title" className="mb-0 mt-5 font-subheading text-3xl font-bold">{t('mapTitle')}</h2>
+                        <DistributionExplorer onAddressSelected={() => setMapOpen(false)} />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

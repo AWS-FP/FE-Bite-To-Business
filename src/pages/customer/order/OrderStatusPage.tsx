@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { RotateCw } from 'lucide-react';
 import { isAxiosError } from 'axios';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useCartStore } from '@/store/customer/cartStore';
+import { useLocation, useParams } from 'react-router-dom';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
 import OrderStatusBadge from '@/components/customer/order/OrderStatusBadge';
 import { paymentStatusLabel } from '@/utils/orderStatus';
@@ -14,6 +13,10 @@ import type { CustomerOrderDetail } from '@/types/customer/order';
 import { createBankPayment, getBankPayment } from '@/services/customer/paymentService';
 import type { BankPayment } from '@/types/customer/payment';
 import PageNav from '@/components/common/PageNav';
+import OrderCancellationSection from '@/components/customer/order/OrderCancellationSection';
+import { useOrderCancellation } from '@/hooks/customer/useOrderCancellation';
+import OrderPackageList from '@/components/customer/order/OrderPackageList';
+import { usePackageReturn } from '@/hooks/customer/usePackageReturn';
 
 const money = (value: number) => `${value.toLocaleString('vi-VN')}đ`;
 const QR_LIFETIME_MS = 5 * 60 * 1000;
@@ -34,15 +37,18 @@ export default function OrderStatusPage() {
     const [paymentLoading, setPaymentLoading] = useState(false);
     const [paymentError, setPaymentError] = useState('');
     const [qrError, setQrError] = useState(false);
-    // 'edit' cancels the unpaid order too, then puts its products back in the cart for re-ordering.
-    const [cancelMode, setCancelMode] = useState<'cancel' | 'edit' | null>(null);
-    const navigate = useNavigate();
+    const [cancelOpen, setCancelOpen] = useState(false);
     const [cancelling, setCancelling] = useState(false);
     const [cancelError, setCancelError] = useState('');
     // The QR is shown for QR_LIFETIME_MS, then blurred until the customer asks for a fresh one.
     // A fresh one re-checks with BE that the order can still be paid before showing it again.
     const [qrIssuedAt, setQrIssuedAt] = useState<number | null>(null);
     const [now, setNow] = useState(0);
+    // Gửi trả hàng xong thì tải lại đơn để cập nhật trạng thái kiện.
+    const packageReturn = usePackageReturn(orderId, () => {
+        if (orderId) void getCustomerOrder(orderId).then(setDetail).catch(() => undefined);
+    });
+    const cancellation = useOrderCancellation(detail?.order.orderId === orderId ? detail : null);
 
     useEffect(() => {
         const abort = new AbortController();
@@ -142,32 +148,7 @@ export default function OrderStatusPage() {
             setDetail(cancelled);
             setPayment(null);
             setQrIssuedAt(null);
-            if (cancelMode === 'edit') {
-                // Put the order's quantities back in the cart (not added on top of what is there).
-                const cart = useCartStore.getState();
-                for (const item of cancelled.items) {
-                    const quantity = Number(item.quantity);
-                    const existing = cart.items.find((entry) => entry.id === item.productId);
-                    if (existing) {
-                        cart.setQuantity(item.productId, quantity);
-                    } else {
-                        cart.addItem(
-                            {
-                                id: item.productId,
-                                name: item.nameVi,
-                                nameVi: item.nameVi,
-                                nameEn: item.nameEn,
-                                spec: item.unitCode,
-                                unitPrice: Number(item.saleUnitPrice),
-                            },
-                            quantity,
-                        );
-                    }
-                }
-                navigate(ROUTES.QUOTES);
-                return;
-            }
-            setCancelMode(null);
+            setCancelOpen(false);
         } catch (error) {
             const status = isAxiosError(error) ? error.response?.status : undefined;
             setCancelError(
@@ -251,26 +232,7 @@ export default function OrderStatusPage() {
                                         </div>
                                     ))}
                                 </section>
-                                <section className="rounded-xl border-2 border-store-ink bg-white p-5">
-                                    <h2 className="mt-0 text-xl font-bold">Các kiện giao hàng</h2>
-                                    {detail.packages.length === 0 && (
-                                        <p className="text-sm">Chưa có kiện giao hàng.</p>
-                                    )}
-                                    {detail.packages.map((pack) => (
-                                        <div key={pack.packageId} className="border-t py-3 text-sm">
-                                            <p className="m-0 font-bold">
-                                                {pack.packageName} ({pack.packageNumber}){' '}
-                                                {pack.cancelled ? '— Đã hủy' : ''}
-                                            </p>
-                                            <p className="my-1">{pack.deliveryAddress}</p>
-                                            <p className="m-0 text-xs text-store-muted">
-                                                Ngày: {pack.deliveryDate} ·{' '}
-                                                {pack.deliveryTimeSlot ?? 'Chưa có khung giờ'} ·{' '}
-                                                {pack.recipientName ?? ''}
-                                            </p>
-                                        </div>
-                                    ))}
-                                </section>
+                                <OrderPackageList packages={detail.packages} returns={packageReturn} />
                             </div>
                             <aside className="space-y-5">
                                 <section className="rounded-xl border-2 border-store-ink bg-white p-5 text-sm">
@@ -321,17 +283,7 @@ export default function OrderStatusPage() {
                                                     type="button"
                                                     onClick={() => {
                                                         setCancelError('');
-                                                        setCancelMode('edit');
-                                                    }}
-                                                    className="w-full rounded border border-store-ink bg-white px-4 py-2 font-semibold text-store-ink hover:bg-store-cream"
-                                                >
-                                                    Chỉnh sửa đơn hàng
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        setCancelError('');
-                                                        setCancelMode('cancel');
+                                                        setCancelOpen(true);
                                                     }}
                                                     className="w-full rounded border border-red-300 bg-white px-4 py-2 font-semibold text-red-700 hover:bg-red-50"
                                                 >
@@ -347,35 +299,26 @@ export default function OrderStatusPage() {
                                 {detail.order.paymentStatus === 'SUCCESS' && (
                                     <section role="status" className="rounded-xl border-2 border-store-green bg-green-50 p-5 text-sm">
                                         <h2 className="mt-0 text-lg font-bold text-store-green">Đã thanh toán</h2>
-                                        <p className="mb-0">SePay đã xác nhận giao dịch. Đơn hàng sẽ được chuyển cho bộ phận giao hàng.</p>
+                                        <p className="mb-0">Hệ thống đã xác nhận giao dịch. Đơn hàng sẽ được chuyển cho bộ phận giao hàng.</p>
                                     </section>
                                 )}
+                                <OrderCancellationSection cancellation={cancellation} />
                             </aside>
                         </div>
                     </>
                 )}
             </div>
             <ConfirmModal
-                open={cancelMode !== null}
-                danger={cancelMode === 'cancel'}
-                title={cancelMode === 'edit' ? 'Chỉnh sửa đơn hàng?' : 'Hủy đơn hàng?'}
-                message={
-                    cancelMode === 'edit'
-                        ? 'Để thêm bớt sản phẩm, đơn hiện tại sẽ được hủy (mã QR này không còn dùng được, hàng đang giữ trả lại kho) và các sản phẩm được đưa lại vào giỏ hàng. Bạn sẽ tạo lại gói giao hàng và đặt đơn mới; giá và ưu đãi được tính lại theo thời điểm đặt.'
-                        : 'Đơn sẽ chuyển sang Đã hủy, mã QR thanh toán không còn dùng được và hàng đang giữ được trả lại kho. Thao tác này không hoàn tác được.'
-                }
-                confirmLabel={
-                    cancelling
-                        ? 'Đang xử lý...'
-                        : cancelMode === 'edit'
-                          ? 'Đưa về giỏ hàng'
-                          : 'Hủy đơn hàng'
-                }
+                open={cancelOpen}
+                danger
+                title="Hủy đơn hàng?"
+                message="Đơn sẽ chuyển sang Đã hủy, mã QR thanh toán không còn dùng được và hàng đang giữ được trả lại kho. Thao tác này không hoàn tác được."
+                confirmLabel={cancelling ? 'Đang xử lý...' : 'Hủy đơn hàng'}
                 cancelLabel="Giữ đơn"
                 busy={cancelling}
                 error={cancelError}
                 onConfirm={() => void confirmCancel()}
-                onCancel={() => !cancelling && setCancelMode(null)}
+                onCancel={() => !cancelling && setCancelOpen(false)}
             />
         </StorefrontLayout>
     );

@@ -1,4 +1,4 @@
-import { MapPinned, Plus, Trash2, UserRoundCheck } from 'lucide-react';
+import { MapPinned, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Dispatch, FormEvent, SetStateAction } from 'react';
@@ -12,7 +12,6 @@ export interface PackageDraft {
     recipientName: string;
     recipientPhone: string;
     deliveryDate: string;
-    deliveryTimeSlot: string;
     address: string;
     addressRefId?: string;
     /** Exact point chosen on the distribution page; used instead of geocoding the address text. */
@@ -21,7 +20,7 @@ export interface PackageDraft {
     /** Filled from the delivery details the customer gave at registration. */
     fromProfile?: boolean;
     note: string;
-    city: 'HCM' | 'HANOI';
+    city: 'HCM';
 }
 
 interface PackageFormProps {
@@ -40,7 +39,6 @@ interface PackageFormProps {
     /** Opens the distribution map to pick the address, then comes back to this step. */
     onPickOnMap?: () => void;
     /** Clears the default package filled from the profile. */
-    onClearProfileDefault?: () => void;
     /** Bumped each time the customer tries to continue with products left unallocated. */
     revealErrors?: number;
 }
@@ -64,13 +62,11 @@ export default function PackageForm({
     clearAddressError,
     createPackage,
     onPickOnMap,
-    onClearProfileDefault,
     revealErrors = 0,
 }: PackageFormProps) {
     const { t, i18n } = useTranslation('quote');
     const productName = (item: Quote['items'][number]) =>
         i18n.resolvedLanguage === 'en' ? item.nameEn || item.nameVi : item.nameVi;
-    const [startTime = '', endTime = ''] = parcel.deliveryTimeSlot.split(' - ');
     const [submitted, setSubmitted] = useState(false);
     const [touched, setTouched] = useState<Record<string, boolean>>({});
     const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
@@ -84,7 +80,7 @@ export default function PackageForm({
         const timer = window.setTimeout(() => {
             void searchDeliveryAddresses(
                 parcel.address.trim(),
-                parcel.city === 'HCM' ? 'hcm' : 'hanoi',
+                'hcm',
                 controller.signal,
             )
                 .then((result) => {
@@ -122,8 +118,6 @@ export default function PackageForm({
     if (!parcel.recipientPhone.trim()) errors.recipientPhone = t('validation.required');
     if (!parcel.deliveryDate) errors.deliveryDate = t('validation.required');
     else if (parcel.deliveryDate < todayString) errors.deliveryDate = t('validation.datePast');
-    if (!startTime || !endTime) errors.time = t('validation.timeRequired');
-    else if (endTime <= startTime) errors.time = t('errors.invalidTime');
     if (!parcel.address.trim()) errors.address = t('validation.required');
     else if (
         duplicateAddressError ||
@@ -183,24 +177,6 @@ export default function PackageForm({
             className="rounded-2xl border border-store-ink/20 bg-white p-6"
         >
             <h2 className="m-0 font-subheading text-xl font-bold">{t('form.title')}</h2>
-            {parcel.fromProfile && (
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-store-green/30 bg-surface-green px-4 py-3 text-sm">
-                    <p className="m-0 flex items-center gap-2 text-store-ink">
-                        <UserRoundCheck size={18} className="shrink-0 text-store-green" aria-hidden="true" />
-                        {t('form.profileDefault')}
-                    </p>
-                    {onClearProfileDefault && (
-                        <button
-                            type="button"
-                            onClick={onClearProfileDefault}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-red-300 bg-white px-3 py-1.5 text-xs font-bold text-red-700 hover:bg-red-50"
-                        >
-                            <Trash2 size={14} aria-hidden="true" />
-                            {t('form.clearProfileDefault')}
-                        </button>
-                    )}
-                </div>
-            )}
             <div className="mt-5 grid grid-cols-2 gap-4">
                 <label className="text-sm font-bold">
                     {t('form.name')}
@@ -218,25 +194,7 @@ export default function PackageForm({
                 </label>
                 <label className="text-sm font-bold">
                     {t('form.city')}
-                    <select
-                        className={`${field} mt-2`}
-                        value={parcel.city}
-                        onChange={(e) => {
-                            setSuggestions([]);
-                            setSuggestionError(false);
-                            clearAddressError();
-                            setParcel({
-                                ...parcel,
-                                city: e.target.value as 'HCM' | 'HANOI',
-                                addressRefId: undefined,
-                                latitude: undefined,
-                                longitude: undefined,
-                            });
-                        }}
-                    >
-                        <option value="HCM">{t('form.hcm')}</option>
-                        <option value="HANOI">{t('form.hanoi')}</option>
-                    </select>
+                    <p className={`${field} mt-2 bg-store-cream/60`}>{t('form.hcm')}</p>
                 </label>
                 <label className="text-sm font-bold">
                     {t('form.recipient')}
@@ -292,48 +250,6 @@ export default function PackageForm({
                     />
                     {errorText('deliveryDate')}
                 </label>
-                <fieldset className="min-w-0 border-0 p-0 text-sm font-bold">
-                    <legend>{t('form.time')}</legend>
-                    <div className="mt-2 flex items-center gap-2">
-                        <label className="min-w-0 flex-1">
-                            <span className="sr-only">{t('form.startTime')}</span>
-                            <input
-                                type="time"
-                                className={field}
-                                required
-                                value={startTime}
-                                onBlur={() => markTouched('time')}
-                                aria-invalid={!!showError('time', errors.time)}
-                                onChange={(e) =>
-                                    setParcel({
-                                        ...parcel,
-                                        deliveryTimeSlot: `${e.target.value} - ${endTime}`,
-                                    })
-                                }
-                            />
-                        </label>
-                        <span aria-hidden="true">–</span>
-                        <label className="min-w-0 flex-1">
-                            <span className="sr-only">{t('form.endTime')}</span>
-                            <input
-                                type="time"
-                                className={field}
-                                required
-                                min={startTime || undefined}
-                                value={endTime}
-                                onBlur={() => markTouched('time')}
-                                aria-invalid={!!showError('time', errors.time)}
-                                onChange={(e) =>
-                                    setParcel({
-                                        ...parcel,
-                                        deliveryTimeSlot: `${startTime} - ${e.target.value}`,
-                                    })
-                                }
-                            />
-                        </label>
-                    </div>
-                    {errorText('time')}
-                </fieldset>
                 <div
                     className="relative col-span-2 text-sm font-bold"
                     onBlur={(event) => {
