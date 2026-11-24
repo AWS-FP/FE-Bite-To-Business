@@ -6,7 +6,6 @@ import { useLogisticsText } from './useLogisticsText';
 
 export interface Stock { productId: string; sku: string; name: string; unit: string; imageUrl: string | null; onHand: number; reserved: number; available: number }
 export interface ProductRequest { id: string; productName: string; customerNote: string | null; status: string; createdAt: string }
-export interface CancelledPackage { packageId: string; orderId: string; packageName: string; packageNumber: string; cancelledAt: string }
 interface Page<T> { content: T[]; totalPages: number }
 
 export function useLogisticsList<T>(path: string, keyword = '', loadAll = false) {

@@ -58,10 +58,9 @@ export interface QuotePackage {
     recipientName: string;
     recipientPhone: string;
     deliveryDate: string;
-    deliveryTimeSlot: string;
     address: string;
     note: string | null;
-    city: 'HCM' | 'HANOI';
+    city: 'HCM';
     shippingFee: number;
     distanceMetres: number;
     items: { quoteItemId: string; quantity: number }[];

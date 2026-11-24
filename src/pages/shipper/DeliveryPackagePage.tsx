@@ -27,7 +27,7 @@ export default function DeliveryPackagePage() {
                     )}
                     <div><strong>Người nhận</strong><p>{parcel.recipientName || 'Chưa có thông tin'}<br />{parcel.recipientPhone || 'Chưa có số điện thoại'}</p></div>
                     <div><strong>Địa chỉ giao hàng</strong><p>{parcel.address}</p></div>
-                    <div><strong>Thời gian giao</strong><p>{parcel.deliveryDate} {parcel.deliveryTimeSlot || ''}</p></div>
+                    <div><strong>Ngày giao</strong><p>{parcel.deliveryDate}</p></div>
                     <div><strong>Ghi chú giao hàng</strong><p>{parcel.note || 'Không có ghi chú'}</p></div>
                     {delivered ? (
                         <p className="rounded-lg bg-surface-green p-3 text-sm font-semibold text-store-green">Đã giao xong package này.</p>
@@ -37,7 +37,7 @@ export default function DeliveryPackagePage() {
                         </button>
                     )}
                 </section>
-                <DeliveryMap latitude={parcel.latitude} longitude={parcel.longitude} city={parcel.city} packageId={parcel.packageId} showRouteFromCurrentPosition={!delivered} />
+                <DeliveryMap latitude={parcel.latitude} longitude={parcel.longitude} city={parcel.city} packageId={parcel.packageId} />
             </div>}
             <ConfirmModal
                 open={confirming}

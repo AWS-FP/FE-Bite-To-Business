@@ -132,7 +132,7 @@ export default function EcommerceRefundsPage() {
                                         {new Date(r.createdAt).toLocaleString('vi-VN')}
                                     </p>
                                     <p>
-                                        {tr('Giao', 'Delivery')}: {r.deliveryDate} {r.deliveryTimeSlot ?? ''} · {r.deliveryAddress}
+                                        {tr('Giao', 'Delivery')}: {r.deliveryDate} · {r.deliveryAddress}
                                     </p>
                                     <p className="whitespace-pre-wrap text-[#3b5545]">
                                         {tr('Lý do', 'Reason')}: {r.reason}

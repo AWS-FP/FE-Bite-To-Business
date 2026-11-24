@@ -4,6 +4,7 @@
     "navigation": {
         "registrations": "Quản lý Customer",
         "staff": "Tài khoản Staff",
+        "returns": "Yêu cầu trả hàng",
         "system": "Hệ thống & Báo cáo"
     },
     "header": {

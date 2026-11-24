@@ -236,7 +236,6 @@ export interface ExecutiveRefund {
     packageName: string;
     cancelledAt: string | null;
     deliveryDate: string;
-    deliveryTimeSlot: string | null;
     deliveryAddress: string;
     orderId: string;
     orderNumber: string;

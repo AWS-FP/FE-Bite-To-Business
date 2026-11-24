@@ -54,7 +54,7 @@ export async function completePackage(packageId: string) {
 }
 
 
-/** Đường đi từ vị trí hiện tại tới điểm giao của package (BE gọi VietMap Route). */
+/** Đường đi từ tọa độ xuất phát tới điểm giao của package (BE gọi VietMap Route). */
 export async function getPackageRoute(packageId: string, lat: number, lng: number, signal?: AbortSignal) {
     const response = await http.get<ApiResponse<DeliveryRoute>>(`/api/delivery/packages/${encodeURIComponent(packageId)}/route`, {
         params: { lat, lng },

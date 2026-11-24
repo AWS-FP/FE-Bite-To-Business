@@ -35,8 +35,11 @@ export interface CustomerOrderPackage {
     deliveryAddress: string;
     recipientName: string | null;
     recipientPhone: string | null;
-    deliveryTimeSlot: string | null;
     cancelled: boolean;
+    deliveryStatus: 'WAITING' | 'IN_DELIVERY' | 'DELIVERED' | 'CANCELLED';
+    deliveredAt: string | null;
+    returnStatus: 'REQUESTED' | 'ACCEPTED' | 'REJECTED' | null;
+    returnable: boolean;
 }
 
 export interface CustomerOrderDetail {

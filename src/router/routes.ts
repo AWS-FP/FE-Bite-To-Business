@@ -35,6 +35,7 @@ export const ROUTES = {
     ADMIN_REGISTRATIONS: '/admin/registration-requests',
     ADMIN_REGISTRATION_DETAIL: '/admin/registration-requests/:requestId',
     ADMIN_STAFF: '/admin/staff',
+    ADMIN_PACKAGE_RETURNS: '/admin/package-returns',
     ADMIN_SYSTEM: '/admin/system',
 
     ECOMMERCE: '/e-commerce',
@@ -51,7 +52,6 @@ export const ROUTES = {
     LOGISTICS: '/logistics',
     LOGISTICS_INVENTORY: '/logistics/inventory',
     LOGISTICS_RECEIVE: '/logistics/receive',
-    LOGISTICS_PACKING: '/logistics/packing',
     LOGISTICS_PRODUCT_REQUESTS: '/logistics/product-requests',
 
     DELIVERY: '/delivery',

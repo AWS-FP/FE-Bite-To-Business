@@ -27,20 +27,16 @@ const branches = {
         name: 'Bitexco Financial Tower',
         ...deliveryMapCities.hcm,
     },
-    hanoi: {
-        name: 'Grand Terra',
-        ...deliveryMapCities.hanoi,
-    },
 };
 const tileKey = import.meta.env.VITE_VIETMAP_TILEMAP_KEY?.trim() ?? '';
 
 /** Service area = the same bounding box the map is locked to for each branch city. */
-function inServiceArea(city: 'hcm' | 'hanoi', lng: number, lat: number) {
+function inServiceArea(city: 'hcm', lng: number, lat: number) {
     const [[minLng, minLat], [maxLng, maxLat]] = branches[city].bounds;
     return lng >= minLng && lng <= maxLng && lat >= minLat && lat <= maxLat;
 }
 
-export default function DistributionExplorer() {
+export default function DistributionExplorer({ onAddressSelected }: { onAddressSelected?: () => void } = {}) {
     const navigate = useNavigate();
     // Opened from the delivery-package form on /quotes: go straight back to that step.
     const [searchParams] = useSearchParams();
@@ -56,7 +52,8 @@ export default function DistributionExplorer() {
     const markerRef = useRef<Marker | null>(null);
     const originMarkerRef = useRef<Marker | null>(null);
     const requestRef = useRef(0);
-    const [city, setCity] = useState<'hcm' | 'hanoi'>('hcm');
+    // Chỉ phục vụ TP. Hồ Chí Minh.
+    const city = 'hcm' as const;
     const [mode, setMode] = useState<'search' | 'map'>('search');
     const [point, setPoint] = useState<[number, number] | null>(null);
     const [query, setQuery] = useState('');
@@ -336,13 +333,17 @@ export default function DistributionExplorer() {
             parcel: {
                 ...form.parcel,
                 address,
-                city: city === 'hcm' ? 'HCM' : 'HANOI',
+                city: 'HCM',
                 addressRefId: undefined,
                 latitude: estimate.lat,
                 longitude: estimate.lng,
                 fromProfile: false,
             },
         }));
+        if (onAddressSelected) {
+            onAddressSelected();
+            return;
+        }
         navigate(
             backToPackage
                 ? `${ROUTES.QUOTES}?step=delivery`
@@ -368,30 +369,6 @@ export default function DistributionExplorer() {
                         </h2>
                     </div>
                 </div>
-                <label
-                    htmlFor="delivery-city"
-                    className="font-label text-sm font-bold uppercase text-store-green"
-                >
-                    {t('distribution.city')}
-                </label>
-                <select
-                    id="delivery-city"
-                    value={city}
-                    disabled={loading}
-                    onChange={(event) => {
-                        requestRef.current++;
-                        setCity(event.target.value as 'hcm' | 'hanoi');
-                        setQuery('');
-                        setSuggestions([]);
-                        setEstimate(null);
-                        setPoint(null);
-                        setError('');
-                    }}
-                    className="mt-1.5 mb-4 w-full rounded-xl border-2 border-store-ink bg-store-cream px-4 py-2.5 font-body text-sm outline-none focus:border-store-green"
-                >
-                    <option value="hcm">{t('distribution.hcm')}</option>
-                    <option value="hanoi">{t('distribution.hanoi')}</option>
-                </select>
                 <div className="mb-4 flex gap-3 border-b border-store-line pb-4">
                     <MapPin className="mt-1 shrink-0 text-store-green" size={20} />
                     <div>
@@ -400,11 +377,7 @@ export default function DistributionExplorer() {
                         </p>
                         <p className="m-0 mt-1 font-bold">{branches[city].name}</p>
                         <p className="m-0 mt-1 text-sm text-store-muted">
-                            {t(
-                                city === 'hcm'
-                                    ? 'distribution.hcmAddress'
-                                    : 'distribution.hanoiAddress',
-                            )}
+                            {t('distribution.hcmAddress')}
                         </p>
                     </div>
                 </div>
@@ -420,7 +393,7 @@ export default function DistributionExplorer() {
                             setMode('search');
                             setSuggestions([]);
                         }}
-                        className={`flex-1 rounded-xl border-2 border-store-ink px-3 py-2 text-sm font-bold ${mode === 'search' ? 'bg-store-yellow' : 'bg-white'}`}
+                        className={`flex-1 rounded-xl border-2 border-store-ink px-3 py-2 text-sm font-bold text-store-ink ${mode === 'search' ? 'bg-store-yellow' : 'bg-white'}`}
                     >
                         {t('distribution.enterAddress')}
                     </button>
@@ -431,7 +404,7 @@ export default function DistributionExplorer() {
                             setMode('map');
                             setSuggestions([]);
                         }}
-                        className={`flex-1 rounded-xl border-2 border-store-ink px-3 py-2 text-sm font-bold ${mode === 'map' ? 'bg-store-yellow' : 'bg-white'}`}
+                        className={`flex-1 rounded-xl border-2 border-store-ink px-3 py-2 text-sm font-bold text-store-ink ${mode === 'map' ? 'bg-store-yellow' : 'bg-white'}`}
                     >
                         {t('distribution.chooseOnMap')}
                     </button>
@@ -472,7 +445,7 @@ export default function DistributionExplorer() {
                         }}
                         placeholder={t('distribution.addressPlaceholder')}
                         autoComplete="off"
-                        className="w-full rounded-xl border-2 border-store-ink bg-store-cream py-2.5 pr-4 pl-12 font-body text-sm outline-none focus:border-store-green"
+                        className="w-full rounded-xl border-2 border-store-ink bg-store-cream py-2.5 pr-4 pl-12 font-body text-sm text-store-ink outline-none focus:border-store-green"
                     />
                     {canSuggest && suggestions.length > 0 && (
                         <ul className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-xl border-2 border-store-ink bg-white p-1 shadow-lg">
@@ -481,7 +454,7 @@ export default function DistributionExplorer() {
                                     <button
                                         type="button"
                                         onClick={() => void selectAddress(item)}
-                                        className="w-full rounded-lg px-3 py-2.5 text-left text-sm hover:bg-surface-green"
+                                        className="w-full rounded-lg px-3 py-2.5 text-left text-sm text-store-ink hover:bg-surface-green"
                                     >
                                         {item.display}
                                     </button>
@@ -525,7 +498,7 @@ export default function DistributionExplorer() {
                 {outsideArea && (
                     <p className="m-0 mt-3 text-sm text-red-700" role="alert">
                         {t('distribution.outsideArea', {
-                            city: t(city === 'hcm' ? 'distribution.hcm' : 'distribution.hanoi'),
+                            city: t('distribution.hcm'),
                         })}
                     </p>
                 )}
@@ -536,7 +509,7 @@ export default function DistributionExplorer() {
                     className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-store-ink px-5 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
                 >
                     {t(
-                        backToPackage
+                        onAddressSelected || backToPackage
                             ? 'distribution.useAddressBackToPackage'
                             : cartCount > 0
                               ? 'distribution.useAddressToQuote'
@@ -546,7 +519,7 @@ export default function DistributionExplorer() {
                 </button>
                 <p className="m-0 mt-2 text-xs text-store-muted">
                     {t(
-                        backToPackage
+                        onAddressSelected || backToPackage
                             ? 'distribution.useAddressHintBackToPackage'
                             : cartCount > 0
                               ? 'distribution.useAddressHintQuote'

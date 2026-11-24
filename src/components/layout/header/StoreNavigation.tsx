@@ -26,7 +26,6 @@ export default function StoreNavigation() {
                         ROUTES.LANDING,
                         ROUTES.WHY_BTB,
                         ROUTES.BTB_MODEL,
-                        ROUTES.DISTRIBUTION_NETWORK,
                     ].some((route) => route === pathname)
                   ? 'about'
                   : 'categories';
@@ -37,7 +36,7 @@ export default function StoreNavigation() {
             className="border-0 border-t border-solid border-store-cream/10 bg-store-dark/75"
             aria-label={t('header.navigation')}
         >
-            <div className="mx-auto flex min-h-[42px] max-w-[1440px] items-center gap-4 px-5 py-1">
+            <div className="mx-auto flex min-h-[42px] max-w-[1440px] items-center justify-center gap-4 px-5 py-1">
                 <Link
                     to={ROUTES.CATALOG}
                     className={`${linkStyle(current === 'categories')} text-[12px]`}

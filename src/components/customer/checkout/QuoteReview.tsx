@@ -35,7 +35,7 @@ export default function QuoteReview({ quote, packages, totals }: QuoteReviewProp
                             {item.recipientName} · {item.address}
                         </p>
                         <p className="mb-0 mt-1 text-sm text-store-muted">
-                            {item.deliveryDate} · {item.deliveryTimeSlot}
+                            {item.deliveryDate}
                         </p>
                         <p className="mb-0 mt-2 text-sm font-bold">
                             {t('review.shipping')} {formatCurrencyVnd(Number(item.shippingFee))}
@@ -49,9 +49,6 @@ export default function QuoteReview({ quote, packages, totals }: QuoteReviewProp
                     </div>
                 ))}
             </div>
-            <p className="mb-0 mt-5 rounded-xl bg-store-cream p-4 text-sm leading-relaxed">
-                {t('review.note')}
-            </p>
         </section>
     );
 }
