@@ -162,7 +162,6 @@ function CustomerProductDetailContent({ productId }: { productId?: string }) {
                                 <CustomerRelatedProducts
                                     productId={product.id}
                                     categoryId={product.categoryId}
-                                    brandId={product.brandId}
                                     categoryNameVi={product.categoryNameVi ?? undefined}
                                     categoryNameEn={product.categoryNameEn ?? undefined}
                                 />

@@ -228,6 +228,8 @@
         "shopHomepage": "Browse products"
     },
     "search": {
+        "suggestions": "Search suggestions",
+        "kinds": { "product": "Product", "brand": "Brand", "category": "Category", "query": "Search" },
         "mode": "Search mode",
         "products": "Find products",
         "askAI": "Ask AI",

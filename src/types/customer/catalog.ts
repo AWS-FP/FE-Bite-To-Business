@@ -30,3 +30,8 @@ export interface CatalogProductPage {
     hasNext: boolean;
     hasPrevious: boolean;
 }
+
+export type CatalogSuggestion = {
+    labelVi: string;
+    labelEn: string;
+} & ({ kind: 'product' | 'category' | 'brand'; id: string } | { kind: 'query'; id: null });

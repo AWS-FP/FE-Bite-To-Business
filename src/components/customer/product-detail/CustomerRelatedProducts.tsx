@@ -4,19 +4,17 @@ import CatalogShowcaseCard from '@/components/customer/CatalogShowcaseCard';
 
 export default function CustomerRelatedProducts({
     categoryId,
-    brandId,
     productId,
     categoryNameVi,
     categoryNameEn,
 }: {
     categoryId: string;
-    brandId: string | null;
     productId: string;
     categoryNameVi?: string;
     categoryNameEn?: string;
 }) {
     const { t } = useTranslation('storefront');
-    const products = useRelatedProducts(categoryId, brandId, productId);
+    const products = useRelatedProducts(productId);
     if (!products.length) return null;
     return (
         <section
@@ -34,8 +32,8 @@ export default function CustomerRelatedProducts({
                     <CatalogShowcaseCard
                         key={item.id}
                         product={item}
-                        categoryNameVi={categoryNameVi}
-                        categoryNameEn={categoryNameEn}
+                        categoryNameVi={item.categoryId === categoryId ? categoryNameVi : undefined}
+                        categoryNameEn={item.categoryId === categoryId ? categoryNameEn : undefined}
                     />
                 ))}
             </div>

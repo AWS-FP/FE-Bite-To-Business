@@ -228,6 +228,8 @@
         "shopHomepage": "Trang mua hàng"
     },
     "search": {
+        "suggestions": "Gợi ý tìm kiếm",
+        "kinds": { "product": "Sản phẩm", "brand": "Thương hiệu", "category": "Danh mục", "query": "Tìm kiếm" },
         "mode": "Chế độ tìm kiếm",
         "products": "Tìm sản phẩm",
         "askAI": "Hỏi AI",

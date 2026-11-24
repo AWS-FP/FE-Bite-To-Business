@@ -1,128 +1,56 @@
-import { useEffect, useRef, useState } from 'react';
 import { Sparkles, Trash2, X } from 'lucide-react';
-import type { FormEvent, MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { getCatalogSearchPath } from '../../../constants/catalogNavigation';
-import useSearchHistory from '../../../hooks/useSearchHistory';
+import { useStoreSearch } from '@/hooks/customer/useStoreSearch';
+import { SEARCH_MAX_LENGTH } from '@/constants/catalogSearch';
 import SearchModeDropdown from './SearchModeDropdown';
 
 export default function StoreSearch() {
     const { t } = useTranslation('storefront');
-    const navigate = useNavigate();
-    const [keyword, setKeyword] = useState('');
-    const [searchMode, setSearchMode] = useState<'products' | 'ai'>('products');
-    const [showAINotice, setShowAINotice] = useState(false);
-    const [isSearching, setIsSearching] = useState(false);
-    const { historyEntries, recordSearch, deleteSearch, clearHistory, deleting, deleteError } =
-        useSearchHistory();
-    const historyRef = useRef<HTMLElement>(null);
-    const dragRef = useRef<{ startX: number; initialScroll: number; moved: boolean } | null>(null);
-    const suppressHistoryClick = useRef(false);
-
-    function startDrag(event: React.PointerEvent<HTMLElement>) {
-        if (event.pointerType !== 'mouse' || event.button !== 0) return;
-        const container = historyRef.current;
-        if (!container) return;
-        dragRef.current = {
-            startX: event.clientX,
-            initialScroll: container.scrollLeft,
-            moved: false,
-        };
-    }
-    function moveDrag(event: React.PointerEvent<HTMLElement>) {
-        const drag = dragRef.current;
-        const container = historyRef.current;
-        if (!drag || !container) return;
-        const distance = event.clientX - drag.startX;
-        if (Math.abs(distance) > 5) drag.moved = true;
-        if (drag.moved) {
-            container.scrollLeft = drag.initialScroll - distance;
-            suppressHistoryClick.current = true;
-        }
-    }
-    function stopDrag() {
-        dragRef.current = null;
-        // Pointerup occurs before click; keep the guard until the browser dispatches it.
-        window.setTimeout(() => {
-            suppressHistoryClick.current = false;
-        }, 0);
-    }
-    // Mouse-wheel scrolling moves search chips horizontally. A non-passive native
-    // listener is required because React registers wheel listeners as passive.
-    useEffect(() => {
-        const container = historyRef.current;
-        if (!container) return;
-
-        function handleHistoryWheel(event: WheelEvent) {
-            if (!container || event.ctrlKey) return;
-            // Touchpads already send horizontal deltaX; let the browser handle those.
-            if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
-
-            const maxScroll = container.scrollWidth - container.clientWidth;
-            if (maxScroll <= 1 || event.deltaY === 0) return;
-            const multiplier =
-                event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? container.clientWidth : 1;
-            const distance = event.deltaY * multiplier;
-            const nextScroll = Math.max(0, Math.min(maxScroll, container.scrollLeft + distance));
-            // At either end, do not trap the wheel: allow the page to scroll normally.
-            if (Math.abs(nextScroll - container.scrollLeft) < 0.5) return;
-            event.preventDefault();
-            container.scrollLeft = nextScroll;
-        }
-
-        container.addEventListener('wheel', handleHistoryWheel, { passive: false });
-        return () => container.removeEventListener('wheel', handleHistoryWheel);
-    }, [historyEntries.length]);
-
-    async function handleSearch(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault();
-        await searchFor(keyword);
-    }
-
-    async function searchFor(value: string) {
-        const searchText = value.replace(/\s+/gu, ' ').trim();
-        if (!searchText) return;
-
-        if (searchMode === 'ai') {
-            setShowAINotice(true);
-            return;
-        }
-
-        if (isSearching) return;
-        setIsSearching(true);
-        try {
-            const shouldNavigate = await recordSearch(searchText);
-            if (shouldNavigate) navigate(getCatalogSearchPath(searchText));
-        } finally {
-            setIsSearching(false);
-        }
-    }
-
-    async function handleHistoryClick(event: MouseEvent<HTMLAnchorElement>, word: string) {
-        if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey || event.button !== 0)
-            return;
-        event.preventDefault();
-        await searchFor(word);
-    }
-
+    const {
+        keyword,
+        changeKeyword,
+        searchMode,
+        changeMode,
+        showAINotice,
+        isSearching,
+        historyEntries,
+        deleteSearch,
+        confirmClear,
+        deleting,
+        deleteError,
+        historyRef,
+        guardHistoryDrag,
+        startDrag,
+        moveDrag,
+        stopDrag,
+        handleSearch,
+        handleHistoryClick,
+        setOpen,
+        suggestions,
+        inputRef,
+        menuRef,
+        handleKeys,
+    } = useStoreSearch();
     return (
-        <div className="min-w-0 max-w-[720px] flex-[1_1_720px]">
+        <div
+            onBlur={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+            }}
+            onKeyDown={handleKeys}
+            className="relative min-w-0 max-w-[720px] flex-[1_1_720px]"
+        >
             <form
                 className="focus-border-group flex h-[52px] min-w-0 items-center rounded-full border-2 border-solid border-store-ink bg-store-cream shadow-[3px_3px_0_var(--color-store-ink)] focus-within:border-store-green"
                 role="search"
                 aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.label')}
                 onSubmit={handleSearch}
             >
-                <SearchModeDropdown
-                    value={searchMode}
-                    onChange={(mode) => {
-                        setSearchMode(mode);
-                        setShowAINotice(false);
-                    }}
-                />
+                <SearchModeDropdown value={searchMode} onChange={changeMode} />
 
                 <input
+                    ref={inputRef}
                     className="h-9 min-w-0 flex-1 rounded-full border-0 bg-transparent px-2.5 text-[12px] text-store-ink outline-none placeholder:text-store-muted"
                     type="search"
                     name="q"
@@ -130,9 +58,11 @@ export default function StoreSearch() {
                     placeholder={t(
                         searchMode === 'ai' ? 'search.aiPlaceholder' : 'search.placeholder',
                     )}
-                    maxLength={100}
+                    autoComplete="off"
+                    onFocus={() => setOpen(true)}
+                    maxLength={SEARCH_MAX_LENGTH}
                     value={keyword}
-                    onChange={(event) => setKeyword(event.target.value)}
+                    onChange={(event) => changeKeyword(event.target.value)}
                 />
 
                 <button
@@ -154,6 +84,28 @@ export default function StoreSearch() {
                 </button>
             </form>
 
+            {suggestions.length > 0 && (
+                <nav
+                    ref={menuRef}
+                    aria-label={t('search.suggestions')}
+                    className="absolute inset-x-0 z-50 max-h-80 overflow-y-auto rounded-xl bg-white p-2 text-store-ink shadow-lg"
+                >
+                    {suggestions.map((item) => (
+                        <Link
+                            key={item.key}
+                            to={item.path}
+                            onClick={(event) =>
+                                void handleHistoryClick(event, item.keyword, item.path)
+                            }
+                            className="flex justify-between gap-3 rounded px-3 py-2 text-sm hover:bg-store-cream focus:bg-store-cream"
+                        >
+                            <span>{item.label}</span>
+                            <small>{t(`search.kinds.${item.kind}`)}</small>
+                        </Link>
+                    ))}
+                </nav>
+            )}
+
             {showAINotice && (
                 <p className="mt-2 px-2 text-[11px] leading-[1.5] text-store-cream" role="status">
                     {t('search.aiUnavailable')}
@@ -171,12 +123,7 @@ export default function StoreSearch() {
                         onPointerUp={stopDrag}
                         onPointerCancel={stopDrag}
                         onPointerLeave={stopDrag}
-                        onClickCapture={(event) => {
-                            if (suppressHistoryClick.current) {
-                                event.preventDefault();
-                                event.stopPropagation();
-                            }
-                        }}
+                        onClickCapture={guardHistoryDrag}
                     >
                         {historyEntries.map((entry) => (
                             <span
@@ -209,10 +156,7 @@ export default function StoreSearch() {
                     <button
                         type="button"
                         disabled={deleting}
-                        onClick={() => {
-                            if (window.confirm(t('searchHistory.confirmClear')))
-                                void clearHistory();
-                        }}
+                        onClick={confirmClear}
                         className="inline-flex shrink-0 cursor-pointer items-center gap-1 whitespace-nowrap rounded-full border border-white/20 bg-transparent px-2.5 py-1.5 text-[11px] text-store-cream hover:bg-red-500/20 disabled:opacity-50"
                     >
                         <Trash2 size={12} aria-hidden="true" />
