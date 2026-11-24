@@ -150,7 +150,7 @@ export default function LandingBusinessSolution({
                                     }
                                 }}
                             >
-                                <div className="flex items-center justify-between font-heading text-[19px] font-normal text-store-cream">
+                                <div className="flex items-center justify-between font-heading text-[19px] font-bold text-store-cream">
                                     <span>1. Đặt hàng nhanh &amp; Đặt lại đơn cũ chỉ 1 chạm</span>
                                     <span>
                                         <img
@@ -180,7 +180,7 @@ export default function LandingBusinessSolution({
                                     }
                                 }}
                             >
-                                <div className="flex items-center justify-between font-heading text-[19px] font-normal text-store-cream">
+                                <div className="flex items-center justify-between font-heading text-[19px] font-bold text-store-cream">
                                     <span>2. Nguồn hàng ổn định, cam kết đủ 100% mới xác nhận</span>
                                     <span>
                                         <img
@@ -209,7 +209,7 @@ export default function LandingBusinessSolution({
                                     }
                                 }}
                             >
-                                <div className="flex items-center justify-between font-heading text-[19px] font-normal text-store-cream">
+                                <div className="flex items-center justify-between font-heading text-[19px] font-bold text-store-cream">
                                     <span>
                                         3. Chia nhiều điểm giao &amp; Theo dõi tuyến Vietmap
                                     </span>
@@ -240,7 +240,7 @@ export default function LandingBusinessSolution({
                                     }
                                 }}
                             >
-                                <div className="flex items-center justify-between font-heading text-[19px] font-normal text-store-cream">
+                                <div className="flex items-center justify-between font-heading text-[19px] font-bold text-store-cream">
                                     <span>
                                         4. Giá bậc thang Volume Pricing &amp; Chứng từ minh bạch
                                     </span>

@@ -1,4 +1,4 @@
-import { Box, ClipboardList, Mail, Menu, PackagePlus } from 'lucide-react';
+import { Box, Mail, Menu, PackagePlus } from 'lucide-react';
 import WorkspaceSidebar from '@/layouts/WorkspaceSidebar';
 import { ROUTES } from '@/router/routes';
 import { useTranslation } from 'react-i18next';
@@ -16,12 +16,11 @@ export default function LogisticsSidebar({ open, onClose, isCollapsed, onToggleC
 
     return (
         <>
-            {open && <button type="button" className="lg-sidebar-backdrop" aria-label="Đóng menu" onClick={onClose} />}
+            {open && <button type="button" className="lg-sidebar-backdrop" aria-label={vietnamese ? 'Đóng menu' : 'Close menu'} onClick={onClose} />}
             <WorkspaceSidebar
                 sidebarId="logistics-sidebar"
                 className={`lg-shared-sidebar ${open ? 'lg-shared-sidebar--open' : ''}`}
                 workspaceLabel={vietnamese ? 'KHÔNG GIAN LÀM VIỆC' : 'WORKSPACE'}
-                logoSrc="/images/storefront/brand-logo.png"
                 isCollapsed={isCollapsed}
                 onToggleCollapse={onToggleCollapse}
                 onNavigate={onClose}
@@ -36,7 +35,6 @@ export default function LogisticsSidebar({ open, onClose, isCollapsed, onToggleC
                     {
                         label: vietnamese ? 'ĐIỀU PHỐI & YÊU CẦU KHÁCH' : 'DISPATCH & REQUESTS',
                         items: [
-                            { path: ROUTES.LOGISTICS_PACKING, label: vietnamese ? 'Package đã hủy' : 'Cancelled packages', icon: <ClipboardList size={18} /> },
                             { path: ROUTES.LOGISTICS_PRODUCT_REQUESTS, label: vietnamese ? 'Yêu cầu thêm SP' : 'Product requests', icon: <Mail size={18} /> },
                         ],
                     },
@@ -47,5 +45,6 @@ export default function LogisticsSidebar({ open, onClose, isCollapsed, onToggleC
 }
 
 export function LogisticsMenuButton({ onClick }: { onClick: () => void }) {
-    return <button type="button" className="lg-mobile-menu lg-icon-button" aria-label="Mở menu" onClick={onClick}><Menu size={22} /></button>;
+    const { i18n } = useTranslation();
+    return <button type="button" className="lg-mobile-menu lg-icon-button" aria-label={i18n.resolvedLanguage === 'en' ? 'Open menu' : 'Mở menu'} onClick={onClick}><Menu size={22} /></button>;
 }

@@ -1,134 +1,134 @@
-import { Camera, CheckCircle2, ImagePlus, UploadCloud, UserRound, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import type { ChangeEvent } from 'react';
+import { Camera, UserRound } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type { CustomerProfile } from '@/types/customer/profile';
-import { uploadCustomerAvatar } from '@/services/customer/profileService';
+import {
+    getCustomerAvatarHistory,
+    restoreCustomerAvatar,
+    uploadCustomerAvatar,
+} from '@/services/customer/profileService';
+import AvatarPhotoDialog from '@/components/common/profile/AvatarPhotoDialog';
 import { useAuthStore } from '@/store/admin/authStore';
-import { getAuthError } from '@/utils/admin/authError';
-import AvatarCropper from './AvatarCropper';
 
-const avatarHistoryKey = (userId: string) => `btb:customer-avatar-history:${userId}`;
-function readAvatarHistory(userId: string): string[] {
+/** Migrate earlier browser-only thumbnail history without trusting client URLs in the restore API. */
+function readLegacyHistory(userId: string): string[] {
     try {
-        const value: unknown = JSON.parse(localStorage.getItem(avatarHistoryKey(userId)) || '[]');
-        return Array.isArray(value)
-            ? value
-                  .filter(
-                      (url): url is string => typeof url === 'string' && url.startsWith('https://'),
-                  )
-                  .slice(0, 6)
-            : [];
+        const parsed: unknown = JSON.parse(
+            localStorage.getItem(`btb:customer-avatar-history:${userId}`) || '[]',
+        );
+        if (!Array.isArray(parsed)) return [];
+        return parsed
+            .filter((url): url is string => {
+                if (typeof url !== 'string') return false;
+                try {
+                    const parsedUrl = new URL(url);
+                    return (
+                        parsedUrl.protocol === 'https:' &&
+                        parsedUrl.hostname === 'res.cloudinary.com' &&
+                        parsedUrl.pathname.includes('/image/upload/') &&
+                        parsedUrl.pathname.includes('/avatars/')
+                    );
+                } catch {
+                    return false;
+                }
+            })
+            .slice(0, 6);
     } catch {
         return [];
     }
 }
-function saveAvatarHistory(userId: string, urls: string[]) {
+
+/** Legacy photos are re-uploaded like any other user-supplied photo, not assigned by URL. */
+async function reuploadLegacyPhoto(url: string): Promise<CustomerProfile> {
+    const response = await fetch(url, { mode: 'cors', credentials: 'omit' });
+    if (!response.ok) throw new Error('Unable to retrieve older photo');
+    const original = await response.blob();
+    if (!original.size || original.size > 5 * 1024 * 1024 || !original.type.startsWith('image/')) {
+        throw new Error('Invalid previous photo');
+    }
+    const bitmap = await createImageBitmap(original);
     try {
-        localStorage.setItem(avatarHistoryKey(userId), JSON.stringify(urls));
-    } catch {
-        /* Storage may be unavailable. */
+        const canvas = document.createElement('canvas');
+        const ratio = Math.min(1, 1024 / Math.max(bitmap.width, bitmap.height));
+        canvas.width = Math.max(1, Math.round(bitmap.width * ratio));
+        canvas.height = Math.max(1, Math.round(bitmap.height * ratio));
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('Unable to restore photo');
+        ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        const blob = await new Promise<Blob>((resolve, reject) => {
+            canvas.toBlob(
+                (result) =>
+                    result ? resolve(result) : reject(new Error('Unable to convert photo')),
+                'image/jpeg',
+                0.9,
+            );
+        });
+        return uploadCustomerAvatar(
+            new File([blob], 'previous-avatar.jpg', { type: 'image/jpeg' }),
+        );
+    } finally {
+        bitmap.close();
     }
 }
 
 export default function ProfileAccountCard({ profile }: { profile: CustomerProfile }) {
-    const { t, i18n } = useTranslation(['profile', 'storefront']);
-    const ui = (key: string) => t(`storefront:customerUI.${key}`);
+    const { t, i18n } = useTranslation('profile');
     const queryClient = useQueryClient();
-    const inputRef = useRef<HTMLInputElement>(null);
-    const [step, setStep] = useState<'choose' | 'crop' | null>(null);
-    const [fileUrl, setFileUrl] = useState<string | null>(null);
-    const [uploading, setUploading] = useState(false);
+    const [photoOpen, setPhotoOpen] = useState(false);
+    const [recent, setRecent] = useState<string[]>([]);
+    const [legacyRecent] = useState<string[]>(() => readLegacyHistory(profile.user.id));
+    const [loadingHistory, setLoadingHistory] = useState(false);
+    const [historyError, setHistoryError] = useState(false);
     const [message, setMessage] = useState('');
-    const [error, setError] = useState(false);
-    // FE-only history for this browser. Durable multi-device history needs a BE API/table.
-    const [recentAvatars, setRecentAvatars] = useState<string[]>(() =>
-        readAvatarHistory(profile.user.id),
-    );
 
-    useEffect(
-        () => () => {
-            if (fileUrl) URL.revokeObjectURL(fileUrl);
-        },
-        [fileUrl],
-    );
     useEffect(() => {
-        if (!step) return;
-        function onEscape(event: KeyboardEvent) {
-            if (event.key === 'Escape' && !uploading) setStep(null);
-        }
-        document.addEventListener('keydown', onEscape);
-        return () => document.removeEventListener('keydown', onEscape);
-    }, [step, uploading]);
+        if (!photoOpen) return;
+        let active = true;
+        getCustomerAvatarHistory()
+            .then((urls) => {
+                if (active) setRecent(urls);
+            })
+            .catch(() => {
+                if (active) {
+                    setRecent([]);
+                    setHistoryError(true);
+                }
+            })
+            .finally(() => {
+                if (active) setLoadingHistory(false);
+            });
+        return () => {
+            active = false;
+        };
+    }, [photoOpen, profile.user.id]);
 
-    function choosePhoto(event: ChangeEvent<HTMLInputElement>) {
-        const file = event.target.files?.[0];
-        event.target.value = '';
-        if (!file) return;
+    function applyUpdatedProfile(updated: CustomerProfile, sessionVersion: number) {
+        const state = useAuthStore.getState();
+        // A stale upload response must not overwrite a different login session.
         if (
-            !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) ||
-            file.size > 5 * 1024 * 1024 ||
-            !file.size
-        ) {
-            setError(true);
-            setMessage(t('avatarInvalid'));
+            !state.session ||
+            state.sessionVersion !== sessionVersion ||
+            state.session.user.id !== updated.user.id
+        )
             return;
-        }
-        setError(false);
-        setMessage('');
-        setFileUrl(URL.createObjectURL(file));
-        setStep('crop');
+        state.updateSession(sessionVersion, { ...state.session, user: updated.user });
+        queryClient.setQueryData(['customer-profile', updated.user.id], updated);
+        setMessage(t('avatarSaved'));
     }
 
-    async function applyCrop(dataUrl: string) {
+    async function upload(file: File) {
         const sessionVersion = useAuthStore.getState().sessionVersion;
-        setUploading(true);
-        setError(false);
-        setMessage('');
-        try {
-            // AvatarCropper outputs a JPEG; WEBP selections are normalized to JPEG for the BE API.
-            const response = await fetch(dataUrl);
-            const blob = await response.blob();
-            const file = new File([blob], 'customer-avatar.jpg', {
-                type: 'image/jpeg',
-            });
-            const updated = await uploadCustomerAvatar(file);
-            // A new URL is returned only after the backend accepts the upload.
-            const previousUrl = profile.user.avatarUrl;
-            if (previousUrl && previousUrl !== updated.user.avatarUrl) {
-                const history = [previousUrl, ...readAvatarHistory(profile.user.id)]
-                    .filter(
-                        (url, index, all) =>
-                            url !== updated.user.avatarUrl && all.indexOf(url) === index,
-                    )
-                    .slice(0, 6);
-                saveAvatarHistory(profile.user.id, history);
-                setRecentAvatars(history);
-            }
-            const state = useAuthStore.getState();
-            if (
-                state.session &&
-                state.sessionVersion === sessionVersion &&
-                state.session.user.id === updated.user.id
-            ) {
-                state.updateSession(sessionVersion, {
-                    ...state.session,
-                    user: updated.user,
-                });
-                queryClient.setQueryData(['customer-profile', updated.user.id], updated);
-                setMessage(t('avatarSaved'));
-                setStep(null);
-                setFileUrl(null);
-            }
-        } catch (uploadError) {
-            setError(true);
-            setMessage(
-                `${t('avatarError')} ${t('errorCode', { code: getAuthError(uploadError).code })}`,
-            );
-        } finally {
-            setUploading(false);
-        }
+        const updated = await uploadCustomerAvatar(file);
+        applyUpdatedProfile(updated, sessionVersion);
+    }
+
+    async function restore(url: string) {
+        const sessionVersion = useAuthStore.getState().sessionVersion;
+        const updated = recent.includes(url)
+            ? await restoreCustomerAvatar(url)
+            : await reuploadLegacyPhoto(url);
+        applyUpdatedProfile(updated, sessionVersion);
     }
 
     const name = (
@@ -151,13 +151,13 @@ export default function ProfileAccountCard({ profile }: { profile: CustomerProfi
                 <button
                     type="button"
                     onClick={() => {
-                        setError(false);
                         setMessage('');
-                        setStep('choose');
+                        setLoadingHistory(true);
+                        setHistoryError(false);
+                        setPhotoOpen(true);
                     }}
                     aria-label={t('changeAvatar')}
-                    disabled={uploading}
-                    className="group relative grid size-20 shrink-0 cursor-pointer place-items-center overflow-hidden rounded-full border-2 border-store-yellow bg-store-cream text-store-green disabled:opacity-60"
+                    className="group relative grid size-20 shrink-0 cursor-pointer place-items-center overflow-hidden rounded-full border-2 border-store-yellow bg-store-cream text-store-green"
                 >
                     {profile.user.avatarUrl ? (
                         <img
@@ -168,7 +168,7 @@ export default function ProfileAccountCard({ profile }: { profile: CustomerProfi
                     ) : (
                         <UserRound size={27} />
                     )}
-                    <span className="absolute inset-0 grid place-items-center bg-black/35 text-white opacity-0 transition group-hover:opacity-100 group-focus:opacity-100">
+                    <span className="absolute inset-0 grid place-items-center bg-black/35 text-white opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
                         <Camera size={23} />
                     </span>
                 </button>
@@ -178,158 +178,23 @@ export default function ProfileAccountCard({ profile }: { profile: CustomerProfi
                     <p className="mb-0 mt-2 inline-flex rounded-full bg-white/10 px-3 py-1 text-xs">
                         {customerType}
                     </p>
-                    {uploading && (
-                        <p role="status" className="mb-0 mt-2 text-xs">
-                            {t('avatarUploading')}
-                        </p>
-                    )}
                     {message && (
-                        <p
-                            role={error ? 'alert' : 'status'}
-                            className={`mb-0 mt-2 text-xs ${error ? 'text-red-200' : 'text-green-200'}`}
-                        >
+                        <p role="status" className="mb-0 mt-2 text-xs text-green-200">
                             {message}
                         </p>
                     )}
                 </div>
             </div>
-            <input
-                ref={inputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="sr-only"
-                onChange={choosePhoto}
-            />
-            {step && (
-                <div
-                    className="fixed inset-0 z-[200] flex items-center justify-center overflow-y-auto bg-[#061910]/80 p-3 backdrop-blur-sm sm:p-6"
-                    role="presentation"
-                    onMouseDown={(event) => {
-                        if (event.target === event.currentTarget && !uploading) setStep(null);
-                    }}
-                >
-                    <div
-                        role="dialog"
-                        aria-modal="true"
-                        aria-label={ui(step === 'choose' ? 'avatarChooseTitle' : 'avatarCropTitle')}
-                        className="my-auto w-full max-w-[560px] overflow-hidden rounded-[28px] border border-white/15 bg-gradient-to-b from-[#0e412d] to-[#08291e] text-white shadow-2xl"
-                    >
-                        <div className="flex items-center justify-between gap-3 border-b border-white/10 px-6 py-5">
-                            <div className="flex items-center gap-3">
-                                <span className="grid h-10 w-10 place-items-center rounded-xl bg-store-yellow text-store-green">
-                                    <Camera size={23} />
-                                </span>
-                                <h2 className="m-0 font-subheading text-xl font-extrabold sm:text-2xl">
-                                    {ui(
-                                        step === 'choose' ? 'avatarChooseTitle' : 'avatarCropTitle',
-                                    )}
-                                </h2>
-                            </div>
-                            <button
-                                onClick={() => {
-                                    if (!uploading) setStep(null);
-                                }}
-                                type="button"
-                                aria-label={ui('avatarCancel')}
-                                className="grid h-9 w-9 cursor-pointer place-items-center rounded-full bg-white/10 text-store-yellow hover:bg-white/20"
-                            >
-                                <X size={21} />
-                            </button>
-                        </div>
-                        <div className="px-5 pb-6 pt-5 sm:px-7">
-                            {step === 'choose' ? (
-                                <>
-                                    <button
-                                        type="button"
-                                        onClick={() => inputRef.current?.click()}
-                                        className="flex min-h-[240px] w-full cursor-pointer flex-col items-center justify-center rounded-[22px] border-2 border-dashed border-store-yellow/60 bg-white/5 p-8 text-center transition hover:bg-white/10"
-                                    >
-                                        <span className="grid h-16 w-16 place-items-center rounded-full bg-store-yellow text-store-green">
-                                            <ImagePlus size={31} />
-                                        </span>
-                                        <span className="mt-5 inline-flex items-center gap-2 rounded-full bg-store-yellow px-6 py-3 text-sm font-bold text-store-green">
-                                            <UploadCloud size={18} />
-                                            {ui('avatarUpload')}
-                                        </span>
-                                        <span className="mt-4 text-xs text-white/70">
-                                            {ui('avatarHint')}
-                                        </span>
-                                    </button>
-                                    {(profile.user.avatarUrl || recentAvatars.length > 0) && (
-                                        <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-5">
-                                            <h3 className="m-0 text-sm font-bold text-store-yellow">
-                                                {ui('avatarRecent')}
-                                            </h3>
-                                            <div className="mt-4 flex flex-wrap items-center gap-3">
-                                                {[profile.user.avatarUrl, ...recentAvatars]
-                                                    .filter((url): url is string => Boolean(url))
-                                                    .filter(
-                                                        (url, index, list) =>
-                                                            list.indexOf(url) === index,
-                                                    )
-                                                    .map((url, index) => (
-                                                        <div
-                                                            key={url}
-                                                            className="flex flex-col items-center gap-1.5"
-                                                        >
-                                                            <img
-                                                                src={url}
-                                                                alt={
-                                                                    index === 0
-                                                                        ? ui('avatarCurrent')
-                                                                        : ui('avatarPrevious')
-                                                                }
-                                                                className={`h-16 w-16 rounded-full border-2 object-cover ${index === 0 ? 'border-store-yellow' : 'border-white/30'}`}
-                                                                loading="lazy"
-                                                            />
-                                                            <span className="text-[10px] text-white/75">
-                                                                {index === 0
-                                                                    ? ui('avatarCurrent')
-                                                                    : ui('avatarPrevious')}
-                                                            </span>
-                                                        </div>
-                                                    ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                    {error && (
-                                        <p role="alert" className="mt-3 text-sm text-red-200">
-                                            {message}
-                                        </p>
-                                    )}
-                                </>
-                            ) : fileUrl ? (
-                                <>
-                                    <p className="mt-0 text-center text-xs text-white/75">
-                                        {ui('avatarCropHint')}
-                                    </p>
-                                    <AvatarCropper
-                                        key={fileUrl}
-                                        src={fileUrl}
-                                        onApply={(dataUrl) => {
-                                            void applyCrop(dataUrl);
-                                        }}
-                                        onBack={() => setStep('choose')}
-                                    />
-                                    {uploading && (
-                                        <p
-                                            role="status"
-                                            className="mt-3 flex items-center gap-2 text-xs text-store-yellow"
-                                        >
-                                            <CheckCircle2 size={16} />
-                                            {t('avatarUploading')}
-                                        </p>
-                                    )}
-                                    {error && (
-                                        <p role="alert" className="mt-3 text-xs text-red-200">
-                                            {message}
-                                        </p>
-                                    )}
-                                </>
-                            ) : null}
-                        </div>
-                    </div>
-                </div>
+            {photoOpen && (
+                <AvatarPhotoDialog
+                    currentUrl={profile.user.avatarUrl}
+                    recentUrls={[...recent, ...legacyRecent]}
+                    loadingHistory={loadingHistory}
+                    historyError={historyError}
+                    onClose={() => setPhotoOpen(false)}
+                    onUpload={upload}
+                    onRestore={restore}
+                />
             )}
         </>
     );

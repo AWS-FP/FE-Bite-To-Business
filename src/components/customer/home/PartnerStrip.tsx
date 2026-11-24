@@ -1,27 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getCatalogBrands } from '@/services/customer/catalogReadService';
-import type { CatalogBrand } from '@/services/customer/catalogReadService';
+import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
+import { ROUTES } from '@/router/routes';
+import { usePartnerBrands } from '@/hooks/customer/usePartnerBrands';
 
 export default function PartnerStrip() {
     const { t } = useTranslation('storefront');
-    const [brands, setBrands] = useState<CatalogBrand[]>([]);
-    const [error, setError] = useState(false);
+    const { brands, error } = usePartnerBrands();
     const trackRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const controller = new AbortController();
-        getCatalogBrands(controller.signal)
-            .then((items) => {
-                if (!controller.signal.aborted)
-                    setBrands(items.filter((item) => Boolean(item.logoUrl?.trim())));
-            })
-            .catch(() => {
-                if (!controller.signal.aborted) setError(true);
-            });
-        return () => controller.abort();
-    }, []);
-
+    // Chỉ là hiệu ứng cuộn của dải logo (UI), dữ liệu lấy từ usePartnerBrands.
     useEffect(() => {
         if (
             !brands.length ||
@@ -55,9 +44,17 @@ export default function PartnerStrip() {
             aria-label={t('homePage.partnerTitle')}
         >
             <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
-                <h2 className="mb-5 mt-0 text-center font-subheading text-lg font-bold sm:text-xl">
-                    {t('homePage.partnerTitle')}
-                </h2>
+                <div className="mb-5 flex flex-wrap items-center justify-center gap-4 sm:justify-between">
+                    <h2 className="m-0 font-subheading text-lg font-bold sm:text-xl">
+                        {t('homePage.partnerTitle')}
+                    </h2>
+                    <Link
+                        to={ROUTES.BRANDS}
+                        className="inline-flex items-center gap-2 text-sm font-extrabold text-store-green no-underline hover:underline"
+                    >
+                        {t('brandPage.allBrands')} <ArrowRight size={16} />
+                    </Link>
+                </div>
             </div>
             {brands.length > 0 ? (
                 <div className="overflow-hidden" aria-label={t('customerUI.brandLogos')}>
@@ -69,9 +66,11 @@ export default function PartnerStrip() {
                                 className="flex shrink-0 items-center gap-5 pr-5"
                             >
                                 {brands.map((brand) => (
-                                    <div
+                                    <Link
                                         key={brand.id}
-                                        className="flex h-20 w-36 shrink-0 items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm"
+                                        to={brand.path}
+                                        tabIndex={copy === 1 ? -1 : undefined}
+                                        className="flex h-20 w-36 shrink-0 items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm transition-transform hover:scale-105"
                                         title={brand.name}
                                     >
                                         <img
@@ -80,7 +79,7 @@ export default function PartnerStrip() {
                                             className="h-full w-full object-contain"
                                             loading="lazy"
                                         />
-                                    </div>
+                                    </Link>
                                 ))}
                             </div>
                         ))}

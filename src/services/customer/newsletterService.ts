@@ -1,10 +1,6 @@
 import { publicHttp } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
-
-export interface NewsletterSubscription {
-    message: string;
-    email: string;
-}
+import type { NewsletterSubscription } from '@/types/customer/newsletter';
 
 /** Public Customer module API. Requires consent=true; no authentication needed. */
 export async function subscribeNewsletter(email: string): Promise<NewsletterSubscription> {

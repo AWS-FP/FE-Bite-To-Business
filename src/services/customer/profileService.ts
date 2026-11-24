@@ -26,3 +26,17 @@ export async function uploadCustomerAvatar(file: File) {
     );
     return response.data.data;
 }
+
+/** Server-side history; URLs cannot be supplied freely when restoring. */
+export async function getCustomerAvatarHistory(): Promise<string[]> {
+    const response = await http.get<ApiResponse<string[]>>('/api/customer/profile/avatars');
+    return response.data.data;
+}
+
+export async function restoreCustomerAvatar(avatarUrl: string): Promise<CustomerProfile> {
+    const response = await http.put<ApiResponse<CustomerProfile>>(
+        '/api/customer/profile/avatar/restore',
+        { avatarUrl },
+    );
+    return response.data.data;
+}

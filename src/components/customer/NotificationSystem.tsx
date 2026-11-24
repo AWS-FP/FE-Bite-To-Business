@@ -15,15 +15,19 @@ import {
     X,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { INITIAL_NOTIFICATIONS } from '../../constants/customer/homeData';
 import { useAuthStore } from '@/store/admin/authStore';
 import {
     getCustomerNotifications,
+    getUnreadNotificationCount,
+    getNotificationPreferences,
+    updateNotificationPreferences,
     markAllNotificationsRead,
     markNotificationRead,
 } from '@/services/customer/notificationService';
-import type { CustomerNotification } from '@/services/customer/notificationService';
-import type { NotificationItemData } from '../../constants/customer/homeData';
+import type { CustomerNotification, CustomerNotificationPreferences } from '@/types/customer/notification';
+import type { NotificationItemData } from '@/types/customer/homeData';
 
 export interface NotificationSystemProps {
     isOpen?: boolean;
@@ -31,7 +35,7 @@ export interface NotificationSystemProps {
     onClose?: () => void;
 }
 
-type Filter = 'all' | NotificationItemData['category'];
+type Filter = 'all' | 'system' | 'delivery';
 
 function toNotificationItem(item: CustomerNotification, english: boolean): NotificationItemData {
     const category =
@@ -50,11 +54,15 @@ function toNotificationItem(item: CustomerNotification, english: boolean): Notif
         description: english ? item.contentEn : item.contentVi,
         timeAgo: new Date(item.createdAt).toLocaleString(english ? 'en-US' : 'vi-VN'),
         unread: !item.isRead,
+        actionUrl:
+            item.actionUrl?.startsWith('/') && !item.actionUrl.startsWith('//')
+                ? item.actionUrl
+                : undefined,
     };
 }
-type PreferenceKey = 'quoteApproval' | 'quoteExpiry' | 'deliveryEta' | 'sourcingReply';
+type PreferenceKey = 'deliveryEta' | 'sourcingReply';
 
-type Preferences = Record<PreferenceKey, boolean>;
+type Preferences = CustomerNotificationPreferences;
 
 const DEFAULT_PREFS: Preferences = {
     quoteApproval: true,
@@ -66,7 +74,6 @@ const DEFAULT_PREFS: Preferences = {
 const FILTERS: { key: Filter; label: string }[] = [
     { key: 'all', label: 'notifFilterAll' },
     { key: 'system', label: 'notifFilterUpdates' },
-    { key: 'quote', label: 'notifFilterQuotes' },
     { key: 'delivery', label: 'notifFilterDelivery' },
 ];
 
@@ -93,17 +100,19 @@ function PreferenceRow({
     description,
     checked,
     onToggle,
+    disabled = false,
 }: {
     title: string;
     description: string;
     checked: boolean;
     onToggle: () => void;
+    disabled?: boolean;
 }) {
     return (
         <div className="flex items-center justify-between gap-4 py-3.5">
             <div className="min-w-0 flex-1">
-                <p className="m-0 text-[13px] font-bold leading-5 text-store-ink">{title}</p>
-                <p className="m-0 mt-1 text-[11px] leading-[1.6] text-store-muted">{description}</p>
+                <p className="m-0 text-sm font-bold leading-5 text-store-ink">{title}</p>
+                <p className="m-0 mt-1 text-xs leading-[1.6] text-store-muted">{description}</p>
             </div>
 
             <button
@@ -112,7 +121,8 @@ function PreferenceRow({
                 aria-checked={checked}
                 aria-label={title}
                 onClick={onToggle}
-                className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full !border-0 p-0 !shadow-none transition-colors duration-200 focus:!border-0 focus:!shadow-none focus:!outline-none focus-visible:!outline-2 focus-visible:!outline-offset-2 focus-visible:!outline-store-yellow ${
+                disabled={disabled}
+                className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full !border-0 p-0 !shadow-none transition-colors duration-200 disabled:cursor-wait disabled:opacity-60 focus:!border-0 focus:!shadow-none focus:!outline-none focus-visible:!outline-2 focus-visible:!outline-offset-2 focus-visible:!outline-store-yellow ${
                     checked ? 'bg-store-green' : 'bg-surface-soft'
                 }`}
             >
@@ -135,7 +145,10 @@ export default function NotificationSystem({
     const { t, i18n } = useTranslation('storefront');
     const ui = (key: string) => t(`customerUI.${key}`);
     const english = i18n.resolvedLanguage?.startsWith('en') ?? false;
-    const isCustomer = useAuthStore((state) => state.session?.user.role === 'CUSTOMER');
+    const customerId = useAuthStore((state) =>
+        state.session?.user.role === 'CUSTOMER' ? state.session.user.id : null,
+    );
+    const isCustomer = Boolean(customerId);
     const [localIsOpen, setLocalIsOpen] = useState(false);
     const isOpen = controlledIsOpen ?? localIsOpen;
 
@@ -148,14 +161,40 @@ export default function NotificationSystem({
     const [view, setView] = useState<'list' | 'settings'>('list');
     const [selected, setSelected] = useState<NotificationItemData | null>(null);
     const [preferences, setPreferences] = useState<Preferences>(DEFAULT_PREFS);
+    const [preferencesLoadedFor, setPreferencesLoadedFor] = useState<string | null>(null);
+    const preferencesReady = Boolean(customerId && preferencesLoadedFor === customerId);
+    const [preferencesBusy, setPreferencesBusy] = useState(false);
+    const [preferencesError, setPreferencesError] = useState(false);
+    const [refreshNotifications, setRefreshNotifications] = useState(0);
+    const [serverUnreadCount, setServerUnreadCount] = useState<number | null>(null);
 
     useEffect(() => {
-        if (!isCustomer) return;
+        // Fetch preferences only when the customer actually opens Settings.
+        if (!customerId || !isOpen || view !== 'settings' || preferencesLoadedFor === customerId) return;
+        let alive = true;
+        getNotificationPreferences()
+            .then((result) => {
+                if (!alive) return;
+                setPreferences(result);
+                setPreferencesLoadedFor(customerId);
+                setPreferencesError(false);
+            })
+            .catch(() => {
+                if (alive) setPreferencesError(true);
+            });
+        return () => {
+            alive = false;
+        };
+    }, [customerId, isOpen, view, preferencesLoadedFor]);
+
+    useEffect(() => {
+        if (!isCustomer || !isOpen) return;
         let active = true;
-        getCustomerNotifications(0, 20)
-            .then((page) => {
+        Promise.all([getCustomerNotifications(0, 20), getUnreadNotificationCount()])
+            .then(([page, unread]) => {
                 if (active) {
                     setNotifications(page.content.map((item) => toNotificationItem(item, english)));
+                    setServerUnreadCount(unread);
                     setLoadError(false);
                 }
             })
@@ -165,9 +204,11 @@ export default function NotificationSystem({
         return () => {
             active = false;
         };
-    }, [isCustomer, isOpen, english]);
+    }, [isCustomer, isOpen, english, refreshNotifications]);
 
-    const unreadCount = notifications.filter((item) => item.unread).length;
+    const unreadCount = isCustomer
+        ? (serverUnreadCount ?? notifications.filter((item) => item.unread).length)
+        : notifications.filter((item) => item.unread).length;
 
     const visibleNotifications = useMemo(
         () =>
@@ -202,7 +243,10 @@ export default function NotificationSystem({
     }
 
     function markRead(id: string) {
-        if (isCustomer) void markNotificationRead(id).catch(() => setLoadError(true));
+        if (isCustomer) {
+            void markNotificationRead(id).catch(() => setLoadError(true));
+            setServerUnreadCount((count) => (count === null ? null : Math.max(0, count - 1)));
+        }
         setNotifications((current) =>
             current.map((item) => (item.id === id ? { ...item, unread: false } : item)),
         );
@@ -214,11 +258,22 @@ export default function NotificationSystem({
         setSelected(item);
     }
 
-    function setPreference(key: PreferenceKey) {
-        setPreferences((previous) => ({
-            ...previous,
-            [key]: !previous[key],
-        }));
+    async function setPreference(key: PreferenceKey) {
+        if (!customerId || !preferencesReady || preferencesBusy) return;
+        setPreferencesBusy(true);
+        setPreferencesError(false);
+        try {
+            const updated = await updateNotificationPreferences({
+                ...preferences,
+                [key]: !preferences[key],
+            });
+            setPreferences(updated);
+            setRefreshNotifications((current) => current + 1);
+        } catch {
+            setPreferencesError(true);
+        } finally {
+            setPreferencesBusy(false);
+        }
     }
 
     return (
@@ -231,7 +286,7 @@ export default function NotificationSystem({
                     aria-label="Notifications"
                     aria-expanded={isOpen}
                     aria-haspopup="dialog"
-                    className={`relative flex size-[42px] cursor-pointer items-center justify-center rounded-full border-2 border-solid border-store-ink text-store-ink shadow-[2px_2px_0_var(--color-store-ink)] transition-colors ${
+                    className={`relative flex size-[52px] cursor-pointer items-center justify-center rounded-full border-2 border-solid border-store-ink text-store-ink shadow-[2px_2px_0_var(--color-store-ink)] transition-colors ${
                         isOpen ? 'bg-store-yellow' : 'bg-store-cream hover:bg-store-yellow'
                     }`}
                 >
@@ -249,34 +304,23 @@ export default function NotificationSystem({
                     <div
                         role="dialog"
                         aria-label="Purchasing notifications"
-                        className="absolute right-0 top-[54px] z-[80] flex w-[min(420px,calc(100vw-24px))] max-h-[min(78vh,640px)] flex-col overflow-hidden rounded-[24px] border border-solid border-store-line bg-surface-green text-store-ink shadow-[0_20px_60px_color-mix(in_srgb,_var(--color-store-dark)_28%,_transparent)]"
+                        className="fixed inset-x-3 top-[max(5rem,env(safe-area-inset-top))] z-[80] flex max-h-[min(80dvh,680px)] flex-col overflow-hidden rounded-[22px] border border-solid border-store-line bg-white text-store-ink shadow-[0_24px_80px_rgba(0,0,0,0.22)] sm:absolute sm:inset-x-auto sm:right-0 sm:top-[60px] sm:w-[420px] sm:max-w-[calc(100vw-24px)]"
                     >
                         {/* HEADER - Một lớp bo góc duy nhất */}
-                        <div className="shrink-0 bg-store-green px-5 pb-4 pt-4 text-white">
+                        <div className="shrink-0 bg-store-green px-5 pb-5 pt-5 text-white">
                             <div className="flex min-w-0 items-start justify-between gap-3">
                                 <div className="min-w-0">
-                                    {view === 'settings' && (
-                                        <button
-                                            type="button"
-                                            onClick={() => setView('list')}
-                                            className="mb-2 inline-flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-[11px] font-semibold text-white/75 hover:text-white"
-                                        >
-                                            <ArrowLeft size={13} />
-                                            {ui('notificationBack')}
-                                        </button>
-                                    )}
-
                                     <p className="m-0 text-[10px] font-extrabold uppercase tracking-[0.14em] text-store-yellow">
                                         BITE TO BUSINESS
                                     </p>
 
-                                    <h3 className="m-0 mt-1 font-subheading text-[19px] font-bold leading-6">
+                                    <h3 className="m-0 mt-1 font-subheading text-[21px] font-bold leading-7">
                                         {view === 'list'
                                             ? ui('notificationTitle')
                                             : ui('notificationSettings')}
                                     </h3>
 
-                                    <p className="m-0 mt-1 text-[11px] leading-4 text-store-muted-light">
+                                    <p className="m-0 mt-1 text-xs leading-5 text-white/75">
                                         {view === 'list'
                                             ? ui('notificationDesc')
                                             : ui('notificationSettingsDesc')}
@@ -300,7 +344,7 @@ export default function NotificationSystem({
                                         onClick={() =>
                                             setView(view === 'list' ? 'settings' : 'list')
                                         }
-                                        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border border-solid border-white/15 bg-white/10 text-white transition-colors hover:bg-white/20"
+                                        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-solid border-white/20 bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-store-yellow"
                                     >
                                         {view === 'list' ? (
                                             <Settings2 size={17} />
@@ -315,7 +359,7 @@ export default function NotificationSystem({
                         {view === 'list' ? (
                             <>
                                 {/* FILTER BAR */}
-                                <div className="shrink-0 border-0 border-b border-solid border-store-line bg-white px-4 pb-3 pt-3">
+                                <div className="shrink-0 border-0 border-b border-solid border-store-line bg-white px-4 pb-3 pt-3 sm:px-5">
                                     <div className="flex items-center justify-between gap-3">
                                         <span className="text-[11px] font-bold text-store-muted">
                                             {ui('notifInbox')}{' '}
@@ -327,10 +371,12 @@ export default function NotificationSystem({
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                if (isCustomer)
+                                                if (isCustomer) {
                                                     void markAllNotificationsRead().catch(() =>
                                                         setLoadError(true),
                                                     );
+                                                    setServerUnreadCount(0);
+                                                }
                                                 setNotifications((list) =>
                                                     list.map((n) => ({ ...n, unread: false })),
                                                 );
@@ -343,7 +389,7 @@ export default function NotificationSystem({
                                         </button>
                                     </div>
 
-                                    <div className="mt-3 flex flex-nowrap gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                                    <div className="mt-3 flex flex-wrap gap-2">
                                         {FILTERS.map((tab) => (
                                             <button
                                                 key={tab.key}
@@ -352,8 +398,8 @@ export default function NotificationSystem({
                                                 aria-pressed={filter === tab.key}
                                                 className={`shrink-0 cursor-pointer whitespace-nowrap rounded-full border border-solid px-3 py-1.5 text-[11px] font-bold transition-colors ${
                                                     filter === tab.key
-                                                        ? 'border-store-green bg-store-green text-white'
-                                                        : 'border-store-line bg-surface-green text-store-muted hover:border-store-line'
+                                                        ? 'border-store-green bg-store-green text-white shadow-sm'
+                                                        : 'border-store-line bg-white text-store-muted hover:border-store-green/40 hover:bg-surface-green'
                                                 }`}
                                             >
                                                 {ui(tab.label)}
@@ -363,7 +409,7 @@ export default function NotificationSystem({
                                 </div>
 
                                 {/* NOTIFICATION LIST */}
-                                <div className="min-h-0 flex-1 space-y-2 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden overscroll-contain bg-surface-green p-3 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                                <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto overscroll-contain bg-[#f7f8f3] p-3 sm:p-4">
                                     {visibleNotifications.length === 0 ? (
                                         <div className="flex min-h-[185px] flex-col items-center justify-center px-4 text-center">
                                             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-green text-store-ink">
@@ -384,10 +430,10 @@ export default function NotificationSystem({
                                                 key={item.id}
                                                 type="button"
                                                 onClick={() => openDetail(item)}
-                                                className={`group w-full cursor-pointer rounded-2xl border border-solid p-3.5 text-left transition-all hover:-translate-y-0.5 hover:border-store-line hover:shadow-sm ${
+                                                className={`group w-full cursor-pointer rounded-2xl border border-solid p-4 text-left transition-all hover:border-store-green/40 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-store-green ${
                                                     item.unread
-                                                        ? 'border-store-line bg-white'
-                                                        : 'border-store-line bg-surface-green opacity-85'
+                                                        ? 'border-store-green/25 bg-white'
+                                                        : 'border-store-line bg-white/65'
                                                 }`}
                                             >
                                                 <div className="flex items-start gap-3">
@@ -406,11 +452,11 @@ export default function NotificationSystem({
                                                             )}
                                                         </div>
 
-                                                        <h4 className="font-subheading m-0 mt-2 text-[12px] font-bold leading-[1.5] text-store-ink">
+                                                        <h4 className="font-subheading m-0 mt-2 line-clamp-2 text-[13px] font-bold leading-[1.5] text-store-ink">
                                                             {item.title}
                                                         </h4>
 
-                                                        <p className="m-0 mt-1 line-clamp-2 text-[11px] leading-[1.65] text-store-muted">
+                                                        <p className="m-0 mt-1 line-clamp-2 text-xs leading-[1.6] text-store-muted">
                                                             {item.description}
                                                         </p>
 
@@ -434,7 +480,7 @@ export default function NotificationSystem({
                                 {/* FOOTER */}
                                 <div className="flex shrink-0 items-center justify-between gap-3 border-0 border-t border-solid border-store-line bg-white px-4 py-3">
                                     <span className="text-[10px] text-store-muted">
-                                        {isCustomer ? ui('notifSystem') : ui('notifSystem')}
+                                        {ui('notifSystem')}
                                     </span>
 
                                     {!isCustomer && (
@@ -453,31 +499,41 @@ export default function NotificationSystem({
                         ) : (
                             <>
                                 {/* NOTIFICATION SETTINGS */}
-                                <div className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden overscroll-contain bg-surface-green p-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                                    <div className="rounded-2xl border border-solid border-store-line bg-white p-4">
-                                        <div className="mb-1 flex items-center gap-2 text-xs font-extrabold text-store-ink">
-                                            <FileText size={16} />
-                                            {ui('notificationQuotes')}
+                                <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-[#f7f8f3] p-4">
+                                    {isCustomer && !preferencesReady && !preferencesError && (
+                                        <p
+                                            role="status"
+                                            className="mb-3 rounded-lg bg-white px-3 py-2 text-xs text-store-muted"
+                                        >
+                                            {ui('notificationPreferencesLoading')}
+                                        </p>
+                                    )}
+                                    {isCustomer && preferencesError && (
+                                        <div
+                                            role="alert"
+                                            className="mb-3 rounded-lg bg-white px-3 py-2 text-xs text-danger"
+                                        >
+                                            {ui('notificationPreferencesError')}
+                                            {!preferencesReady && (
+                                                <button
+                                                    type="button"
+                                                    className="ml-2 font-bold underline"
+                                                    onClick={() => {
+                                                        setPreferencesError(false);
+                                                        void getNotificationPreferences()
+                                                            .then((data) => {
+                                                                setPreferences(data);
+                                                                setPreferencesLoadedFor(customerId);
+                                                            })
+                                                            .catch(() => setPreferencesError(true));
+                                                    }}
+                                                >
+                                                    {ui('notificationPreferencesRetry')}
+                                                </button>
+                                            )}
                                         </div>
-
-                                        <div className="divide-y divide-[var(--color-surface-soft)]">
-                                            <PreferenceRow
-                                                title={ui('notificationApproval')}
-                                                description={ui('notificationApprovalDesc')}
-                                                checked={preferences.quoteApproval}
-                                                onToggle={() => setPreference('quoteApproval')}
-                                            />
-
-                                            <PreferenceRow
-                                                title={ui('notificationExpiry')}
-                                                description={ui('notificationExpiryDesc')}
-                                                checked={preferences.quoteExpiry}
-                                                onToggle={() => setPreference('quoteExpiry')}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-3 rounded-2xl border border-solid border-store-line bg-white p-4">
+                                    )}
+                                    <div className="rounded-2xl border border-solid border-store-line bg-white p-4 shadow-sm">
                                         <div className="mb-1 flex items-center gap-2 text-xs font-extrabold text-store-ink">
                                             <Truck size={16} />
                                             {ui('notificationLogistics')}
@@ -488,31 +544,29 @@ export default function NotificationSystem({
                                                 title={ui('notificationDelivery')}
                                                 description={ui('notificationDeliveryDesc')}
                                                 checked={preferences.deliveryEta}
-                                                onToggle={() => setPreference('deliveryEta')}
-                                            />
-
-                                            <PreferenceRow
-                                                title={ui('notificationSourcing')}
-                                                description={ui('notificationSourcingDesc')}
-                                                checked={preferences.sourcingReply}
-                                                onToggle={() => setPreference('sourcingReply')}
+                                                disabled={
+                                                    !isCustomer ||
+                                                    !preferencesReady ||
+                                                    preferencesBusy
+                                                }
+                                                onToggle={() => void setPreference('deliveryEta')}
                                             />
                                         </div>
                                     </div>
 
-                                    <p className="mt-3 text-[11px] leading-5 text-store-muted">
-                                        {ui('notificationSessionNote')}
-                                    </p>
-                                </div>
-
-                                <div className="shrink-0 border-t border-store-line bg-white p-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => setView('list')}
-                                        className="w-full cursor-pointer rounded-xl border-0 bg-store-green px-4 py-3 text-[12px] font-bold text-white hover:bg-store-green"
-                                    >
-                                        {ui('notificationBack')}
-                                    </button>
+                                    <div className="rounded-2xl border border-solid border-store-line bg-white p-4 shadow-sm">
+                                        <div className="mb-1 flex items-center gap-2 text-xs font-extrabold text-store-ink">
+                                            <FileText size={16} />
+                                            {ui('notificationProductRequests')}
+                                        </div>
+                                        <PreferenceRow
+                                            title={ui('notificationSourcing')}
+                                            description={ui('notificationSourcingDesc')}
+                                            checked={preferences.sourcingReply}
+                                            disabled={!isCustomer || !preferencesReady || preferencesBusy}
+                                            onToggle={() => void setPreference('sourcingReply')}
+                                        />
+                                    </div>
                                 </div>
                             </>
                         )}
@@ -596,11 +650,14 @@ export default function NotificationSystem({
                                 </div>
                             ) : null}
 
-                            {!selected.isSystemUpdatePopup && (
-                                <p className="m-0 rounded-xl bg-surface-green p-3 text-[11px] leading-5 text-store-muted">
-                                    This is a sample notification. Related purchasing actions will
-                                    be available after backend integration.
-                                </p>
+                            {selected.actionUrl && (
+                                <Link
+                                    to={selected.actionUrl}
+                                    onClick={() => setSelected(null)}
+                                    className="inline-flex rounded-lg bg-store-green px-4 py-2 text-xs font-bold text-white no-underline"
+                                >
+                                    {ui('notificationOpenRelated')}
+                                </Link>
                             )}
                         </div>
 

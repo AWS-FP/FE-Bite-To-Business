@@ -8,10 +8,11 @@ import CategorySection from '../components/customer/home/CategorySection';
 import ProductsSection from '../components/customer/home/ProductsSection';
 import CombosSection from '../components/customer/home/CombosSection';
 import CommitmentSection from '../components/customer/home/CommitmentSection';
-import NewsletterSection from '../components/customer/home/NewsletterSection';
+import { useAuthStore } from '@/store/admin/authStore';
 
 export default function HomePage() {
     const { hash } = useLocation();
+    const isLoggedIn = useAuthStore((state) => Boolean(state.session?.user));
     useEffect(() => {
         if (!hash) return;
         const id = decodeURIComponent(hash.slice(1));
@@ -28,8 +29,7 @@ export default function HomePage() {
                 <CategorySection />
                 <ProductsSection />
                 <CombosSection />
-                <CommitmentSection />
-                <NewsletterSection />
+                {!isLoggedIn && <CommitmentSection />}
             </StorefrontLayout>
         </HomeModelProvider>
     );

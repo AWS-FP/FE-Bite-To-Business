@@ -1,14 +1,26 @@
 import type { ReactNode } from 'react';
-export default function LogisticsPageShell({ title, description, children }: { title: string; description: string; children: ReactNode }) {
-    return <div className="mx-auto max-w-[1200px] space-y-6 text-store-ink"><header><h1 className="font-heading text-3xl font-bold">{title}</h1><p className="mt-2 text-store-muted">{description}</p></header>{children}</div>;
+import { useLogisticsText } from '@/hooks/logistic/useLogisticsText';
+export function LogisticsPageHeader({ number, label, title, description, children }: { number: string; label: string; title: string; description?: string; children?: ReactNode }) {
+    return <header className="flex items-start justify-between gap-6 text-black">
+        <div>
+            <div className="flex items-center gap-2.5 font-body text-[11px] font-semibold uppercase tracking-[1.2px]">
+                <span className="grid size-[25px] place-items-center rounded-[3px] border border-black bg-store-cream tracking-normal">{number}</span>
+                <span>{label}</span>
+            </div>
+            <h1 className="pt-2 font-heading text-[34px] leading-[44px] tracking-[-1px]">{title}</h1>
+            {description && <p className="pt-2 text-[13px] leading-[21px] text-store-muted">{description}</p>}
+        </div>
+        {children}
+    </header>;
 }
-export function Pagination({ page, totalPages, setPage }: { page: number; totalPages: number; setPage: (page: number) => void }) {
-    if (totalPages <= 1) return null;
-    return <div className="flex items-center gap-3 py-4"><button type="button" disabled={page === 0} onClick={() => setPage(page - 1)} className="rounded border px-3 py-2 disabled:opacity-40">Trước</button><span>Trang {page + 1} / {totalPages}</span><button type="button" disabled={page + 1 >= totalPages} onClick={() => setPage(page + 1)} className="rounded border px-3 py-2 disabled:opacity-40">Sau</button></div>;
+
+export default function LogisticsPageShell({ number, label, title, description, children }: { number: string; label: string; title: string; description: string; children: ReactNode }) {
+    return <div className="mx-auto max-w-[1200px] space-y-6 text-black"><LogisticsPageHeader number={number} label={label} title={title} description={description} />{children}</div>;
 }
 export function ListStatus({ loading, error, empty }: { loading: boolean; error: string; empty: boolean }) {
-    if (loading) return <p role="status">Đang tải dữ liệu...</p>;
+    const { tr } = useLogisticsText();
+    if (loading) return <p role="status">{tr('Đang tải dữ liệu...')}</p>;
     if (error) return <p role="alert" className="text-red-700">{error}</p>;
-    if (empty) return <p className="text-store-muted">Chưa có dữ liệu.</p>;
+    if (empty) return <p className="text-store-muted">{tr('Chưa có dữ liệu.')}</p>;
     return null;
 }

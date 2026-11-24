@@ -1,28 +1,7 @@
 import { http, publicHttp } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
-
-export interface CustomerReview {
-    id: string;
-    productId: string;
-    customerId: string;
-    reviewerName: string;
-    rating: number;
-    content: string | null;
-    createdAt: string;
-    updatedAt: string;
-    images: { id: string; imageUrl: string; sortOrder: number }[];
-}
-export interface CustomerReviewsPage {
-    content: CustomerReview[];
-    page: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
-}
-export interface ProductReviewsPage extends CustomerReviewsPage {
-    averageRating: number | null;
-}
-export interface ReviewInput { rating: number; content?: string }
+import { createBatchLoader } from '@/services/batchLoader';
+import type { CustomerReview, CustomerReviewsPage, ProductReviewsPage, ReviewInput, ReviewSummary } from '@/types/customer/review';
 
 export async function getMyReviews(page = 0, size = 10) {
     const { data } = await http.get<ApiResponse<CustomerReviewsPage>>('/api/customer/reviews', { params: { page, size } });
@@ -34,6 +13,23 @@ export async function getProductReviews(productId: string, page = 0, size = 10) 
     );
     return data.data;
 }
+
+/** Rating summary for a whole grid of products in one request (instead of one per card). */
+export const reviewSummaries = createBatchLoader<ReviewSummary>({
+    fetchMany: async (ids) => {
+        const { data } = await publicHttp.get<ApiResponse<ReviewSummary[]>>(
+            '/api/catalog/products/review-summaries',
+            { params: { ids: ids.join(',') } },
+        );
+        return new Map(data.data.map((item) => [item.productId, item]));
+    },
+    // Older server without the batch endpoint: fall back to the per-product page (size 1).
+    fetchOne: async (id) => {
+        const page = await getProductReviews(id, 0, 1);
+        return { productId: id, reviewCount: page.totalElements, averageRating: page.averageRating };
+    },
+});
+
 export async function createReview(productId: string, input: ReviewInput, images: File[] = []) {
     const form = new FormData();
     form.append('productId', productId);

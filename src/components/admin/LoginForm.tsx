@@ -1,4 +1,4 @@
-import { ArrowLeft, Eye, EyeOff, LoaderCircle } from 'lucide-react';
+import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import { useRef, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import useAuth from '@/hooks/admin/useAuth';
 import { getAuthError, type AuthError } from '@/utils/admin/authError';
 import { loginSchema } from '@/validations/admin/authSchema';
 import AuthField from './AuthField';
+import PageNav from '@/components/common/PageNav';
 
 export default function LoginForm() {
     const { t } = useTranslation();
@@ -19,7 +20,6 @@ export default function LoginForm() {
     );
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [showPasswordHelp, setShowPasswordHelp] = useState(false);
     const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
     const [serverError, setServerError] = useState<AuthError | null>(null);
     const emailRef = useRef<HTMLInputElement>(null);
@@ -80,13 +80,9 @@ export default function LoginForm() {
 
     return (
         <>
-            <Link
-                className="auth-back-home mb-[18px] inline-flex items-center gap-[5px] text-[12px] font-bold text-black no-underline hover:text-auth-green"
-                to={ROUTES.HOME}
-            >
-                <ArrowLeft size={14} aria-hidden="true" />
-                {t('auth.home')}
-            </Link>
+            <div className="mb-[18px] flex justify-end">
+                <PageNav back={{ label: t('auth.home'), to: ROUTES.HOME }} />
+            </div>
             <h1 id="auth-title">{t('login.title')}</h1>
             {location.state?.activationComplete && (
                 <p
@@ -94,6 +90,14 @@ export default function LoginForm() {
                     role="status"
                 >
                     {t('login.activationComplete')}
+                </p>
+            )}
+            {location.state?.passwordResetComplete && (
+                <p
+                    className="mt-5 mb-0 rounded-xl border border-solid border-auth-green/15 bg-surface-green px-4 py-[14px] text-[13px] leading-[1.6] text-auth-green"
+                    role="status"
+                >
+                    {t('login.passwordResetComplete')}
                 </p>
             )}
             <form
@@ -177,27 +181,14 @@ export default function LoginForm() {
                 </AuthField>
 
                 <div className="auth-forgot-row -mt-2 flex justify-end">
-                    <button
-                        className="auth-text-button border-0 bg-transparent px-0 py-[3px] text-[12px] leading-[1.5] font-bold
- text-auth-green underline-offset-4 hover:underline"
-                        type="button"
-                        aria-expanded={showPasswordHelp}
-                        aria-controls="password-help"
-                        onClick={() => setShowPasswordHelp(!showPasswordHelp)}
+                    <Link
+                        className="auth-text-button px-0 py-[3px] text-[12px] leading-[1.5] font-bold text-auth-green no-underline underline-offset-4 hover:underline"
+                        to={ROUTES.FORGOT_PASSWORD}
+                        state={{ email }}
                     >
                         {t('login.forgotPassword')}
-                    </button>
+                    </Link>
                 </div>
-                {showPasswordHelp && (
-                    <p
-                        className="auth-info-banner m-0 rounded-xl border border-solid border-auth-green/15 bg-surface-blue px-4 py-[14px]
- text-[13px] leading-[1.6] text-info"
-                        id="password-help"
-                        role="status"
-                    >
-                        {t('login.passwordHelp')}
-                    </p>
-                )}
 
                 <button
                     className="auth-button inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-solid px-[18px] py-3 text-center text-[14px] leading-[1.4] font-bold no-underline transition-[background,transform] duration-150 active:translate-y-px disabled:active:translate-y-0 disabled:opacity-[0.65] auth-button-primary w-full border-transparent bg-auth-ink text-white hover:bg-auth-green disabled:hover:bg-auth-ink"

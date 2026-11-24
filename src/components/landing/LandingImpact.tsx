@@ -11,7 +11,7 @@ export default function LandingImpact() {
                     <h2 className="mb-2.5 font-subheading text-[clamp(28px,3.2vw,40px)] font-normal leading-[1.22] text-store-cream">
                         {t('introPages.impact.title')}
                     </h2>
-                    <p className="font-heading text-lg font-normal not-italic text-store-pink">
+                    <p className="font-heading text-lg font-bold not-italic text-store-pink">
                         {t('introPages.impact.description')}
                     </p>
                 </div>

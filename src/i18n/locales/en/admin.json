@@ -4,6 +4,7 @@
     "navigation": {
         "registrations": "Customer management",
         "staff": "Staff accounts",
+        "returns": "Return requests",
         "system": "System & Reports"
     },
     "header": {

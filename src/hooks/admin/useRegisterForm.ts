@@ -7,7 +7,11 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/router/routes';
 import type { ApiErrorResponse } from '@/types/api';
-import { DEFAULT_REGISTRATION, REGISTRATION_STEP_FIELDS } from '@/constants/admin/registration';
+import {
+    DEFAULT_REGISTRATION,
+    REGISTRATION_STEP_COUNT,
+    REGISTRATION_STEP_FIELDS,
+} from '@/constants/admin/registration';
 import { register as sendRegistration } from '@/services/admin/authService';
 import type { RegisterRequest } from '@/types/admin/auth';
 import { getAuthError, type AuthError } from '@/utils/admin/authError';
@@ -32,6 +36,7 @@ export default function useRegisterForm() {
     });
     const [step, setStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [newsletterConsent, setNewsletterConsent] = useState(false);
     const [serverError, setServerError] = useState<AuthError | null>(null);
     const submittingRef = useRef(false);
 
@@ -39,12 +44,6 @@ export default function useRegisterForm() {
         if (submittingRef.current) return;
         setServerError(null);
         setStep(step - 1);
-    }
-
-    function editStep(nextStep: number) {
-        if (submittingRef.current) return;
-        setServerError(null);
-        setStep(nextStep);
     }
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -59,7 +58,7 @@ export default function useRegisterForm() {
             });
             if (!valid) return;
 
-            if (step < 3) {
+            if (step < REGISTRATION_STEP_COUNT) {
                 setStep(step + 1);
                 return;
             }
@@ -68,11 +67,14 @@ export default function useRegisterForm() {
             await form.handleSubmit(
                 async (request) => {
                     setIsSubmitting(true);
-                    await sendRegistration(request);
+                    await sendRegistration({ ...request, newsletterConsent });
                     clearActivationSession();
                     navigate(ROUTES.VERIFY_OTP, {
                         replace: true,
-                        state: { email: request.email, registrationSubmitted: true },
+                        state: {
+                            email: request.email,
+                            registrationSubmitted: true,
+                        },
                     });
                 },
                 () => {
@@ -90,7 +92,7 @@ export default function useRegisterForm() {
 
             if (axios.isAxiosError<ApiErrorResponse>(error)) {
                 const fieldErrors = error.response?.data?.errors;
-                let firstErrorStep = 3;
+                let firstErrorStep = REGISTRATION_STEP_COUNT;
                 if (Array.isArray(fieldErrors)) {
                     for (const fieldError of fieldErrors) {
                         for (let index = 0; index < REGISTRATION_STEP_FIELDS.length; index++) {
@@ -108,14 +110,8 @@ export default function useRegisterForm() {
                     }
                     setStep(firstErrorStep);
                 }
-                if (error.response?.data?.code === 'EMAIL_ALREADY_EXISTS') {
-                    form.setError('email', { type: 'server', message: 'errors.emailExists' });
-                    setStep(1);
-                }
-                if (error.response?.data?.code === 'PHONE_ALREADY_EXISTS') {
-                    form.setError('phone', { type: 'server', message: 'errors.phoneExists' });
-                    setStep(1);
-                }
+                // No "email/phone already registered" handling: the API never reveals that (it would
+                // let anyone probe accounts). Duplicates get a normal receipt and an emailed rejection.
             }
         } finally {
             submittingRef.current = false;
@@ -123,5 +119,14 @@ export default function useRegisterForm() {
         }
     }
 
-    return { form, step, goBack, editStep, handleSubmit, isSubmitting, serverError };
+    return {
+        form,
+        step,
+        goBack,
+        handleSubmit,
+        isSubmitting,
+        serverError,
+        newsletterConsent,
+        setNewsletterConsent,
+    };
 }

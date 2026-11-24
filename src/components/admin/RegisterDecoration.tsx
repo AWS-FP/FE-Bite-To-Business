@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import AuthJournal from './AuthJournal';
 import AuthWordmark from './AuthWordmark';
+import AuthFreshSticker from './AuthFreshSticker';
 
 // Chỉ chứa phần trang trí của trang đăng ký.
 export default function RegisterDecoration() {
@@ -44,7 +45,7 @@ export default function RegisterDecoration() {
 
                 {/* Ảnh đồ hộp và nước sốt bên phải. */}
                 <div
-                    className="auth-photo absolute top-[180px] left-[calc(50%_+_325px)] h-[150px]
+                    className="auth-photo absolute top-[200px] left-[calc(50%_+_325px)] h-[150px]
  w-[clamp(218px,18vw,260px)] rotate-[8deg] overflow-hidden rounded-[100px]
  border-4 border-solid border-auth-cream bg-surface-soft shadow-[10px_10px_0_var(--color-auth-ink)]"
                 >
@@ -70,45 +71,37 @@ export default function RegisterDecoration() {
                 </div>
 
                 <div
-                    className="auth-photo absolute top-[695px] left-[calc(50%_+_320px)] h-[150px] w-[150px]
+                    className="auth-photo absolute top-[850px] left-[calc(50%_+_320px)] h-[150px] w-[150px]
  -rotate-[8deg] overflow-hidden rounded-[32px] border-4 border-solid border-auth-cream
  bg-store-yellow shadow-[10px_10px_0_var(--color-auth-ink)]"
                 >
                     <img
                         src="/images/register/ham.jpg"
-                        className="block h-full w-full object-cover"
+                        className="block h-full w-full scale-150 object-cover"
                         alt=""
                         decoding="async"
                     />
                 </div>
 
-                <div
-                    className="auth-fresh-sticker absolute top-[320px] left-[3%] grid h-28 w-28
- -rotate-[14deg] content-center rounded-full bg-store-pink text-center font-label
- text-[12px] leading-[1.25] font-bold uppercase shadow-[4px_4px_0_var(--color-auth-ink)]"
-                >
-                    {t('auth.fresh')}
-                    <br />
-                    {t('auth.everyMorning')}
-                    <span className="mt-1">★</span>
-                </div>
+                <AuthFreshSticker className="top-[330px] left-[3%]" />
 
                 {/* Khung Journal dùng chung, trang đăng ký chỉ đặt vị trí. */}
                 <AuthJournal className="top-[550px] right-[calc(50%_+_300px)] w-[clamp(250px,calc(50%_-_330px),340px)]" />
 
                 {/* Hướng dẫn đăng ký viết rõ từng bước. */}
                 <aside
-                    className="auth-paper-note absolute top-[355px] left-[calc(50%_+_310px)]
- w-[clamp(250px,calc(50%_-_340px),290px)] rotate-2 bg-white px-6 pt-7 pb-6 shadow-[8px_8px_0_var(--color-auth-ink)]"
+                    className="auth-paper-note absolute top-[420px] left-[calc(50%_+_310px)]
+ w-[clamp(250px,calc(50%_-_340px),320px)] rotate-2 border-2 border-auth-ink bg-white px-7 pt-9 pb-9 shadow-[8px_8px_0_var(--color-auth-ink)]"
                 >
                     <span className="absolute -top-3 left-[calc(50%_-_48px)] h-6 w-24 -rotate-3 bg-store-pink/85" />
+                    <span className="absolute right-0 bottom-0 h-2 w-16 bg-store-yellow" />
                     <h2 className="m-0 font-subheading text-[24px] leading-[1.15] font-bold">
                         {t('auth.registerNote.title')}
                     </h2>
 
-                    <ol className="mt-5 mb-0 list-none p-0">
-                        <li className="flex items-baseline gap-3">
-                            <span className="auth-note-number font-display text-[24px] leading-none font-bold text-auth-green">
+                    <ol className="mt-7 mb-0 list-none p-0">
+                        <li className="flex items-start gap-3">
+                            <span className="auth-note-number w-8 shrink-0 font-display text-[24px] leading-6 font-bold text-auth-green">
                                 01
                             </span>
                             <div>
@@ -120,8 +113,8 @@ export default function RegisterDecoration() {
                                 </p>
                             </div>
                         </li>
-                        <li className="mt-3 flex items-baseline gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-3">
-                            <span className="auth-note-number font-display text-[24px] leading-none font-bold text-auth-green">
+                        <li className="mt-5 flex items-start gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-5">
+                            <span className="auth-note-number w-8 shrink-0 font-display text-[24px] leading-6 font-bold text-auth-green">
                                 02
                             </span>
                             <div>
@@ -133,8 +126,8 @@ export default function RegisterDecoration() {
                                 </p>
                             </div>
                         </li>
-                        <li className="mt-3 flex items-baseline gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-3">
-                            <span className="auth-note-number font-display text-[24px] leading-none font-bold text-auth-green">
+                        <li className="mt-5 flex items-start gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-5">
+                            <span className="auth-note-number w-8 shrink-0 font-display text-[24px] leading-6 font-bold text-auth-green">
                                 03
                             </span>
                             <div>

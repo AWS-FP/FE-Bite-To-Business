@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import AuthJournal from './AuthJournal';
 import AuthWordmark from './AuthWordmark';
+import AuthFreshSticker from './AuthFreshSticker';
 
 // Chỉ chứa phần trang trí của trang đăng nhập.
 export default function LoginDecoration() {
@@ -71,7 +72,7 @@ export default function LoginDecoration() {
                 </div>
 
                 <div
-                    className="auth-photo absolute top-[540px] right-[22%] h-[120px] w-[120px] -rotate-[8deg]
+                    className="auth-photo absolute top-[170px] right-[1%] h-[100px] w-[100px] -rotate-[8deg]
  overflow-hidden rounded-[32px] border-4 border-solid border-auth-cream
  bg-store-yellow shadow-[10px_10px_0_var(--color-auth-ink)]"
                 >
@@ -83,33 +84,25 @@ export default function LoginDecoration() {
                     />
                 </div>
 
-                <div
-                    className="auth-fresh-sticker absolute top-[260px] left-[3%] grid h-24 w-24
- -rotate-[14deg] content-center rounded-full bg-store-pink text-center font-label
- text-[11px] leading-[1.25] font-bold uppercase shadow-[4px_4px_0_var(--color-auth-ink)]"
-                >
-                    {t('auth.fresh')}
-                    <br />
-                    {t('auth.everyMorning')}
-                    <span className="mt-1">★</span>
-                </div>
+                <AuthFreshSticker className="top-[270px] left-[3%]" />
 
                 {/* Khung Journal dùng chung, trang đăng nhập chỉ đặt vị trí. */}
                 <AuthJournal className="top-[430px] left-[3%] w-[340px] origin-top-left scale-[0.84]" />
 
                 {/* Ba bước dành cho Customer vừa gửi đăng ký. */}
                 <aside
-                    className="auth-paper-note absolute top-[295px] right-[3%] w-[290px]
- origin-top-right rotate-2 scale-[0.86] bg-white px-6 pt-7 pb-6 shadow-[8px_8px_0_var(--color-auth-ink)]"
+                    className="auth-paper-note absolute top-[295px] right-[3%] w-[320px]
+ origin-top-right rotate-2 scale-[0.86] border-2 border-auth-ink bg-white px-7 pt-9 pb-9 shadow-[8px_8px_0_var(--color-auth-ink)]"
                 >
                     <span className="absolute -top-3 left-[calc(50%_-_48px)] h-6 w-24 -rotate-3 bg-store-pink/85" />
-                    <h2 className="m-0 font-subheading text-[24px] leading-[1.15] font-bold">
+                    <span className="absolute right-0 bottom-0 h-2 w-16 bg-store-yellow" />
+                    <h2 className="m-0 whitespace-nowrap font-subheading text-[17px] leading-[1.3] font-bold">
                         {t('auth.loginNote.title')}
                     </h2>
 
-                    <ol className="mt-5 mb-0 list-none p-0">
-                        <li className="flex items-baseline gap-3">
-                            <span className="auth-note-number font-display text-[24px] leading-none font-bold text-auth-green">
+                    <ol className="mt-7 mb-0 list-none p-0">
+                        <li className="flex items-start gap-3">
+                            <span className="auth-note-number w-8 shrink-0 font-display text-[24px] leading-6 font-bold text-auth-green">
                                 01
                             </span>
                             <div>
@@ -121,8 +114,8 @@ export default function LoginDecoration() {
                                 </p>
                             </div>
                         </li>
-                        <li className="mt-3 flex items-baseline gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-3">
-                            <span className="auth-note-number font-display text-[24px] leading-none font-bold text-auth-green">
+                        <li className="mt-5 flex items-start gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-5">
+                            <span className="auth-note-number w-8 shrink-0 font-display text-[24px] leading-6 font-bold text-auth-green">
                                 02
                             </span>
                             <div>
@@ -134,8 +127,8 @@ export default function LoginDecoration() {
                                 </p>
                             </div>
                         </li>
-                        <li className="mt-3 flex items-baseline gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-3">
-                            <span className="auth-note-number font-display text-[24px] leading-none font-bold text-auth-green">
+                        <li className="mt-5 flex items-start gap-3 border-0 border-t border-dashed border-auth-ink/15 pt-5">
+                            <span className="auth-note-number w-8 shrink-0 font-display text-[24px] leading-6 font-bold text-auth-green">
                                 03
                             </span>
                             <div>

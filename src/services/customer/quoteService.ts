@@ -1,52 +1,24 @@
 import { http } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
+import type { AvailableCoupon, CreatedOrder, CustomerQuotePage, Quote, QuoteAvailability, QuotePackage, QuotePackageAmount } from '@/types/customer/quote';
 
-export interface QuoteItem {
-    id: string;
-    productId: string;
-    nameVi: string;
-    unitCode: string;
-    quantity: number;
-    listUnitPrice: number;
-    volumeUnitPrice: number;
-    saleUnitPrice: number;
-    vatRate: number | null;
-}
-
-export interface Quote {
-    id: string;
-    revision: number;
-    contactName: string | null;
-    itemsSubtotal: number;
-    volumeDiscountAmount: number;
-    saleDiscountAmount: number;
-    couponDiscountAmount: number;
-    shippingFee: number;
-    shippingCouponDiscountAmount: number;
-    productCouponId: string | null;
-    shippingCouponId: string | null;
-    vatAmount: number | null;
-    estimatedTotalAmount: number;
-    items: QuoteItem[];
-}
-
-export interface QuotePackage {
-    id: string;
-    name: string;
-    recipientName: string;
-    recipientPhone: string;
-    deliveryDate: string;
-    deliveryTimeSlot: string;
-    address: string;
-    note: string | null;
-    city: 'HCM' | 'HANOI';
-    shippingFee: number;
-    distanceMetres: number;
-    items: { quoteItemId: string; quantity: number }[];
+export async function getQuotePackageTotals(id: string, signal?: AbortSignal) {
+    const response = await http.get<ApiResponse<Record<string, QuotePackageAmount>>>(
+        `/api/customer/quotes/${id}/package-totals`,
+        { signal },
+    );
+    return response.data.data;
 }
 
 export async function createQuoteDraft() {
     const response = await http.post<ApiResponse<Quote>>('/api/customer/quotes/draft');
+    return response.data.data;
+}
+
+export async function createQuoteFromCart(items: { productId: string; quantity: number }[]) {
+    const response = await http.post<ApiResponse<Quote>>('/api/customer/quotes/draft/from-cart', {
+        items,
+    });
     return response.data.data;
 }
 
@@ -81,6 +53,14 @@ export async function saveQuoteContact(
     return response.data.data;
 }
 
+export async function getAvailableCoupons(id: string, signal?: AbortSignal) {
+    const response = await http.get<ApiResponse<AvailableCoupon[]>>(
+        `/api/customer/quotes/${id}/coupons/available`,
+        { signal },
+    );
+    return response.data.data;
+}
+
 export async function applyQuoteCoupons(id: string, productCode: string, shippingCode: string) {
     const response = await http.put<ApiResponse<Quote>>(`/api/customer/quotes/${id}/coupons`, {
         productCode: productCode.trim() || null,
@@ -105,49 +85,18 @@ export async function addQuotePackage(
 ) {
     const response = await http.post<ApiResponse<QuotePackage>>(
         `/api/customer/quotes/${id}/packages`,
-        parcel,
+        {
+            ...parcel,
+            latitude: Number(parcel.latitude.toFixed(6)),
+            longitude: Number(parcel.longitude.toFixed(6)),
+        },
+        { timeout: 25_000 },
     );
     return response.data.data;
 }
 
 export async function deleteQuotePackage(id: string, packageId: string) {
     await http.delete(`/api/customer/quotes/${id}/packages/${packageId}`);
-}
-
-/** Additional endpoints in BE features/customer/controller/CustomerQuoteController. */
-export interface QuoteSummary {
-    id: string;
-    quoteNumber: string;
-    status: string;
-    revision: number;
-    reviewNote: string | null;
-    createdAt: string;
-    submittedAt: string | null;
-    updatedAt: string;
-}
-export interface CustomerQuotePage {
-    content: QuoteSummary[];
-    page: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
-}
-export interface QuoteAvailability {
-    available: boolean;
-    items: {
-        productId: string;
-        sku: string;
-        requestedQuantity: number;
-        availableQuantity: number;
-        available: boolean;
-    }[];
-}
-export interface CreatedOrder {
-    orderId: string;
-    orderNumber: string;
-    status: string;
-    totalAmount: number;
-    reservationExpiresAt: string | null;
 }
 export async function getMyQuotes(page = 0, size = 10) {
     const { data } = await http.get<ApiResponse<CustomerQuotePage>>('/api/customer/quotes', {
@@ -191,7 +140,11 @@ export async function updateQuotePackage(
 ) {
     const { data } = await http.put<ApiResponse<QuotePackage>>(
         `/api/customer/quotes/${encodeURIComponent(quoteId)}/packages/${encodeURIComponent(packageId)}`,
-        parcel,
+        {
+            ...parcel,
+            latitude: Number(parcel.latitude.toFixed(6)),
+            longitude: Number(parcel.longitude.toFixed(6)),
+        },
     );
     return data.data;
 }

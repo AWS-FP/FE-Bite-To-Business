@@ -85,6 +85,7 @@ function AdminWorkspace() {
                 pendingCount={statsQuery.data?.pending}
                 registrationsPath={ROUTES.ADMIN_REGISTRATIONS}
                 staffPath={ROUTES.ADMIN_STAFF}
+                returnsPath={ROUTES.ADMIN_PACKAGE_RETURNS}
                 systemPath={ROUTES.ADMIN_SYSTEM}
                 isCollapsed={isCollapsed}
                 onToggleCollapse={() => setIsCollapsed(!isCollapsed)}

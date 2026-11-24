@@ -19,7 +19,7 @@ export default function LandingPartners() {
             <path d="M18 22 H68 L58 36 H18 Z" fill="#FFD100" fill-opacity="0.22" />
           </svg>
           <div className="z-[2] flex flex-col text-left">
-            <span className="font-heading text-base font-normal leading-[1.15] text-white">MEATDeli</span>
+            <span className="font-heading text-base font-bold leading-[1.15] text-white">MEATDeli</span>
             <span className="font-body text-[10.5px] font-semibold tracking-[0.03em] text-store-yellow">Thịt sạch chuẩn Âu</span>
           </div>
           <span className="z-[1] h-11 w-11 shrink-0 -rotate-[8deg] text-store-yellow/32 [&_svg]:h-full [&_svg]:w-full">
@@ -43,7 +43,7 @@ export default function LandingPartners() {
             <text x="100" y="62" text-anchor="middle" font-family="Georgia, serif" font-weight="900" font-size="40" fill="#FFFFFF" fill-opacity="0.16" letter-spacing="3">C.P.</text>
           </svg>
           <div className="z-[2] flex flex-col text-left">
-            <span className="font-heading text-base font-normal leading-[1.15] text-white">C.P. Việt Nam</span>
+            <span className="font-heading text-base font-bold leading-[1.15] text-white">C.P. Việt Nam</span>
             <span className="font-body text-[10.5px] font-semibold tracking-[0.03em] text-store-yellow">Thực phẩm &amp; Gia cầm</span>
           </div>
           <span className="z-[1] h-11 w-11 shrink-0 -rotate-[8deg] text-store-yellow/32 [&_svg]:h-full [&_svg]:w-full">
@@ -66,7 +66,7 @@ export default function LandingPartners() {
             <text x="130" y="56" text-anchor="middle" font-family="Georgia, serif" font-weight="900" font-size="32" fill="#FFFFFF" fill-opacity="0.16" letter-spacing="2">ANCHOR</text>
           </svg>
           <div className="z-[2] flex flex-col text-left">
-            <span className="font-heading text-base font-normal leading-[1.15] text-white">Anchor Dairy NZ</span>
+            <span className="font-heading text-base font-bold leading-[1.15] text-white">Anchor Dairy NZ</span>
             <span className="font-body text-[10.5px] font-semibold tracking-[0.03em] text-store-yellow">Bơ sữa &amp; Phô mai</span>
           </div>
           <span className="z-[1] h-11 w-11 shrink-0 -rotate-[8deg] text-store-yellow/32 [&_svg]:h-full [&_svg]:w-full">
@@ -91,7 +91,7 @@ export default function LandingPartners() {
             <text x="130" y="57" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-weight="900" font-size="32" fill="#FFFFFF" fill-opacity="0.18">Barilla</text>
           </svg>
           <div className="z-[2] flex flex-col text-left">
-            <span className="font-heading text-base font-normal leading-[1.15] text-white">Barilla Italia</span>
+            <span className="font-heading text-base font-bold leading-[1.15] text-white">Barilla Italia</span>
             <span className="font-body text-[10.5px] font-semibold tracking-[0.03em] text-store-yellow">Mì Ý &amp; Sốt Âu</span>
           </div>
           <span className="z-[1] h-11 w-11 shrink-0 -rotate-[8deg] text-store-yellow/32 [&_svg]:h-full [&_svg]:w-full">
@@ -115,7 +115,7 @@ export default function LandingPartners() {
             <text x="130" y="56" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="28" fill="#FFFFFF" fill-opacity="0.16" letter-spacing="2">VINH HOAN</text>
           </svg>
           <div className="z-[2] flex flex-col text-left">
-            <span className="font-heading text-base font-normal leading-[1.15] text-white">Vĩnh Hoàn Corp</span>
+            <span className="font-heading text-base font-bold leading-[1.15] text-white">Vĩnh Hoàn Corp</span>
             <span className="font-body text-[10.5px] font-semibold tracking-[0.03em] text-store-yellow">Cá tra &amp; Hải sản</span>
           </div>
           <span className="z-[1] h-11 w-11 shrink-0 -rotate-[8deg] text-store-yellow/32 [&_svg]:h-full [&_svg]:w-full">
@@ -139,7 +139,7 @@ export default function LandingPartners() {
             <text x="130" y="56" text-anchor="middle" font-family="Georgia, serif" font-weight="900" font-size="28" fill="#FFFFFF" fill-opacity="0.17" letter-spacing="1.5">TƯỜNG AN</text>
           </svg>
           <div className="z-[2] flex flex-col text-left">
-            <span className="font-heading text-base font-normal leading-[1.15] text-white">Dầu Ăn Tường An</span>
+            <span className="font-heading text-base font-bold leading-[1.15] text-white">Dầu Ăn Tường An</span>
             <span className="font-body text-[10.5px] font-semibold tracking-[0.03em] text-store-yellow">Dầu thực vật B2B</span>
           </div>
           <span className="z-[1] h-11 w-11 shrink-0 -rotate-[8deg] text-store-yellow/32 [&_svg]:h-full [&_svg]:w-full">
@@ -162,7 +162,7 @@ export default function LandingPartners() {
             <text x="130" y="56" text-anchor="middle" font-family="Georgia, serif" font-weight="900" font-size="27" fill="#FFFFFF" fill-opacity="0.16" letter-spacing="1.5">XUÂN HỒNG</text>
           </svg>
           <div className="z-[2] flex flex-col text-left">
-            <span className="font-heading text-base font-normal leading-[1.15] text-white">Nông Sản Xuân Hồng</span>
+            <span className="font-heading text-base font-bold leading-[1.15] text-white">Nông Sản Xuân Hồng</span>
             <span className="font-body text-[10.5px] font-semibold tracking-[0.03em] text-store-yellow">Gạo &amp; Ngũ cốc</span>
           </div>
           <span className="z-[1] h-11 w-11 shrink-0 -rotate-[8deg] text-store-yellow/32 [&_svg]:h-full [&_svg]:w-full">
@@ -189,7 +189,7 @@ export default function LandingPartners() {
             <text x="130" y="57" text-anchor="middle" font-family="Arial Black, sans-serif" font-weight="900" font-size="31" fill="#FFFFFF" fill-opacity="0.17" letter-spacing="2">V.FOOD</text>
           </svg>
           <div className="z-[2] flex flex-col text-left">
-            <span className="font-heading text-base font-normal leading-[1.15] text-white">Trứng V.Food</span>
+            <span className="font-heading text-base font-bold leading-[1.15] text-white">Trứng V.Food</span>
             <span className="font-body text-[10.5px] font-semibold tracking-[0.03em] text-store-yellow">Trứng sạch tiệt trùng</span>
           </div>
           <span className="z-[1] h-11 w-11 shrink-0 -rotate-[8deg] text-store-yellow/32 [&_svg]:h-full [&_svg]:w-full">
@@ -213,7 +213,7 @@ export default function LandingPartners() {
             <path d="M18 22 H68 L58 36 H18 Z" fill="#FFD100" fill-opacity="0.22" />
           </svg>
           <div className="z-[2] flex flex-col text-left">
-            <span className="font-heading text-base font-normal leading-[1.15] text-white">MEATDeli</span>
+            <span className="font-heading text-base font-bold leading-[1.15] text-white">MEATDeli</span>
             <span className="font-body text-[10.5px] font-semibold tracking-[0.03em] text-store-yellow">Thịt sạch chuẩn Âu</span>
           </div>
           <span className="z-[1] h-11 w-11 shrink-0 -rotate-[8deg] text-store-yellow/32 [&_svg]:h-full [&_svg]:w-full">
@@ -237,7 +237,7 @@ export default function LandingPartners() {
             <text x="100" y="62" text-anchor="middle" font-family="Georgia, serif" font-weight="900" font-size="40" fill="#FFFFFF" fill-opacity="0.16" letter-spacing="3">C.P.</text>
           </svg>
           <div className="z-[2] flex flex-col text-left">
-            <span className="font-heading text-base font-normal leading-[1.15] text-white">C.P. Việt Nam</span>
+            <span className="font-heading text-base font-bold leading-[1.15] text-white">C.P. Việt Nam</span>
             <span className="font-body text-[10.5px] font-semibold tracking-[0.03em] text-store-yellow">Thực phẩm &amp; Gia cầm</span>
           </div>
           <span className="z-[1] h-11 w-11 shrink-0 -rotate-[8deg] text-store-yellow/32 [&_svg]:h-full [&_svg]:w-full">
@@ -260,7 +260,7 @@ export default function LandingPartners() {
             <text x="130" y="56" text-anchor="middle" font-family="Georgia, serif" font-weight="900" font-size="32" fill="#FFFFFF" fill-opacity="0.16" letter-spacing="2">ANCHOR</text>
           </svg>
           <div className="z-[2] flex flex-col text-left">
-            <span className="font-heading text-base font-normal leading-[1.15] text-white">Anchor Dairy NZ</span>
+            <span className="font-heading text-base font-bold leading-[1.15] text-white">Anchor Dairy NZ</span>
             <span className="font-body text-[10.5px] font-semibold tracking-[0.03em] text-store-yellow">Bơ sữa &amp; Phô mai</span>
           </div>
           <span className="z-[1] h-11 w-11 shrink-0 -rotate-[8deg] text-store-yellow/32 [&_svg]:h-full [&_svg]:w-full">
@@ -285,7 +285,7 @@ export default function LandingPartners() {
             <text x="130" y="57" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-weight="900" font-size="32" fill="#FFFFFF" fill-opacity="0.18">Barilla</text>
           </svg>
           <div className="z-[2] flex flex-col text-left">
-            <span className="font-heading text-base font-normal leading-[1.15] text-white">Barilla Italia</span>
+            <span className="font-heading text-base font-bold leading-[1.15] text-white">Barilla Italia</span>
             <span className="font-body text-[10.5px] font-semibold tracking-[0.03em] text-store-yellow">Mì Ý &amp; Sốt Âu</span>
           </div>
           <span className="z-[1] h-11 w-11 shrink-0 -rotate-[8deg] text-store-yellow/32 [&_svg]:h-full [&_svg]:w-full">
@@ -309,7 +309,7 @@ export default function LandingPartners() {
             <text x="130" y="56" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="28" fill="#FFFFFF" fill-opacity="0.16" letter-spacing="2">VINH HOAN</text>
           </svg>
           <div className="z-[2] flex flex-col text-left">
-            <span className="font-heading text-base font-normal leading-[1.15] text-white">Vĩnh Hoàn Corp</span>
+            <span className="font-heading text-base font-bold leading-[1.15] text-white">Vĩnh Hoàn Corp</span>
             <span className="font-body text-[10.5px] font-semibold tracking-[0.03em] text-store-yellow">Cá tra &amp; Hải sản</span>
           </div>
           <span className="z-[1] h-11 w-11 shrink-0 -rotate-[8deg] text-store-yellow/32 [&_svg]:h-full [&_svg]:w-full">
@@ -333,7 +333,7 @@ export default function LandingPartners() {
             <text x="130" y="56" text-anchor="middle" font-family="Georgia, serif" font-weight="900" font-size="28" fill="#FFFFFF" fill-opacity="0.17" letter-spacing="1.5">TƯỜNG AN</text>
           </svg>
           <div className="z-[2] flex flex-col text-left">
-            <span className="font-heading text-base font-normal leading-[1.15] text-white">Dầu Ăn Tường An</span>
+            <span className="font-heading text-base font-bold leading-[1.15] text-white">Dầu Ăn Tường An</span>
             <span className="font-body text-[10.5px] font-semibold tracking-[0.03em] text-store-yellow">Dầu thực vật B2B</span>
           </div>
           <span className="z-[1] h-11 w-11 shrink-0 -rotate-[8deg] text-store-yellow/32 [&_svg]:h-full [&_svg]:w-full">
@@ -356,7 +356,7 @@ export default function LandingPartners() {
             <text x="130" y="56" text-anchor="middle" font-family="Georgia, serif" font-weight="900" font-size="27" fill="#FFFFFF" fill-opacity="0.16" letter-spacing="1.5">XUÂN HỒNG</text>
           </svg>
           <div className="z-[2] flex flex-col text-left">
-            <span className="font-heading text-base font-normal leading-[1.15] text-white">Nông Sản Xuân Hồng</span>
+            <span className="font-heading text-base font-bold leading-[1.15] text-white">Nông Sản Xuân Hồng</span>
             <span className="font-body text-[10.5px] font-semibold tracking-[0.03em] text-store-yellow">Gạo &amp; Ngũ cốc</span>
           </div>
           <span className="z-[1] h-11 w-11 shrink-0 -rotate-[8deg] text-store-yellow/32 [&_svg]:h-full [&_svg]:w-full">
@@ -383,7 +383,7 @@ export default function LandingPartners() {
             <text x="130" y="57" text-anchor="middle" font-family="Arial Black, sans-serif" font-weight="900" font-size="31" fill="#FFFFFF" fill-opacity="0.17" letter-spacing="2">V.FOOD</text>
           </svg>
           <div className="z-[2] flex flex-col text-left">
-            <span className="font-heading text-base font-normal leading-[1.15] text-white">Trứng V.Food</span>
+            <span className="font-heading text-base font-bold leading-[1.15] text-white">Trứng V.Food</span>
             <span className="font-body text-[10.5px] font-semibold tracking-[0.03em] text-store-yellow">Trứng sạch tiệt trùng</span>
           </div>
           <span className="z-[1] h-11 w-11 shrink-0 -rotate-[8deg] text-store-yellow/32 [&_svg]:h-full [&_svg]:w-full">

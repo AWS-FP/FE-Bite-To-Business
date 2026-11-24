@@ -1,4 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import RootLayout from '@/layouts/RootLayout';
+import MyProductRequestsPage from '@/pages/customer/MyProductRequestsPage';
 
 import { AUTH_ROLES } from '@/constants/roles';
 
@@ -7,6 +9,7 @@ import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 import ActivationPage from '@/pages/auth/ActivationPage';
 import VerifyOtpPage from '@/pages/auth/VerifyOtpPage';
+import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage';
 
 // Public Customer Pages
 import HomePage from '@/pages/HomePage';
@@ -39,7 +42,7 @@ import DeliveryPackagePage from '@/pages/shipper/DeliveryPackagePage';
 import LogisticsLayout from '@/layouts/logistic/LogisticsLayout';
 import InventoryPage from '@/pages/logistic/InventoryPage';
 import ReceivePage from '@/pages/logistic/ReceivePage';
-import PackingPage from '@/pages/logistic/PackingPage';
+import PackageReturnsPage from '@/pages/admin/PackageReturnsPage';
 import ProductRequestsPage from '@/pages/logistic/ProductRequestsPage';
 
 // Admin Pages
@@ -55,15 +58,21 @@ import PendingPage from '@/components/common/PendingPage';
 
 // Router
 import ProtectedRoute from './ProtectedRoute';
+import StorefrontRoleGuard from './StorefrontRoleGuard';
 import { ROUTES } from './routes';
 import EcommerceDashboardPage from '@/pages/e-commerce/EcommerceDashboardPage';
 import EcommerceQuotesPage from '@/pages/e-commerce/EcommerceQuotesPage';
 import EcommerceProductsPage from '@/pages/e-commerce/EcommerceProductsPage';
 import EcommercePromotionsPage from '@/pages/e-commerce/EcommercePromotionsPage';
 import EcommerceCouponsPage from '@/pages/e-commerce/EcommerceCouponsPage';
-import EcommercePosterPage from '@/pages/e-commerce/EcommercePosterPage';
+import EcommerceRequestsPage from '@/pages/e-commerce/EcommerceRequestsPage';
+import EcommerceReviewsPage from '@/pages/e-commerce/EcommerceReviewsPage';
+import EcommerceRefundsPage from '@/pages/e-commerce/EcommerceRefundsPage';
 
-export const router = createBrowserRouter([
+export const router = createBrowserRouter([{
+    // Bọc mọi route để ScrollRestoration cuộn lên đầu khi chuyển trang.
+    Component: RootLayout,
+    children: [
     // ==========================================
     // 1. AUTHENTICATION
     // ==========================================
@@ -85,59 +94,68 @@ export const router = createBrowserRouter([
     },
     {
         path: ROUTES.FORGOT_PASSWORD,
-        Component: PendingPage,
+        Component: ForgotPasswordPage,
     },
 
     // ==========================================
     // 2. PUBLIC CUSTOMER PAGES
-    // Không cần đăng nhập
+    // Guests/Customers may browse; E-commerce staff stay in their workspace.
     // ==========================================
     {
-        path: ROUTES.HOME,
-        Component: HomePage,
-    },
-    {
-        path: ROUTES.LANDING,
-        Component: LandingPage,
-    },
-    {
-        path: ROUTES.WHY_BTB,
-        Component: WhyBTBPage,
-    },
-    {
-        path: ROUTES.BTB_MODEL,
-        Component: BTBModelPage,
-    },
-    {
-        path: ROUTES.BRANDS,
-        Component: BrandsPage,
-    },
-    {
-        path: ROUTES.BRAND_DETAIL,
-        Component: BrandDetailPage,
-    },
-    {
-        path: ROUTES.CATALOG,
-        Component: CustomerCatalogPage,
-    },
-    {
-        path: ROUTES.CUSTOMER_COLLECTION,
-        Component: CustomerCollectionPage,
-    },
-    {
-        path: ROUTES.PRODUCT_DETAIL,
-        Component: CustomerProductDetailPage,
-    },
-    {
-        path: ROUTES.QUOTES,
-        Component: CartPage,
-    },
-    {
-        element: <ProtectedRoute allowedRoles={Object.values(AUTH_ROLES)} />,
+        element: <StorefrontRoleGuard />,
         children: [
             {
-                path: ROUTES.DISTRIBUTION_NETWORK,
-                Component: DistributionNetworkPage,
+                path: ROUTES.HOME,
+                Component: HomePage,
+            },
+            {
+                path: ROUTES.LANDING,
+                Component: LandingPage,
+            },
+            {
+                path: ROUTES.WHY_BTB,
+                Component: WhyBTBPage,
+            },
+            {
+                path: ROUTES.BTB_MODEL,
+                Component: BTBModelPage,
+            },
+            {
+                path: ROUTES.BRANDS,
+                Component: BrandsPage,
+            },
+            {
+                path: ROUTES.BRAND_DETAIL,
+                Component: BrandDetailPage,
+            },
+            {
+                path: ROUTES.BRAND_DETAIL_LEGACY,
+                Component: BrandDetailPage,
+            },
+            {
+                path: ROUTES.CATALOG,
+                Component: CustomerCatalogPage,
+            },
+            {
+                path: ROUTES.CUSTOMER_COLLECTION,
+                Component: CustomerCollectionPage,
+            },
+            {
+                path: ROUTES.PRODUCT_DETAIL,
+                Component: CustomerProductDetailPage,
+            },
+            {
+                path: ROUTES.QUOTES,
+                Component: CartPage,
+            },
+            {
+                element: <ProtectedRoute allowedRoles={Object.values(AUTH_ROLES)} />,
+                children: [
+                    {
+                        path: ROUTES.DISTRIBUTION_NETWORK,
+                        Component: DistributionNetworkPage,
+                    },
+                ],
             },
         ],
     },
@@ -170,6 +188,10 @@ export const router = createBrowserRouter([
             {
                 path: ROUTES.FAVORITES,
                 Component: CustomerFavoritesPage,
+            },
+            {
+                path: ROUTES.MY_PRODUCT_REQUESTS,
+                Component: MyProductRequestsPage,
             },
             {
                 path: ROUTES.PROFILE,
@@ -210,6 +232,10 @@ export const router = createBrowserRouter([
                         Component: StaffPage,
                     },
                     {
+                        path: ROUTES.ADMIN_PACKAGE_RETURNS,
+                        Component: PackageReturnsPage,
+                    },
+                    {
                         path: ROUTES.ADMIN_SYSTEM,
                         Component: SystemMetricsPage,
                     },
@@ -245,7 +271,13 @@ export const router = createBrowserRouter([
                         Component: EcommercePromotionsPage,
                     },
                     { path: ROUTES.ECOMMERCE_COUPONS, Component: EcommerceCouponsPage },
-                    { path: ROUTES.ECOMMERCE_POSTER, Component: EcommercePosterPage },
+                    {
+                        path: ROUTES.ECOMMERCE_POSTER,
+                        element: <Navigate to={ROUTES.ECOMMERCE_PROMOTIONS} replace />,
+                    },
+                    { path: ROUTES.ECOMMERCE_REQUESTS, Component: EcommerceRequestsPage },
+                    { path: ROUTES.ECOMMERCE_REVIEWS, Component: EcommerceReviewsPage },
+                    { path: ROUTES.ECOMMERCE_REFUNDS, Component: EcommerceRefundsPage },
                 ],
             },
         ],
@@ -274,10 +306,6 @@ export const router = createBrowserRouter([
                     {
                         path: ROUTES.LOGISTICS_RECEIVE,
                         Component: ReceivePage,
-                    },
-                    {
-                        path: ROUTES.LOGISTICS_PACKING,
-                        Component: PackingPage,
                     },
                     {
                         path: ROUTES.LOGISTICS_PRODUCT_REQUESTS,
@@ -328,4 +356,4 @@ export const router = createBrowserRouter([
         path: '*',
         element: <Navigate to={ROUTES.HOME} replace />,
     },
-]);
+]}]);
