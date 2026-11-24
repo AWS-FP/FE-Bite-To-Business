@@ -19,7 +19,6 @@ export function useStoreSearch() {
     const [keyword, setKeyword] = useState('');
     const [searchMode, setSearchMode] = useState<'products' | 'ai'>('products');
     const [showAINotice, setShowAINotice] = useState(false);
-    const [isSearching, setIsSearching] = useState(false);
     const { historyEntries, recordSearch, deleteSearch, clearHistory, deleting, deleteError } =
         useSearchHistory();
     const historyRef = useRef<HTMLElement>(null);
@@ -96,14 +95,9 @@ export function useStoreSearch() {
         }
 
         setOpen(false);
-        if (isSearching) return;
-        setIsSearching(true);
-        try {
-            const shouldNavigate = await recordSearch(searchText);
-            if (shouldNavigate) navigate(path ?? getCatalogSearchPath(searchText));
-        } finally {
-            setIsSearching(false);
-        }
+        // Navigation must never wait for the search-history network request.
+        navigate(path ?? getCatalogSearchPath(searchText));
+        void recordSearch(searchText);
     }
 
     async function handleHistoryClick(
@@ -124,7 +118,7 @@ export function useStoreSearch() {
         return () => window.clearTimeout(timer);
     }, [term]);
     const enabled = open && searchMode === 'products' && term === debounced && canSuggest(term);
-    const { data } = useCatalogQuery({
+    const { data, isFetching, isError } = useCatalogQuery({
         // Detach from the previous request immediately while the next term debounces.
         queryKey: ['catalogSuggestions', enabled ? term : null],
         queryFn: ({ signal }) => getCatalogSuggestions(term, signal),
@@ -151,6 +145,7 @@ export function useStoreSearch() {
             label,
             path: suggestionPath(item, label),
             keyword: item.kind === 'query' ? label : term,
+            imageUrl: item.imageUrl ?? null,
         };
     });
 
@@ -188,12 +183,16 @@ export function useStoreSearch() {
     }
 
     return {
+        open,
+        suggestionLoading: open && searchMode === 'products' && canSuggest(term) && (!enabled || isFetching),
+        suggestionError: enabled && isError,
+        showSuggestionMenu: open && searchMode === 'products' && canSuggest(term),
+        showRecentSearches: open && searchMode === 'products' && !term && historyEntries.length > 0,
         keyword,
         changeKeyword,
         searchMode,
         changeMode,
         showAINotice,
-        isSearching,
         historyEntries,
         deleteSearch,
         confirmClear,

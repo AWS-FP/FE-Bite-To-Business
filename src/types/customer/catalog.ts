@@ -34,4 +34,5 @@ export interface CatalogProductPage {
 export type CatalogSuggestion = {
     labelVi: string;
     labelEn: string;
+    imageUrl?: string | null;
 } & ({ kind: 'product' | 'category' | 'brand'; id: string } | { kind: 'query'; id: null });

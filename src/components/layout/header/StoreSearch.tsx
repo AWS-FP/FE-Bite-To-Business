@@ -1,4 +1,4 @@
-import { Sparkles, Trash2, X } from 'lucide-react';
+import { ArrowRight, Clock3, Image as ImageIcon, Search, Sparkles, Trash2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { getCatalogSearchPath } from '../../../constants/catalogNavigation';
@@ -11,20 +11,18 @@ export default function StoreSearch() {
     const {
         keyword,
         changeKeyword,
+        showSuggestionMenu,
+        suggestionLoading,
+        suggestionError,
+        showRecentSearches,
         searchMode,
         changeMode,
         showAINotice,
-        isSearching,
         historyEntries,
         deleteSearch,
         confirmClear,
         deleting,
         deleteError,
-        historyRef,
-        guardHistoryDrag,
-        startDrag,
-        moveDrag,
-        stopDrag,
         handleSearch,
         handleHistoryClick,
         setOpen,
@@ -69,7 +67,6 @@ export default function StoreSearch() {
                     className="flex h-full shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-r-full border-0 border-l-2 border-solid border-store-ink bg-store-yellow px-3.5 text-[12px] font-extrabold text-store-ink transition-colors hover:bg-[#ffe97b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white disabled:cursor-wait disabled:opacity-70"
                     type="submit"
                     aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.submit')}
-                    disabled={isSearching}
                 >
                     {searchMode === 'ai' ? (
                         <Sparkles size={16} className="shrink-0" aria-hidden="true" />
@@ -84,25 +81,87 @@ export default function StoreSearch() {
                 </button>
             </form>
 
-            {suggestions.length > 0 && (
+            {(showSuggestionMenu || showRecentSearches) && (
                 <nav
                     ref={menuRef}
-                    aria-label={t('search.suggestions')}
-                    className="absolute inset-x-0 z-50 max-h-80 overflow-y-auto rounded-xl bg-white p-2 text-store-ink shadow-lg"
+                    aria-label={t(showRecentSearches ? 'search.history' : 'search.suggestions')}
+                    className="absolute inset-x-0 top-[calc(100%+8px)] z-[90] max-h-[min(420px,65dvh)] overflow-y-auto overscroll-contain rounded-2xl border border-solid border-store-line bg-white p-2.5 text-store-ink shadow-[0_18px_45px_rgba(0,0,0,0.22)]"
                 >
-                    {suggestions.map((item) => (
-                        <Link
-                            key={item.key}
-                            to={item.path}
-                            onClick={(event) =>
-                                void handleHistoryClick(event, item.keyword, item.path)
-                            }
-                            className="flex justify-between gap-3 rounded px-3 py-2 text-sm hover:bg-store-cream focus:bg-store-cream"
-                        >
-                            <span>{item.label}</span>
-                            <small>{t(`search.kinds.${item.kind}`)}</small>
-                        </Link>
-                    ))}
+                    {showRecentSearches ? (
+                        <>
+                            <div className="flex items-center justify-between gap-3 px-2 pb-2 pt-1">
+                                <p className="m-0 text-[11px] font-extrabold uppercase tracking-wide text-store-muted">
+                                    {t('search.history')}
+                                </p>
+                                <button type="button" disabled={deleting} onClick={confirmClear}
+                                    className="inline-flex cursor-pointer items-center gap-1 rounded-lg border-0 bg-transparent px-1.5 py-1 text-xs text-store-muted hover:text-danger disabled:opacity-40">
+                                    <Trash2 size={13} /> {t('searchHistory.clearAll')}
+                                </button>
+                            </div>
+                            {historyEntries.slice(0, 7).map((entry) => (
+                                <div key={entry.id} className="flex items-center gap-2 rounded-xl hover:bg-store-cream">
+                                    <Link to={getCatalogSearchPath(entry.keyword)}
+                                        onClick={(event) => void handleHistoryClick(event, entry.keyword)}
+                                        className="flex min-w-0 flex-1 items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold text-store-ink no-underline focus-visible:outline-2 focus-visible:outline-store-green">
+                                        <Clock3 size={15} className="shrink-0 text-store-muted" />
+                                        <span className="truncate">{entry.keyword}</span>
+                                    </Link>
+                                    <button type="button" onClick={() => void deleteSearch(entry.id)}
+                                        disabled={deleting} aria-label={`${t('searchHistory.remove')}: ${entry.keyword}`}
+                                        className="mr-2 flex size-7 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent text-store-muted hover:bg-red-50 hover:text-danger disabled:opacity-40">
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            ))}
+                        </>
+                    ) : (
+                        <>
+                            <p className="m-0 px-2 pb-2 pt-1 text-[11px] font-extrabold uppercase tracking-wide text-store-muted">
+                                {t('search.suggestions')}
+                            </p>
+                            {suggestionLoading ? (
+                                <div className="flex items-center gap-2 px-3 py-5 text-sm text-store-muted" role="status">
+                                    <span className="size-4 animate-spin rounded-full border-2 border-store-line border-t-store-green" />
+                                    {t('search.loadingSuggestions')}
+                                </div>
+                            ) : suggestionError ? (
+                                <p role="status" className="m-0 px-3 py-5 text-sm text-store-muted">
+                                    {t('search.suggestionUnavailable')}
+                                </p>
+                            ) : suggestions.length ? (
+                                suggestions.map((item) => (
+                                    <Link key={item.key} to={item.path}
+                                        onClick={(event) => void handleHistoryClick(event, item.keyword, item.path)}
+                                        className="group flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 text-store-ink no-underline transition-colors hover:bg-store-cream focus-visible:bg-store-cream focus-visible:outline-2 focus-visible:outline-store-green">
+                                        {item.kind === 'product' ? (
+                                            item.imageUrl ? (
+                                                <img src={item.imageUrl} alt="" loading="lazy"
+                                                    className="size-12 shrink-0 rounded-lg border border-solid border-store-line bg-white object-contain p-1" />
+                                            ) : (
+                                                <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-surface-green text-store-muted"><ImageIcon size={18} /></span>
+                                            )
+                                        ) : (
+                                            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-green text-store-green"><Search size={17} /></span>
+                                        )}
+                                        <span className="min-w-0 flex-1 truncate text-[13px] font-semibold leading-5">{item.label}</span>
+                                        {item.kind !== 'product' && (
+                                            <span className="shrink-0 rounded-full bg-surface-green px-2 py-1 text-[10px] font-semibold text-store-muted">
+                                                {t(`search.kinds.${item.kind}`)}
+                                            </span>
+                                        )}
+                                    </Link>
+                                ))
+                            ) : (
+                                <p className="m-0 px-3 py-5 text-sm text-store-muted">{t('search.noSuggestions')}</p>
+                            )}
+                            <Link to={getCatalogSearchPath(keyword.trim())}
+                                onClick={(event) => void handleHistoryClick(event, keyword.trim())}
+                                className="mt-2 flex items-center justify-between gap-2 rounded-xl border border-solid border-store-line bg-store-cream px-3 py-3 text-xs font-bold text-store-green no-underline hover:bg-surface-yellow focus-visible:outline-2 focus-visible:outline-store-green">
+                                <span className="min-w-0 truncate">{t('search.viewAll', { query: keyword.trim() })}</span>
+                                <ArrowRight size={15} />
+                            </Link>
+                        </>
+                    )}
                 </nav>
             )}
 
@@ -112,58 +171,6 @@ export default function StoreSearch() {
                 </p>
             )}
 
-            {historyEntries.length > 0 && (
-                <div className="mt-2 flex min-w-0 items-center gap-1.5 border-0 bg-transparent py-1">
-                    <nav
-                        ref={historyRef}
-                        className="flex min-w-0 flex-1 cursor-grab select-none items-center gap-2 overflow-x-auto whitespace-nowrap touch-pan-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden active:cursor-grabbing"
-                        aria-label={t('search.history')}
-                        onPointerDown={startDrag}
-                        onPointerMove={moveDrag}
-                        onPointerUp={stopDrag}
-                        onPointerCancel={stopDrag}
-                        onPointerLeave={stopDrag}
-                        onClickCapture={guardHistoryDrag}
-                    >
-                        {historyEntries.map((entry) => (
-                            <span
-                                key={entry.id}
-                                className="inline-flex max-w-[220px] shrink-0 items-center overflow-hidden rounded-full border border-white/20 bg-white/10 text-[11px] text-store-cream"
-                            >
-                                <Link
-                                    to={getCatalogSearchPath(entry.keyword)}
-                                    onClick={(event) =>
-                                        void handleHistoryClick(event, entry.keyword)
-                                    }
-                                    title={entry.keyword}
-                                    className="block min-w-0 max-w-[182px] truncate px-3 py-1.5 text-store-cream no-underline hover:bg-white/10"
-                                >
-                                    {entry.keyword}
-                                </Link>
-                                <button
-                                    type="button"
-                                    disabled={deleting}
-                                    aria-label={`${t('searchHistory.remove')}: ${entry.keyword}`}
-                                    title={t('searchHistory.remove')}
-                                    onClick={() => void deleteSearch(entry.id)}
-                                    className="flex size-7 shrink-0 cursor-pointer items-center justify-center border-0 border-l border-white/20 bg-transparent text-store-cream hover:bg-red-500/30 disabled:opacity-50"
-                                >
-                                    <X size={13} aria-hidden="true" />
-                                </button>
-                            </span>
-                        ))}
-                    </nav>
-                    <button
-                        type="button"
-                        disabled={deleting}
-                        onClick={confirmClear}
-                        className="inline-flex shrink-0 cursor-pointer items-center gap-1 whitespace-nowrap rounded-full border border-white/20 bg-transparent px-2.5 py-1.5 text-[11px] text-store-cream hover:bg-red-500/20 disabled:opacity-50"
-                    >
-                        <Trash2 size={12} aria-hidden="true" />
-                        {t('searchHistory.clearAll')}
-                    </button>
-                </div>
-            )}
             {deleteError && (
                 <p role="alert" className="mt-1 px-2 text-xs text-red-200">
                     {t('searchHistory.deleteError')}
