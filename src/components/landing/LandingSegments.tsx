@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import BtbImagePlaceholder from './BtbImagePlaceholder';
 /* Generated from the supplied HTML layout. Edit this section independently. */
 import { useState } from 'react';
 import { landingSegments } from './landingSegmentsData';
 
 export default function LandingSegments() {
+    const { t } = useTranslation('storefront');
     const [activeSegment, setActiveSegment] = useState(0);
     const segment = landingSegments[activeSegment];
     const photoBySegment = ['market', 'vegetables', 'kitchen', 'warehouse', 'produce'] as const;
@@ -14,9 +16,9 @@ export default function LandingSegments() {
         >
             <div className="mx-auto max-w-[1240px] px-6">
                 <div className="mx-auto mb-11 max-w-[720px] text-center">
-                    <span className="mb-2.5 inline-block rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3.5 py-1 font-label text-[15px] font-normal text-store-ink shadow-[3px_3px_0_var(--color-store-ink)]">04 • ĐỐI TƯỢNG PHỤC VỤ</span>
+                    <span className="mb-2.5 inline-block rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3.5 py-1 font-label text-[15px] font-normal text-store-ink shadow-[3px_3px_0_var(--color-store-ink)]">{t('landing.segments.eyebrow')}</span>
                     <h2 className="mb-2.5 font-subheading text-[clamp(28px,3.2vw,40px)] font-normal leading-[1.22] text-store-ink">
-                        Phục vụ đa dạng nhu cầu mua thực phẩm
+                        {t('landing.segments.title')}
                     </h2>
                 </div>
                 <div className="mb-7 flex flex-wrap items-center justify-center gap-2.5">
@@ -24,7 +26,7 @@ export default function LandingSegments() {
                         type="button"
                         className="inline-flex h-[38px] w-[38px] cursor-pointer items-center justify-center rounded-full border-[2.5px] border-solid border-store-ink bg-store-yellow text-base font-extrabold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] hover:bg-store-coral hover:text-white"
                         id="btnSegPrev"
-                        aria-label="Mô hình trước"
+                        aria-label={t('landing.segments.previous')}
                         onClick={() =>
                             setActiveSegment(
                                 (v) => (v + landingSegments.length - 1) % landingSegments.length,
@@ -47,7 +49,7 @@ export default function LandingSegments() {
                         data-seg-idx="0"
                         onClick={() => setActiveSegment(0)}
                     >
-                        Doanh nghiệp / HTX
+                        {t('landing.segments.businessTab')}
                     </button>
                     <button
                         type="button"
@@ -58,7 +60,7 @@ export default function LandingSegments() {
                         data-seg-idx="1"
                         onClick={() => setActiveSegment(1)}
                     >
-                        Cửa hàng / Hộ kinh doanh
+                        {t('landing.segments.shopTab')}
                     </button>
                     <button
                         type="button"
@@ -69,7 +71,7 @@ export default function LandingSegments() {
                         data-seg-idx="2"
                         onClick={() => setActiveSegment(2)}
                     >
-                        Nhà hàng / Bếp ăn
+                        {t('landing.segments.restaurantTab')}
                     </button>
                     <button
                         type="button"
@@ -80,7 +82,7 @@ export default function LandingSegments() {
                         data-seg-idx="3"
                         onClick={() => setActiveSegment(3)}
                     >
-                        Phân phối / Bán lẻ
+                        {t('landing.segments.distributionTab')}
                     </button>
                     <button
                         type="button"
@@ -91,13 +93,13 @@ export default function LandingSegments() {
                         data-seg-idx="4"
                         onClick={() => setActiveSegment(4)}
                     >
-                        Cá nhân / Gia đình
+                        {t('landing.segments.householdTab')}
                     </button>
                     <button
                         type="button"
                         className="inline-flex h-[38px] w-[38px] cursor-pointer items-center justify-center rounded-full border-[2.5px] border-solid border-store-ink bg-store-yellow text-base font-extrabold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] hover:bg-store-coral hover:text-white"
                         id="btnSegNext"
-                        aria-label="Mô hình kế tiếp"
+                        aria-label={t('landing.segments.next')}
                         onClick={() => setActiveSegment((v) => (v + 1) % landingSegments.length)}
                     >
                         <img
@@ -118,10 +120,10 @@ export default function LandingSegments() {
                             }}
                             id="segTitle"
                         >
-                            {segment.title}
+                            {t(segment.title)}
                         </h3>
                         <p style={{ fontSize: '14.5px', color: 'var(--text-body)' }} id="segDesc">
-                            {segment.desc}
+                            {t(segment.desc)}
                         </p>
                         <ul className="my-[18px] mb-6 flex list-none flex-col gap-3 text-[15px] text-store-ink [&_li]:flex [&_li]:items-center [&_li]:gap-2.5">
                             <li>
@@ -133,7 +135,7 @@ export default function LandingSegments() {
                                         aria-hidden="true"
                                     />
                                 </span>
-                                <span id="segBullet1">{segment.b1}</span>
+                                <span id="segBullet1">{t(segment.b1)}</span>
                             </li>
                             <li>
                                 <span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-solid border-store-ink bg-[var(--green-soft-bg)] text-xs font-extrabold text-[var(--green-ok)]">
@@ -144,7 +146,7 @@ export default function LandingSegments() {
                                         aria-hidden="true"
                                     />
                                 </span>
-                                <span id="segBullet2">{segment.b2}</span>
+                                <span id="segBullet2">{t(segment.b2)}</span>
                             </li>
                             <li>
                                 <span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-solid border-store-ink bg-[var(--green-soft-bg)] text-xs font-extrabold text-[var(--green-ok)]">
@@ -155,7 +157,7 @@ export default function LandingSegments() {
                                         aria-hidden="true"
                                     />
                                 </span>
-                                <span id="segBullet3">{segment.b3}</span>
+                                <span id="segBullet3">{t(segment.b3)}</span>
                             </li>
                         </ul>
                         <div
@@ -165,7 +167,7 @@ export default function LandingSegments() {
                                 fontWeight: '600',
                             }}
                         >
-                            {segment.audience}
+                            {t(segment.audience)}
                         </div>
                     </div>
                     <div
@@ -177,7 +179,7 @@ export default function LandingSegments() {
                             boxShadow: 'var(--shadow-soft)',
                         }}
                     >
-                        <BtbImagePlaceholder label={`Ảnh minh họa: ${segment.title}`} photo={photoBySegment[activeSegment]} />
+                        <BtbImagePlaceholder label={t('landing.segments.imageAlt', { title: t(segment.title) })} photo={photoBySegment[activeSegment]} />
                     </div>
                 </div>
             </div>
