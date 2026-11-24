@@ -192,17 +192,6 @@ export type ExecutiveReview = {
     productNameEn: string;
 };
 
-export type ProductRequest = {
-    id: string;
-    customerId: string;
-    productName: string;
-    referenceUrl: string | null;
-    status: string;
-    customerNote: string | null;
-    createdAt: string;
-    updatedAt: string;
-};
-
 export type DashboardMetrics = {
     publishedProducts: number;
     draftProducts: number;
