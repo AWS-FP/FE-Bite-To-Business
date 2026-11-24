@@ -297,7 +297,8 @@
         "orderHistory": "Order history",
         "accountSettings": "Account Settings",
         "signOut": "Sign Out",
-        "favorites": "My Favorites"
+        "favorites": "My Favorites",
+        "productRequests": "My product requests"
     },
     "homePage": {
         "productsLoading": "Loading products…",

@@ -66,9 +66,11 @@ export default function PartnerStrip() {
                                 className="flex shrink-0 items-center gap-5 pr-5"
                             >
                                 {brands.map((brand) => (
-                                    <div
+                                    <Link
                                         key={brand.id}
-                                        className="flex h-20 w-36 shrink-0 items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm"
+                                        to={brand.path}
+                                        tabIndex={copy === 1 ? -1 : undefined}
+                                        className="flex h-20 w-36 shrink-0 items-center justify-center rounded-xl bg-white px-4 py-3 shadow-sm transition-transform hover:scale-105"
                                         title={brand.name}
                                     >
                                         <img
@@ -77,7 +79,7 @@ export default function PartnerStrip() {
                                             className="h-full w-full object-contain"
                                             loading="lazy"
                                         />
-                                    </div>
+                                    </Link>
                                 ))}
                             </div>
                         ))}

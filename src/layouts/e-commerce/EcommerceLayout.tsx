@@ -8,6 +8,7 @@ import {
     Megaphone,
     Menu,
     MessageSquare,
+    Undo2,
     Package,
     Search,
     TicketPercent,
@@ -69,6 +70,11 @@ function EcommerceWorkspace() {
             path: ROUTES.ECOMMERCE_REVIEWS,
             label: tr('Đánh giá khách hàng', 'Customer reviews'),
             icon: <MessageSquare size={18} />,
+        },
+        {
+            path: ROUTES.ECOMMERCE_REFUNDS,
+            label: tr('Yêu cầu hủy hàng', 'Cancellation requests'),
+            icon: <Undo2 size={18} />,
         },
     ];
     const current = navigation.find((item) => location.pathname === item.path) ?? navigation[0];

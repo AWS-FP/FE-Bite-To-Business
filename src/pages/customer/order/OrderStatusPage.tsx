@@ -14,6 +14,8 @@ import type { CustomerOrderDetail } from '@/types/customer/order';
 import { createBankPayment, getBankPayment } from '@/services/customer/paymentService';
 import type { BankPayment } from '@/types/customer/payment';
 import PageNav from '@/components/common/PageNav';
+import OrderCancellationSection from '@/components/customer/order/OrderCancellationSection';
+import { useOrderCancellation } from '@/hooks/customer/useOrderCancellation';
 
 const money = (value: number) => `${value.toLocaleString('vi-VN')}đ`;
 const QR_LIFETIME_MS = 5 * 60 * 1000;
@@ -43,6 +45,7 @@ export default function OrderStatusPage() {
     // A fresh one re-checks with BE that the order can still be paid before showing it again.
     const [qrIssuedAt, setQrIssuedAt] = useState<number | null>(null);
     const [now, setNow] = useState(0);
+    const cancellation = useOrderCancellation(detail?.order.orderId === orderId ? detail : null);
 
     useEffect(() => {
         const abort = new AbortController();
@@ -350,6 +353,7 @@ export default function OrderStatusPage() {
                                         <p className="mb-0">SePay đã xác nhận giao dịch. Đơn hàng sẽ được chuyển cho bộ phận giao hàng.</p>
                                     </section>
                                 )}
+                                <OrderCancellationSection cancellation={cancellation} />
                             </aside>
                         </div>
                     </>

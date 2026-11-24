@@ -1,6 +1,6 @@
 import { http } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
-import type { AdminPage, AdminPricing, AdminProduct, Coupon, CouponWrite, DashboardMetrics, ExecutiveReview, PricingWrite, ProductRequest, Promotion, PromotionPriceUpdate, PromotionProductChoice, PromotionProductFilter, PromotionWrite, Quote } from '@/types/e-commerce/executiveAdmin';
+import type { AdminPage, AdminPricing, AdminProduct, Coupon, CouponWrite, DashboardMetrics, ExecutiveRefund, ExecutiveReview, PricingWrite, ProductRequest, Promotion, PromotionPriceUpdate, PromotionProductChoice, PromotionProductFilter, PromotionWrite, Quote } from '@/types/e-commerce/executiveAdmin';
 
 async function getData<T>(url: string, params?: Record<string, unknown>): Promise<T> {
     const { data } = await http.get<ApiResponse<T>>(url, { params });
@@ -116,6 +116,14 @@ export const executiveApi = {
         getData<AdminPage<ExecutiveReview>>(`${api}/reviews`, { status, stars, page, size }),
     moderateReview: (id: string, action: 'HIDE' | 'RESTORE', reason?: string) =>
         patchData<ExecutiveReview>(`${api}/reviews/${id}/moderation`, { action, reason }),
+    refundRequests: (status?: string, page = 0, size = 20) =>
+        getData<AdminPage<ExecutiveRefund>>(`${api}/refund-requests`, { status, page, size }),
+    approveRefund: (id: string, note?: string) =>
+        patchData<ExecutiveRefund>(`${api}/refund-requests/${id}/approve`, { note }),
+    rejectRefund: (id: string, note: string) =>
+        patchData<ExecutiveRefund>(`${api}/refund-requests/${id}/reject`, { note }),
+    markRefunded: (id: string, transferReference: string) =>
+        patchData<ExecutiveRefund>(`${api}/refund-requests/${id}/refunded`, { transferReference }),
     productRequests: (status?: string, page = 0, size = 20) =>
         getData<AdminPage<ProductRequest>>(`${api}/product-requests`, { status, page, size }),
     productRequest: (id: string) =>

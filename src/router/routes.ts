@@ -28,6 +28,7 @@ export const ROUTES = {
     ORDERS: '/orders',
     ORDER_DETAIL: '/orders/:orderId',
     FAVORITES: '/favorites',
+    MY_PRODUCT_REQUESTS: '/product-requests',
     PROFILE: '/profile',
 
     ADMIN: '/admin',
@@ -45,6 +46,7 @@ export const ROUTES = {
     ECOMMERCE_COUPONS: '/e-commerce/coupons',
     ECOMMERCE_REQUESTS: '/e-commerce/product-requests',
     ECOMMERCE_REVIEWS: '/e-commerce/reviews',
+    ECOMMERCE_REFUNDS: '/e-commerce/cancellations',
 
     LOGISTICS: '/logistics',
     LOGISTICS_INVENTORY: '/logistics/inventory',

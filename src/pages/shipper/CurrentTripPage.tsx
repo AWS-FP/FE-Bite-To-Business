@@ -1,108 +1,20 @@
-import axios from 'axios';
-import { useCallback, useEffect, useState } from 'react';
 import { Package, RefreshCw, Truck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { routePaths } from '@/router/routes';
 import Pagination from '@/components/common/Pagination';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import { SectionHeading } from '@/components/shipper/DeliveryUI';
 import { useDelivery } from '@/components/shipper/DeliveryModel';
-import { claimPackage, getMyPackages, getReadyOrders } from '@/services/shipper/deliveryService';
-import type { ClaimedPackage, Page, ReadyOrder } from '@/types/shipper/delivery';
-
-function errorMessage(error: unknown) {
-    if (axios.isAxiosError(error)) {
-        if (error.response?.status === 409)
-            return 'Gói này không còn sẵn sàng. Danh sách sẽ được cập nhật lại.';
-        const code = error.response?.data?.code || error.code;
-        return `Không tải được dữ liệu. Vui lòng thử lại.${code ? ` Mã lỗi: ${code}` : ''}`;
-    }
-    return 'Không tải được dữ liệu. Vui lòng thử lại.';
-}
-
-function groupPackages(packages: ClaimedPackage[]) {
-    const groups: Record<string, ClaimedPackage[]> = {};
-    for (const parcel of packages) {
-        if (!groups[parcel.orderId]) groups[parcel.orderId] = [];
-        groups[parcel.orderId].push(parcel);
-    }
-    return Object.values(groups);
-}
+import { groupPackages, useDeliveryBoard } from '@/hooks/shipper/useDeliveryBoard';
+import { isDeliveryOverdue } from '@/utils/shipper/deliveryDeadline';
 
 export default function CurrentTripPage() {
     const { language } = useDelivery();
-    const [ready, setReady] = useState<Page<ReadyOrder> | null>(null);
-    const [mine, setMine] = useState<Page<ClaimedPackage> | null>(null);
-    const [readyPage, setReadyPage] = useState(0);
-    const [minePage, setMinePage] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const [claiming, setClaiming] = useState<string | null>(null);
-    const [error, setError] = useState('');
-    const [notice, setNotice] = useState('');
-
-    const load = useCallback(
-        async (signal?: AbortSignal) => {
-            try {
-                const [readyData, myData] = await Promise.all([
-                    getReadyOrders(readyPage, signal),
-                    getMyPackages(minePage, signal),
-                ]);
-                if (signal?.aborted) return;
-                if (readyPage > 0 && readyPage >= readyData.totalPages) {
-                    setReadyPage(Math.max(0, readyData.totalPages - 1));
-                }
-                if (minePage > 0 && minePage >= myData.totalPages) {
-                    setMinePage(Math.max(0, myData.totalPages - 1));
-                }
-                setReady(readyData);
-                setMine(myData);
-            } catch (err) {
-                if (!signal?.aborted) setError(errorMessage(err));
-            } finally {
-                if (!signal?.aborted) setLoading(false);
-            }
-        },
-        [readyPage, minePage],
-    );
-
-    useEffect(() => {
-        const controller = new AbortController();
-        void Promise.resolve().then(() => {
-            if (!controller.signal.aborted) return load(controller.signal);
-        });
-        return () => controller.abort();
-    }, [load]);
-
-    async function receive(packageId: string) {
-        if (claiming) return;
-        setClaiming(packageId);
-        setError('');
-        setNotice('');
-        try {
-            await claimPackage(packageId);
-            setNotice('Đã nhận package. Thông tin giao hàng nằm trong mục “Package của tôi”.');
-            setLoading(true);
-            await load();
-        } catch (err) {
-            const message = errorMessage(err);
-            setLoading(true);
-            await load();
-            setError(message);
-        } finally {
-            setClaiming(null);
-        }
-    }
-
-    function changeReadyPage(page: number) {
-        setLoading(true);
-        setError('');
-        setReadyPage(page);
-    }
-
-    function changeMinePage(page: number) {
-        setLoading(true);
-        setError('');
-        setMinePage(page);
-    }
+    const {
+        ready, mine, readyPage, minePage, loading, claiming, error, notice,
+        pendingAction, setPendingAction, acting, confirmAction,
+        refresh, receive, changeReadyPage, changeMinePage,
+    } = useDeliveryBoard();
 
     return (
         <div className="space-y-6 text-store-ink">
@@ -116,11 +28,7 @@ export default function CurrentTripPage() {
                     type="button"
                     className="dl-btn"
                     disabled={loading || !!claiming}
-                    onClick={() => {
-                        setLoading(true);
-                        setError('');
-                        void load();
-                    }}
+                    onClick={refresh}
                 >
                     <RefreshCw size={15} /> {language === 'vi' ? 'Làm mới' : 'Refresh'}
                 </button>
@@ -168,9 +76,6 @@ export default function CurrentTripPage() {
                             key={group[0].orderId}
                             className="overflow-hidden rounded-xl border border-store-ink/15"
                         >
-                            <div className="bg-store-cream px-4 py-3 text-sm font-bold">
-                                {group[0].orderNumber}
-                            </div>
                             <div className="divide-y divide-store-ink/10">
                                 {group.map((parcel) => (
                                     <div
@@ -178,8 +83,13 @@ export default function CurrentTripPage() {
                                         className="flex items-start justify-between gap-3 p-4"
                                     >
                                         <div>
-                                            <h3 className="mb-1 mt-0 text-base font-bold">
+                                            <h3 className="mb-1 mt-0 flex flex-wrap items-center gap-2 text-base font-bold">
                                                 {parcel.packageName}
+                                                {isDeliveryOverdue(parcel) && (
+                                                    <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">
+                                                        Trễ hạn hơn 24 giờ
+                                                    </span>
+                                                )}
                                             </h3>
                                             <p className="my-1 text-sm text-store-muted">
                                                 {parcel.address}
@@ -200,7 +110,17 @@ export default function CurrentTripPage() {
                                                 </p>
                                             )}
                                         </div>
-                                        <Link className="dl-btn" to={routePaths.deliveryTripDetail(parcel.packageId)}>Xem chi tiết</Link>
+                                        <div className="flex shrink-0 flex-col items-stretch gap-2">
+                                            <Link className="dl-btn" to={routePaths.deliveryTripDetail(parcel.packageId)}>Xem chi tiết</Link>
+                                            <button
+                                                type="button"
+                                                className="dl-btn dl-btn--primary"
+                                                disabled={acting || loading}
+                                                onClick={() => setPendingAction({ parcel })}
+                                            >
+                                                Đã giao
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -242,9 +162,6 @@ export default function CurrentTripPage() {
                             <div className="flex items-center justify-between bg-store-cream px-4 py-3">
                                 <div>
                                     <strong>Đơn của {order.customerName}</strong>
-                                    <p className="mb-0 mt-1 text-xs text-store-muted">
-                                        {order.orderNumber}
-                                    </p>
                                 </div>
                                 <span className="text-xs font-bold">
                                     {order.packages.length} package
@@ -287,6 +204,16 @@ export default function CurrentTripPage() {
                     />
                 )}
             </section>
+            <ConfirmModal
+                open={pendingAction !== null}
+                title="Xác nhận đã giao?"
+                message={`Xác nhận "${pendingAction?.parcel.packageName ?? ''}" đã được giao cho khách. Giao xong mọi package thì đơn hàng hoàn thành.`}
+                confirmLabel={acting ? 'Đang xử lý...' : 'Đã giao'}
+                cancelLabel="Quay lại"
+                busy={acting}
+                onConfirm={() => void confirmAction()}
+                onCancel={() => !acting && setPendingAction(null)}
+            />
         </div>
     );
 }

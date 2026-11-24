@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import AssistantBubble from '@/components/assistant/AssistantBubble';
 
 type Props = {
     children: ReactNode;
@@ -23,6 +24,7 @@ export default function StorefrontLayout({
             </main>
             <Footer />
             {afterMain}
+            <AssistantBubble />
         </div>
     );
 }
