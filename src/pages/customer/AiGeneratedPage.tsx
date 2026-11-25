@@ -7,7 +7,7 @@ import StorefrontLayout from '@/layouts/StorefrontLayout';
 import { getCatalogSearchPath } from '@/constants/catalogNavigation';
 import { AgentHttpError, runAgent, type AgentEvent } from '@/a2ui/client/agentClient';
 import { applyA2ui, getSurface, getSurfaceTree } from '@/a2ui/runtime/a2uiRuntime';
-import { personalizationAnonId, trackEvent } from '@/a2ui/telemetry/interactionTracker';
+import { trackEvent } from '@/a2ui/telemetry/interactionTracker';
 import WidgetTree from '@/a2ui/devtools/WidgetTree';
 
 const DEFAULT_PROMPT = 'Gợi ý trang mua sắm phù hợp với tôi';
@@ -110,7 +110,7 @@ function GeneratedSurface({
                 threadId: crypto.randomUUID(),
                 runId: crypto.randomUUID(),
                 messages: [{ role: 'user', content: prompt }],
-                state: { locale, anonId: personalizationAnonId() },
+                state: { locale },
                 mode: 'page',
             },
             onEvent,

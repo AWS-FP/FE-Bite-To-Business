@@ -55,6 +55,32 @@ function errorCode(error: unknown) {
     return (error.response?.data as { code?: string } | undefined)?.code;
 }
 
+interface StockShortage {
+    productId: string;
+    available: number;
+    requested: number;
+}
+
+// QUOTE_STOCK_UNAVAILABLE carries one errors[] row per short product:
+// field = productId, code = INSUFFICIENT_STOCK, message = "available=3;requested=8".
+function stockShortages(error: unknown): StockShortage[] {
+    if (!axios.isAxiosError(error)) return [];
+    const rows = (error.response?.data as { errors?: { field?: string; code?: string; message?: string }[] } | undefined)?.errors;
+    if (!Array.isArray(rows)) return [];
+    return rows
+        .filter((row) => row.code === 'INSUFFICIENT_STOCK' && row.field)
+        .map((row) => {
+            const values = Object.fromEntries(
+                (row.message ?? '').split(';').map((part) => part.split('=') as [string, string]),
+            );
+            return {
+                productId: row.field as string,
+                available: Number(values.available) || 0,
+                requested: Number(values.requested) || 0,
+            };
+        });
+}
+
 function errorMessage(error: unknown, fallback: string) {
     if (axios.isAxiosError(error)) {
         const data = error.response?.data as { message?: string; code?: string } | undefined;
@@ -111,6 +137,7 @@ export default function CartPage() {
         }));
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState('');
+    const [shortages, setShortages] = useState<StockShortage[]>([]);
     const [packageError, setPackageError] = useState('');
     const [mapOpen, setMapOpen] = useState(false);
     const [reorderLoading, setReorderLoading] = useState(!!reorderQuoteId);
@@ -320,7 +347,20 @@ export default function CartPage() {
                 // Giữ thông báo xung đột; khách có thể tải lại trang.
             }
         }
+        setShortages(code === 'QUOTE_STOCK_UNAVAILABLE' ? stockShortages(error) : []);
         setMessage(code && checkoutErrors[code] ? checkoutErrors[code] : errorMessage(error, t('errors.fallback')));
+    }
+
+    // Name + unit of a short product: from the quote when there is one, else from the cart.
+    function shortageLabel(row: StockShortage) {
+        const quoted = quote?.items.find((item) => item.productId === row.productId);
+        if (quoted) return { name: productName(quoted), unit: quoted.unitCode };
+        const carted = items.find((item) => item.id === row.productId);
+        const english = i18n.resolvedLanguage === 'en';
+        return {
+            name: carted ? (english ? carted.nameEn : carted.nameVi) || carted.name : row.productId,
+            unit: '',
+        };
     }
 
     async function reviewQuote() {
@@ -620,12 +660,29 @@ export default function CartPage() {
                 )}
                 {!reorderLoading && !quoteClosed && <QuoteSteps step={step} busy={busy} onSelectStep={selectStep} />}
                 {message && (
-                    <p
+                    <div
                         role="alert"
                         className="mb-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800"
                     >
                         {displayMessage(message)}
-                    </p>
+                        {message === 'errors.stockUnavailable' && shortages.length > 0 && (
+                            <ul className="mb-0 mt-2 list-disc space-y-1 pl-5 font-semibold">
+                                {shortages.map((row) => {
+                                    const { name, unit } = shortageLabel(row);
+                                    return (
+                                        <li key={row.productId}>
+                                            {t(row.available > 0 ? 'errors.stockShortItem' : 'errors.stockOutItem', {
+                                                name,
+                                                requested: row.requested,
+                                                available: row.available,
+                                                unit,
+                                            })}
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        )}
+                    </div>
                 )}
                 {notice && (
                     <p

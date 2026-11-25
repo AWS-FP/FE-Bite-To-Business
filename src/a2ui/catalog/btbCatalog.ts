@@ -25,6 +25,7 @@ import {
     Section,
 } from './pageComponents';
 import { CartSummary, ReorderList } from './personalComponents';
+import { ProductFacts } from './factsComponents';
 
 /** Phải trùng catalogId trong Generate-UI-BE/src/main/resources/ai/catalog.json. */
 export const BTB_CATALOG_ID = 'https://bite2business.cloud/a2ui/catalogs/bite-to-business/v1.json';
@@ -54,6 +55,7 @@ export const btbCatalog = new Catalog(BTB_CATALOG_ID, 'v0.9', [
     PromotionList,
     ReorderList,
     CartSummary,
+    ProductFacts,
 ]);
 
 /** Action phía client; phải khớp $defs.BtbAction của catalog BE. */

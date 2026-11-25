@@ -68,11 +68,12 @@ export const ProductGrid = createComponentImplementation(ProductGridApi, ({ prop
     );
 });
 
-type Column = 'image' | 'name' | 'spec' | 'price' | 'priceTiers' | 'moq' | 'stock';
+type Column = 'image' | 'name' | 'spec' | 'origin' | 'price' | 'priceTiers' | 'moq' | 'stock';
 const COLUMN_LABEL: Record<Column, string> = {
     image: '',
     name: 'Sản phẩm',
     spec: 'Quy cách',
+    origin: 'Xuất xứ',
     price: 'Giá',
     priceTiers: 'Bậc giá',
     moq: 'Tối thiểu',
@@ -84,7 +85,9 @@ export const ProductTableApi = {
     schema: z.object({
         ...common,
         items: CommonSchemas.DynamicValue,
-        columns: z.array(z.enum(['image', 'name', 'spec', 'price', 'priceTiers', 'moq', 'stock'])),
+        columns: z.array(
+            z.enum(['image', 'name', 'spec', 'origin', 'price', 'priceTiers', 'moq', 'stock']),
+        ),
         highlight: z.enum(['none', 'lowestPrice', 'inStock']).optional(),
         maxItems: z.number().optional(),
         showAddToCart: z.boolean().optional(),
@@ -148,6 +151,8 @@ export const ProductTable = createComponentImplementation(ProductTableApi, ({ pr
                                         </button>
                                     )}
                                     {column === 'spec' && (product.spec ?? '—')}
+                                    {column === 'origin' &&
+                                        (product.facts?.origin ?? product.origin ?? '—')}
                                     {column === 'price' && <Price product={product} />}
                                     {column === 'priceTiers' && <Tiers product={product} />}
                                     {column === 'moq' &&

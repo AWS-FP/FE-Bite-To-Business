@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import type { Map, Marker } from '@vietmap/vietmap-gl-js/dist/vietmap-gl';
 import { deliveryMapCities } from '@/utils/deliveryMapCities';
 import { ROUTES } from '@/router/routes';
+import { isAxiosError } from 'axios';
 import { publicHttp } from '@/services/axiosClient';
 import { addressToCoordinates, coordinatesToAddress } from '@/services/geocodingService';
 import { loadVietMap } from '@/services/shipper/vietmapService';
@@ -83,9 +84,19 @@ export default function DistributionExplorer({ onAddressSelected, formOwner }: {
             ]);
             if (request !== requestRef.current) return;
             if (addressResult.status === 'fulfilled') setQuery(addressResult.value.address);
-            if (routeResult.status === 'fulfilled') setEstimate(routeResult.value.data.data);
+            if (routeResult.status === 'fulfilled') {
+                const result = routeResult.value.data.data;
+                // BE đã đưa điểm về đường xe chạy gần nhất: dời marker ngay tới đó.
+                markerRef.current?.setLngLat([result.lng, result.lat]);
+                setPoint([result.lng, result.lat]);
+                setEstimate(result);
+            }
             if (addressResult.status === 'rejected') setError('distribution.errors.reverse');
-            if (routeResult.status === 'rejected') setError('distribution.errors.route');
+            if (routeResult.status === 'rejected') {
+                const unreachable = isAxiosError(routeResult.reason) && routeResult.reason.response?.status === 422;
+                setError(unreachable ? 'distribution.errors.unreachable' : 'distribution.errors.route');
+                if (unreachable) setQuery('');
+            }
             setLoading(false);
         },
         [city],

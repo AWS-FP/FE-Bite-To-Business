@@ -5,6 +5,7 @@
         "registrations": "Quản lý Customer",
         "staff": "Tài khoản Staff",
         "returns": "Yêu cầu trả hàng",
+        "paymentReviews": "Thanh toán cần xử lý",
         "system": "Hệ thống & Báo cáo"
     },
     "header": {
@@ -23,6 +24,7 @@
         "systemManagement": "VẬN HÀNH HỆ THỐNG",
         "pendingRegistrations": "Đăng ký Customer, {{count}} hồ sơ chờ duyệt",
         "collapse": "Thu gọn sidebar",
-        "expand": "Mở rộng sidebar"
+        "expand": "Mở rộng sidebar",
+        "openPaymentReviews": "Thanh toán cần xử lý: {{count}} khoản chưa xử lý"
     }
 }

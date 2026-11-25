@@ -45,6 +45,7 @@ import LogisticsLayout from '@/layouts/logistic/LogisticsLayout';
 import InventoryPage from '@/pages/logistic/InventoryPage';
 import ReceivePage from '@/pages/logistic/ReceivePage';
 import PackageReturnsPage from '@/pages/admin/PackageReturnsPage';
+import PaymentReviewsPage from '@/pages/admin/PaymentReviewsPage';
 import ProductRequestsPage from '@/pages/logistic/ProductRequestsPage';
 
 // Admin Pages
@@ -141,11 +142,6 @@ export const router = createBrowserRouter([
                         Component: CustomerCatalogPage,
                     },
                     {
-                        // Trang do AI dựng thay trang mặc định (Generative UI, chế độ Page).
-                        path: ROUTES.AI_PAGE,
-                        Component: AiGeneratedPage,
-                    },
-                    {
                         path: ROUTES.CUSTOMER_COLLECTION,
                         Component: CustomerCollectionPage,
                     },
@@ -177,6 +173,12 @@ export const router = createBrowserRouter([
                 element: <ProtectedRoute allowedRoles={[AUTH_ROLES.CUSTOMER]} />,
 
                 children: [
+                    {
+                        // Trang do AI dựng thay trang mặc định (Generative UI, chế độ Page).
+                        // Chỉ Customer: Guest được ProtectedRoute đưa tới đăng nhập rồi quay lại đúng /ai?q=...
+                        path: ROUTES.AI_PAGE,
+                        Component: AiGeneratedPage,
+                    },
                     {
                         path: ROUTES.QUOTE_DETAIL,
                         Component: PendingPage,
@@ -243,6 +245,10 @@ export const router = createBrowserRouter([
                             {
                                 path: ROUTES.ADMIN_PACKAGE_RETURNS,
                                 Component: PackageReturnsPage,
+                            },
+                            {
+                                path: ROUTES.ADMIN_PAYMENT_REVIEWS,
+                                Component: PaymentReviewsPage,
                             },
                             {
                                 path: ROUTES.ADMIN_SYSTEM,
