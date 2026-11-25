@@ -87,7 +87,11 @@
         "addressFromDistribution": "Dùng đúng vị trí đã chọn ở trang Phân phối. Sửa địa chỉ sẽ tìm lại tọa độ.",
         "creating": "Đang tạo gói...",
         "pickOnMap": "Chọn trên bản đồ",
-        "defaultPackageName": "Gói giao hàng mặc định"
+        "defaultPackageName": "Gói giao hàng mặc định",
+        "editTitle": "Chỉnh sửa kiện giao hàng",
+        "saveEdit": "Lưu kiện giao hàng",
+        "cancelEdit": "Hủy chỉnh sửa",
+        "finishEditing": "Lưu hoặc hủy chỉnh sửa kiện giao hàng trước khi tiếp tục."
     },
     "review": {
         "title": "Kiểm tra trước khi thanh toán",
@@ -123,7 +127,8 @@
     "notices": {
         "couponsUpdated": "Đã cập nhật ưu đãi.",
         "couponsRemoved": "Đã bỏ các coupon khỏi báo giá.",
-        "packageAdded": "Đã thêm gói giao hàng."
+        "packageAdded": "Đã thêm gói giao hàng.",
+        "packageUpdated": "Đã cập nhật kiện giao hàng."
     },
     "lineVat": "VAT {{rate}}%: {{amount}}",
     "lineVatMissing": "Chưa có thuế suất VAT",
@@ -132,7 +137,7 @@
     "couponPicker": {
         "productTitle": "Coupon sản phẩm",
         "shippingTitle": "Coupon phí giao hàng",
-        "selectOrEnter": "Chọn hoặc nhập mã",
+        "selectOrEnter": "Nhập mã",
         "appliedUnknown": "Đã áp dụng",
         "inputLabel": "Mã coupon",
         "inputPlaceholder": "Nhập mã 8 ký tự",
@@ -156,6 +161,17 @@
         "choose": "Chọn",
         "inUse": "Đang dùng",
         "remove": "Bỏ mã đang dùng",
-        "close": "Đóng"
+        "close": "Đóng",
+        "privateNotice": "Nhập chính xác mã được cung cấp. Mã khuyến mãi sẽ không hiển thị công khai.",
+        "savedCodes": "Mã của bạn còn sử dụng được"
+    },
+    "reorder": {
+        "title": "Đặt lại đơn hàng",
+        "summary": "Đã lấy thông tin giao hàng cũ. Giá, tồn kho và ngày giao được kiểm tra lại trước khi thanh toán.",
+        "loading": "Đang kiểm tra đơn đặt lại...",
+        "cartTitle": "Sản phẩm đặt hàng lại",
+        "cartHint": "Chỉnh số lượng tại đây. Nhập 0 để bỏ sản phẩm. Giỏ hàng thường không thay đổi.",
+        "allocationReset": "Kiện chứa sản phẩm thay đổi cần được phân bổ lại. Các kiện không bị ảnh hưởng vẫn được giữ.",
+        "invalidCart": "Nhập số lượng hợp lệ và giữ ít nhất một sản phẩm."
     }
 }

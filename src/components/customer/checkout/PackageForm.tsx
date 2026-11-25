@@ -25,6 +25,8 @@ export interface PackageDraft {
 
 interface PackageFormProps {
     quote: Quote;
+    editing?: boolean;
+    onCancelEdit?: () => void;
     packages: QuotePackage[];
     parcel: PackageDraft;
     setParcel: Dispatch<SetStateAction<PackageDraft>>;
@@ -50,6 +52,8 @@ const secondary =
 
 export default function PackageForm({
     quote,
+    editing = false,
+    onCancelEdit,
     packages,
     parcel,
     setParcel,
@@ -176,7 +180,7 @@ export default function PackageForm({
             onSubmit={onSubmit}
             className="rounded-2xl border border-store-ink/20 bg-white p-6"
         >
-            <h2 className="m-0 font-subheading text-xl font-bold">{t('form.title')}</h2>
+            <h2 className="m-0 font-subheading text-xl font-bold">{t(editing ? 'form.editTitle' : 'form.title')}</h2>
             <div className="mt-5 grid grid-cols-2 gap-4">
                 <label className="text-sm font-bold">
                     {t('form.name')}
@@ -432,8 +436,10 @@ export default function PackageForm({
                 </p>
             )}
             <button disabled={busy} type="submit" className={secondary}>
-                <Plus size={17} /> {busy ? t('form.creating') : t('createPackage')}
+                <Plus size={17} /> {busy ? t('processing') : t(editing ? 'form.saveEdit' : 'createPackage')}
             </button>
+            {editing && <button type="button" disabled={busy} onClick={onCancelEdit}
+                className={`${secondary} ml-2`}>{t('form.cancelEdit')}</button>}
         </form>
     );
 }
