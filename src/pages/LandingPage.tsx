@@ -26,24 +26,24 @@ export default function LandingPage() {
 
     const [category, setCategory] = useState('all');
     const [view, setView] = useState<'grid' | 'table'>('grid');
-    const [toast, setToast] = useState('');
+    const [toast, setToast] = useState<{ key: string; itemKey?: string } | null>(null);
 
     useEffect(() => {
         if (!toast) return;
 
         const timeout = window.setTimeout(() => {
-            setToast('');
+            setToast(null);
         }, 3600);
 
         return () => window.clearTimeout(timeout);
     }, [toast]);
 
-    const showToast = (message: string) => {
-        setToast(message);
+    const showToast = (key: string) => {
+        setToast({ key });
     };
 
-    const onAddToQuote = (item: string) => {
-        showToast(`Đã thêm "${item}" vào báo giá mẫu. Chưa lưu lên máy chủ.`);
+    const onAddToQuote = (itemKey: string) => {
+        setToast({ key: 'landing.toast.added', itemKey });
     };
 
     return (
@@ -85,7 +85,7 @@ export default function LandingPage() {
                     role="status"
                     aria-live="polite"
                 >
-                    {toast}
+                    {toast ? t(toast.key, { item: toast.itemKey ? t(toast.itemKey) : '' }) : ''}
                 </div>
             </div>
 

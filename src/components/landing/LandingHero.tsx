@@ -5,9 +5,8 @@ import LandingPartners from './LandingPartners';
 import { useLandingAudience } from '@/hooks/useLandingAudience';
 
 export default function LandingHero() {
-    const { t, i18n } = useTranslation('storefront');
+    const { t } = useTranslation('storefront');
     const { audience } = useLandingAudience();
-    const language = i18n.resolvedLanguage ?? i18n.language;
     return (
         <section className="relative bg-store-green pt-12 pb-14 text-center sm:pt-16" id="top-hero">
             <div className="mx-auto max-w-[1240px] px-6">
@@ -18,29 +17,14 @@ export default function LandingHero() {
                     className="mx-auto mb-3.5 max-w-[900px] font-heading text-[clamp(38px,5.2vw,66px)] font-normal leading-[1.18] text-store-cream [text-shadow:3px_3px_0_var(--color-store-ink)] [&_em]:font-heading [&_em]:font-bold [&_em]:not-italic [&_em]:text-store-yellow"
                     id="heroMainTitle"
                 >
-                    {language === 'en' ? (
-                        <>
-                            Food sourcing for <em>businesses and individuals</em>
-                        </>
-                    ) : audience === 'business' ? (
-                        <>
-                            Giải pháp mua thực phẩm cho <em>doanh nghiệp và đơn vị thu mua.</em>
-                        </>
-                    ) : (
-                        <>
-                            Thực phẩm thiết yếu cho <em>cá nhân và gia đình.</em>
-                        </>
-                    )}
+                    {t(audience === 'business' ? 'landing.hero.businessTitle' : 'landing.hero.personalTitle')}{' '}
+                    <em>{t(audience === 'business' ? 'landing.hero.businessHighlight' : 'landing.hero.personalHighlight')}</em>
                 </h1>
                 <p
                     className="mx-auto mb-[18px] max-w-[660px] font-subtext text-[16.5px] text-store-cream"
                     id="heroSubText"
                 >
-                    {language === 'en'
-                        ? 'Discover products, compare package sizes and quantity-based pricing for each item, and explore a more organized shopping experience.'
-                        : audience === 'business'
-                            ? 'Khám phá nguồn thực phẩm, so sánh quy cách và giá theo số lượng từng sản phẩm, tập hợp nhu cầu vào một quy trình báo giá rõ ràng.'
-                            : 'Khám phá thực phẩm theo nhu cầu gia đình, xem thông tin sản phẩm và quy cách, lưu trải nghiệm để tìm lại dễ hơn khi cần.'}
+                    {t(audience === 'business' ? 'landing.hero.businessDescription' : 'landing.hero.personalDescription')}
                 </p>
                 <div className="mb-9 flex flex-wrap justify-center gap-3.5">
                     <a href="#categories" className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white">

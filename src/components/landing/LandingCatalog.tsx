@@ -1,11 +1,12 @@
+import { useTranslation } from 'react-i18next';
 /* Generated from the supplied HTML layout. Edit this section independently. */
 type CatalogProps = {
     category: string;
     view: 'grid' | 'table';
     setCategory: (category: string) => void;
     setView: (view: 'grid' | 'table') => void;
-    onAddToQuote: (item: string) => void;
-    showToast: (message: string) => void;
+    onAddToQuote: (itemKey: string) => void;
+    showToast: (key: string) => void;
 };
 
 export default function LandingCatalog({
@@ -16,6 +17,7 @@ export default function LandingCatalog({
     onAddToQuote,
     showToast,
 }: CatalogProps) {
+    const { t } = useTranslation('storefront');
     return (
         <section
             className="py-[72px]"
@@ -29,17 +31,15 @@ export default function LandingCatalog({
             <div className="mx-auto max-w-[1240px] px-6">
                 <div className="mb-8 grid grid-cols-[5fr_7fr] items-end gap-8">
                     <div>
-                        <span className="mb-2.5 inline-block rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3.5 py-1 font-label text-[15px] font-normal text-store-ink shadow-[3px_3px_0_var(--color-store-ink)]">02 • DANH MỤC ĐA DẠNG</span>
+                        <span className="mb-2.5 inline-block rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3.5 py-1 font-label text-[15px] font-normal text-store-ink shadow-[3px_3px_0_var(--color-store-ink)]">{t('landing.catalog.eyebrow')}</span>
                         <h2 className="mb-2.5 font-subheading text-[clamp(28px,3.2vw,40px)] font-normal leading-[1.22] text-store-ink" style={{ marginBottom: '0' }}>
-                            Bite to Business — Đáp ứng nhu cầu mua hàng trên một nền tảng
+                            {t('landing.catalog.title')}
                         </h2>
                     </div>
                     <p style={{ fontSize: '15px', color: 'var(--text-body)' }}>
-                        Từ rau củ, thịt cá tươi sống đến
-                        <strong>thực phẩm chế biến sẵn</strong>
-                        (chả giò, bò viên, xúc xích, croissant cấp đông), gia vị và nguyên liệu pha
-                        chế — giúp doanh nghiệp hợp nhất mọi nhu cầu thu mua trên một hệ thống duy
-                        nhất.
+                        {t('landing.catalog.descriptionStart')}{' '}
+                        <strong>{t('landing.catalog.descriptionHighlight')}</strong>
+                        {' '}{t('landing.catalog.descriptionEnd')}
                     </p>
                 </div>
                 <div className="mb-8 flex flex-wrap gap-3" id="categoryPillCloud">
@@ -49,7 +49,7 @@ export default function LandingCatalog({
                         type="button"
                         onClick={() => setCategory('all')}
                     >
-                        <span style={{ position: 'relative', zIndex: '2' }}>Tất cả nổi bật</span>
+                        <span style={{ position: 'relative', zIndex: '2' }}>{t('landing.catalog.all')}</span>
                         <span className="pointer-events-none absolute -right-1.5 -bottom-2 z-0 h-12 w-12 -rotate-12 text-store-ink opacity-10 transition-transform group-hover:scale-110 group-hover:opacity-[0.18] [&_svg]:h-full [&_svg]:w-full">
                             <svg
                                 viewBox="0 0 24 24"
@@ -72,7 +72,7 @@ export default function LandingCatalog({
                         onClick={() => setCategory('meat')}
                     >
                         <span style={{ position: 'relative', zIndex: '2' }}>
-                            Thịt &amp; Gia cầm
+                            {t('landing.catalog.meat')}
                         </span>
                         <span className="pointer-events-none absolute -right-1.5 -bottom-2 z-0 h-12 w-12 -rotate-12 text-store-ink opacity-10 transition-transform group-hover:scale-110 group-hover:opacity-[0.18] [&_svg]:h-full [&_svg]:w-full">
                             <svg
@@ -95,7 +95,7 @@ export default function LandingCatalog({
                         type="button"
                         onClick={() => setCategory('seafood')}
                     >
-                        <span style={{ position: 'relative', zIndex: '2' }}>Cá &amp; Hải sản</span>
+                        <span style={{ position: 'relative', zIndex: '2' }}>{t('landing.catalog.seafood')}</span>
                         <span className="pointer-events-none absolute -right-1.5 -bottom-2 z-0 h-12 w-12 -rotate-12 text-store-ink opacity-10 transition-transform group-hover:scale-110 group-hover:opacity-[0.18] [&_svg]:h-full [&_svg]:w-full">
                             <svg
                                 viewBox="0 0 24 24"
@@ -119,7 +119,7 @@ export default function LandingCatalog({
                         onClick={() => setCategory('prepared')}
                     >
                         <span style={{ position: 'relative', zIndex: '2' }}>
-                            Đồ ăn chế biến sẵn
+                            {t('landing.catalog.prepared')}
                         </span>
                         <span className="pointer-events-none absolute -right-1.5 -bottom-2 z-0 h-12 w-12 -rotate-12 text-store-ink opacity-10 transition-transform group-hover:scale-110 group-hover:opacity-[0.18] [&_svg]:h-full [&_svg]:w-full">
                             <svg
@@ -142,7 +142,7 @@ export default function LandingCatalog({
                         type="button"
                         onClick={() => setCategory('veg')}
                     >
-                        <span style={{ position: 'relative', zIndex: '2' }}>Rau, Củ &amp; Nấm</span>
+                        <span style={{ position: 'relative', zIndex: '2' }}>{t('landing.catalog.produce')}</span>
                         <span className="pointer-events-none absolute -right-1.5 -bottom-2 z-0 h-12 w-12 -rotate-12 text-store-ink opacity-10 transition-transform group-hover:scale-110 group-hover:opacity-[0.18] [&_svg]:h-full [&_svg]:w-full">
                             <svg
                                 viewBox="0 0 24 24"
@@ -166,7 +166,7 @@ export default function LandingCatalog({
                         onClick={() => setCategory('dairy')}
                     >
                         <span style={{ position: 'relative', zIndex: '2' }}>
-                            Sữa, Bơ &amp; Phô mai
+                            {t('landing.catalog.dairy')}
                         </span>
                         <span className="pointer-events-none absolute -right-1.5 -bottom-2 z-0 h-12 w-12 -rotate-12 text-store-ink opacity-10 transition-transform group-hover:scale-110 group-hover:opacity-[0.18] [&_svg]:h-full [&_svg]:w-full">
                             <svg
@@ -192,7 +192,7 @@ export default function LandingCatalog({
                         onClick={() => setCategory('bakery')}
                     >
                         <span style={{ position: 'relative', zIndex: '2' }}>
-                            Bánh &amp; Tráng miệng
+                            {t('landing.catalog.bakery')}
                         </span>
                         <span className="pointer-events-none absolute -right-1.5 -bottom-2 z-0 h-12 w-12 -rotate-12 text-store-ink opacity-10 transition-transform group-hover:scale-110 group-hover:opacity-[0.18] [&_svg]:h-full [&_svg]:w-full">
                             <svg
@@ -222,7 +222,7 @@ export default function LandingCatalog({
                         }}
                     >
                         <span style={{ fontWeight: '700', fontSize: '15px' }}>
-                            Mặt hàng tiêu biểu (Công khai bảng giá Volume Pricing cho cả Guest):
+                            {t('landing.catalog.featured')}
                         </span>
                         <div style={{ display: 'flex', gap: '8px' }}>
                             <button
@@ -232,7 +232,7 @@ export default function LandingCatalog({
                                 style={{ padding: '7px 16px', fontSize: '12.5px' }}
                                 onClick={() => setView('grid')}
                             >
-                                Dạng Thẻ (Base UI)
+                                {t('landing.catalog.grid')}
                             </button>
                             <button
                                 type="button"
@@ -241,7 +241,7 @@ export default function LandingCatalog({
                                 style={{ padding: '7px 16px', fontSize: '12.5px' }}
                                 onClick={() => setView('table')}
                             >
-                                Dạng Bảng So Sánh (A2UI)
+                                {t('landing.catalog.table')}
                             </button>
                         </div>
                     </div>
@@ -260,7 +260,7 @@ export default function LandingCatalog({
                         >
                             <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[50px]">
                                 <div className="absolute top-3 left-3 flex gap-1.5" style={{ zIndex: '3' }}>
-                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-coral px-2.5 py-[3px] text-[11px] font-extrabold text-white shadow-[2px_2px_0_var(--color-store-ink)]">Bán chạy</span>
+                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-coral px-2.5 py-[3px] text-[11px] font-extrabold text-white shadow-[2px_2px_0_var(--color-store-ink)]">{t('landing.catalog.bestSeller')}</span>
                                 </div>
                                 <div className="svg-bg-watermark watermark-center">
                                     <svg
@@ -287,32 +287,32 @@ export default function LandingCatalog({
                                 >
                                     MDL-PORK-BELLY-500G
                                 </div>
-                                <div className="font-subheading text-[17px] font-normal leading-[1.3] text-store-ink">Ba Chỉ Heo Mát Chuẩn Khay 500g</div>
+                                <div className="font-subheading text-[17px] font-normal leading-[1.3] text-store-ink">{t('landing.catalog.porkTitle')}</div>
                                 <div style={{ fontSize: '12px', color: 'var(--text-body)' }}>
-                                    Đơn vị: Khay 500g • MOQ: 3 khay
+                                    {t('landing.catalog.porkUnit')}
                                 </div>
                                 <div className="mt-0.5 flex items-baseline gap-2">
-                                    <span className="font-price text-lg font-extrabold text-store-green tabular-nums">80.000đ/khay</span>
-                                    <span className="font-price text-xs text-[var(--err-4)] line-through tabular-nums">90.000đ</span>
+                                    <span className="font-price text-lg font-extrabold text-store-green tabular-nums">{t('landing.catalog.porkPrice')}</span>
+                                    <span className="font-price text-xs text-[var(--err-4)] line-through tabular-nums">{t('landing.catalog.porkOldPrice')}</span>
                                 </div>
                                 <div className="rounded-lg border-[1.5px] border-solid border-store-ink bg-[var(--yellow-tint)] px-2.5 py-1.5 text-[11px] font-bold text-[var(--warn-2)]">
-                                    Mua từ 10 khay:
-                                    <strong>76.000đ</strong>• 30+:
-                                    <strong>72.000đ</strong>
+                                    {t('landing.catalog.porkTier')}{' '}
+                                    <strong>{t('landing.catalog.porkTierPrice')}</strong>{' '}• 30+:
+                                    <strong>{t('landing.catalog.porkLargeTierPrice')}</strong>
                                 </div>
                                 <button
                                     type="button"
                                     className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
-                                    data-item="Ba Chỉ Heo Mát 500g"
+                                    data-item={t('landing.catalog.porkName')}
                                     style={{
                                         width: '100%',
                                         padding: '9px',
                                         fontSize: '13px',
                                         marginTop: 'auto',
                                     }}
-                                    onClick={() => onAddToQuote('Ba Chỉ Heo Mát 500g')}
+                                    onClick={() => onAddToQuote('landing.catalog.porkName')}
                                 >
-                                    + Thêm vào Báo giá
+                                    {t('landing.catalog.addQuote')}
                                 </button>
                             </div>
                         </div>
@@ -326,8 +326,8 @@ export default function LandingCatalog({
                         >
                             <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[50px]">
                                 <div className="absolute top-3 left-3 flex gap-1.5" style={{ zIndex: '3' }}>
-                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-yellow px-2.5 py-[3px] text-[11px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">Mới</span>
-                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-pink px-2.5 py-[3px] text-[11px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">Chế biến sẵn</span>
+                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-yellow px-2.5 py-[3px] text-[11px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">{t('landing.catalog.new')}</span>
+                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-pink px-2.5 py-[3px] text-[11px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">{t('landing.catalog.preparedBadge')}</span>
                                 </div>
                                 <div className="svg-bg-watermark watermark-center">
                                     <svg
@@ -355,33 +355,33 @@ export default function LandingCatalog({
                                     MD-PREP-003
                                 </div>
                                 <div className="font-subheading text-[17px] font-normal leading-[1.3] text-store-ink">
-                                    Chả Giò Tôm Thịt Cấp Đông Gói 1kg
+                                    {t('landing.catalog.springRollTitle')}
                                 </div>
                                 <div style={{ fontSize: '12px', color: 'var(--text-body)' }}>
-                                    Đơn vị: Gói 1kg • MOQ: 3 gói
+                                    {t('landing.catalog.packUnit')}
                                 </div>
                                 <div className="mt-0.5 flex items-baseline gap-2">
-                                    <span className="font-price text-lg font-extrabold text-store-green tabular-nums">119.000đ/gói</span>
-                                    <span className="font-price text-xs text-[var(--err-4)] line-through tabular-nums">140.000đ</span>
+                                    <span className="font-price text-lg font-extrabold text-store-green tabular-nums">{t('landing.catalog.springRollPrice')}</span>
+                                    <span className="font-price text-xs text-[var(--err-4)] line-through tabular-nums">{t('landing.catalog.springRollOldPrice')}</span>
                                 </div>
                                 <div className="rounded-lg border-[1.5px] border-solid border-store-ink bg-[var(--yellow-tint)] px-2.5 py-1.5 text-[11px] font-bold text-[var(--warn-2)]">
-                                    Mua từ 15 gói:
-                                    <strong>112.000đ</strong>• 40+:
-                                    <strong>105.000đ</strong>
+                                    {t('landing.catalog.springRollTier')}{' '}
+                                    <strong>{t('landing.catalog.springRollTierPrice')}</strong>{' '}• 40+:
+                                    <strong>{t('landing.catalog.springRollLargeTierPrice')}</strong>
                                 </div>
                                 <button
                                     type="button"
                                     className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
-                                    data-item="Chả Giò Tôm Thịt 1kg"
+                                    data-item={t('landing.catalog.springRollName')}
                                     style={{
                                         width: '100%',
                                         padding: '9px',
                                         fontSize: '13px',
                                         marginTop: 'auto',
                                     }}
-                                    onClick={() => onAddToQuote('Chả Giò Tôm Thịt 1kg')}
+                                    onClick={() => onAddToQuote('landing.catalog.springRollName')}
                                 >
-                                    + Thêm vào Báo giá
+                                    {t('landing.catalog.addQuote')}
                                 </button>
                             </div>
                         </div>
@@ -395,7 +395,7 @@ export default function LandingCatalog({
                         >
                             <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[50px]">
                                 <div className="absolute top-3 left-3 flex gap-1.5" style={{ zIndex: '3' }}>
-                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-pink px-2.5 py-[3px] text-[11px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">Chế biến sẵn</span>
+                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-pink px-2.5 py-[3px] text-[11px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">{t('landing.catalog.preparedBadge')}</span>
                                 </div>
                                 <div className="svg-bg-watermark watermark-center">
                                     <svg
@@ -423,31 +423,31 @@ export default function LandingCatalog({
                                 >
                                     MD-PREP-002
                                 </div>
-                                <div className="font-subheading text-[17px] font-normal leading-[1.3] text-store-ink">Bò Viên Gân Đặc Biệt Gói 1kg</div>
+                                <div className="font-subheading text-[17px] font-normal leading-[1.3] text-store-ink">{t('landing.catalog.beefBallTitle')}</div>
                                 <div style={{ fontSize: '12px', color: 'var(--text-body)' }}>
-                                    Đơn vị: Gói 1kg • MOQ: 3 gói
+                                    {t('landing.catalog.packUnit')}
                                 </div>
                                 <div className="mt-0.5 flex items-baseline gap-2">
-                                    <span className="font-price text-lg font-extrabold text-store-green tabular-nums">165.000đ/gói</span>
+                                    <span className="font-price text-lg font-extrabold text-store-green tabular-nums">{t('landing.catalog.beefBallPrice')}</span>
                                 </div>
                                 <div className="rounded-lg border-[1.5px] border-solid border-store-ink bg-[var(--yellow-tint)] px-2.5 py-1.5 text-[11px] font-bold text-[var(--warn-2)]">
-                                    Mua từ 10 gói:
-                                    <strong>155.000đ</strong>• 25+:
-                                    <strong>148.000đ</strong>
+                                    {t('landing.catalog.beefBallTier')}{' '}
+                                    <strong>{t('landing.catalog.beefBallTierPrice')}</strong>{' '}• 25+:
+                                    <strong>{t('landing.catalog.beefBallLargeTierPrice')}</strong>
                                 </div>
                                 <button
                                     type="button"
                                     className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
-                                    data-item="Bò Viên Gân 1kg"
+                                    data-item={t('landing.catalog.beefBallName')}
                                     style={{
                                         width: '100%',
                                         padding: '9px',
                                         fontSize: '13px',
                                         marginTop: 'auto',
                                     }}
-                                    onClick={() => onAddToQuote('Bò Viên Gân 1kg')}
+                                    onClick={() => onAddToQuote('landing.catalog.beefBallName')}
                                 >
-                                    + Thêm vào Báo giá
+                                    {t('landing.catalog.addQuote')}
                                 </button>
                             </div>
                         </div>
@@ -459,7 +459,8 @@ export default function LandingCatalog({
                                     category === 'all' || category === 'bakery' ? 'flex' : 'none',
                             }}
                         >
-                            <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[50px] after:absolute after:inset-0 after:flex after:items-center after:justify-center after:bg-store-ink/72 after:text-[13px] after:font-extrabold after:text-store-yellow after:backdrop-blur-[2px] after:content-['H?t_h?ng_(Available_=_0)']">
+
+                            <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[50px]">
                                 <div className="svg-bg-watermark watermark-center">
                                     <svg
                                         viewBox="0 0 24 24"
@@ -474,6 +475,10 @@ export default function LandingCatalog({
                                         <path d="M15.5 7C14.5 9.5 14.5 12 15.2 14.5" />
                                     </svg>
                                 </div>
+
+                                <div className="absolute inset-0 z-10 flex items-center justify-center bg-store-ink/72 px-3 text-center text-[13px] font-extrabold text-store-yellow backdrop-blur-[2px]">
+                                    {t('landing.catalog.outOfStock')}
+                                </div>
                             </div>
                             <div className="flex flex-1 flex-col gap-2 p-4">
                                 <div
@@ -486,17 +491,17 @@ export default function LandingCatalog({
                                     MD-BAKE-001
                                 </div>
                                 <div className="font-subheading text-[17px] font-normal leading-[1.3] text-store-ink">
-                                    Croissant Bơ Pháp Cấp Đông (10 chiếc)
+                                    {t('landing.catalog.croissantTitle')}
                                 </div>
                                 <div style={{ fontSize: '12px', color: 'var(--text-body)' }}>
-                                    Đơn vị: Gói 10c • MOQ: 2 gói
+                                    {t('landing.catalog.croissantUnit')}
                                 </div>
                                 <div className="mt-0.5 flex items-baseline gap-2">
                                     <span
                                         className="font-price text-lg font-extrabold text-store-green tabular-nums"
                                         style={{ color: 'var(--text-muted)' }}
                                     >
-                                        135.000đ/gói
+                                        {t('landing.catalog.croissantPrice')}
                                     </span>
                                 </div>
                                 <div
@@ -506,7 +511,7 @@ export default function LandingCatalog({
                                         color: 'var(--coral)',
                                     }}
                                 >
-                                    Tạm hết khả dụng (On hand = Reserved)
+                                    {t('landing.catalog.unavailable')}
                                 </div>
                                 <button
                                     type="button"
@@ -521,7 +526,7 @@ export default function LandingCatalog({
                                         color: 'var(--color-store-muted)',
                                     }}
                                 >
-                                    Tạm hết hàng
+                                    {t('landing.catalog.outOfStock')}
                                 </button>
                             </div>
                         </div>
@@ -550,12 +555,12 @@ export default function LandingCatalog({
                                     color: 'var(--navy)',
                                 }}
                             >
-                                Bạn cần nguồn hàng chưa có trên kệ?
+                                {t('landing.catalog.requestTitle')}
                             </div>
                             <div style={{ fontSize: '13.5px', color: 'var(--text-body)' }}>
-                                Gửi yêu cầu trực tiếp cho bộ phận
+                                {t('landing.catalog.requestStart')}{' '}
                                 <strong>Logistics Staff</strong>
-                                để bổ sung vào Catalog và nhận báo giá qua Gmail.
+                                {' '}{t('landing.catalog.requestEnd')}
                             </div>
                         </div>
                         <button
@@ -565,11 +570,11 @@ export default function LandingCatalog({
                             style={{ padding: '9px 18px', fontSize: '13px' }}
                             onClick={() =>
                                 showToast(
-                                    'Tính năng gửi yêu cầu sản phẩm mới chưa được kết nối Backend.',
+                                    'landing.catalog.requestToast',
                                 )
                             }
                         >
-                            + Gửi yêu cầu thêm sản phẩm mới
+                            {t('landing.catalog.requestButton')}
                         </button>
                     </div>
                     <div
@@ -580,107 +585,106 @@ export default function LandingCatalog({
                         <table className="w-full border-collapse text-sm [&_td]:border-b-[1.5px] [&_td]:border-solid [&_td]:border-store-ink [&_td]:px-4 [&_td]:py-3.5 [&_td]:text-store-ink [&_th]:border-b-[2.5px] [&_th]:border-solid [&_th]:border-store-ink [&_th]:bg-store-ink [&_th]:px-4 [&_th]:py-3.5 [&_th]:text-left [&_th]:font-heading [&_th]:font-bold [&_th]:text-store-yellow">
                             <thead>
                                 <tr>
-                                    <th>Mã SKU &amp; Sản phẩm</th>
-                                    <th>Quy cách / MOQ</th>
-                                    <th>Giá lẻ / Sale</th>
-                                    <th>Giá sỉ Volume (10+)</th>
-                                    <th>Trạng thái Kho</th>
-                                    <th>Thao tác</th>
+                                    <th>{t('landing.catalog.skuColumn')}</th>
+                                    <th>{t('landing.catalog.unitColumn')}</th>
+                                    <th>{t('landing.catalog.retailColumn')}</th>
+                                    <th>{t('landing.catalog.volumeColumn')}</th>
+                                    <th>{t('landing.catalog.stockColumn')}</th>
+                                    <th>{t('landing.catalog.actionColumn')}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td>
-                                        <strong>MDL-PORK-BELLY-500G</strong>— Ba Chỉ Heo Mát Khay
-                                        500g
+                                        <strong>MDL-PORK-BELLY-500G</strong>{' '}{t('landing.catalog.porkTableTitle')}
                                     </td>
-                                    <td>Khay • MOQ 3</td>
-                                    <td>80.000đ</td>
+                                    <td>{t('landing.catalog.trayMoq')}</td>
+                                    <td>{t('landing.catalog.porkTablePrice')}</td>
                                     <td>
                                         <strong style={{ color: 'var(--forest)' }}>
-                                            76.000đ / khay
+                                            {t('landing.catalog.porkTableTier')}
                                         </strong>
                                     </td>
                                     <td>
                                         <span
                                             style={{ color: 'var(--green-ok)', fontWeight: '700' }}
                                         >
-                                            Còn 120 khay
+                                            {t('landing.catalog.porkStock')}
                                         </span>
                                     </td>
                                     <td>
                                         <button
                                             type="button"
                                             className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
-                                            data-item="Ba Chỉ Heo Mát 500g (10 khay)"
+                                            data-item={t('landing.catalog.porkBulkName')}
                                             style={{ padding: '6px 14px', fontSize: '12px' }}
                                             onClick={() =>
-                                                onAddToQuote('Ba Chỉ Heo Mát 500g (10 khay)')
+                                                onAddToQuote('landing.catalog.porkBulkName')
                                             }
                                         >
-                                            + Thêm 10 khay
+                                            {t('landing.catalog.porkBulkAdd')}
                                         </button>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <strong>MD-PREP-003</strong>— Chả Giò Tôm Thịt Cấp Đông 1kg
+                                        <strong>MD-PREP-003</strong>{' '}{t('landing.catalog.springRollTableTitle')}
                                     </td>
-                                    <td>Gói • MOQ 3</td>
-                                    <td>119.000đ</td>
+                                    <td>{t('landing.catalog.packMoq')}</td>
+                                    <td>{t('landing.catalog.springRollTablePrice')}</td>
                                     <td>
                                         <strong style={{ color: 'var(--forest)' }}>
-                                            112.000đ / gói
+                                            {t('landing.catalog.springRollTableTier')}
                                         </strong>
                                     </td>
                                     <td>
                                         <span
                                             style={{ color: 'var(--green-ok)', fontWeight: '700' }}
                                         >
-                                            Còn 85 gói
+                                            {t('landing.catalog.springRollStock')}
                                         </span>
                                     </td>
                                     <td>
                                         <button
                                             type="button"
                                             className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
-                                            data-item="Chả Giò Tôm Thịt 1kg (15 gói)"
+                                            data-item={t('landing.catalog.springRollBulkName')}
                                             style={{ padding: '6px 14px', fontSize: '12px' }}
                                             onClick={() =>
-                                                onAddToQuote('Chả Giò Tôm Thịt 1kg (15 gói)')
+                                                onAddToQuote('landing.catalog.springRollBulkName')
                                             }
                                         >
-                                            + Thêm 15 gói
+                                            {t('landing.catalog.springRollBulkAdd')}
                                         </button>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <strong>MD-PREP-002</strong>— Bò Viên Gân Đặc Biệt 1kg
+                                        <strong>MD-PREP-002</strong>{' '}{t('landing.catalog.beefBallTableTitle')}
                                     </td>
-                                    <td>Gói • MOQ 3</td>
-                                    <td>165.000đ</td>
+                                    <td>{t('landing.catalog.packMoq')}</td>
+                                    <td>{t('landing.catalog.beefBallTablePrice')}</td>
                                     <td>
                                         <strong style={{ color: 'var(--forest)' }}>
-                                            155.000đ / gói
+                                            {t('landing.catalog.beefBallTableTier')}
                                         </strong>
                                     </td>
                                     <td>
                                         <span
                                             style={{ color: 'var(--green-ok)', fontWeight: '700' }}
                                         >
-                                            Còn 64 gói
+                                            {t('landing.catalog.beefBallStock')}
                                         </span>
                                     </td>
                                     <td>
                                         <button
                                             type="button"
                                             className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
-                                            data-item="Bò Viên Gân 1kg (10 gói)"
+                                            data-item={t('landing.catalog.beefBallBulkName')}
                                             style={{ padding: '6px 14px', fontSize: '12px' }}
-                                            onClick={() => onAddToQuote('Bò Viên Gân 1kg (10 gói)')}
+                                            onClick={() => onAddToQuote('landing.catalog.beefBallBulkName')}
                                         >
-                                            + Thêm 10 gói
+                                            {t('landing.catalog.beefBallBulkAdd')}
                                         </button>
                                     </td>
                                 </tr>

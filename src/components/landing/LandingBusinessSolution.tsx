@@ -1,11 +1,13 @@
+import { useTranslation } from 'react-i18next';
 /* Generated from the supplied HTML layout. Edit this section independently. */
 import { useState } from 'react';
 
 export default function LandingBusinessSolution({
     showToast,
 }: {
-    showToast: (message: string) => void;
+    showToast: (key: string) => void;
 }) {
+    const { t } = useTranslation('storefront');
     const [openAccordion, setOpenAccordion] = useState(0);
     return (
         <section className="py-[72px]">
@@ -13,9 +15,9 @@ export default function LandingBusinessSolution({
                 <div className="rounded-[var(--radius-lg)] border-[3px] border-solid border-store-yellow bg-store-ink px-12 py-14 text-store-cream shadow-[10px_10px_0_var(--color-store-dark)]">
                     <div className="mx-auto mb-10 max-w-[680px] text-center [&_h2]:mb-4 [&_h2]:font-subheading [&_h2]:text-[clamp(28px,3.2vw,40px)] [&_h2]:font-bold [&_h2]:text-store-cream">
                         <h2>
-                            Giải pháp giúp
-                            <span className="rounded-lg bg-store-yellow px-2.5 font-medium italic text-store-ink">mua sắm thuận tiện</span>
-                            cho tổ chức và cá nhân
+                            {t('landing.solution.titleStart')}{' '}
+                            <span className="rounded-lg bg-store-yellow px-2.5 font-medium italic text-store-ink">{t('landing.solution.titleHighlight')}</span>
+                            {' '}{t('landing.solution.titleEnd')}
                         </h2>
                         <p
                             style={{
@@ -24,12 +26,10 @@ export default function LandingBusinessSolution({
                                 marginBottom: '22px',
                             }}
                         >
-                            Minh họa luồng báo giá, kiểm tra thông tin mặt hàng và tùy chỉnh cách
-                            xem theo nhu cầu. Các chức năng nâng cao sẽ hoàn thiện ở giai đoạn tích
-                            hợp Backend.
+                            {t('landing.solution.description')}
                         </p>
                         <a href="#onboarding-cta" className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white">
-                            Khám phá giải pháp
+                            {t('landing.solution.explore')}
                             <span className="inline-flex h-[22px] w-[22px] items-center justify-center rounded-full bg-store-ink text-xs text-store-yellow">
                                 <img
                                     src="/icons/arrow-right.svg"
@@ -51,7 +51,7 @@ export default function LandingBusinessSolution({
                                             color: 'var(--forest)',
                                         }}
                                     >
-                                        DỰ THẢO BÁO GIÁ • QUOTE #QT-2026-089
+                                        {t('landing.solution.draft')}
                                     </div>
                                     <strong
                                         style={{
@@ -59,7 +59,7 @@ export default function LandingBusinessSolution({
                                             fontSize: '18px',
                                         }}
                                     >
-                                        Danh sách đặt hàng &amp; Chia điểm giao
+                                        {t('landing.solution.quoteTitle')}
                                     </strong>
                                 </div>
                                 <span
@@ -72,38 +72,38 @@ export default function LandingBusinessSolution({
                                         borderRadius: '99px',
                                     }}
                                 >
-                                    Revision 1 • Đã duyệt
+                                    {t('landing.solution.revision')}
                                 </span>
                             </div>
                             <div className="mb-2.5 flex items-center justify-between rounded-[var(--radius-sm)] border-2 border-solid border-store-ink bg-store-cream px-3.5 py-2.5 text-[13px] shadow-[3px_3px_0_var(--color-store-ink)]">
                                 <div>
-                                    <strong>Cá Hồi Na Uy Phi Lê Tươi (Khay 1kg)</strong>
+                                    <strong>{t('landing.solution.salmon')}</strong>
                                     <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
-                                        Ghi chú món: Cắt sẵn phần bụng riêng • Giao Chi nhánh Quận 1
+                                        {t('landing.solution.salmonNote')}
                                     </div>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                     <strong style={{ color: 'var(--forest)' }}>
-                                        20 kg × 622.000đ
+                                        {t('landing.solution.salmonPrice')}
                                     </strong>
                                     <div style={{ fontSize: '11px', color: 'var(--coral)' }}>
-                                        Đã cộng dồn Volume + Sale
+                                        {t('landing.solution.salmonSavings')}
                                     </div>
                                 </div>
                             </div>
                             <div className="mb-2.5 flex items-center justify-between rounded-[var(--radius-sm)] border-2 border-solid border-store-ink bg-store-cream px-3.5 py-2.5 text-[13px] shadow-[3px_3px_0_var(--color-store-ink)]">
                                 <div>
-                                    <strong>Chả Giò Tôm Thịt Chế Biến Sẵn (Gói 1kg)</strong>
+                                    <strong>{t('landing.solution.springRolls')}</strong>
                                     <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
-                                        Ghi chú món: Đóng thùng xốp giữ lạnh • Giao Chi nhánh Quận 7
+                                        {t('landing.solution.springRollNote')}
                                     </div>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                     <strong style={{ color: 'var(--forest)' }}>
-                                        15 gói × 112.000đ
+                                        {t('landing.solution.springRollPrice')}
                                     </strong>
                                     <div style={{ fontSize: '11px', color: 'var(--green-ok)' }}>
-                                        Kho khả dụng: Đủ 100%
+                                        {t('landing.solution.stock')}
                                     </div>
                                 </div>
                             </div>
@@ -118,8 +118,8 @@ export default function LandingBusinessSolution({
                                 }}
                             >
                                 <span style={{ fontSize: '12.5px', fontWeight: '600' }}>
-                                    Mã giảm giá áp dụng:
-                                    <code>MDFOOD10</code>
+                                    {t('landing.solution.coupon')}{' '}
+                                    <code>MDFOOD10</code>{' '}
                                     (-10%)
                                 </span>
                                 <button
@@ -129,11 +129,11 @@ export default function LandingBusinessSolution({
                                     style={{ padding: '8px 18px', fontSize: '13px' }}
                                     onClick={() =>
                                         showToast(
-                                            'Đây là đơn hàng mẫu trên landing page, chưa có đơn nào được gửi.',
+                                            'landing.solution.confirmToast',
                                         )
                                     }
                                 >
-                                    Xác nhận Đặt mua
+                                    {t('landing.solution.confirm')}
                                 </button>
                             </div>
                         </div>
@@ -150,8 +150,8 @@ export default function LandingBusinessSolution({
                                     }
                                 }}
                             >
-                                <div className="flex items-center justify-between font-heading text-[19px] font-bold text-store-cream">
-                                    <span>1. Đặt hàng nhanh &amp; Đặt lại đơn cũ chỉ 1 chạm</span>
+                                <div className="flex items-center justify-between font-heading text-[19px] font-normal text-store-cream">
+                                    <span>{t('landing.solution.quickTitle')}</span>
                                     <span>
                                         <img
                                             src="/icons/chevron-up.svg"
@@ -162,10 +162,7 @@ export default function LandingBusinessSolution({
                                     </span>
                                 </div>
                                 <div className="mt-2.5 hidden text-sm text-store-cream group-[.active]:block">
-                                    Tìm kiếm bằng ngôn ngữ tự nhiên qua bong bóng AI, chuyển đổi
-                                    linh hoạt giữa dạng thẻ và bảng so sánh, hoặc khởi tạo Quote mới
-                                    từ lịch sử đơn hàng tuần trước với giá và tồn kho cập nhật tức
-                                    thì.
+                                    {t('landing.solution.quickDescription')}
                                 </div>
                             </div>
                             <div
@@ -180,8 +177,8 @@ export default function LandingBusinessSolution({
                                     }
                                 }}
                             >
-                                <div className="flex items-center justify-between font-heading text-[19px] font-bold text-store-cream">
-                                    <span>2. Nguồn hàng ổn định, cam kết đủ 100% mới xác nhận</span>
+                                <div className="flex items-center justify-between font-heading text-[19px] font-normal text-store-cream">
+                                    <span>{t('landing.solution.stockTitle')}</span>
                                     <span>
                                         <img
                                             src="/icons/chevron-down.svg"
@@ -192,9 +189,7 @@ export default function LandingBusinessSolution({
                                     </span>
                                 </div>
                                 <div className="mt-2.5 hidden text-sm text-store-cream group-[.active]:block">
-                                    Khác với nơi nhận đơn rồi giao thiếu, Bite to Business đối chiếu
-                                    trực tiếp tồn khả dụng (Available = On hand − Reserved) và chỉ
-                                    xác nhận đơn khi đáp ứng trọn vẹn mọi mặt hàng bạn đặt.
+                                    {t('landing.solution.stockDescription')}
                                 </div>
                             </div>
                             <div
@@ -211,7 +206,7 @@ export default function LandingBusinessSolution({
                             >
                                 <div className="flex items-center justify-between font-heading text-[19px] font-bold text-store-cream">
                                     <span>
-                                        3. Chia nhiều điểm giao &amp; Theo dõi tuyến Vietmap
+                                        {t('landing.solution.routeTitle')}
                                     </span>
                                     <span>
                                         <img
@@ -223,9 +218,7 @@ export default function LandingBusinessSolution({
                                     </span>
                                 </div>
                                 <div className="mt-2.5 hidden text-sm text-store-cream group-[.active]:block">
-                                    Một đơn hàng có thể chia thành nhiều nhóm giao hàng (Packages)
-                                    tới nhiều địa chỉ khác nhau, kèm bản đồ tuyến đường minh họa và
-                                    thời gian dự kiến (ETA) rõ ràng.
+                                    {t('landing.solution.routeDescription')}
                                 </div>
                             </div>
                             <div
@@ -242,7 +235,7 @@ export default function LandingBusinessSolution({
                             >
                                 <div className="flex items-center justify-between font-heading text-[19px] font-bold text-store-cream">
                                     <span>
-                                        4. Giá bậc thang Volume Pricing &amp; Chứng từ minh bạch
+                                        {t('landing.solution.pricingTitle')}
                                     </span>
                                     <span>
                                         <img
@@ -254,9 +247,7 @@ export default function LandingBusinessSolution({
                                     </span>
                                 </div>
                                 <div className="mt-2.5 hidden text-sm text-store-cream group-[.active]:block">
-                                    Công khai các bậc giá theo số lượng mua, cho phép cộng dồn cùng
-                                    chương trình khuyến mãi và mã giảm giá 8 ký tự, lưu trữ Snapshot
-                                    đơn hàng phục vụ đối soát và xuất hóa đơn VAT.
+                                    {t('landing.solution.pricingDescription')}
                                 </div>
                             </div>
                         </div>
