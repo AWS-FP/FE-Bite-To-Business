@@ -110,8 +110,14 @@ export default function useRegisterForm() {
                     }
                     setStep(firstErrorStep);
                 }
-                // No "email/phone already registered" handling: the API never reveals that (it would
-                // let anyone probe accounts). Duplicates get a normal receipt and an emailed rejection.
+                // A taken email is never revealed (that would let anyone probe accounts): it gets a normal
+                // receipt and an emailed rejection. A taken phone number is reported on the phone field.
+                if (error.response?.data?.code === 'PHONE_ALREADY_EXISTS') {
+                    form.setError('phone', { type: 'server', message: 'errors.phoneExists' });
+                    setStep(
+                        REGISTRATION_STEP_FIELDS.findIndex((fields) => fields.includes('phone')) + 1,
+                    );
+                }
             }
         } finally {
             submittingRef.current = false;

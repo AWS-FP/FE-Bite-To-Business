@@ -54,6 +54,7 @@ export function registrationErrorKey(error: unknown) {
     const codes: Record<string, string> = {
         REGISTRATION_ALREADY_REVIEWED: 'errors.alreadyReviewed',
         REGISTRATION_ALREADY_ACTIVATED: 'errors.alreadyActivated',
+        REGISTRATION_APPROVAL_LOCKED: 'errors.approvalLocked',
         REJECTION_NOTE_REQUIRED: 'errors.reasonRequired',
         TOO_MANY_REQUESTS: 'errors.cooldown',
         EMAIL_DELIVERY_FAILED: 'errors.mail',

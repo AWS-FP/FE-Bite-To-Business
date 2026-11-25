@@ -172,6 +172,13 @@
         "cartTitle": "Sản phẩm đặt hàng lại",
         "cartHint": "Chỉnh số lượng tại đây. Nhập 0 để bỏ sản phẩm. Giỏ hàng thường không thay đổi.",
         "allocationReset": "Kiện chứa sản phẩm thay đổi cần được phân bổ lại. Các kiện không bị ảnh hưởng vẫn được giữ.",
-        "invalidCart": "Nhập số lượng hợp lệ và giữ ít nhất một sản phẩm."
-    }
+        "invalidCart": "Mỗi sản phẩm cần số lượng từ mức tối thiểu trở lên (hoặc 0 để bỏ), và giữ ít nhất một sản phẩm.",
+        "closedTitle": "Báo giá này đã được đặt hàng.",
+        "closedHint": "Không thể sửa hay thanh toán lại báo giá này. Xem đơn hàng để thanh toán, hoặc quay lại giỏ hàng để đặt đơn mới.",
+        "viewOrders": "Xem đơn hàng",
+        "backToCart": "Về giỏ hàng"
+    },
+    "quantityInput": "Số lượng {{name}}",
+    "quantityOverStock": "Kho chỉ còn {{stock}}, không đủ {{quantity}}. Đã chỉnh về {{stock}}.",
+    "quantityBelowMinimum": "Số lượng tối thiểu là {{min}}. Đã chỉnh về {{min}}."
 }

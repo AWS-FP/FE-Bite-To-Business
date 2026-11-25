@@ -44,7 +44,6 @@ export default function RegistrationDuplicates() {
                         </span>
                     )}
                 </h2>
-                <p className="mt-1 text-[13px] leading-6 text-store-muted">{t('duplicates.description')}</p>
             </div>
 
             {query.isPending && <p className="px-6 py-6 text-[13px]">{t('duplicates.loading')}</p>}

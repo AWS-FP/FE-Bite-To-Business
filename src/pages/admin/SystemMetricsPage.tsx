@@ -4,8 +4,6 @@ import { useTranslation } from 'react-i18next';
 import {
     Activity,
     ArrowUpRight,
-    BarChart3,
-    Check,
     CheckCircle2,
     CircleHelp,
     Clock3,
@@ -25,6 +23,7 @@ import {
 } from 'lucide-react';
 import AdminButton from '@/components/admin/AdminButton';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
+import SystemMonitoringDashboard from '@/components/admin/SystemMonitoringDashboard';
 import SystemSettingsForm from '@/components/admin/SystemSettingsForm';
 import { useSystemMetrics } from '@/hooks/admin/useSystemMetrics';
 import { useRegistrationStats } from '@/hooks/admin/useRegistrations';
@@ -38,7 +37,7 @@ import './SystemMetricsPage.css';
 
 export default function SystemMetricsPage() {
     const { t, i18n } = useTranslation('admin');
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
     const health = useSystemMetrics();
     const registrations = useRegistrationStats();
     const staff = useStaff({ page: 0, size: 1 });
@@ -124,6 +123,7 @@ export default function SystemMetricsPage() {
 
             {tab === 'overview' && (
                 <>
+                    <SystemMonitoringDashboard />
                     <div className="system-section-toolbar">
                         <div>
                             <h2>{t('system.overview.title')}</h2>
@@ -288,26 +288,8 @@ export default function SystemMetricsPage() {
                                 </li>
                                 <li>
                                     <span>
-                                        <Activity size={18} />
-                                        {t('system.sources.telemetry')}
-                                    </span>
-                                    <span className="system-badge">
-                                        {t('system.status.notConnected')}
-                                    </span>
-                                </li>
-                                <li>
-                                    <span>
                                         <Wallet size={18} />
                                         {t('system.sources.payments')}
-                                    </span>
-                                    <span className="system-badge">
-                                        {t('system.status.notConnected')}
-                                    </span>
-                                </li>
-                                <li>
-                                    <span>
-                                        <Cpu size={18} />
-                                        {t('system.sources.ai')}
                                     </span>
                                     <span className="system-badge">
                                         {t('system.status.notConnected')}
@@ -320,20 +302,7 @@ export default function SystemMetricsPage() {
                             </p>
                         </section>
                     </div>
-                    <section className="system-panel">
-                        <header className="system-panel-heading">
-                            <div>
-                                <h2>{t('system.traffic.title')}</h2>
-                                <p>{t('system.traffic.description')}</p>
-                            </div>
-                            <span className="system-badge">{t('system.status.notConnected')}</span>
-                        </header>
-                        <div className="system-chart-empty">
-                            <BarChart3 size={38} strokeWidth={1.3} aria-hidden="true" />
-                            <h3>{t('system.traffic.empty')}</h3>
-                            <p>{t('system.traffic.hint')}</p>
-                        </div>
-                    </section>
+
                     <p className="system-updated" role="status">
                         <Clock3 size={14} />
                         {health.data
@@ -352,16 +321,14 @@ export default function SystemMetricsPage() {
                 </>
             )}
             {tab === 'reports' && <SystemReports />}
-            {tab === 'ai' && (
-                <SystemAiUsage onConfigure={() => setSearchParams({ tab: 'settings' })} />
-            )}
+            {tab === 'ai' && <SystemMonitoringDashboard mode="ai" />}
             {tab === 'settings' && (
                 <SystemSettingsForm
                     key={`${session?.user.id}:${sessionVersion}`}
                     storageKey={`bitetobusiness.admin.systemDraft.${session?.user.id}`}
                 />
             )}
-            {tab === 'logs' && <SystemLogs />}
+            {tab === 'logs' && <SystemMonitoringDashboard mode="logs" />}
         </div>
     );
 }
@@ -588,133 +555,6 @@ function SystemReports() {
             <div className="system-notice">
                 <Info size={20} />
                 <p>{t('system.reports.definition')}</p>
-            </div>
-        </>
-    );
-}
-
-function SystemAiUsage({ onConfigure }: { onConfigure: () => void }) {
-    const { t } = useTranslation('admin');
-    return (
-        <>
-            <div className="system-section-toolbar">
-                <div>
-                    <h2>{t('system.ai.title')}</h2>
-                    <p>{t('system.ai.description')}</p>
-                </div>
-                <AdminButton onClick={onConfigure}>
-                    <SlidersHorizontal size={16} />
-                    {t('system.ai.configure')}
-                </AdminButton>
-            </div>
-            <div className="system-metric-grid">
-                <article className="system-metric-card">
-                    <div className="system-metric-label">
-                        <span>{t('system.ai.requests')}</span>
-                        <Cpu size={20} />
-                    </div>
-                    <strong>—</strong>
-                    <p>{t('system.noData')}</p>
-                </article>
-                <article className="system-metric-card">
-                    <div className="system-metric-label">
-                        <span>{t('system.ai.tokens')}</span>
-                        <BarChart3 size={20} />
-                    </div>
-                    <strong>—</strong>
-                    <p>{t('system.ai.tokensHint')}</p>
-                </article>
-                <article className="system-metric-card">
-                    <div className="system-metric-label">
-                        <span>{t('system.ai.cost')}</span>
-                        <Wallet size={20} />
-                    </div>
-                    <strong>—</strong>
-                    <p>{t('system.ai.costHint')}</p>
-                </article>
-                <article className="system-metric-card">
-                    <div className="system-metric-label">
-                        <span>{t('system.ai.uiSuccess')}</span>
-                        <Check size={20} />
-                    </div>
-                    <strong>—</strong>
-                    <p>{t('system.ai.uiSuccessHint')}</p>
-                </article>
-            </div>
-            <section className="system-panel">
-                <header className="system-panel-heading">
-                    <div>
-                        <h2>{t('system.ai.usageChart')}</h2>
-                        <p>{t('system.ai.usageHint')}</p>
-                    </div>
-                    <span className="system-badge">{t('system.status.notConnected')}</span>
-                </header>
-                <div className="system-chart-empty">
-                    <Cpu size={40} strokeWidth={1.3} />
-                    <h3>{t('system.ai.empty')}</h3>
-                    <p>{t('system.ai.emptyHint')}</p>
-                </div>
-            </section>
-            <div className="system-notice">
-                <Info size={20} />
-                <p>{t('system.ai.billingNote')}</p>
-            </div>
-        </>
-    );
-}
-
-function SystemLogs() {
-    const { t } = useTranslation('admin');
-    return (
-        <>
-            <div className="system-section-toolbar">
-                <div>
-                    <h2>{t('system.logs.title')}</h2>
-                    <p>{t('system.logs.description')}</p>
-                </div>
-                <span className="system-badge">{t('system.status.notConnected')}</span>
-            </div>
-            <section className="system-panel">
-                <div className="system-form-body system-log-filters">
-                    <label>
-                        {t('system.logs.search')}
-                        <input type="search" placeholder={t('system.logs.searchHint')} disabled />
-                    </label>
-                    <label>
-                        {t('system.logs.type')}
-                        <select disabled defaultValue="all">
-                            <option value="all">{t('system.logs.all')}</option>
-                        </select>
-                    </label>
-                </div>
-                <div className="system-table-scroll">
-                    <table className="system-log-table">
-                        <thead>
-                            <tr>
-                                <th>{t('system.logs.time')}</th>
-                                <th>{t('system.logs.event')}</th>
-                                <th>{t('system.logs.source')}</th>
-                                <th>{t('system.logs.code')}</th>
-                                <th>{t('system.logs.actor')}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td colSpan={5}>
-                                    <div className="system-empty-state">
-                                        <FileText size={35} strokeWidth={1.4} />
-                                        <h3>{t('system.logs.empty')}</h3>
-                                        <p>{t('system.logs.emptyHint')}</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-            <div className="system-notice">
-                <ShieldCheck size={20} />
-                <p>{t('system.logs.draftNote')}</p>
             </div>
         </>
     );

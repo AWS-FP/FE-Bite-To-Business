@@ -111,6 +111,7 @@
         "notProvided": "Not provided",
         "yes": "Yes",
         "no": "No",
+        "approvalLocked": "This email was used in a duplicate registration and already received an automatic rejection, so it cannot be approved. It can only be rejected.",
         "onceOnly": "One-time decision"
     },
     "review": {
@@ -143,6 +144,7 @@
         "forbidden": "You do not have permission to process this application.",
         "notFound": "Registration application not found.",
         "alreadyReviewed": "This application has already been reviewed. Refreshing the information.",
+        "approvalLocked": "This email was used in a duplicate registration, so the application cannot be approved. Please reject it.",
         "alreadyActivated": "The Customer has already activated their account. An OTP is no longer needed.",
         "reasonRequired": "Please enter a rejection reason.",
         "cooldown": "Requests were sent too quickly. Please wait and try again.",
@@ -155,7 +157,6 @@
     },
     "duplicates": {
         "title": "Duplicate registrations – auto-rejected",
-        "description": "The email or phone matches an existing account. The form still confirms the request (so it never reveals which accounts exist); the system emails a rejection after a few minutes, at most one per address per 24 hours.",
         "loading": "Loading...",
         "error": "Could not load duplicate registrations.",
         "empty": "No duplicate registrations.",

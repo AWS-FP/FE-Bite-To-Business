@@ -348,22 +348,11 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             }
         }
         if (index === 2) {
-            if (!values.price?.trim() || !values.quantityStep?.trim())
-                return tr('Vui lòng nhập giá và số lượng tăng thêm mỗi lần đặt.');
+            if (!values.price?.trim()) return tr('Vui lòng nhập giá niêm yết.');
             const price = Number(values.price),
-                min = Number(values.minOrder),
-                stepSize = Number(values.quantityStep);
-            if (
-                ![price, min, stepSize].every(Number.isFinite) ||
-                price < 0 ||
-                !Number.isInteger(price) ||
-                min <= 0 ||
-                stepSize <= 0 ||
-                Math.abs(min / stepSize - Math.round(min / stepSize)) > 1e-8
-            )
-                return tr(
-                    'Giá phải là số nguyên không âm và số lượng tối thiểu phải chia hết cho số lượng tăng thêm mỗi lần đặt.',
-                );
+                min = Number(values.minOrder);
+            if (![price, min].every(Number.isFinite) || price < 0 || !Number.isInteger(price) || min <= 0)
+                return tr('Giá phải là số nguyên không âm và số lượng tối thiểu phải lớn hơn 0.');
             const sorted = [...tiers].sort((a, b) => Number(a.min) - Number(b.min));
             for (let i = 0; i < sorted.length; i++) {
                 const tier = sorted[i],
@@ -450,7 +439,6 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             price: Number(values.price),
             vat: Number(values.vat),
             minOrder: Number(values.minOrder),
-            quantityStep: Number(values.quantityStep),
             tiers: tiers.map((tier) => ({
                 min: Number(tier.min),
                 max: tier.max.trim() ? Number(tier.max) : null,
@@ -1126,20 +1114,6 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                             <div className="mt-5 space-y-5">
                                 <div className="grid grid-cols-2 gap-4">
                                     {field('price', tr('Giá niêm yết (đ) *'), { type: 'number' })}
-                                    <div>
-                                        {field(
-                                            'quantityStep',
-                                            tr('Số lượng tăng thêm mỗi lần đặt *'),
-                                            {
-                                                type: 'number',
-                                            },
-                                        )}
-                                        <p className="mt-1 text-xs text-store-muted">
-                                            {tr(
-                                                'Ví dụ: tối thiểu 5, tăng thêm 5 thì khách đặt được 5, 10, 15…',
-                                            )}
-                                        </p>
-                                    </div>
                                 </div>
                                 <div className="flex items-center justify-between border-t border-store-line pt-5">
                                     <h3 className="font-semibold">{tr('Bậc giá sỉ')}</h3>
