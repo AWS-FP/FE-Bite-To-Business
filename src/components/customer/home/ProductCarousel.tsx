@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { HomeProductCardItem } from '@/constants/customer/homeData';
+import type { HomeProductCardItem } from '@/types/customer/homeData';
 import ProductShowcaseCard from './ProductShowcaseCard';
 
 /** Horizontal product row with buttons only: no slider track or page-number navigation. */
@@ -45,7 +45,7 @@ export default function ProductCarousel({
             <div
                 ref={track}
                 aria-label={label}
-                tabIndex={0}
+                role="region"
                 className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth px-2 pb-6 pt-2 scroll-px-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
             >
                 {products.map((product) => (

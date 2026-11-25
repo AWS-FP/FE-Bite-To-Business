@@ -1,6 +1,5 @@
 import { Check } from 'lucide-react';
-
-const steps = ['Giỏ hàng', 'Giá & ưu đãi', 'Gói giao hàng', 'Xác nhận'];
+import { useTranslation } from 'react-i18next';
 
 interface QuoteStepsProps {
     step: number;
@@ -9,8 +8,10 @@ interface QuoteStepsProps {
 }
 
 export default function QuoteSteps({ step, busy, onSelectStep }: QuoteStepsProps) {
+    const { t } = useTranslation('quote');
+    const steps = [t('steps.cart'), t('steps.pricing'), t('steps.delivery'), t('steps.review')];
     return (
-        <nav aria-label="Các bước đặt hàng" className="my-8 grid grid-cols-4 gap-3">
+        <nav aria-label={t('steps.navigation')} className="my-8 grid grid-cols-4 gap-3">
             {steps.map((label, index) => {
                 const active = index === step;
                 const buttonColor = active

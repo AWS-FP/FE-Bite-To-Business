@@ -13,7 +13,8 @@ export const ROUTES = {
     PRODUCT_DETAIL: '/products/:productId',
 
     BRANDS: '/brands',
-    BRAND_DETAIL: '/brands/:brandSlug',
+    BRAND_DETAIL: '/brand/:brandSlug',
+    BRAND_DETAIL_LEGACY: '/brands/:brandSlug',
 
     LOGIN: '/login',
     REGISTER: '/register',
@@ -27,12 +28,14 @@ export const ROUTES = {
     ORDERS: '/orders',
     ORDER_DETAIL: '/orders/:orderId',
     FAVORITES: '/favorites',
+    MY_PRODUCT_REQUESTS: '/product-requests',
     PROFILE: '/profile',
 
     ADMIN: '/admin',
     ADMIN_REGISTRATIONS: '/admin/registration-requests',
     ADMIN_REGISTRATION_DETAIL: '/admin/registration-requests/:requestId',
     ADMIN_STAFF: '/admin/staff',
+    ADMIN_PACKAGE_RETURNS: '/admin/package-returns',
     ADMIN_SYSTEM: '/admin/system',
 
     ECOMMERCE: '/e-commerce',
@@ -42,11 +45,13 @@ export const ROUTES = {
     ECOMMERCE_PRODUCTS: '/e-commerce/products',
     ECOMMERCE_PROMOTIONS: '/e-commerce/promotions',
     ECOMMERCE_COUPONS: '/e-commerce/coupons',
+    ECOMMERCE_REQUESTS: '/e-commerce/product-requests',
+    ECOMMERCE_REVIEWS: '/e-commerce/reviews',
+    ECOMMERCE_REFUNDS: '/e-commerce/cancellations',
 
     LOGISTICS: '/logistics',
     LOGISTICS_INVENTORY: '/logistics/inventory',
     LOGISTICS_RECEIVE: '/logistics/receive',
-    LOGISTICS_PACKING: '/logistics/packing',
     LOGISTICS_PRODUCT_REQUESTS: '/logistics/product-requests',
 
     DELIVERY: '/delivery',

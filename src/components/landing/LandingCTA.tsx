@@ -56,7 +56,7 @@ export default function LandingCTA() {
                 </div>
                 <div className="flex flex-col gap-5">
                     <div className="flex items-start gap-[18px] rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-[18px] text-store-ink shadow-[6px_6px_0_var(--color-store-ink)]">
-                        <span className="min-w-12 rounded-xl border-2 border-solid border-store-ink bg-store-green px-3 py-1 text-center font-heading text-4xl font-normal leading-none text-store-yellow shadow-[3px_3px_0_var(--color-store-ink)]">
+                        <span className="min-w-12 rounded-xl border-2 border-solid border-store-ink bg-store-green px-3 py-1 text-center font-heading text-4xl font-bold leading-none text-store-yellow shadow-[3px_3px_0_var(--color-store-ink)]">
                             1
                         </span>
                         <div>
@@ -69,7 +69,7 @@ export default function LandingCTA() {
                         </div>
                     </div>
                     <div className="flex items-start gap-[18px] rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-[18px] text-store-ink shadow-[6px_6px_0_var(--color-store-ink)]">
-                        <span className="min-w-12 rounded-xl border-2 border-solid border-store-ink bg-store-green px-3 py-1 text-center font-heading text-4xl font-normal leading-none text-store-yellow shadow-[3px_3px_0_var(--color-store-ink)]">
+                        <span className="min-w-12 rounded-xl border-2 border-solid border-store-ink bg-store-green px-3 py-1 text-center font-heading text-4xl font-bold leading-none text-store-yellow shadow-[3px_3px_0_var(--color-store-ink)]">
                             2
                         </span>
                         <div>
@@ -82,7 +82,7 @@ export default function LandingCTA() {
                         </div>
                     </div>
                     <div className="flex items-start gap-[18px] rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-[18px] text-store-ink shadow-[6px_6px_0_var(--color-store-ink)]">
-                        <span className="min-w-12 rounded-xl border-2 border-solid border-store-ink bg-store-green px-3 py-1 text-center font-heading text-4xl font-normal leading-none text-store-yellow shadow-[3px_3px_0_var(--color-store-ink)]">
+                        <span className="min-w-12 rounded-xl border-2 border-solid border-store-ink bg-store-green px-3 py-1 text-center font-heading text-4xl font-bold leading-none text-store-yellow shadow-[3px_3px_0_var(--color-store-ink)]">
                             3
                         </span>
                         <div>

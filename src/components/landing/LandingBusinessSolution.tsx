@@ -204,7 +204,7 @@ export default function LandingBusinessSolution({
                                     }
                                 }}
                             >
-                                <div className="flex items-center justify-between font-heading text-[19px] font-normal text-store-cream">
+                                <div className="flex items-center justify-between font-heading text-[19px] font-bold text-store-cream">
                                     <span>
                                         {t('landing.solution.routeTitle')}
                                     </span>
@@ -233,7 +233,7 @@ export default function LandingBusinessSolution({
                                     }
                                 }}
                             >
-                                <div className="flex items-center justify-between font-heading text-[19px] font-normal text-store-cream">
+                                <div className="flex items-center justify-between font-heading text-[19px] font-bold text-store-cream">
                                     <span>
                                         {t('landing.solution.pricingTitle')}
                                     </span>

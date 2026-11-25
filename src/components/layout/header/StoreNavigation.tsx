@@ -1,127 +1,82 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../../../router/routes';
-import CategoryMegaMenu from '../../category/CategoryMegaMenu';
+import ProductRequestSection from '@/components/customer/home/ProductRequestSection';
+import AboutBusinessDropdown from './AboutBusinessDropdown';
 
 export default function StoreNavigation() {
     const { t } = useTranslation('storefront');
-
-    const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
-
-    const [menuTop, setMenuTop] = useState(0);
-
-    const navRef = useRef<HTMLElement>(null);
-    const categoryButtonRef = useRef<HTMLButtonElement>(null);
-
-    // Mở/đóng Mega Menu ngay trên trang hiện tại
-    function toggleCategoryMenu() {
-        const bottom = navRef.current?.getBoundingClientRect().bottom ?? 0;
-
-        setMenuTop(bottom);
-        setIsCategoryMenuOpen((current) => !current);
-    }
-
-    // Đóng menu và trả focus về nút mở
-    const closeCategoryMenu = useCallback(() => {
-        setIsCategoryMenuOpen(false);
-        categoryButtonRef.current?.focus();
-    }, []);
-
-    // Cập nhật vị trí Mega Menu khi resize hoặc scroll
-    useEffect(() => {
-        if (!isCategoryMenuOpen) return;
-
-        function updatePosition() {
-            const bottom = navRef.current?.getBoundingClientRect().bottom ?? 0;
-
-            setMenuTop(bottom);
-        }
-
-        updatePosition();
-
-        window.addEventListener('resize', updatePosition);
-        window.addEventListener('scroll', updatePosition, true);
-
-        return () => {
-            window.removeEventListener('resize', updatePosition);
-            window.removeEventListener('scroll', updatePosition, true);
-        };
-    }, [isCategoryMenuOpen]);
-
+    const { pathname } = useLocation();
+    const [requestOpen, setRequestOpen] = useState(false);
+    const [aboutOpen, setAboutOpen] = useState(false);
+    const current = requestOpen
+        ? 'request'
+        : aboutOpen
+          ? 'about'
+          : pathname === '/collections/deals'
+            ? 'deals'
+            : pathname === '/collections/combos'
+              ? 'combos'
+              : pathname === ROUTES.BRANDS ||
+                  pathname.startsWith('/brands/') ||
+                  pathname.startsWith('/brand/')
+                ? 'brands'
+                : [
+                        ROUTES.LANDING,
+                        ROUTES.WHY_BTB,
+                        ROUTES.BTB_MODEL,
+                    ].some((route) => route === pathname)
+                  ? 'about'
+                  : 'categories';
+    const linkStyle = (active: boolean) =>
+        `inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-bold no-underline transition-colors ${active ? 'bg-store-yellow text-store-ink' : 'text-store-cream hover:bg-white/10 hover:text-store-yellow'}`;
     return (
-        <>
-            <nav
-                ref={navRef}
-                className="border-0 border-t border-solid border-store-cream/10 bg-store-dark/75"
-                aria-label={t('header.navigation')}
-            >
-                <div className="mx-auto flex min-h-[42px] max-w-[1440px] items-center gap-4 px-5 py-1">
-                    {/* Nút mở danh mục */}
-                    <button
-                        ref={categoryButtonRef}
-                        type="button"
-                        className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border-2 border-solid border-store-ink bg-store-yellow px-3 py-1.5 text-[12px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)] hover:bg-store-yellow"
-                        aria-haspopup="dialog"
-                        aria-expanded={isCategoryMenuOpen}
-                        aria-controls={isCategoryMenuOpen ? 'btb-category-mega-menu' : undefined}
-                        onClick={toggleCategoryMenu}
-                    >
-                        <img
-                            className="block shrink-0"
-                            src="/images/storefront/menu.svg"
-                            width={16}
-                            height={16}
-                            alt=""
-                        />
-
-                        {t('header.categories')}
-                    </button>
-
-                    {/* Các liên kết Header giữ nguyên */}
-                    <div className="flex min-w-0 flex-1 items-center gap-4 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1.5 text-[12px] leading-[1.5] whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                        <Link
-                            className="text-store-cream no-underline hover:text-store-yellow"
-                            to="/collections/deals"
-                        >
-                            {t('header.deals')}
-                        </Link>
-
-                        <Link
-                            className="text-store-cream no-underline hover:text-store-yellow"
-                            to={ROUTES.CATALOG}
-                        >
-                            {t('header.standardFood')}
-                        </Link>
-
-                        <Link
-                            className="text-store-cream no-underline hover:text-store-yellow"
-                            to="/collections/combos"
-                        >
-                            {t('header.combos')}
-                        </Link>
-                    </div>
-
-                    {/* Thông điệp VAT */}
+        <nav
+            className="border-0 border-t border-solid border-store-cream/10 bg-store-dark/75"
+            aria-label={t('header.navigation')}
+        >
+            <div className="mx-auto flex min-h-[42px] max-w-[1440px] items-center justify-center gap-4 px-5 py-1">
+                <Link
+                    to={ROUTES.CATALOG}
+                    className={`${linkStyle(current === 'categories')} text-[12px]`}
+                    aria-current={current === 'categories' ? 'page' : undefined}
+                >
+                    <img
+                        src="/images/storefront/menu.svg"
+                        width={16}
+                        height={16}
+                        alt=""
+                        className={current === 'categories' ? '' : 'brightness-0 invert'}
+                    />
+                    {t('header.categories')}
+                </Link>
+                <div className="flex shrink-0 items-center gap-4 py-1.5 text-[12px] leading-[1.5] whitespace-nowrap">
                     <Link
-                        to={ROUTES.ORDERS}
-                        className="ml-auto hidden shrink-0 items-center gap-1.5 text-[12px] font-semibold text-store-pink no-underline hover:text-store-yellow min-[1440px]:flex"
-                        title={t('customerUI.navVat')}
+                        className={linkStyle(current === 'deals')}
+                        to="/collections/deals"
+                        aria-current={current === 'deals' ? 'page' : undefined}
                     >
-                        {t('header.invoice')}
-                        <img
-                            className="block shrink-0"
-                            src="/images/storefront/arrow-right.svg"
-                            alt=""
-                        />
+                        {t('header.deals')}
                     </Link>
+                    <Link
+                        className={linkStyle(current === 'brands')}
+                        to={ROUTES.BRANDS}
+                        aria-current={current === 'brands' ? 'page' : undefined}
+                    >
+                        {t('brandPage.brands')}
+                    </Link>
+                    <Link
+                        className={linkStyle(current === 'combos')}
+                        to="/collections/combos"
+                        aria-current={current === 'combos' ? 'page' : undefined}
+                    >
+                        {t('header.combos')}
+                    </Link>
+                    <ProductRequestSection onOpenChange={setRequestOpen} />
                 </div>
-            </nav>
-
-            {/* Mega Menu hiển thị trên trang hiện tại */}
-            <CategoryMegaMenu open={isCategoryMenuOpen} top={menuTop} onClose={closeCategoryMenu} />
-        </>
+                <AboutBusinessDropdown active={current === 'about'} onOpenChange={setAboutOpen} />
+            </div>
+        </nav>
     );
 }
-
-// Header mua sắm dùng chung; page nào cần thì import trực tiếp.

@@ -8,6 +8,7 @@ import type {
     RegistrationStats,
     ReviewRegistrationRequest,
 } from '@/types/admin/registration';
+import type { RegistrationDuplicate } from '@/types/admin/registration';
 
 const endpoint = '/api/admin/registration-requests';
 
@@ -16,6 +17,14 @@ export async function getRegistrations(params: RegistrationListParams, signal?: 
         params,
         signal,
     });
+    return response.data.data;
+}
+
+export async function getRegistrationDuplicates(page: number, size: number, signal?: AbortSignal) {
+    const response = await http.get<ApiResponse<PageResponse<RegistrationDuplicate>>>(
+        `${endpoint}/duplicates`,
+        { params: { page, size }, signal },
+    );
     return response.data.data;
 }
 

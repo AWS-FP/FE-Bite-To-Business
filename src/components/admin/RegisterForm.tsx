@@ -6,12 +6,21 @@ import { ROUTES } from '@/router/routes';
 import useRegisterForm from '@/hooks/admin/useRegisterForm';
 import CustomerInformationStep from './CustomerInformationStep';
 import DeliveryAddressStep from './DeliveryAddressStep';
-import InvoiceInformationStep from './InvoiceInformationStep';
+import PageNav from '@/components/common/PageNav';
+import { REGISTRATION_STEP_COUNT } from '@/constants/admin/registration';
 
 export default function RegisterForm() {
     const { t } = useTranslation();
-    const { form, step, goBack, editStep, handleSubmit, isSubmitting, serverError } =
-        useRegisterForm();
+    const {
+        form,
+        step,
+        goBack,
+        handleSubmit,
+        isSubmitting,
+        serverError,
+        newsletterConsent,
+        setNewsletterConsent,
+    } = useRegisterForm();
     const titleRef = useRef<HTMLHeadingElement>(null);
     const previousStepRef = useRef(step);
 
@@ -26,20 +35,12 @@ export default function RegisterForm() {
 
     return (
         <>
-            <Link
-                className="auth-back-home mb-[18px] inline-flex items-center gap-[5px] text-[12px] font-bold text-black
- no-underline hover:text-auth-green"
-                to={ROUTES.HOME}
-            >
-                <ArrowLeft size={14} aria-hidden="true" />
-                {t('auth.home')}
-            </Link>
+            <div className="mb-[18px] flex justify-end">
+                <PageNav back={{ label: t('auth.home'), to: ROUTES.HOME }} />
+            </div>
             <h1 id="auth-title" ref={titleRef} tabIndex={-1}>
                 {t('register.title')}
             </h1>
-            <p className="auth-introduction mt-2.5 mb-0 font-subtext text-[16px] leading-[1.6] text-auth-muted">
-                {t('register.description')}
-            </p>
 
             <ol
                 className="auth-progress mt-6 mb-0 flex list-none gap-2 p-0"
@@ -61,23 +62,12 @@ export default function RegisterForm() {
                     />
                     <span>2. {t('register.deliveryStep')}</span>
                 </li>
-                <li
-                    className={`group/step min-w-0 flex-1 font-label text-[11px] leading-[1.5] font-bold ${step === 3 ? 'is-reached text-auth-ink' : 'text-store-placeholder'}`}
-                    aria-current={step === 3 ? 'step' : undefined}
-                >
-                    <span
-                        className={`auth-progress-bar mb-[9px] block h-1.5 rounded group-aria-[current=step]/step:bg-auth-ink ${step === 3 ? 'bg-auth-green' : 'bg-auth-ink/10'}`}
-                    />
-                    <span>3. {t('register.invoiceStep')}</span>
-                </li>
             </ol>
             <p className="auth-sr-only sr-only" aria-live="polite">
                 {step === 1 &&
                     t('register.currentStep', { step: 1, label: t('register.customerStep') })}
                 {step === 2 &&
                     t('register.currentStep', { step: 2, label: t('register.deliveryStep') })}
-                {step === 3 &&
-                    t('register.currentStep', { step: 3, label: t('register.invoiceStep') })}
             </p>
 
             <form
@@ -106,12 +96,32 @@ export default function RegisterForm() {
                     <legend className="auth-sr-only sr-only">
                         {step === 1 && t('register.customerStep')}
                         {step === 2 && t('register.deliveryStep')}
-                        {step === 3 && t('register.invoiceStep')}
                     </legend>
                     {step === 1 && <CustomerInformationStep form={form} />}
                     {step === 2 && <DeliveryAddressStep form={form} />}
-                    {step === 3 && <InvoiceInformationStep form={form} onEdit={editStep} />}
                 </fieldset>
+                {step === REGISTRATION_STEP_COUNT && (
+                    <p className="auth-submit-note mt-5 mb-0 font-subtext text-[12px] leading-[1.6] text-auth-muted">
+                        {t('register.submitNote')}
+                    </p>
+                )}
+                {step === REGISTRATION_STEP_COUNT && (
+                    <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl border border-solid border-auth-ink/15 bg-white p-4 text-sm text-auth-ink">
+                        <input
+                            type="checkbox"
+                            checked={newsletterConsent}
+                            onChange={(event) => setNewsletterConsent(event.target.checked)}
+                            disabled={isSubmitting}
+                            className="mt-1 h-4 w-4 shrink-0 accent-auth-green"
+                        />
+                        <span>
+                            <strong className="block">{t('register.newsletterOptInTitle')}</strong>
+                            <span className="mt-1 block text-xs leading-5 text-auth-muted">
+                                {t('register.newsletterOptInHelp')}
+                            </span>
+                        </span>
+                    </label>
+                )}
 
                 <div className="auth-form-actions mt-6 flex gap-3">
                     {step > 1 && (
@@ -138,8 +148,8 @@ export default function RegisterForm() {
                             />
                         )}
                         {isSubmitting && t('register.submitting')}
-                        {!isSubmitting && step < 3 && t('register.continue')}
-                        {!isSubmitting && step === 3 && t('register.submit')}
+                        {!isSubmitting && step < REGISTRATION_STEP_COUNT && t('register.continue')}
+                        {!isSubmitting && step === REGISTRATION_STEP_COUNT && t('register.submit')}
                     </button>
                 </div>
             </form>

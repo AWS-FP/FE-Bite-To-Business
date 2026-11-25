@@ -20,11 +20,8 @@ export interface RegistrationResponse {
     deliveryAddress: string | null;
     fullDeliveryAddress: string | null;
     deliveryNote: string | null;
-    invoiceSameAsDelivery: boolean | null;
     invoicePurchaser: string | null;
     invoiceTaxCode: string | null;
-    invoiceEmail: string | null;
-    invoiceAddress: string | null;
     status: RegistrationStatus;
     reviewNote: string | null;
     submittedAt: string;
@@ -58,4 +55,18 @@ export interface RegistrationStats {
     pending: number;
     approved: number;
     rejected: number;
+}
+
+/** Registrations whose email/phone already had an account; auto-rejected by email. */
+export interface RegistrationDuplicate {
+    id: string;
+    email: string;
+    phone: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    duplicateField: 'EMAIL' | 'PHONE' | 'EMAIL_AND_PHONE';
+    existingUserId: string | null;
+    emailStatus: 'PENDING' | 'SENT' | 'SKIPPED' | 'FAILED';
+    emailSentAt: string | null;
+    createdAt: string;
 }

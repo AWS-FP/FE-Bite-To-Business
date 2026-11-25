@@ -1,6 +1,6 @@
 import axios, { type InternalAxiosRequestConfig } from 'axios';
 import { env } from '@/lib/env';
-import type { AuthResponse, RefreshTokenRequest } from '@/types/admin/auth';
+import type { AuthResponse } from '@/types/admin/auth';
 import { useAuthStore } from '@/store/admin/authStore';
 import type { ApiResponse } from '@/types/api';
 
@@ -10,7 +10,8 @@ const clientConfig = {
 };
 
 // Các feature gọi API qua hai client này, không tạo Axios instance riêng.
-export const http = axios.create(clientConfig);
+// http = API cần đăng nhập: trình duyệt tự gửi cookie HttpOnly btb_access (JS không đọc/gắn token).
+export const http = axios.create({ ...clientConfig, withCredentials: true });
 export const publicHttp = axios.create(clientConfig);
 
 // Tách client refresh để lỗi 401 của refresh không chạy lại interceptor vô hạn.
@@ -19,28 +20,35 @@ const refreshClient = axios.create(clientConfig);
 interface AuthRequestConfig extends InternalAxiosRequestConfig {
     _retry?: boolean;
     _sessionVersion?: number;
-    _accessToken?: string;
+    /** Value of refreshGeneration when the request was sent. */
+    _generation?: number;
 }
+
+// Bumped after every successful refresh: a 401 from a request sent before it just needs a retry.
+let refreshGeneration = 0;
 
 let refreshing: { version: number; promise: Promise<AuthResponse> } | null = null;
 
-async function refreshSession(version: number, refreshToken: string) {
+/** POST /api/auth/refresh with the HttpOnly refresh cookie (no token in JS or in the body). */
+function requestRefresh() {
+    return refreshClient.post<ApiResponse<AuthResponse>>('/api/auth/refresh', undefined, {
+        withCredentials: true,
+    });
+}
+
+async function refreshSession(version: number) {
     try {
-        // BE hiện nhận refreshToken trong JSON body, không đọc refresh cookie như SWP.
-        const body: RefreshTokenRequest = { refreshToken };
-        const response = await refreshClient.post<ApiResponse<AuthResponse>>(
-            '/api/auth/refresh',
-            body,
-        );
+        const response = await requestRefresh();
         const session = response.data.data;
 
-        if (!session.accessToken || !session.refreshToken || !session.user) {
+        if (!session.user) {
             throw new Error('Backend returned an invalid authentication session.');
         }
 
         if (!useAuthStore.getState().updateSession(version, session)) {
             throw new axios.CanceledError('Authentication session changed.');
         }
+        refreshGeneration++;
 
         return session;
     } catch (error: unknown) {
@@ -63,12 +71,8 @@ http.interceptors.request.use((config: AuthRequestConfig) => {
     }
 
     config._sessionVersion = state.sessionVersion;
-    config._accessToken = state.session?.accessToken;
-
-    if (state.session) {
-        config.headers.set('Authorization', `Bearer ${state.session.accessToken}`);
-    }
-
+    config._generation = refreshGeneration;
+    // No Authorization header: the access token travels only in the HttpOnly btb_access cookie.
     return config;
 });
 
@@ -88,21 +92,21 @@ http.interceptors.response.use(
         const session = state.session;
 
         // Chỉ refresh request đã dùng phiên đăng nhập này, không tự đăng nhập lại cho Guest.
-        if (!session || !request._accessToken || request._sessionVersion !== state.sessionVersion) {
+        if (!session || request._sessionVersion !== state.sessionVersion) {
             throw error;
         }
 
         request._retry = true;
 
         // Một request khác có thể đã refresh xong trước khi lỗi 401 này trả về.
-        if (request._accessToken !== session.accessToken) {
+        if (request._generation !== refreshGeneration) {
             return http(request);
         }
 
         // Nhiều request 401 cùng phiên dùng chung một lần refresh, không đổi token nhiều lần.
         if (!refreshing || refreshing.version !== state.sessionVersion) {
             const version = state.sessionVersion;
-            const promise = refreshSession(version, session.refreshToken).finally(() => {
+            const promise = refreshSession(version).finally(() => {
                 if (refreshing?.version === version) {
                     refreshing = null;
                 }
@@ -119,6 +123,34 @@ http.interceptors.response.use(
         return http(request);
     },
 );
+
+/**
+ * Runs once at startup: the session is not stored in the browser, so a reload, a new tab or
+ * reopening the site asks BE for a fresh access token using the HttpOnly refresh cookie.
+ * Route guards wait until this finishes.
+ */
+let restoring: Promise<void> | null = null;
+export function restoreSession() {
+    restoring ??= (async () => {
+        const version = useAuthStore.getState().sessionVersion;
+        try {
+            const response = await requestRefresh();
+            const session = response.data.data;
+            // A login that finished meanwhile wins over the restored session.
+            if (
+                session?.user &&
+                useAuthStore.getState().sessionVersion === version
+            ) {
+                useAuthStore.getState().setSession(session);
+            }
+        } catch {
+            // No cookie, expired, or offline: stay signed out.
+        } finally {
+            useAuthStore.getState().finishRestoring();
+        }
+    })();
+    return restoring;
+}
 
 // Login/register/verify-otp/activate dùng publicHttp: không tự gắn token hoặc refresh.
 // Khi activate, service sẽ truyền token từ bước verify-otp vào header của riêng request đó.

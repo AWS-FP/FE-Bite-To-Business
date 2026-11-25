@@ -20,12 +20,10 @@ export interface RegisterRequest {
     ward: string;
     deliveryAddress: string;
     deliveryNote?: string | null;
-    invoiceSameAsDelivery: boolean;
     invoicePurchaser?: string | null;
     // MST là chuỗi để giữ đủ 10 chữ số, kể cả khi bắt đầu bằng 0.
     invoiceTaxCode?: string | null;
-    invoiceEmail?: string | null;
-    invoiceAddress?: string | null;
+    newsletterConsent?: boolean;
 }
 
 // UUID và Instant trong JSON được đọc thành string ở FE.
@@ -77,8 +75,10 @@ export interface AuthUser {
 
 // Chỉ lưu phiên sau khi đăng nhập bằng mật khẩu; token xác minh OTP được xử lý riêng.
 export interface AuthResponse {
-    accessToken: string;
-    refreshToken: string;
+    /** Not sent any more: the access token lives only in the HttpOnly `btb_access` cookie. */
+    accessToken?: string | null;
+    /** Not sent any more: the refresh token lives only in the HttpOnly `btb_refresh` cookie. */
+    refreshToken?: string | null;
     tokenType: string;
     expiresIn: number;
     user: AuthUser;

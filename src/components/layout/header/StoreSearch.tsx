@@ -1,71 +1,56 @@
-import { useState } from 'react';
-import { Sparkles } from 'lucide-react';
-import type { FormEvent, MouseEvent } from 'react';
+import { ArrowRight, Clock3, Image as ImageIcon, Search, Sparkles, Trash2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { getCatalogSearchPath } from '../../../constants/catalogNavigation';
-import useSearchHistory from '../../../hooks/useSearchHistory';
+import { useStoreSearch } from '@/hooks/customer/useStoreSearch';
+import { SEARCH_MAX_LENGTH } from '@/constants/catalogSearch';
 import SearchModeDropdown from './SearchModeDropdown';
+import { useAssistantStore } from '@/a2ui/runtime/assistantStore';
+import { trackEvent } from '@/a2ui/telemetry/interactionTracker';
 
 export default function StoreSearch() {
     const { t } = useTranslation('storefront');
-    const navigate = useNavigate();
-    const [keyword, setKeyword] = useState('');
-    const [searchMode, setSearchMode] = useState<'products' | 'ai'>('products');
-    const [showAINotice, setShowAINotice] = useState(false);
-    const [isSearching, setIsSearching] = useState(false);
-    const { history, isLoadingHistory, isHistoryUnavailable, recordSearch } = useSearchHistory();
-
-    async function handleSearch(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault();
-        if (isSearching) return;
-
-        const searchText = keyword.replace(/\s+/gu, ' ').trim();
-        if (!searchText) return;
-
-        if (searchMode === 'ai') {
-            setShowAINotice(true);
-            return;
-        }
-
-        await searchFor(searchText);
-    }
-
-    async function searchFor(searchText: string) {
-        if (isSearching) return;
-        setIsSearching(true);
-        try {
-            const canNavigate = await recordSearch(searchText);
-            if (canNavigate) navigate(getCatalogSearchPath(searchText));
-        } finally {
-            setIsSearching(false);
-        }
-    }
-
-    async function handleHistoryClick(event: MouseEvent<HTMLAnchorElement>, searchText: string) {
-        if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0)
-            return;
-        event.preventDefault();
-        await searchFor(searchText);
-    }
-
+    const {
+        keyword,
+        changeKeyword,
+        showSuggestionMenu,
+        suggestionLoading,
+        suggestionError,
+        showRecentSearches,
+        searchMode,
+        changeMode,
+        showAINotice,
+        historyEntries,
+        deleteSearch,
+        confirmClear,
+        deleting,
+        deleteError,
+        handleSearch,
+        handleHistoryClick,
+        setOpen,
+        suggestions,
+        inputRef,
+        menuRef,
+        handleKeys,
+    } = useStoreSearch();
     return (
-        <div className="min-w-0 flex-1">
+        <div
+            onBlur={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+            }}
+            onKeyDown={handleKeys}
+            className="relative min-w-0 max-w-[720px] flex-[1_1_720px]"
+        >
             <form
-                className="focus-border-group flex h-[46px] min-w-0 items-center rounded-full border-2 border-solid border-store-ink bg-store-cream shadow-[3px_3px_0_var(--color-store-ink)] focus-within:border-store-green"
+                className="focus-border-group flex h-[52px] min-w-0 items-center rounded-full border-2 border-solid border-store-ink bg-store-cream shadow-[3px_3px_0_var(--color-store-ink)] focus-within:border-store-green"
                 role="search"
                 aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.label')}
                 onSubmit={handleSearch}
             >
-                <SearchModeDropdown
-                    value={searchMode}
-                    onChange={(mode) => {
-                        setSearchMode(mode);
-                        setShowAINotice(false);
-                    }}
-                />
+                <SearchModeDropdown value={searchMode} onChange={changeMode} />
 
                 <input
+                    ref={inputRef}
                     className="h-9 min-w-0 flex-1 rounded-full border-0 bg-transparent px-2.5 text-[12px] text-store-ink outline-none placeholder:text-store-muted"
                     type="search"
                     name="q"
@@ -73,17 +58,17 @@ export default function StoreSearch() {
                     placeholder={t(
                         searchMode === 'ai' ? 'search.aiPlaceholder' : 'search.placeholder',
                     )}
-                    maxLength={100}
+                    autoComplete="off"
+                    onFocus={() => setOpen(true)}
+                    maxLength={SEARCH_MAX_LENGTH}
                     value={keyword}
-                    onChange={(event) => setKeyword(event.target.value)}
+                    onChange={(event) => changeKeyword(event.target.value)}
                 />
 
                 <button
-                    className="flex h-full shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-r-full border-0 border-l-2 border-solid border-store-ink bg-store-yellow px-3.5 text-[12px] font-extrabold text-store-ink transition-colors hover:bg-store-yellow focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white disabled:cursor-wait disabled:opacity-70"
+                    className="flex h-full shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-r-full border-0 border-l-2 border-solid border-store-ink bg-store-yellow px-3.5 text-[12px] font-extrabold text-store-ink transition-colors hover:bg-[#ffe97b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white disabled:cursor-wait disabled:opacity-70"
                     type="submit"
                     aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.submit')}
-                    disabled={isSearching}
-                    aria-busy={isSearching}
                 >
                     {searchMode === 'ai' ? (
                         <Sparkles size={16} className="shrink-0" aria-hidden="true" />
@@ -98,43 +83,101 @@ export default function StoreSearch() {
                 </button>
             </form>
 
+            {(showSuggestionMenu || showRecentSearches) && (
+                <nav
+                    ref={menuRef}
+                    aria-label={t(showRecentSearches ? 'search.history' : 'search.suggestions')}
+                    className="absolute inset-x-0 top-[calc(100%+8px)] z-[90] max-h-[min(420px,65dvh)] overflow-y-auto overscroll-contain rounded-2xl border border-solid border-store-line bg-white p-2.5 text-store-ink shadow-[0_18px_45px_rgba(0,0,0,0.22)]"
+                >
+                    {showRecentSearches ? (
+                        <>
+                            <div className="flex items-center justify-between gap-3 px-2 pb-2 pt-1">
+                                <p className="m-0 text-[11px] font-extrabold uppercase tracking-wide text-store-muted">
+                                    {t('search.history')}
+                                </p>
+                                <button type="button" disabled={deleting} onClick={confirmClear}
+                                    className="inline-flex cursor-pointer items-center gap-1 rounded-lg border-0 bg-transparent px-1.5 py-1 text-xs text-store-muted hover:text-danger disabled:opacity-40">
+                                    <Trash2 size={13} /> {t('searchHistory.clearAll')}
+                                </button>
+                            </div>
+                            {historyEntries.slice(0, 7).map((entry) => (
+                                <div key={entry.id} className="flex items-center gap-2 rounded-xl hover:bg-store-cream">
+                                    <Link to={getCatalogSearchPath(entry.keyword)}
+                                        onClick={(event) => void handleHistoryClick(event, entry.keyword)}
+                                        className="flex min-w-0 flex-1 items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold text-store-ink no-underline focus-visible:outline-2 focus-visible:outline-store-green">
+                                        <Clock3 size={15} className="shrink-0 text-store-muted" />
+                                        <span className="truncate">{entry.keyword}</span>
+                                    </Link>
+                                    <button type="button" onClick={() => void deleteSearch(entry.id)}
+                                        disabled={deleting} aria-label={`${t('searchHistory.remove')}: ${entry.keyword}`}
+                                        className="mr-2 flex size-7 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent text-store-muted hover:bg-red-50 hover:text-danger disabled:opacity-40">
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            ))}
+                        </>
+                    ) : (
+                        <>
+                            <p className="m-0 px-2 pb-2 pt-1 text-[11px] font-extrabold uppercase tracking-wide text-store-muted">
+                                {t('search.suggestions')}
+                            </p>
+                            {suggestionLoading ? (
+                                <div className="flex items-center gap-2 px-3 py-5 text-sm text-store-muted" role="status">
+                                    <span className="size-4 animate-spin rounded-full border-2 border-store-line border-t-store-green" />
+                                    {t('search.loadingSuggestions')}
+                                </div>
+                            ) : suggestionError ? (
+                                <p role="status" className="m-0 px-3 py-5 text-sm text-store-muted">
+                                    {t('search.suggestionUnavailable')}
+                                </p>
+                            ) : suggestions.length ? (
+                                suggestions.map((item) => (
+                                    <Link key={item.key} to={item.path}
+                                        onClick={(event) => void handleHistoryClick(event, item.keyword, item.path)}
+                                        className="group flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 text-store-ink no-underline transition-colors hover:bg-store-cream focus-visible:bg-store-cream focus-visible:outline-2 focus-visible:outline-store-green">
+                                        {item.kind === 'product' ? (
+                                            item.imageUrl ? (
+                                                <img src={item.imageUrl} alt="" loading="lazy"
+                                                    className="size-12 shrink-0 rounded-lg border border-solid border-store-line bg-white object-contain p-1" />
+                                            ) : (
+                                                <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-surface-green text-store-muted"><ImageIcon size={18} /></span>
+                                            )
+                                        ) : (
+                                            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-green text-store-green"><Search size={17} /></span>
+                                        )}
+                                        <span className="min-w-0 flex-1 truncate text-[13px] font-semibold leading-5">{item.label}</span>
+                                        {item.kind !== 'product' && (
+                                            <span className="shrink-0 rounded-full bg-surface-green px-2 py-1 text-[10px] font-semibold text-store-muted">
+                                                {t(`search.kinds.${item.kind}`)}
+                                            </span>
+                                        )}
+                                    </Link>
+                                ))
+                            ) : (
+                                <p className="m-0 px-3 py-5 text-sm text-store-muted">{t('search.noSuggestions')}</p>
+                            )}
+                            <Link to={getCatalogSearchPath(keyword.trim())}
+                                onClick={(event) => void handleHistoryClick(event, keyword.trim())}
+                                className="mt-2 flex items-center justify-between gap-2 rounded-xl border border-solid border-store-line bg-store-cream px-3 py-3 text-xs font-bold text-store-green no-underline hover:bg-surface-yellow focus-visible:outline-2 focus-visible:outline-store-green">
+                                <span className="min-w-0 truncate">{t('search.viewAll', { query: keyword.trim() })}</span>
+                                <ArrowRight size={15} />
+                            </Link>
+                        </>
+                    )}
+                </nav>
+            )}
+
             {showAINotice && (
                 <p className="mt-2 px-2 text-[11px] leading-[1.5] text-store-cream" role="status">
                     {t('search.aiUnavailable')}
                 </p>
             )}
 
-            <div
-                className="mt-1 flex min-h-[18px] items-center gap-1.5 overflow-x-auto px-2 text-[11px] leading-[1.5] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-                aria-label={t('search.history')}
-            >
-                <span className="shrink-0 text-store-cream/75">{t('search.history')}</span>
-                {isLoadingHistory && (
-                    <span className="shrink-0 text-store-cream/60" role="status">
-                        · {t('search.loadingHistory')}
-                    </span>
-                )}
-                {isHistoryUnavailable && (
-                    <span className="shrink-0 text-store-cream/60" role="status">
-                        · {t('search.historyUnavailable')}
-                    </span>
-                )}
-                {!isLoadingHistory && !isHistoryUnavailable && history.length === 0 && (
-                    <span className="shrink-0 text-store-cream/60">
-                        · {t('search.emptyHistory')}
-                    </span>
-                )}
-                {history.map((searchText) => (
-                    <Link
-                        className="shrink-0 rounded-full border border-solid border-white/15 bg-white/10 px-2 py-0.5 text-store-cream no-underline hover:bg-white/20"
-                        key={searchText}
-                        to={getCatalogSearchPath(searchText)}
-                        onClick={(event) => handleHistoryClick(event, searchText)}
-                    >
-                        {searchText}
-                    </Link>
-                ))}
-            </div>
+            {deleteError && (
+                <p role="alert" className="mt-1 px-2 text-xs text-red-200">
+                    {t('searchHistory.deleteError')}
+                </p>
+            )}
         </div>
     );
 }

@@ -1,13 +1,16 @@
 import { Truck } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
-import type { Quote, QuotePackage } from '@/services/customer/quoteService';
+import type { Quote, QuotePackage, QuotePackageAmount } from '@/types/customer/quote';
 
 interface QuoteReviewProps {
     quote: Quote;
     packages: QuotePackage[];
+    totals: Record<string, QuotePackageAmount>;
 }
 
-export default function QuoteReview({ quote, packages }: QuoteReviewProps) {
+export default function QuoteReview({ quote, packages, totals }: QuoteReviewProps) {
+    const { t } = useTranslation('quote');
     return (
         <section className="rounded-2xl border border-store-ink/20 bg-white p-6">
             <div className="flex items-center gap-3">
@@ -15,11 +18,12 @@ export default function QuoteReview({ quote, packages }: QuoteReviewProps) {
                     <Truck size={21} />
                 </span>
                 <div>
-                    <h2 className="m-0 font-subheading text-xl font-bold">
-                        Kiểm tra trước khi thanh toán
-                    </h2>
+                    <h2 className="m-0 font-subheading text-xl font-bold">{t('review.title')}</h2>
                     <p className="mb-0 mt-1 text-sm text-store-muted">
-                        {packages.length} gói giao hàng · {quote.items.length} sản phẩm
+                        {t('review.counts', {
+                            packages: packages.length,
+                            products: quote.items.length,
+                        })}
                     </p>
                 </div>
             </div>
@@ -31,18 +35,20 @@ export default function QuoteReview({ quote, packages }: QuoteReviewProps) {
                             {item.recipientName} · {item.address}
                         </p>
                         <p className="mb-0 mt-1 text-sm text-store-muted">
-                            {item.deliveryDate} · {item.deliveryTimeSlot}
+                            {item.deliveryDate}
                         </p>
                         <p className="mb-0 mt-2 text-sm font-bold">
-                            Phí giao: {formatCurrencyVnd(Number(item.shippingFee))}
+                            {t('review.shipping')} {formatCurrencyVnd(Number(item.shippingFee))}
                         </p>
+                        {totals[item.id] && (
+                            <p className="mb-0 mt-2 text-sm font-bold text-store-green">
+                                {t('packageTotal')}{' '}
+                                {formatCurrencyVnd(Number(totals[item.id].total))}
+                            </p>
+                        )}
                     </div>
                 ))}
             </div>
-            <p className="mb-0 mt-5 rounded-xl bg-store-cream p-4 text-sm leading-relaxed">
-                Chức năng tạo đơn và thanh toán đang được hoàn thiện. Bạn có thể quay lại để kiểm
-                tra thông tin báo giá.
-            </p>
         </section>
     );
 }

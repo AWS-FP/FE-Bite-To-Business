@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
 import ProfileSidebar from '@/components/customer/profile/ProfileSidebar';
 import ProfileAccountCard from '@/components/customer/profile/ProfileAccountCard';
@@ -11,6 +9,7 @@ import { getCustomerProfile } from '@/services/customer/profileService';
 import { useAuthStore } from '@/store/admin/authStore';
 import { getAuthError } from '@/utils/admin/authError';
 import { ROUTES } from '@/router/routes';
+import PageNav from '@/components/common/PageNav';
 
 function ProfileContent() {
     const { t } = useTranslation('profile');
@@ -28,16 +27,11 @@ function ProfileContent() {
             rootClassName="min-h-screen bg-store-cream font-body text-store-ink"
             mainClassName="mx-auto max-w-[1440px] px-6 pb-14 pt-5"
         >
-            <nav
-                className="mb-5 flex items-center gap-2 text-xs text-store-muted"
-                aria-label={t('breadcrumb')}
-            >
-                <Link className="text-store-green no-underline hover:underline" to={ROUTES.HOME}>
-                    Bite to Business
-                </Link>
-                <ChevronRight size={14} aria-hidden="true" />
-                <span>{t('breadcrumb')}</span>
-            </nav>
+            <PageNav
+                className="mb-5"
+                ariaLabel={t('breadcrumb')}
+                items={[{ label: 'Bite to Business', to: ROUTES.HOME }, { label: t('breadcrumb') }]}
+            />
             <div className="mb-6 flex items-center justify-between gap-6 border-b border-store-line pb-5">
                 <div>
                     <p className="m-0 text-[11px] font-bold tracking-widest text-store-green">

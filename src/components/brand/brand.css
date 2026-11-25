@@ -54,7 +54,7 @@
 
 .btb-brand-hero h1 {
     font-family: var(--font-heading);
-    font-weight: 400;
+    font-weight: 700;
     letter-spacing: -.05em;
     font-synthesis: none;
 }
@@ -73,7 +73,7 @@
 
 .btb-brand-detail-hero h1 {
     font-family: var(--font-heading);
-    font-weight: 400;
+    font-weight: 700;
     letter-spacing: -.05em;
     font-synthesis: none;
 }
@@ -92,7 +92,7 @@
 
 .btb-brand-not-found h1 {
     font-family: var(--font-heading);
-    font-weight: 400;
+    font-weight: 700;
     letter-spacing: -.05em;
     font-synthesis: none;
 }
@@ -217,13 +217,13 @@
     font-size: clamp(39px, 5vw, 69px);
     line-height: 1.13;
     font-family: var(--font-heading);
-    font-weight: 400;
+    font-weight: 700;
     font-synthesis: none;
 }
 
 .btb-brand-hero h1 em {
     color: var(--btb-yellow);
-    font-weight: 400;
+    font-weight: 700;
     font-family: var(--font-heading);
     font-synthesis: none;
 }
@@ -280,7 +280,7 @@
 .btb-brand-hero__feature-info>strong {
     font-family: var(--font-heading);
     font-size: clamp(25px, 3vw, 39px);
-    font-weight: 400;
+    font-weight: 700;
     font-synthesis: none;
 }
 
@@ -457,7 +457,7 @@
     color: var(--btb-navy);
     font-family: var(--font-heading);
     font-size: 13px;
-    font-weight: 400;
+    font-weight: 700;
     font-synthesis: none;
 }
 
@@ -471,7 +471,7 @@
     font-family: var(--font-heading);
     font-size: clamp(16px, 1.7vw, 23px);
     line-height: 1.3;
-    font-weight: 400;
+    font-weight: 700;
     font-synthesis: none;
 }
 
@@ -648,7 +648,7 @@
     font-size: clamp(44px, 5vw, 76px);
     line-height: 1.05;
     font-family: var(--font-heading);
-    font-weight: 400;
+    font-weight: 700;
     font-synthesis: none;
 }
 
@@ -953,7 +953,7 @@
 .btb-brand-not-found h1 {
     color: var(--btb-cream);
     font-family: var(--font-heading);
-    font-weight: 400;
+    font-weight: 700;
     font-synthesis: none;
 }
 

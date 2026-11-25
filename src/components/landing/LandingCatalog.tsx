@@ -582,7 +582,7 @@ export default function LandingCatalog({
                         id="productTableContainer"
                         style={{ display: view === 'table' ? 'block' : 'none' }}
                     >
-                        <table className="w-full border-collapse text-sm [&_td]:border-b-[1.5px] [&_td]:border-solid [&_td]:border-store-ink [&_td]:px-4 [&_td]:py-3.5 [&_td]:text-store-ink [&_th]:border-b-[2.5px] [&_th]:border-solid [&_th]:border-store-ink [&_th]:bg-store-ink [&_th]:px-4 [&_th]:py-3.5 [&_th]:text-left [&_th]:font-heading [&_th]:font-normal [&_th]:text-store-yellow">
+                        <table className="w-full border-collapse text-sm [&_td]:border-b-[1.5px] [&_td]:border-solid [&_td]:border-store-ink [&_td]:px-4 [&_td]:py-3.5 [&_td]:text-store-ink [&_th]:border-b-[2.5px] [&_th]:border-solid [&_th]:border-store-ink [&_th]:bg-store-ink [&_th]:px-4 [&_th]:py-3.5 [&_th]:text-left [&_th]:font-heading [&_th]:font-bold [&_th]:text-store-yellow">
                             <thead>
                                 <tr>
                                     <th>{t('landing.catalog.skuColumn')}</th>

@@ -11,6 +11,16 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     const location = useLocation();
     const session = useAuthStore((state) => state.session);
+    const restoring = useAuthStore((state) => state.restoring);
+
+    // The session comes back from the refresh cookie after a reload; wait before sending to login.
+    if (restoring) {
+        return (
+            <div role="status" className="grid min-h-[60vh] place-items-center text-sm text-store-muted">
+                Đang khôi phục phiên đăng nhập…
+            </div>
+        );
+    }
 
     if (!session) {
         return <Navigate to={ROUTES.LOGIN} replace state={{ from: location }} />;

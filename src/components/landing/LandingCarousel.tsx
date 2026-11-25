@@ -384,7 +384,7 @@ export default function LandingCarousel() {
                                     alt={t('landing.carousel.logoAlt')}
                                     className="haccp-logo-img"
                                 />
-                                <div className="font-heading text-[clamp(36px,5vw,58px)] font-normal leading-none tracking-[0.02em] text-store-ink">BITE TO BUSINESS</div>
+                                <div className="font-heading text-[clamp(36px,5vw,58px)] font-bold leading-none tracking-[0.02em] text-store-ink">BITE TO BUSINESS</div>
                             </div>
                             <div className="mb-[18px] font-body text-[clamp(18px,2.4vw,26px)] font-extrabold tracking-[0.12em] text-store-coral">
                                 HACCP CODEX &amp; AI A2UI PLATFORM 2026

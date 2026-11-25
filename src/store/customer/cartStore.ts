@@ -5,15 +5,74 @@ export interface CartItem {
     id: string
     name: string
     spec: string
+    nameVi?: string
+    nameEn?: string
+    specVi?: string | null
+    specEn?: string | null
     unitPrice: number
     quantity: number
+    selected?: boolean
     imageUrl?: string
+    /** MOQ: the smallest quantity that can be ordered. */
+    minOrderQuantity?: number
+    /** Quantities go MOQ, MOQ + step, MOQ + 2·step, ... */
+    quantityStep?: number
+    /** Stock available to sell when last checked; quantities never go above it. */
+    maxQuantity?: number | null
 }
 
 interface CartStoreState {
     items: CartItem[]
     addItem: (item: Omit<CartItem, 'quantity'>, quantity: number) => void
-    updateQuantity: (id: string, delta: number) => void
+    /**
+     * Moves the quantity by `steps` order steps (+1 / -1 from the cart buttons).
+     * Going below the MOQ removes the item; going above available stock is ignored.
+     */
+    updateQuantity: (id: string, steps: number) => void
+    /** Sets an exact quantity, snapped onto the MOQ/step grid and capped by stock; 0 or less removes the item. */
+    setQuantity: (id: string, quantity: number) => void
+    /** Refreshes MOQ/step/stock for a line (from the product pricing API). */
+    setItemRules: (
+        id: string,
+        minOrderQuantity: number,
+        quantityStep: number,
+        maxQuantity?: number | null,
+    ) => void
+    clear: () => void
+    setSelected: (id: string, selected: boolean) => void
+    selectAll: (selected: boolean) => void
+    removePurchased: (ids: string[]) => void
+}
+
+const round = (value: number) => Number(value.toFixed(3))
+
+export function cartRules(item: Pick<CartItem, 'minOrderQuantity' | 'quantityStep' | 'maxQuantity'>) {
+    const min = Math.max(0.001, Number(item.minOrderQuantity) || 1)
+    const step = Math.max(0.001, Number(item.quantityStep) || 1)
+    const max = item.maxQuantity == null ? null : Math.max(0, Number(item.maxQuantity))
+    /** Largest allowed quantity within stock; null when stock is unknown, below MOQ when it cannot be ordered. */
+    const cap = max == null ? null : max < min ? 0 : round(min + Math.floor(round((max - min) / step)) * step)
+    return { min, step, max, cap }
+}
+
+/** Nearest allowed quantity at or above `quantity` (MOQ, MOQ + step, ...), capped by stock. */
+function snap(quantity: number, rules: ReturnType<typeof cartRules>) {
+    const { min, step, cap } = rules
+    const up = quantity <= min ? min : round(min + Math.ceil(round((quantity - min) / step)) * step)
+    // Not enough stock even for the MOQ: keep the MOQ so the cart can warn instead of hiding the line.
+    if (cap == null || cap < min) return up
+    return Math.min(up, cap)
+}
+
+/** Allowed quantity one step away in `direction`; below MOQ returns 0, above stock stays put. */
+function stepFrom(quantity: number, rules: ReturnType<typeof cartRules>, direction: number) {
+    const { min, step, cap } = rules
+    const position = (quantity - min) / step
+    const index = direction > 0 ? Math.floor(round(position)) + 1 : Math.ceil(round(position)) - 1
+    if (index < 0) return 0
+    const next = round(min + index * step)
+    if (direction > 0 && cap != null && next > cap) return quantity
+    return next
 }
 
 export const useCartStore = create<CartStoreState>()(persist((set) => ({
@@ -21,29 +80,71 @@ export const useCartStore = create<CartStoreState>()(persist((set) => ({
     addItem: (newItem, quantity) =>
         set((state) => {
             const existing = state.items.find((i) => i.id === newItem.id)
+            const rules = cartRules({ ...existing, ...newItem })
             if (existing) {
                 return {
                     items: state.items.map((i) =>
-                        i.id === newItem.id ? { ...i, quantity: i.quantity + quantity } : i
+                        i.id === newItem.id
+                            ? { ...i, ...newItem, quantity: snap(i.quantity + quantity, rules) }
+                            : i
                     ),
                 }
             }
             return {
-                items: [{ ...newItem, quantity }, ...state.items],
+                items: [{ ...newItem, quantity: snap(quantity, rules) }, ...state.items],
             }
         }),
-    updateQuantity: (id, delta) =>
+    updateQuantity: (id, steps) =>
         set((state) => ({
             items: state.items
-                .map((item) =>
-                    item.id === id
-                        ? { ...item, quantity: Math.max(0, item.quantity + delta) }
-                        : item
-                )
+                .map((item) => {
+                    if (item.id !== id || steps === 0) return item
+                    const rules = cartRules(item)
+                    let quantity = item.quantity
+                    for (let i = 0; i < Math.abs(steps) && quantity > 0; i++) {
+                        quantity = stepFrom(quantity, rules, Math.sign(steps))
+                    }
+                    return { ...item, quantity }
+                })
                 .filter((item) => item.quantity > 0),
         })),
+    setQuantity: (id, quantity) =>
+        set((state) => ({
+            items: state.items
+                .map((item) => {
+                    if (item.id !== id) return item
+                    if (quantity <= 0) return { ...item, quantity: 0 }
+                    return { ...item, quantity: snap(quantity, cartRules(item)) }
+                })
+                .filter((item) => item.quantity > 0),
+        })),
+    setItemRules: (id, minOrderQuantity, quantityStep, maxQuantity) =>
+        set((state) => ({
+            items: state.items.map((item) => {
+                if (item.id !== id) return item
+                const next = {
+                    ...item,
+                    minOrderQuantity,
+                    quantityStep,
+                    maxQuantity: maxQuantity === undefined ? item.maxQuantity : maxQuantity,
+                }
+                return { ...next, quantity: snap(item.quantity, cartRules(next)) }
+            }),
+        })),
+    clear: () => set({ items: [] }),
+    setSelected: (id, selected) => set((state) => ({ items: state.items.map((item) => item.id === id ? { ...item, selected } : item) })),
+    selectAll: (selected) => set((state) => ({ items: state.items.map((item) => ({ ...item, selected })) })),
+    removePurchased: (ids) => set((state) => ({ items: state.items.filter((item) => !ids.includes(item.id)) })),
 }), {
     name: 'bitetobusiness.guest-cart',
     storage: createJSONStorage(() => localStorage),
     partialize: (state) => ({ items: state.items }),
+    // Re-apply MOQ/step/stock to a saved cart, e.g. a line saved at 100 when only 65 can be sold.
+    merge: (persisted, current) => {
+        const items = ((persisted as Partial<CartStoreState> | undefined)?.items ?? []).map((item) => ({
+            ...item,
+            quantity: snap(item.quantity, cartRules(item)),
+        }))
+        return { ...current, items }
+    },
 }))

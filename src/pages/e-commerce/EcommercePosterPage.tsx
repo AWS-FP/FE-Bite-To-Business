@@ -1,10 +1,377 @@
-import { useState } from 'react';
-import { useEcommerceData } from '@/components/e-commerce/useEcommerceData';
-import { PageTitle, ui } from '@/components/e-commerce/EcommerceUI';
-import { money } from '@/components/e-commerce/ecommerceData';
-type Language = 'vi' | 'en';
+import { useEffect, useRef, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { CheckCircle2, ImagePlus, Pencil, UploadCloud } from 'lucide-react';
+import { executiveUi } from '@/constants/e-commerce/executiveUi';
+import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
+import { ExecutiveFeedback, ExecutiveSelect } from '@/components/e-commerce/ExecutiveControls';
+import {
+    ExecutiveEmpty,
+    ExecutiveError,
+    ExecutiveHeading,
+    ExecutivePanel,
+} from '@/components/e-commerce/ExecutiveUI';
+import PromotionImageCropper from '@/components/e-commerce/PromotionImageCropper';
+import { executiveApi } from '@/services/e-commerce/executiveAdminService';
+import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
+import type { Promotion } from '@/types/e-commerce/executiveAdmin';
+
+const MAX_BYTES = 5 * 1024 * 1024;
+
+/** Cloudinary accepts JPG/PNG/WebP; convert AVIF before opening it in the crop editor. */
+async function preparePoster(file: File): Promise<File> {
+    if (file.type !== 'image/avif') return file;
+    const bitmap = await createImageBitmap(file);
+    try {
+        const canvas = document.createElement('canvas');
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        const context = canvas.getContext('2d');
+        if (!context) throw new Error('Cannot decode image');
+        context.drawImage(bitmap, 0, 0);
+        const blob = await new Promise<Blob | null>((resolve) =>
+            canvas.toBlob(resolve, 'image/jpeg', 0.86),
+        );
+        if (!blob || blob.size > MAX_BYTES) throw new Error('Cannot convert image');
+        return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+    } finally {
+        bitmap.close();
+    }
+}
+
+/** Load every page, so the client-side search also works when there are 100+ campaigns. */
+async function loadCampaigns(): Promise<Promotion[]> {
+    const first = await executiveApi.promotions(undefined, 0, 100);
+    const all = [...first.items];
+    const totalPages = Math.max(1, first.totalPages);
+    // Limit concurrency to five pages rather than flooding the BE with requests.
+    for (let page = 1; page < totalPages; page += 5) {
+        const pages = await Promise.all(
+            Array.from({ length: Math.min(5, totalPages - page) }, (_, index) =>
+                executiveApi.promotions(undefined, page + index, 100),
+            ),
+        );
+        for (const result of pages) all.push(...result.items);
+    }
+    return all;
+}
+
 export default function EcommercePosterPage() {
-    const { data } = useEcommerceData(); const [lang, setLang] = useState<Language>('vi'); const [size, setSize] = useState<'desktop' | 'mobile'>('desktop'); const [vi, setVi] = useState('Hải sản tuyển chọn cho bếp chuyên nghiệp'); const [en, setEn] = useState('Premium seafood for professional kitchens'); const [campaign, setCampaign] = useState(data.campaigns[0]?.id ?? ''); const [product, setProduct] = useState(data.products[0]?.id ?? ''); const [cta, setCta] = useState('/products'); const [note, setNote] = useState('Ưu tiên nhấn giá nổi bật, bố cục có nhiều khoảng thở.'); const [generated, setGenerated] = useState(false); const [checks, setChecks] = useState({ vi: false, en: false }); const [gradient, setGradient] = useState(true); const [dark, setDark] = useState(true); const [message, setMessage] = useState(''); const selected = data.products.find(p => p.id === product); const ready = generated && checks.vi && checks.en && vi.trim() && en.trim() && selected;
-    function generate() { if (!vi.trim() || !en.trim() || !selected) { setMessage('Vui lòng nhập đủ hai ngôn ngữ và chọn sản phẩm.'); return } setGenerated(true); setChecks({ vi: false, en: false }); setMessage('Đã tạo bản preview demo từ nội dung bạn nhập (không gọi dịch vụ AI).') }
-    return <div className="pb-10"><PageTitle eyebrow="CAMPAIGN CREATIVE / PUBLISH CONTROL" title="AI Create Poster Studio" description="Tạo bản nháp poster song ngữ, duyệt lớp nội dung và bố cục trước khi xuất bản." /><div className="grid gap-5 xl:grid-cols-[300px_minmax(0,1fr)]"><section className="h-fit rounded-xl border-2 border-store-ink bg-white p-5 shadow-[3px_3px_0_#14132b]"><small className="font-bold tracking-widest text-emerald-700">CONFIGURATION</small><h2 className="mb-4 font-display text-lg font-extrabold">Nội dung & lớp dữ liệu</h2><div className="space-y-4">{([['Nội dung quảng cáo (VI)', vi, setVi], ['Advertising copy (EN)', en, setEn]] as const).map(([label, value, setter]) => <label key={label} className="block"><span className={ui.label}>{label}</span><textarea className={ui.input} rows={3} value={value} onChange={e => { setter(e.target.value); setGenerated(false) }} /></label>)}<button className={`${ui.secondary} w-full`} onClick={() => { setEn('Selected quality products for professional kitchens'); setMessage('Đã điền bản dịch mẫu; hãy kiểm tra nội dung tiếng Anh trước khi duyệt.'); setGenerated(false) }}>✦ Dịch tự động (mẫu)</button><label className="block"><span className={ui.label}>Chương trình liên kết</span><select className={ui.select} value={campaign} onChange={e => setCampaign(e.target.value)}>{data.campaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label><label className="block"><span className={ui.label}>Sản phẩm áp dụng</span><select className={ui.select} value={product} onChange={e => { setProduct(e.target.value); setGenerated(false) }}>{data.products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label><label className="block"><span className={ui.label}>Đường dẫn nút CTA</span><input className={ui.input} value={cta} onChange={e => setCta(e.target.value)} /></label><label className="block"><span className={ui.label}>Ghi chú bố cục cho AI</span><textarea className={ui.input} value={note} rows={2} onChange={e => setNote(e.target.value)} /></label><button className={`${ui.primary} w-full !bg-emerald-700 !text-white`} onClick={generate}>✦ Tạo bản nháp AI (demo)</button></div></section><section className="overflow-hidden rounded-xl border-2 border-store-ink bg-white shadow-[3px_3px_0_#14132b]"><div className="flex flex-wrap items-center justify-between gap-3 p-5"><div><small className="font-bold tracking-widest text-emerald-700">LAYER-AWARE PREVIEW</small><h2 className="font-display text-lg font-extrabold">Live Preview & Duyệt theo lớp</h2></div><div className="flex gap-2"><button className={`${ui.secondary} ${lang === 'vi' ? '!bg-emerald-50' : ''}`} onClick={() => setLang('vi')}>VI</button><button className={`${ui.secondary} ${lang === 'en' ? '!bg-emerald-50' : ''}`} onClick={() => setLang('en')}>EN</button><button className={ui.secondary} onClick={() => setSize(s => s === 'desktop' ? 'mobile' : 'desktop')}>{size === 'desktop' ? 'Desktop' : 'Mobile'}</button></div></div><div className="grid min-h-[320px] place-items-center bg-slate-100 p-6"><div className={`relative overflow-hidden rounded-xl border-4 border-white p-7 text-white shadow-xl transition-all ${gradient ? 'bg-emerald-950' : 'bg-store-green'} ${size === 'mobile' ? 'min-h-[360px] w-[230px]' : 'min-h-[250px] w-full max-w-[750px]'}`}><div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,#235a41_0%,transparent_60%)]" /><div className={`relative z-10 ${dark ? 'drop-shadow-md' : ''}`}><p className="text-[10px] font-bold tracking-widest text-store-yellow">✦ BITE TO BUSINESS</p><div className="mt-8 max-w-[420px]"><span className="rounded-full bg-pink-500 px-2 py-1 text-[10px] font-bold">{data.campaigns.find(c => c.id === campaign)?.name ?? 'ƯU ĐÃI'}</span><h2 className="mt-3 font-display text-[clamp(20px,3vw,30px)] font-bold leading-tight">{lang === 'vi' ? vi : en}</h2><p className="mt-2 text-xs text-emerald-100">{selected?.name ?? 'Sản phẩm demo'}</p><div className="mt-4 flex flex-wrap items-center gap-2"><strong className="text-sm text-store-yellow">{selected ? money(selected.price) : '—'}</strong><span className="rounded-lg bg-store-yellow px-3 py-2 text-[10px] font-bold text-store-ink">{lang === 'vi' ? 'Xem sản phẩm' : 'View product'} ↗</span></div></div></div><div className="absolute right-3 bottom-3 grid size-[80px] place-items-center rounded-lg border border-dashed border-white/40 bg-emerald-800/60 text-center text-[10px] text-white/75">Ảnh sản phẩm<br />chưa có</div></div></div><div className="bg-store-cream p-5"><small className="font-bold tracking-widest text-emerald-700">QUICK ADJUSTMENT</small><h2 className="font-display text-lg font-extrabold">Quản lý các lớp (Layer Controls)</h2><div className="mt-4 grid gap-3 md:grid-cols-2"><label className="rounded-lg border border-store-ink bg-white p-3 text-xs"><b>Lớp nền Colourway</b><span className="mt-3 flex gap-2"><input type="checkbox" checked={gradient} onChange={e => setGradient(e.target.checked)} /> Gradient {gradient ? 'được chọn' : 'đã tắt'}</span></label><div className="rounded-lg border border-store-ink bg-white p-3 text-xs"><b>Lớp ảnh sản phẩm</b><p className="mt-3 text-slate-500">Chờ ảnh thật từ catalog / ảnh hiện là placeholder</p></div><label className="rounded-lg border border-store-ink bg-white p-3 text-xs"><b>Lớp chữ song ngữ</b><span className="mt-3 flex gap-2"><input type="checkbox" checked={dark} onChange={e => setDark(e.target.checked)} /> Chữ nổi bật {dark ? 'đang bật' : 'đã tắt'}</span></label><div className="rounded-lg border border-store-ink bg-white p-3 text-xs"><b>Lớp nút hành động CTA</b><p className="mt-3 break-all text-slate-500">{cta}</p></div></div></div><div className="flex flex-wrap items-center justify-between gap-3 p-5"><div className="space-y-2 text-xs"><label className="flex items-center gap-2"><input type="checkbox" checked={checks.vi} onChange={e => setChecks(p => ({ ...p, vi: e.target.checked }))} /> Đã kiểm tra & duyệt bản Tiếng Việt</label><label className="flex items-center gap-2"><input type="checkbox" checked={checks.en} onChange={e => setChecks(p => ({ ...p, en: e.target.checked }))} /> Đã kiểm tra & duyệt bản Tiếng Anh</label></div><button disabled={!ready} className={`${ui.primary} disabled:!bg-slate-300`} onClick={() => setMessage('Poster đã được đánh dấu ĐỦ ĐIỀU KIỆN trong bản demo. Chưa xuất bản thật.')}>Publish lên Trang chủ</button></div>{message && <p role="status" className="p-4 text-center text-xs text-amber-800">{message}</p>}</section></div></div>
+    const tr = useExecutiveText();
+    const qc = useQueryClient();
+    const [promotionId, setPromotionId] = useState('');
+    const [file, setFile] = useState<File | null>(null);
+    const [preview, setPreview] = useState('');
+    const [sourcePreview, setSourcePreview] = useState('');
+    const [sourceName, setSourceName] = useState('');
+    const [cropping, setCropping] = useState(false);
+    const [message, setMessage] = useState('');
+    const [failed, setFailed] = useState(false);
+    const urls = useRef<{ original: string | null; cropped: string | null }>({
+        original: null,
+        cropped: null,
+    });
+    const pickerId = useRef(0);
+
+    const promos = useQuery({
+        queryKey: ['ecom', 'images-promotions'],
+        queryFn: loadCampaigns,
+    });
+    const promotion = promos.data?.find((campaign) => campaign.id === promotionId);
+
+    useEffect(() => {
+        const storedUrls = urls.current;
+        return () => {
+            if (storedUrls.original) URL.revokeObjectURL(storedUrls.original);
+            if (storedUrls.cropped) URL.revokeObjectURL(storedUrls.cropped);
+        };
+    }, []);
+
+    function clearCrop() {
+        if (urls.current.original) URL.revokeObjectURL(urls.current.original);
+        if (urls.current.cropped) URL.revokeObjectURL(urls.current.cropped);
+        urls.current.original = null;
+        urls.current.cropped = null;
+        setSourcePreview('');
+        setSourceName('');
+        setPreview('');
+        setFile(null);
+        setCropping(false);
+    }
+
+    const upload = useMutation({
+        mutationFn: async () => {
+            if (!file || !promotion)
+                throw new Error('Choose a campaign and apply the image crop first');
+            const result = await executiveApi.uploadPromotionImage(file);
+            return executiveApi.updatePromotion(promotion.id, {
+                nameVi: promotion.nameVi,
+                nameEn: promotion.nameEn,
+                contentVi: promotion.contentVi,
+                contentEn: promotion.contentEn,
+                startsAt: promotion.startsAt,
+                endsAt: promotion.endsAt,
+                imageUrl: result.imageUrl,
+                promotionType: promotion.promotionType ?? 'STANDARD',
+            });
+        },
+        onSuccess: () => {
+            setMessage(
+                tr(
+                    'Đã tải ảnh đã cắt lên và gắn vào chiến dịch.',
+                    'Cropped image uploaded and attached to campaign.',
+                ),
+            );
+            setFailed(false);
+            clearCrop();
+            void qc.invalidateQueries({ queryKey: ['ecom', 'images-promotions'] });
+            void qc.invalidateQueries({ queryKey: ['ecom', 'promotions'] });
+        },
+        onError: (error) => {
+            setFailed(true);
+            setMessage(
+                executiveErrorMessage(
+                    error,
+                    tr(
+                        'Không thể lưu ảnh. Vui lòng thử lại hoặc kiểm tra cấu hình tải ảnh.',
+                        'Could not save the image. Retry or check image upload configuration.',
+                    ),
+                ),
+            );
+        },
+    });
+
+    async function chooseFile(next: File | undefined) {
+        if (!next) return;
+        if (
+            !['image/jpeg', 'image/png', 'image/webp', 'image/avif'].includes(next.type) ||
+            next.size > MAX_BYTES
+        ) {
+            setFailed(true);
+            setMessage(
+                tr(
+                    'Chỉ nhận JPG, PNG, WebP, AVIF tối đa 5 MB.',
+                    'JPG, PNG, WebP or AVIF up to 5 MB only.',
+                ),
+            );
+            return;
+        }
+        const sequence = ++pickerId.current;
+        try {
+            const selected = await preparePoster(next);
+            if (sequence !== pickerId.current) return;
+            clearCrop();
+            const url = URL.createObjectURL(selected);
+            urls.current.original = url;
+            setSourceName(next.name);
+            setSourcePreview(url);
+            setCropping(true);
+            setMessage('');
+            setFailed(false);
+        } catch {
+            setFailed(true);
+            setMessage(
+                tr(
+                    'Không đọc được ảnh này. Hãy chọn JPG, PNG hoặc WebP.',
+                    'This image cannot be decoded. Choose JPG, PNG or WebP.',
+                ),
+            );
+        }
+    }
+
+    function applyCrop(result: File) {
+        if (urls.current.cropped) URL.revokeObjectURL(urls.current.cropped);
+        const url = URL.createObjectURL(result);
+        urls.current.cropped = url;
+        setFile(result);
+        setPreview(url);
+        setCropping(false);
+        setFailed(false);
+        setMessage('');
+    }
+
+    return (
+        <div className="space-y-6">
+            <ExecutiveHeading
+                number="06"
+                eyebrow="MARKETING / MEDIA"
+                title={tr('Ảnh khuyến mãi', 'Promotion images')}
+                description={tr(
+                    'Chọn chiến dịch, cắt đúng vùng banner hoặc poster rồi tải ảnh lên.',
+                    'Find a campaign, choose an exact banner or poster crop, then upload.',
+                )}
+            />
+            <ExecutiveFeedback message={message} error={failed} />
+            <div className="grid gap-5 xl:grid-cols-[minmax(340px,0.9fr)_1.2fr]">
+                <ExecutivePanel title={tr('Tải ảnh quảng cáo', 'Upload campaign image')}>
+                    <div className="space-y-5 p-5">
+                        <ExecutiveSelect
+                            label={tr('Chọn chiến dịch', 'Select a campaign')}
+                            value={promotionId}
+                            onValueChange={setPromotionId}
+                            disabled={promos.isPending || upload.isPending}
+                            searchable
+                            searchPlaceholder={tr(
+                                'Tìm theo tên hoặc trạng thái...',
+                                'Search by name or status...',
+                            )}
+                            emptyMessage={tr(
+                                'Không tìm thấy chiến dịch phù hợp.',
+                                'No matching campaigns found.',
+                            )}
+                        >
+                            <option value="">
+                                {tr('Chọn chiến dịch...', 'Choose campaign...')}
+                            </option>
+                            {promos.data
+                                ?.filter((campaign) => campaign.status !== 'ARCHIVED')
+                                .map((campaign) => (
+                                    <option
+                                        key={campaign.id}
+                                        value={campaign.id}
+                                        data-search={`${campaign.nameVi} ${campaign.nameEn} ${campaign.status}`}
+                                    >
+                                        {`${tr(campaign.nameVi, campaign.nameEn)} · ${campaign.status}`}
+                                    </option>
+                                ))}
+                        </ExecutiveSelect>
+                        {promos.isPending && (
+                            <p className="text-xs text-[#667d6b]">
+                                {tr('Đang tải danh sách chiến dịch...', 'Loading campaigns...')}
+                            </p>
+                        )}
+                        {promos.isError && (
+                            <ExecutiveError
+                                message={tr(
+                                    'Không lấy được danh sách chiến dịch.',
+                                    'Could not load campaigns.',
+                                )}
+                            />
+                        )}
+                        <label
+                            className={`flex min-h-44 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#9cbfa7] bg-[#f5faf3] px-5 py-8 text-center transition ${upload.isPending ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-[#eaf5ea]'}`}
+                        >
+                            <ImagePlus size={38} className="text-[#4c9367]" />
+                            <strong className="mt-3 text-sm">
+                                {file
+                                    ? file.name
+                                    : tr('Chọn ảnh để cắt', 'Select an image to crop')}
+                            </strong>
+                            <span className="mt-2 text-xs text-[#6d8975]">
+                                JPG · PNG · WebP · AVIF · 5 MB
+                            </span>
+                            <input
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp,image/avif"
+                                disabled={upload.isPending}
+                                className="sr-only"
+                                onChange={(event) => {
+                                    void chooseFile(event.currentTarget.files?.[0]);
+                                    event.currentTarget.value = '';
+                                }}
+                            />
+                        </label>
+                        {sourcePreview && (
+                            <button
+                                type="button"
+                                disabled={upload.isPending}
+                                onClick={() => setCropping(true)}
+                                className={`${executiveUi.secondary} w-full`}
+                            >
+                                <Pencil size={16} />
+                                {tr('Chỉnh lại vùng cắt', 'Adjust crop again')}
+                            </button>
+                        )}
+                        {sourcePreview && !file && (
+                            <p className="text-xs text-[#97680b]">
+                                {tr(
+                                    'Hãy áp dụng vùng cắt để bật nút tải ảnh.',
+                                    'Apply the crop before uploading.',
+                                )}
+                            </p>
+                        )}
+                        <p className="text-xs leading-5 text-[#667d6b]">
+                            {tr(
+                                'Lưu ý: thay ảnh sẽ đưa chiến dịch đã xuất bản về bản nháp để xét duyệt lại.',
+                                'Note: replacing an image returns a published campaign to DRAFT for review.',
+                            )}
+                        </p>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (
+                                    window.confirm(
+                                        tr(
+                                            'Tải ảnh đã cắt và cập nhật chiến dịch?',
+                                            'Upload cropped image and update campaign?',
+                                        ),
+                                    )
+                                )
+                                    upload.mutate();
+                            }}
+                            disabled={!file || !promotion || upload.isPending || promos.isPending}
+                            className={`${executiveUi.button} w-full`}
+                        >
+                            <UploadCloud size={17} />
+                            {upload.isPending
+                                ? tr('Đang tải ảnh...', 'Uploading...')
+                                : tr('Tải ảnh đã cắt lên chiến dịch', 'Upload cropped image')}
+                        </button>
+                    </div>
+                </ExecutivePanel>
+                <ExecutivePanel
+                    title={tr('Xem trước ảnh', 'Image preview')}
+                    caption={
+                        promotion
+                            ? tr(promotion.nameVi, promotion.nameEn)
+                            : tr(
+                                  'Chọn chiến dịch để hiển thị ảnh hiện tại.',
+                                  'Select a campaign to view its image.',
+                              )
+                    }
+                >
+                    <div className="flex min-h-[350px] items-center justify-center bg-[#eef4e9] p-6">
+                        {preview || promotion?.imageUrl ? (
+                            <img
+                                src={preview || promotion?.imageUrl || ''}
+                                alt={tr('Ảnh banner xem trước', 'Banner preview')}
+                                className="max-h-[420px] w-full rounded-2xl object-contain shadow-lg"
+                            />
+                        ) : (
+                            <ExecutiveEmpty
+                                icon={<ImagePlus />}
+                                title={tr('Chưa có ảnh', 'No image selected')}
+                                description={tr(
+                                    'Chọn ảnh để cắt và xem trước trước khi lưu.',
+                                    'Select and crop an image to preview it before saving.',
+                                )}
+                            />
+                        )}
+                    </div>
+                    {preview && (
+                        <div className="flex items-center gap-2 border-t px-5 py-4 text-xs font-semibold text-[#377b52]">
+                            <CheckCircle2 size={16} />
+                            {tr(
+                                'Đây là ảnh sau khi cắt, đúng ảnh sẽ được tải lên.',
+                                'This is the cropped image that will be uploaded.',
+                            )}
+                        </div>
+                    )}
+                    {promotion?.imageUrl && !preview && (
+                        <div className="flex items-center gap-2 border-t px-5 py-4 text-xs font-semibold text-[#377b52]">
+                            <CheckCircle2 size={16} />
+                            {tr('Ảnh hiện tại của chiến dịch', 'Current campaign image')}
+                        </div>
+                    )}
+                </ExecutivePanel>
+            </div>
+            {cropping && sourcePreview && (
+                <PromotionImageCropper
+                    src={sourcePreview}
+                    originalName={sourceName}
+                    onApply={applyCrop}
+                    onCancel={() => setCropping(false)}
+                />
+            )}
+        </div>
+    );
 }

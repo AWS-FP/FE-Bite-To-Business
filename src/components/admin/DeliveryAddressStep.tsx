@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { MapPin } from 'lucide-react';
 import { useWatch } from 'react-hook-form';
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -48,14 +47,6 @@ export default function DeliveryAddressStep({ form }: DeliveryAddressStepProps) 
 
     return (
         <div className="auth-fields flex flex-col gap-5">
-            <div className="auth-info-banner flex items-start gap-2.5 rounded-xl border border-solid border-auth-green/15 bg-surface-blue px-4 py-[14px] text-[13px] leading-[1.6] text-info">
-                <MapPin className="mt-0.5 shrink-0" size={19} aria-hidden="true" />
-                <div>
-                    <strong>{t('register.deliveryTitle')}</strong>
-                    <p className="m-0">{t('register.deliveryHint')}</p>
-                </div>
-            </div>
-
             <AuthField
                 name="businessName"
                 label={t('fields.businessName')}
@@ -198,6 +189,58 @@ export default function DeliveryAddressStep({ form }: DeliveryAddressStepProps) 
                     aria-describedby="deliveryNote-help"
                 />
             </AuthField>
+
+            {/* Hóa đơn luôn dùng địa chỉ giao hàng ở trên; chỉ hỏi người mua và mã số thuế. */}
+            <section
+                className="flex flex-col gap-5 border-0 border-t border-solid border-auth-ink/10 pt-5"
+                aria-labelledby="registration-invoice-title"
+            >
+                <div>
+                    <h2
+                        id="registration-invoice-title"
+                        className="m-0 font-subheading text-[16px] leading-[1.4] font-semibold text-auth-ink"
+                    >
+                        {t('register.invoiceTitle')}
+                    </h2>
+                    <p className="mt-1 mb-0 font-subtext text-[13px] leading-[1.6] text-auth-muted">
+                        {t('register.invoiceHint')}
+                    </p>
+                </div>
+
+                <AuthField
+                    name="invoicePurchaser"
+                    label={t('fields.invoicePurchaser')}
+                    optional
+                    error={errors.invoicePurchaser?.message}
+                >
+                    <input
+                        className="auth-delivery-control"
+                        id="invoicePurchaser"
+                        maxLength={200}
+                        {...register('invoicePurchaser')}
+                        aria-invalid={!!errors.invoicePurchaser}
+                        aria-describedby="invoicePurchaser-help"
+                    />
+                </AuthField>
+
+                <AuthField
+                    name="invoiceTaxCode"
+                    label={t('fields.invoiceTaxCode')}
+                    optional
+                    error={errors.invoiceTaxCode?.message}
+                >
+                    <input
+                        className="auth-delivery-control"
+                        id="invoiceTaxCode"
+                        inputMode="numeric"
+                        maxLength={10}
+                        placeholder={t('placeholders.taxCode')}
+                        {...register('invoiceTaxCode')}
+                        aria-invalid={!!errors.invoiceTaxCode}
+                        aria-describedby="invoiceTaxCode-help"
+                    />
+                </AuthField>
+            </section>
         </div>
     );
 }

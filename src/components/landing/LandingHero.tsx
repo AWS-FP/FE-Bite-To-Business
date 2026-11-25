@@ -14,7 +14,7 @@ export default function LandingHero() {
                     <span>{t('introPages.hero.eyebrow')}</span>
                 </div>
                 <h1
-                    className="mx-auto mb-3.5 max-w-[900px] font-heading text-[clamp(38px,5.2vw,66px)] font-normal leading-[1.18] text-store-cream [text-shadow:3px_3px_0_var(--color-store-ink)] [&_em]:font-heading [&_em]:font-normal [&_em]:not-italic [&_em]:text-store-yellow"
+                    className="mx-auto mb-3.5 max-w-[900px] font-heading text-[clamp(38px,5.2vw,66px)] font-normal leading-[1.18] text-store-cream [text-shadow:3px_3px_0_var(--color-store-ink)] [&_em]:font-heading [&_em]:font-bold [&_em]:not-italic [&_em]:text-store-yellow"
                     id="heroMainTitle"
                 >
                     {t(audience === 'business' ? 'landing.hero.businessTitle' : 'landing.hero.personalTitle')}{' '}
@@ -45,7 +45,7 @@ export default function LandingHero() {
                 <LandingCarousel />
                 <div className="mb-8 grid grid-cols-2 gap-3 sm:gap-[18px] lg:grid-cols-4">
                     <div className="rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream px-3 py-5 sm:px-[18px] sm:py-[22px] text-center shadow-[5px_5px_0_var(--color-store-ink)] transition-transform hover:-translate-y-[3px]">
-                        <div className="mb-1.5 font-heading text-[32px] font-normal leading-[1.1] text-store-coral">
+                        <div className="mb-1.5 font-heading text-[32px] font-bold leading-[1.1] text-store-coral">
                             {t('introPages.hero.quantity')}
                         </div>
                         <div className="text-[13.5px] font-bold text-store-ink">
@@ -53,7 +53,7 @@ export default function LandingHero() {
                         </div>
                     </div>
                     <div className="rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream px-3 py-5 sm:px-[18px] sm:py-[22px] text-center shadow-[5px_5px_0_var(--color-store-ink)] transition-transform hover:-translate-y-[3px]">
-                        <div className="mb-1.5 font-heading text-[32px] font-normal leading-[1.1] text-store-coral">
+                        <div className="mb-1.5 font-heading text-[32px] font-bold leading-[1.1] text-store-coral">
                             {t('introPages.hero.categories')}
                         </div>
                         <div className="text-[13.5px] font-bold text-store-ink">
@@ -67,7 +67,7 @@ export default function LandingHero() {
                         </div>
                     </div>
                     <div className="rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream px-3 py-5 sm:px-[18px] sm:py-[22px] text-center shadow-[5px_5px_0_var(--color-store-ink)] transition-transform hover:-translate-y-[3px]">
-                        <div className="mb-1.5 font-heading text-[32px] font-normal leading-[1.1] text-store-coral">
+                        <div className="mb-1.5 font-heading text-[32px] font-bold leading-[1.1] text-store-coral">
                             {t('introPages.hero.clear')}
                         </div>
                         <div className="text-[13.5px] font-bold text-store-ink">
@@ -75,7 +75,7 @@ export default function LandingHero() {
                         </div>
                     </div>
                     <div className="rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream px-3 py-5 sm:px-[18px] sm:py-[22px] text-center shadow-[5px_5px_0_var(--color-store-ink)] transition-transform hover:-translate-y-[3px]">
-                        <div className="mb-1.5 font-heading text-[32px] font-normal leading-[1.1] text-store-coral">
+                        <div className="mb-1.5 font-heading text-[32px] font-bold leading-[1.1] text-store-coral">
                             {t('introPages.hero.groups')}
                         </div>
                         <div className="text-[13.5px] font-bold text-store-ink">

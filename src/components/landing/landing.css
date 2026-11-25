@@ -138,7 +138,7 @@
       background: var(--yellow-soft);
       color: var(--navy);
       font-family: var(--font-heading);
-      font-weight: 400;
+      font-weight: 700;
       font-size: 18px;
       padding: 6px 10px;
       border-radius: 10px;
@@ -202,7 +202,7 @@
       border: 2.5px solid var(--navy);
       box-shadow: 4px 4px 0px var(--navy);
       font-family: var(--font-heading);
-      font-weight: 400;
+      font-weight: 700;
       font-size: 28px;
       display: flex;
       align-items: center;
@@ -249,7 +249,7 @@
 .btb-landing .review-text {
       font-family: var(--font-heading);
       font-style: normal;
-      font-weight: 400;
+      font-weight: 700;
       font-size: 14px;
       color: var(--text-body);
       margin-bottom: 14px;
@@ -293,7 +293,7 @@
       justify-content: space-between;
       align-items: center;
       font-family: var(--font-heading);
-      font-weight: 400;
+      font-weight: 700;
       font-size: 17px;
       color: var(--navy);
       font-synthesis: none;

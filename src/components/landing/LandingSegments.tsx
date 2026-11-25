@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import BtbImagePlaceholder from './BtbImagePlaceholder';
 /* Generated from the supplied HTML layout. Edit this section independently. */
 import { useState } from 'react';
-import { landingSegments } from './landingSegmentsData';
+import { landingSegments } from '@/constants/landing/landingSegments';
 
 export default function LandingSegments() {
     const { t } = useTranslation('storefront');
