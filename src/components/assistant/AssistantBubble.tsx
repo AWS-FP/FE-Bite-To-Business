@@ -1,10 +1,13 @@
 /**
- * Khung chat "Trợ lý mua hàng" nổi trên storefront (Guest/Customer). Hiển thị tin nhắn và render surface A2UI
+ * Khung chat "Trợ lý mua hàng" nổi trên storefront. AI chỉ dành cho Customer đã đăng nhập: Guest bấm nút sẽ được
+ * đưa tới trang đăng nhập rồi quay lại trang đang xem. Hiển thị tin nhắn và render surface A2UI
  * của từng lượt bằng A2uiSurface; action trên surface được xử lý bởi useA2uiActions (RootLayout).
  * Có ô tích bật/tắt dùng thói quen duyệt web để cá nhân hóa.
  */
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ROUTES } from '@/router/routes';
 import { Loader2, RotateCcw, Send, Sparkles, X } from 'lucide-react';
 import { A2uiSurface } from '@a2ui/react/v0_9';
 import { useAuthStore } from '@/store/admin/authStore';
@@ -15,9 +18,11 @@ import {
     setPersonalizationEnabled,
 } from '@/a2ui/telemetry/interactionTracker';
 
-/** Trợ lý mua hàng: chat + giao diện A2UI do AI sinh. Chỉ Guest và Customer thấy. */
+/** Trợ lý mua hàng: chat + giao diện A2UI do AI sinh. Nhân viên/Admin không thấy; Guest thấy nút mời đăng nhập. */
 export default function AssistantBubble() {
     const role = useAuthStore((state) => state.session?.user.role);
+    const navigate = useNavigate();
+    const location = useLocation();
     const { i18n } = useTranslation();
     const locale = i18n.resolvedLanguage?.startsWith('en') ? 'en' : 'vi';
     const { entries, busy, open, setOpen, send, reset } = useAssistantStore();
@@ -39,11 +44,22 @@ export default function AssistantBubble() {
         void send(value, locale);
     }
 
-    if (!open) {
+    // Guest có thể còn trạng thái open từ phiên trước (sessionStorage): luôn hiện nút mời đăng nhập.
+    if (!open || role !== 'CUSTOMER') {
         return (
             <button
                 type="button"
-                onClick={() => setOpen(true)}
+                onClick={() =>
+                    role === 'CUSTOMER'
+                        ? setOpen(true)
+                        : // Guest: AI cần biết đúng khách (ý định, thói quen) nên phải đăng nhập trước.
+                          navigate(ROUTES.LOGIN, {
+                              state: {
+                                  from: { pathname: location.pathname, search: location.search },
+                              },
+                          })
+                }
+                title={role === 'CUSTOMER' ? undefined : 'Đăng nhập để dùng trợ lý AI'}
                 className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full bg-store-green px-4 py-3 text-sm font-bold text-white shadow-lg hover:bg-store-dark"
             >
                 <Sparkles size={18} aria-hidden="true" /> Trợ lý mua hàng

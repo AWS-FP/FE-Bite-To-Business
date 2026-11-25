@@ -37,6 +37,7 @@ export const ROUTES = {
     ADMIN_REGISTRATION_DETAIL: '/admin/registration-requests/:requestId',
     ADMIN_STAFF: '/admin/staff',
     ADMIN_PACKAGE_RETURNS: '/admin/package-returns',
+    ADMIN_PAYMENT_REVIEWS: '/admin/payment-reviews',
     ADMIN_SYSTEM: '/admin/system',
 
     ECOMMERCE: '/e-commerce',

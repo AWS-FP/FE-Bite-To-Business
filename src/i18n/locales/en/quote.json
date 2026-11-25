@@ -122,6 +122,8 @@
         "shippingUnavailable": "Could not calculate the delivery fee. Please try again later.",
         "vatMissing": "Some products do not have a VAT rate configured yet, so the order cannot be placed. Please contact Bite to Business.",
         "stockUnavailable": "Some products no longer have enough stock. Go back to the cart to adjust quantities.",
+        "stockShortItem": "{{name}}: ordered {{requested}} {{unit}}, only {{available}} {{unit}} left",
+        "stockOutItem": "{{name}}: out of stock (ordered {{requested}} {{unit}})",
         "revisionConflict": "The quote has just changed. Review the total and try again.",
         "quoteIncomplete": "The quote is incomplete. Check the contact details and allocate every product to a package."
     },

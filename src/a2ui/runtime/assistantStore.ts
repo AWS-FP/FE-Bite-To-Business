@@ -7,7 +7,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { applyA2ui } from './a2uiRuntime';
 import { AgentHttpError, runAgent, type AgentEvent, type AgentState } from '../client/agentClient';
-import { personalizationAnonId, trackEvent } from '../telemetry/interactionTracker';
+import { trackEvent } from '../telemetry/interactionTracker';
 
 export type ChatEntry = {
     id: string;
@@ -111,7 +111,7 @@ export const useAssistantStore = create<AssistantState>()(
                             threadId: get().threadId,
                             runId: newId(),
                             messages: history,
-                            state: { ...get().agentState, locale, anonId: personalizationAnonId() },
+                            state: { ...get().agentState, locale },
                         },
                         onEvent,
                     );

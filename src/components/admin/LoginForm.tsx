@@ -68,7 +68,12 @@ export default function LoginForm() {
                 !previousPage.startsWith('/login') &&
                 !previousPage.startsWith('/register')
             ) {
-                destination = previousPage;
+                const previousSearch = location.state?.from?.search;
+                // Giữ query (vd. /ai?q=...) để yêu cầu AI của khách không bị mất sau khi đăng nhập.
+                destination =
+                    typeof previousSearch === 'string' && previousSearch.startsWith('?')
+                        ? previousPage + previousSearch
+                        : previousPage;
             }
             navigate(destination, { replace: true });
         } catch (error) {

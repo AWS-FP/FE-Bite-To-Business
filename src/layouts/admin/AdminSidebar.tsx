@@ -1,4 +1,4 @@
-import { Activity, RotateCcw } from 'lucide-react';
+import { Activity, Banknote, RotateCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import WorkspaceSidebar from '../WorkspaceSidebar';
 
@@ -6,6 +6,8 @@ interface AdminSidebarProps {
     registrationsPath: string;
     staffPath: string;
     returnsPath: string;
+    paymentReviewsPath: string;
+    openPaymentReviews?: number;
     systemPath: string;
     pendingCount?: number;
     isCollapsed: boolean;
@@ -16,6 +18,8 @@ export default function AdminSidebar({
     registrationsPath,
     staffPath,
     returnsPath,
+    paymentReviewsPath,
+    openPaymentReviews,
     systemPath,
     pendingCount,
     isCollapsed,
@@ -60,6 +64,15 @@ export default function AdminSidebar({
                             path: returnsPath,
                             label: t('navigation.returns'),
                             icon: <RotateCcw size={18} aria-hidden="true" />,
+                        },
+                        {
+                            path: paymentReviewsPath,
+                            label: t('navigation.paymentReviews'),
+                            icon: <Banknote size={18} aria-hidden="true" />,
+                            count: openPaymentReviews || undefined,
+                            ariaLabel: openPaymentReviews
+                                ? t('sidebar.openPaymentReviews', { count: openPaymentReviews })
+                                : t('navigation.paymentReviews'),
                         },
                     ],
                 },

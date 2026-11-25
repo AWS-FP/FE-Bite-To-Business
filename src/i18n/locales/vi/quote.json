@@ -121,6 +121,8 @@
         "shippingUnavailable": "Không thể tính phí giao hàng lúc này. Vui lòng thử lại sau.",
         "vatMissing": "Một số sản phẩm chưa được cấu hình thuế suất VAT nên chưa thể đặt hàng. Vui lòng liên hệ Bite to Business.",
         "stockUnavailable": "Một số sản phẩm không còn đủ hàng. Vui lòng quay lại giỏ hàng để điều chỉnh số lượng.",
+        "stockShortItem": "{{name}}: đặt {{requested}} {{unit}}, chỉ còn {{available}} {{unit}}",
+        "stockOutItem": "{{name}}: đã hết hàng (đặt {{requested}} {{unit}})",
         "revisionConflict": "Báo giá vừa thay đổi. Vui lòng kiểm tra lại tổng tiền rồi thử lại.",
         "quoteIncomplete": "Báo giá chưa đầy đủ. Vui lòng kiểm tra thông tin liên hệ và phân bổ đủ sản phẩm vào gói giao."
     },

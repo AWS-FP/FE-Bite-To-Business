@@ -8,8 +8,6 @@ export type AgentState = {
     lastQuery?: string | null;
     lastSort?: string | null;
     lastIntents?: string[];
-    /** ID ẩn danh của trình duyệt cho hồ sơ thói quen Guest (không phải danh tính). */
-    anonId?: string;
 };
 
 export type AgentEvent =

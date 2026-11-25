@@ -25,6 +25,25 @@ export type A2uiProduct = {
     saleEndsAt?: string | null;
     averageRating?: number | null;
     reviewCount?: number;
+    /** Thông tin mô tả từ DB (chỉ có khi tra cứu: tìm theo thuộc tính hoặc hỏi thông tin sản phẩm). */
+    facts?: A2uiProductFacts;
+    /** Nhóm điều kiện khớp khi tìm theo thuộc tính: origin | storage | contains | nutrient | compliance. */
+    matchedOn?: string[];
+};
+
+export type A2uiProductFacts = {
+    origin?: string | null;
+    brand?: string | null;
+    category?: string | null;
+    distributor?: string | null;
+    description?: string | null;
+    netWeightKg?: number | null;
+    storage?: string | null;
+    technical?: string | null;
+    originDetail?: string | null;
+    compliance?: string | null;
+    nutritionBasis?: string | null;
+    nutrition?: { nutrient: string; amount: string }[];
 };
 
 export type A2uiCategory = {

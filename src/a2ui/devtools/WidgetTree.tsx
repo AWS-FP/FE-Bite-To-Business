@@ -25,6 +25,7 @@ const LIBRARY: Record<string, string> = {
     ProductCarousel: 'Dải sản phẩm',
     ProductCard: 'Một sản phẩm',
     PriceTiers: 'Bậc giá sỉ',
+    ProductFacts: 'Bảo quản, xuất xứ, dinh dưỡng',
     InventoryBadge: 'Tồn kho',
     BannerCarousel: 'Banner',
     CategoryGrid: 'Danh mục',
