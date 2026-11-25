@@ -86,6 +86,8 @@ export type Promotion = {
     contentEn: string | null;
     startsAt: string;
     endsAt: string;
+    /** Supabase server clock determines expiry (not the browser clock). */
+    expired?: boolean;
     imageUrl: string | null;
     status: string;
     promotionType: 'STANDARD' | 'FLASH_SALE';

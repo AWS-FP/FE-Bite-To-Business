@@ -43,6 +43,9 @@ export interface Quote {
     shippingCouponDiscountAmount: number;
     productCouponId: string | null;
     shippingCouponId: string | null;
+    /** Only codes already applied to this quote; never a list of published coupons. */
+    productCouponCode: string | null;
+    shippingCouponCode: string | null;
     /** Null until every product in the quote has a VAT rate. */
     vatAmount: number | null;
     /** VAT of the lines that do have a rate, available even when vatAmount is null. */
@@ -61,6 +64,8 @@ export interface QuotePackage {
     address: string;
     note: string | null;
     city: 'HCM';
+    latitude?: number | null;
+    longitude?: number | null;
     shippingFee: number;
     distanceMetres: number;
     items: { quoteItemId: string; quantity: number }[];

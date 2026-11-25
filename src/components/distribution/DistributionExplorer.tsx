@@ -36,7 +36,7 @@ function inServiceArea(city: 'hcm', lng: number, lat: number) {
     return lng >= minLng && lng <= maxLng && lat >= minLat && lat <= maxLat;
 }
 
-export default function DistributionExplorer({ onAddressSelected }: { onAddressSelected?: () => void } = {}) {
+export default function DistributionExplorer({ onAddressSelected, formOwner }: { onAddressSelected?: () => void; formOwner?: string } = {}) {
     const navigate = useNavigate();
     // Opened from the delivery-package form on /quotes: go straight back to that step.
     const [searchParams] = useSearchParams();
@@ -44,7 +44,8 @@ export default function DistributionExplorer({ onAddressSelected }: { onAddressS
         searchParams.get('returnTo') === 'quote-delivery' &&
         useCartStore.getState().items.length > 0;
     const { t, i18n } = useTranslation('storefront');
-    const owner = useAuthStore((state) => state.session?.user.id ?? 'guest');
+    const accountOwner = useAuthStore((state) => state.session?.user.id ?? 'guest');
+    const owner = formOwner ?? accountOwner;
     const cartCount = useCartStore((state) => state.items.length);
     const updateForm = useQuoteDraftStore((state) => state.updateForm);
     const mapContainer = useRef<HTMLDivElement>(null);

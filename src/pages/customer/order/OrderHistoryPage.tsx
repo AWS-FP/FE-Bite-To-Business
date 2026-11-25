@@ -5,6 +5,8 @@ import { ROUTES } from '@/router/routes';
 import { useCustomerOrders } from '@/hooks/customer/useCustomerOrders';
 import type { CustomerOrderGroup } from '@/types/customer/order';
 import PageNav from '@/components/common/PageNav';
+import { RotateCcw } from 'lucide-react';
+import { useReorderOrder } from '@/hooks/customer/useReorderOrder';
 
 const formatMoney = (value: number) => `${value.toLocaleString('vi-VN')}đ`;
 
@@ -62,8 +64,10 @@ export default function OrderHistoryPage() {
 
 function OrderList({ group, empty }: { group: CustomerOrderGroup; empty: string }) {
     const { page, goToPage, orders, error, loading, visible } = useCustomerOrders(group);
+    const reordering = useReorderOrder();
     return (
         <>
+            {reordering.error && <p role="alert" className="mb-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">{reordering.error}</p>}
             {loading && <p role="status">Đang tải đơn hàng...</p>}
             {error && (
                 <p role="alert" className="text-danger">
@@ -103,12 +107,18 @@ function OrderList({ group, empty }: { group: CustomerOrderGroup; empty: string 
                                     <p className="m-0 text-xl font-black text-store-coral">
                                         {formatMoney(order.totalAmount)}
                                     </p>
-                                    <Link
-                                        to={`/orders/${encodeURIComponent(order.orderId)}`}
-                                        className="mt-3 inline-block rounded-lg bg-store-green px-4 py-2 text-xs font-bold text-white no-underline"
-                                    >
-                                        Xem đơn hàng
-                                    </Link>
+                                    <div className="mt-3 flex flex-wrap justify-end gap-2">
+                                        <button type="button" disabled={reordering.pendingOrderId !== null}
+                                            onClick={() => void reordering.reorder(order.orderId)}
+                                            className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-store-green bg-white px-4 py-2 text-xs font-bold text-store-green hover:bg-surface-green disabled:cursor-not-allowed disabled:opacity-50">
+                                            <RotateCcw size={15} aria-hidden="true" />
+                                            {reordering.pendingOrderId === order.orderId ? 'Đang chuẩn bị...' : 'Đặt lại đơn hàng'}
+                                        </button>
+                                        <Link to={`/orders/${encodeURIComponent(order.orderId)}`}
+                                            className="inline-block rounded-lg bg-store-green px-4 py-2 text-xs font-bold text-white no-underline">
+                                            Xem đơn hàng
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
                         </article>
