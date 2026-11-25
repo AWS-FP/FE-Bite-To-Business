@@ -11,16 +11,9 @@ export default function StorefrontRoleGuard() {
     const session = useAuthStore((state) => state.session);
     const restoring = useAuthStore((state) => state.restoring);
 
-    // Wait for cookie session restoration to avoid briefly showing the storefront.
-    if (restoring) {
-        return (
-            <div role="status" className="grid min-h-[60vh] place-items-center text-sm text-store-muted">
-                Đang khôi phục phiên đăng nhập…
-            </div>
-        );
-    }
-
-    if (session?.user.role === AUTH_ROLES.ECOMMERCE_EXECUTIVE) {
+    // Khách và guest thấy storefront ngay, không phải chờ khôi phục phiên.
+    // Nhân viên E-commerce được chuyển về workspace ngay sau khi phiên khôi phục xong.
+    if (!restoring && session?.user.role === AUTH_ROLES.ECOMMERCE_EXECUTIVE) {
         return <Navigate to={ROUTES.ECOMMERCE_DASHBOARD} replace />;
     }
 

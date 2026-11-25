@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import type { UserRole } from '@/types/admin/auth';
 import { useAuthStore } from '@/store/admin/authStore';
+import QuietLoader from '@/components/common/QuietLoader';
 import { getRoleHome, ROUTES } from './routes';
 
 interface ProtectedRouteProps {
@@ -15,11 +16,7 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
 
     // The session comes back from the refresh cookie after a reload; wait before sending to login.
     if (restoring) {
-        return (
-            <div role="status" className="grid min-h-[60vh] place-items-center text-sm text-store-muted">
-                Đang khôi phục phiên đăng nhập…
-            </div>
-        );
+        return <QuietLoader />;
     }
 
     if (!session) {

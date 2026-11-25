@@ -1,3 +1,8 @@
+/**
+ * Kiểu dữ liệu và helper dùng chung cho widget A2UI.
+ * Hình dạng dữ liệu khớp data model backend ghi (ai/catalog.json → dataModel.productShape). Mọi số liệu
+ * (giá, tồn, MOQ) đến từ data model; widget chỉ hiển thị, không tính lại giá cuối (BE tính khi tạo báo giá).
+ */
 import type { ComponentContext } from '@a2ui/web_core/v0_9';
 
 export type A2uiProduct = {
@@ -17,12 +22,55 @@ export type A2uiProduct = {
     priceTiers: { minQuantity: number; maxQuantity: number | null; unitPrice: number }[];
     inventoryAvailable: boolean;
     availableQuantity?: number | null;
+    saleEndsAt?: string | null;
+    averageRating?: number | null;
+    reviewCount?: number;
 };
 
+export type A2uiCategory = {
+    id: string;
+    code: string;
+    name: string;
+    productCount: number;
+    children: { code: string; name: string; productCount: number }[];
+};
+
+export type A2uiCombo = A2uiProduct & {
+    servingCount?: number | null;
+    items: { name: string; quantity: number; unitCode: string }[];
+};
+
+export type A2uiPromotion = {
+    id: string;
+    name: string;
+    content?: string | null;
+    startsAt?: string;
+    endsAt?: string;
+};
+
+export type A2uiBanner = {
+    id: string;
+    title: string;
+    description?: string | null;
+    imageUrl?: string | null;
+    targetUrl?: string | null;
+};
+
+/** Lấy mảng object từ giá trị đã bind; dữ liệu lạ (không phải mảng) thành mảng rỗng để widget không vỡ. */
+export const listOf = <T>(value: unknown): T[] =>
+    Array.isArray(value) ? (value.filter((item) => item && typeof item === 'object') as T[]) : [];
+
+/** Phát action open_category (FE mở trang danh mục theo code). */
+export function openCategory(context: ComponentContext, code: string) {
+    void context.dispatchAction({ event: { name: 'open_category', context: { code } } });
+}
+
+/** Danh sách sản phẩm từ giá trị bind (/products, /home/*, /favorites…). */
 export const productList = (value: unknown): A2uiProduct[] =>
     Array.isArray(value)
         ? (value.filter((item) => item && typeof item === 'object') as A2uiProduct[])
         : [];
+/** Một sản phẩm từ giá trị bind /list/N; không đúng hình dạng thì null. */
 export const productOf = (value: unknown): A2uiProduct | null =>
     value && typeof value === 'object' && 'productId' in value ? (value as A2uiProduct) : null;
 
@@ -40,18 +88,22 @@ const UNIT: Record<string, string> = {
     CASE: 'thùng',
 };
 export const unitLabel = (code: string) => UNIT[code] ?? code.toLowerCase();
+/** Còn hàng để bán: tồn khả dụng > 0 (null = chưa rõ, coi như không thêm được). */
 export const inStock = (product: A2uiProduct) =>
     product.availableQuantity != null && product.availableQuantity > 0;
+/** Đơn giá hiển thị: giá sale nếu chương trình đang chạy, ngược lại giá niêm yết (chưa VAT). */
 export const unitPrice = (product: A2uiProduct) =>
     product.saleActive && product.salePrice != null
         ? product.salePrice
         : (product.listPrice ?? null);
 
+/** Phát action view_product; handler toàn cục mở trang chi tiết sản phẩm. */
 export function viewProduct(context: ComponentContext, product: A2uiProduct) {
     void context.dispatchAction({
         event: { name: 'view_product', context: { productId: product.productId } },
     });
 }
+/** Phát action add_to_cart với số lượng = MOQ; handler tra lại sản phẩm thật trong data model rồi thêm giỏ. */
 export function addToCart(context: ComponentContext, product: A2uiProduct) {
     void context.dispatchAction({
         event: {

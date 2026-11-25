@@ -1,90 +1,29 @@
+/**
+ * Khung chat "Trợ lý mua hàng" nổi trên storefront (Guest/Customer). Hiển thị tin nhắn và render surface A2UI
+ * của từng lượt bằng A2uiSurface; action trên surface được xử lý bởi useA2uiActions (RootLayout).
+ * Có ô tích bật/tắt dùng thói quen duyệt web để cá nhân hóa.
+ */
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Loader2, RotateCcw, Send, Sparkles, X } from 'lucide-react';
 import { A2uiSurface } from '@a2ui/react/v0_9';
-import { ROUTES } from '@/router/routes';
 import { useAuthStore } from '@/store/admin/authStore';
-import { useCartStore } from '@/store/customer/cartStore';
-import {
-    getProcessor,
-    setAssistantActionHandler,
-    useAssistantStore,
-    type ChatEntry,
-} from '@/a2ui/runtime/assistantStore';
+import { useAssistantStore, type ChatEntry } from '@/a2ui/runtime/assistantStore';
+import { getSurface } from '@/a2ui/runtime/a2uiRuntime';
 import {
     personalizationEnabled,
     setPersonalizationEnabled,
 } from '@/a2ui/telemetry/interactionTracker';
-
-const PAGES: Record<string, string> = {
-    catalog: ROUTES.CATALOG,
-    cart: ROUTES.QUOTES,
-    orders: ROUTES.ORDERS,
-    favorites: ROUTES.FAVORITES,
-    profile: ROUTES.PROFILE,
-    brands: ROUTES.BRANDS,
-};
 
 /** Trợ lý mua hàng: chat + giao diện A2UI do AI sinh. Chỉ Guest và Customer thấy. */
 export default function AssistantBubble() {
     const role = useAuthStore((state) => state.session?.user.role);
     const { i18n } = useTranslation();
     const locale = i18n.resolvedLanguage?.startsWith('en') ? 'en' : 'vi';
-    const navigate = useNavigate();
-    const { entries, busy, open, setOpen, send, note, reset } = useAssistantStore();
+    const { entries, busy, open, setOpen, send, reset } = useAssistantStore();
     const [text, setText] = useState('');
     const [personalize, setPersonalize] = useState(personalizationEnabled);
     const listRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        setAssistantActionHandler((action, product) => {
-            const context = action.context ?? {};
-            switch (action.name) {
-                case 'view_product':
-                    if (typeof context.productId === 'string')
-                        navigate(`/products/${context.productId}`);
-                    break;
-                case 'add_to_cart': {
-                    // Giá/tồn lấy từ data model BE vừa gửi; giỏ hàng kiểm tra lại khi tạo báo giá.
-                    if (!product || product.listPrice == null) {
-                        note('Chưa thêm được: sản phẩm chưa có giá.');
-                        break;
-                    }
-                    const price =
-                        product.saleActive && product.salePrice != null
-                            ? product.salePrice
-                            : product.listPrice;
-                    useCartStore.getState().addItem(
-                        {
-                            id: product.productId,
-                            name: product.name,
-                            spec: product.spec ?? product.unitCode,
-                            unitPrice: price,
-                            imageUrl: product.imageUrl ?? undefined,
-                            minOrderQuantity: product.minOrderQuantity,
-                            quantityStep: product.quantityStep,
-                            maxQuantity: product.availableQuantity ?? null,
-                        },
-                        Number(context.quantity) || product.minOrderQuantity,
-                    );
-                    note(`Đã thêm ${product.name} vào giỏ. Bạn chỉnh số lượng trong giỏ hàng.`);
-                    break;
-                }
-                case 'refine_search':
-                    if (typeof context.q === 'string') void send(context.q, locale);
-                    break;
-                case 'send_prompt':
-                    if (typeof context.text === 'string') void send(context.text, locale);
-                    break;
-                case 'open_page':
-                    if (typeof context.page === 'string' && PAGES[context.page])
-                        navigate(PAGES[context.page]);
-                    break;
-            }
-        });
-        return () => setAssistantActionHandler(null);
-    }, [navigate, note, send, locale]);
 
     useEffect(() => {
         listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
@@ -218,6 +157,7 @@ export default function AssistantBubble() {
     );
 }
 
+/** Một mục hội thoại: tin nhắn người dùng, ghi chú hệ thống, hoặc câu trả lời kèm surface A2UI. */
 function Entry({ entry }: { entry: ChatEntry }) {
     if (entry.role === 'user') {
         return (
@@ -229,9 +169,7 @@ function Entry({ entry }: { entry: ChatEntry }) {
     if (entry.role === 'system') {
         return <p className="text-center text-[11px] text-store-muted">{entry.text}</p>;
     }
-    const surface = entry.surfaceId
-        ? getProcessor().model.surfacesMap.get(entry.surfaceId)
-        : undefined;
+    const surface = getSurface(entry.surfaceId);
     return (
         <div className="space-y-2">
             {entry.text && (
