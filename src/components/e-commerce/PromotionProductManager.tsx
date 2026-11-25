@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, ChevronLeft, ChevronRight, Filter, Package, Search, Tag, X } from 'lucide-react';
 import { executiveUi } from '@/constants/e-commerce/executiveUi';
 import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
+import { useDebouncedSearch } from '@/hooks/e-commerce/useDebouncedSearch';
 import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 import type { Promotion, PromotionPriceUpdate, PromotionProductChoice, PromotionProductFilter } from '@/types/e-commerce/executiveAdmin';
 import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
@@ -31,6 +32,8 @@ export default function PromotionProductManager({
     const qc = useQueryClient();
     const flash = campaign.promotionType === 'FLASH_SALE';
     const [search, setSearch] = useState('');
+    const settledSearch = useDebouncedSearch(search.trim());
+    const searchIsSettled = search.trim() === settledSearch;
     const [brandId, setBrandId] = useState('');
     const [categoryId, setCategoryId] = useState('');
     const [inStockOnly, setInStockOnly] = useState(false);
@@ -49,21 +52,26 @@ export default function PromotionProductManager({
 
     const filter = useMemo<PromotionProductFilter>(
         () => ({
-            q: search.trim(),
+            q: settledSearch,
             brandId: brandId || null,
             categoryId: categoryId || null,
             inStockOnly,
             discountOnly,
         }),
-        [search, brandId, categoryId, inStockOnly, discountOnly],
+        [settledSearch, brandId, categoryId, inStockOnly, discountOnly],
     );
+    const latestFilter = useRef(filter);
+    useEffect(() => {
+        latestFilter.current = filter;
+    }, [filter]);
     const assigned = useQuery({
         queryKey: ['ecom', 'promotion-product-ids', campaign.id],
         queryFn: () => executiveApi.promotionProductIds(campaign.id),
     });
     const products = useQuery({
         queryKey: ['ecom', 'promotion-product-options', campaign.id, filter, page],
-        queryFn: () => executiveApi.promotionProductOptions(campaign.id, filter, page, PAGE_SIZE),
+        queryFn: ({ signal }) => executiveApi.promotionProductOptions(campaign.id, filter, page, PAGE_SIZE, signal),
+        enabled: searchIsSettled,
     });
     const brands = useQuery({ queryKey: ['ecom', 'brands'], queryFn: () => getCatalogBrands() });
     const categories = useQuery({
@@ -189,8 +197,11 @@ export default function PromotionProductManager({
             ),
     });
     const bulkSelect = useMutation({
-        mutationFn: () => executiveApi.promotionMatchingProductIds(campaign.id, filter),
-        onSuccess: (ids) => {
+        mutationFn: (submitted: PromotionProductFilter) =>
+            executiveApi.promotionMatchingProductIds(campaign.id, submitted),
+        onSuccess: (ids, submitted) => {
+            // Ignore an in-flight bulk response after filters have changed.
+            if (JSON.stringify(submitted) !== JSON.stringify(latestFilter.current)) return;
             const next = Array.from(new Set([...selected, ...ids]));
             if (next.length > (flash ? 8 : MAX_ASSIGNED)) {
                 setFeedback(
@@ -269,6 +280,7 @@ export default function PromotionProductManager({
         setFeedback('');
     }
     async function applyBulk() {
+        if (!searchIsSettled || products.isFetching || !products.isSuccess) return;
         setBulkFeedback('');
         const amount = numeric(bulkAmount);
         if (
@@ -290,6 +302,7 @@ export default function PromotionProductManager({
         try {
             if (bulkScope === 'MATCHING') {
                 const matches = await executiveApi.promotionMatchingProductIds(campaign.id, filter);
+                if (JSON.stringify(filter) !== JSON.stringify(latestFilter.current)) return;
                 const matching = new Set(matches);
                 ids = selected.filter((id) => matching.has(id));
             }
@@ -629,9 +642,10 @@ export default function PromotionProductManager({
                             <button
                                 type="button"
                                 disabled={
-                                    bulkSelect.isPending || assigned.isLoading || save.isPending
+                                    bulkSelect.isPending || assigned.isLoading || save.isPending ||
+                                    !searchIsSettled || products.isFetching || !products.isSuccess
                                 }
-                                onClick={() => bulkSelect.mutate()}
+                                onClick={() => bulkSelect.mutate(filter)}
                                 className={executiveUi.secondary}
                             >
                                 {bulkSelect.isPending
@@ -657,7 +671,7 @@ export default function PromotionProductManager({
                 <div className="min-h-0 flex-1 overflow-y-auto px-5 py-3">
                     {tab === 'browse' ? (
                         <>
-                            {products.isFetching && (
+                            {(!searchIsSettled || products.isFetching) && (
                                 <p
                                     role="status"
                                     className="py-2 text-center text-xs text-[#597668]"
@@ -665,18 +679,19 @@ export default function PromotionProductManager({
                                     {tr('Đang tải...', 'Loading...')}
                                 </p>
                             )}
-                            {products.isError && (
+                            {searchIsSettled && products.isError && (
                                 <p role="alert" className="rounded-lg bg-red-50 p-4 text-red-700">
                                     {tr('Không tải được sản phẩm.', 'Unable to load products.')}
                                 </p>
                             )}
-                            {products.data?.items.length === 0 && (
+                            {searchIsSettled && !products.isFetching && products.data?.items.length === 0 && (
                                 <p className="py-8 text-center text-sm text-[#597668]">
                                     {tr('Không tìm thấy sản phẩm.', 'No matching products.')}
                                 </p>
                             )}
                             <div className="space-y-2">
-                                {products.data?.items.map((item) => productRow(item, false))}
+                                {searchIsSettled && !products.isFetching &&
+                                    products.data?.items.map((item) => productRow(item, false))}
                             </div>
                         </>
                     ) : (
@@ -793,7 +808,8 @@ export default function PromotionProductManager({
                         <button
                             type="button"
                             disabled={
-                                !selected.length || selectedDetails.isFetching || save.isPending
+                                !selected.length || selectedDetails.isFetching || save.isPending ||
+                                !searchIsSettled || products.isFetching || !products.isSuccess
                             }
                             onClick={() => void applyBulk()}
                             className={executiveUi.secondary}
