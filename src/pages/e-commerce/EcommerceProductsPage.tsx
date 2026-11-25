@@ -229,12 +229,6 @@ function ProductDrawer({
                             </div>
                             <div>
                                 <span className="text-xs text-[#728576]">
-                                    {tr('Bước số lượng', 'Quantity step')}
-                                </span>
-                                <strong className="block">{product.quantityStep}</strong>
-                            </div>
-                            <div>
-                                <span className="text-xs text-[#728576]">
                                     {tr('Ngày cập nhật', 'Updated')}
                                 </span>
                                 <strong className="block">

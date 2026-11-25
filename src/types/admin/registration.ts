@@ -30,6 +30,8 @@ export interface RegistrationResponse {
     otpDeliveryState: 'QUEUED' | 'SENT' | 'FAILED' | 'UNCONFIRMED' | 'VERIFIED' | null;
     otpResendAvailableAt: string | null;
     activatedAt: string | null;
+    // Email bị đăng ký trùng: BE từ chối APPROVE, chỉ cho REJECT.
+    approvalLocked: boolean;
 }
 
 export interface RegistrationReviewResponse {

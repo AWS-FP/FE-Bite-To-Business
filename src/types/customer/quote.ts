@@ -6,6 +6,8 @@ export interface QuoteItem {
     unitCode: string;
     quantity: number;
     quantityStep: number | null;
+    /** Smallest quantity that can be ordered (MOQ); quantities go MOQ, MOQ + 1, ... */
+    minOrderQuantity: number | null;
     listUnitPrice: number;
     volumeUnitPrice: number;
     saleUnitPrice: number;
@@ -33,6 +35,8 @@ export interface AvailableCoupon {
 
 export interface Quote {
     id: string;
+    /** DRAFT while editable; any other value means it was already turned into an order. */
+    status: string;
     revision: number;
     contactName: string | null;
     itemsSubtotal: number;

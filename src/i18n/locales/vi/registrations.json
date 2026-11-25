@@ -110,6 +110,7 @@
         "notProvided": "Chưa cung cấp",
         "yes": "Có",
         "no": "Không",
+        "approvalLocked": "Email này đã bị đăng ký trùng và đã nhận mail từ chối tự động, nên không thể duyệt. Chỉ có thể từ chối.",
         "onceOnly": "Chỉ xử lý một lần"
     },
     "review": {
@@ -142,6 +143,7 @@
         "forbidden": "Bạn không có quyền xử lý hồ sơ này.",
         "notFound": "Không tìm thấy hồ sơ đăng ký.",
         "alreadyReviewed": "Hồ sơ đã được xử lý trước đó. Thông tin đang được cập nhật lại.",
+        "approvalLocked": "Email này đã bị đăng ký trùng nên không thể duyệt hồ sơ. Vui lòng từ chối.",
         "alreadyActivated": "Customer đã kích hoạt tài khoản, không cần gửi lại OTP.",
         "reasonRequired": "Vui lòng nhập lý do từ chối.",
         "cooldown": "Bạn vừa gửi yêu cầu quá nhanh. Vui lòng chờ rồi thử lại.",
@@ -154,7 +156,6 @@
     },
     "duplicates": {
         "title": "Đăng ký trùng – tự động từ chối",
-        "description": "Email hoặc số điện thoại trùng với tài khoản đã có. Form đăng ký vẫn báo đã nhận yêu cầu (để không lộ tài khoản nào tồn tại); hệ thống tự gửi mail từ chối sau vài phút, mỗi địa chỉ tối đa 1 mail/24 giờ.",
         "loading": "Đang tải...",
         "error": "Không tải được danh sách đăng ký trùng.",
         "empty": "Chưa có đăng ký trùng.",

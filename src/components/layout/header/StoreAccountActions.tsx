@@ -6,8 +6,6 @@ import {
     Package,
     Settings,
     ShoppingCart,
-    Minus,
-    Plus,
     PackageOpen,
     PackageSearch,
 } from 'lucide-react';
@@ -20,6 +18,7 @@ import { getWorkspaceHome, ROUTES } from '../../../router/routes';
 import { useAuthStore } from '../../../store/admin/authStore';
 import { useCartStore } from '../../../store/customer/cartStore';
 import GuestHeaderActions from './GuestHeaderActions';
+import CartQuantityControl from '@/components/customer/checkout/CartQuantityControl';
 import LogoutConfirmation from '@/components/common/LogoutConfirmation';
 import { logout } from '@/services/admin/authService';
 
@@ -40,7 +39,6 @@ export default function StoreAccountActions() {
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const cartItems = useCartStore((state) => state.items);
-    const updateQuantity = useCartStore((state) => state.updateQuantity);
     const cartIsOpen = openDropdown === 'cart';
     const isVietnamese = i18n.language.startsWith('vi');
 
@@ -239,27 +237,12 @@ export default function StoreAccountActions() {
                                                 <strong className="text-xs text-store-green">
                                                     {formatCurrencyVnd(item.unitPrice)}
                                                 </strong>
-                                                <div className="flex shrink-0 items-center rounded-lg border border-store-ink/15">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => updateQuantity(item.id, -1)}
-                                                        aria-label={`${t('cartPreview.decrease')} ${title}`}
-                                                        className="flex size-7 cursor-pointer items-center justify-center border-0 bg-transparent hover:bg-store-cream"
-                                                    >
-                                                        <Minus size={12} />
-                                                    </button>
-                                                    <span className="min-w-6 text-center text-[11px] font-bold tabular-nums">
-                                                        {item.quantity}
-                                                    </span>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => updateQuantity(item.id, 1)}
-                                                        aria-label={`${t('cartPreview.increase')} ${title}`}
-                                                        className="flex size-7 cursor-pointer items-center justify-center border-0 bg-transparent hover:bg-store-cream"
-                                                    >
-                                                        <Plus size={12} />
-                                                    </button>
-                                                </div>
+                                                <CartQuantityControl
+                                                    item={item}
+                                                    label={title}
+                                                    compact
+                                                    minusRemoves
+                                                />
                                             </div>
                                         </div>
                                     </div>

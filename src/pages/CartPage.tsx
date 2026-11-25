@@ -125,6 +125,8 @@ export default function CartPage() {
                 if (!active) return;
                 setQuote(draft);
                 setPackages(savedPackages);
+                // Already ordered (e.g. Back from the order page): show the notice, never re-validate it.
+                if (draft.status !== 'DRAFT') return;
                 const complete = savedPackages.length > 0 && draft.items.every(item =>
                     Math.abs(Number(item.quantity) - savedPackages.reduce((sum, pkg) =>
                         sum + pkg.items.filter(line => line.quoteItemId === item.id)
@@ -219,14 +221,18 @@ export default function CartPage() {
     const reorderLines = quote?.items.map(item => ({
         productId: item.productId, quantity: Number(reorderQuantities[item.productId] ?? item.quantity),
     })) ?? [];
+    // Same rule as BE: 0 removes the line, otherwise at least the MOQ and MOQ + whole steps (step is 1).
     const reorderValid = !!quote && quote.items.every(item => {
         const raw = reorderQuantities[item.productId] ?? String(item.quantity);
         const quantity = Number(raw);
-        const increment = Number(item.quantityStep);
+        const min = Number(item.minOrderQuantity) || 0;
+        const increment = Number(item.quantityStep) || 1;
+        const steps = (quantity - min) / increment;
         return raw.trim() !== '' && Number.isFinite(quantity) && quantity >= 0 &&
             quantity < 1e9 && Math.abs(quantity * 1000 - Math.round(quantity * 1000)) < 1e-5 &&
-            (quantity === 0 || (increment > 0 && Math.abs(quantity / increment - Math.round(quantity / increment)) < 1e-6));
+            (quantity === 0 || (quantity >= min - 1e-9 && Math.abs(steps - Math.round(steps)) < 1e-6));
     }) && reorderLines.some(item => item.quantity > 0);
+    const quoteClosed = !!reorderQuoteId && !!quote && quote.status !== 'DRAFT';
     const reorderChanged = !!quote && reorderLines.some((line, index) =>
         line.quantity !== Number(quote.items[index].quantity));
 
@@ -292,6 +298,20 @@ export default function CartPage() {
 
     async function checkoutFailed(error: unknown) {
         const code = errorCode(error);
+        // CONFLICT on a quote = it is no longer a DRAFT (already ordered, e.g. in another tab).
+        // Reload it so the page switches to the "already ordered" notice instead of a generic error.
+        if (code === 'CONFLICT' && quote) {
+            try {
+                const latest = await getQuote(quote.id);
+                if (latest.status !== 'DRAFT') {
+                    setQuote(latest);
+                    setMessage('');
+                    return;
+                }
+            } catch {
+                // Fall through to the generic message.
+            }
+        }
         if (code === 'QUOTE_REVISION_CONFLICT' && quote) {
             try {
                 setQuote(await getQuote(quote.id));
@@ -330,7 +350,9 @@ export default function CartPage() {
                 removePurchased(quote.items.map((item) => item.productId));
             }
             resetForm(owner);
+            // replace: Back from the order page must not reopen this quote, which is no longer editable.
             navigate(ROUTES.ORDER_DETAIL.replace(':orderId', order.orderId), {
+                replace: true,
                 state: { showPayment: true },
             });
         } catch (error) {
@@ -580,7 +602,23 @@ export default function CartPage() {
                     <strong>{t('reorder.title')}</strong> — {t('reorder.summary')}
                 </div>}
                 {reorderLoading && <p role="status" className="my-5 text-store-muted">{t('reorder.loading')}</p>}
-                {!reorderLoading && <QuoteSteps step={step} busy={busy} onSelectStep={selectStep} />}
+                {quoteClosed && (
+                    <div role="status" className="my-5 rounded-xl border border-black bg-white p-5">
+                        <p className="m-0 font-semibold">{t('reorder.closedTitle')}</p>
+                        <p className="mb-4 mt-2 text-sm text-store-muted">{t('reorder.closedHint')}</p>
+                        <div className="flex flex-wrap gap-3">
+                            <button type="button" onClick={() => navigate(ROUTES.ORDERS)}
+                                className="rounded-lg bg-store-green px-4 py-2 text-sm font-bold text-white">
+                                {t('reorder.viewOrders')}
+                            </button>
+                            <button type="button" onClick={() => { setQuote(null); setStep(0); setSearchParams({}); }}
+                                className="rounded-lg border border-black px-4 py-2 text-sm font-bold">
+                                {t('reorder.backToCart')}
+                            </button>
+                        </div>
+                    </div>
+                )}
+                {!reorderLoading && !quoteClosed && <QuoteSteps step={step} busy={busy} onSelectStep={selectStep} />}
                 {message && (
                     <p
                         role="alert"
@@ -597,7 +635,7 @@ export default function CartPage() {
                         {displayMessage(notice)}
                     </p>
                 )}
-                {!reorderLoading && (!reorderQuoteId || quote) && <div className="grid grid-cols-[minmax(0,1fr)_340px] items-start gap-6">
+                {!reorderLoading && !quoteClosed && (!reorderQuoteId || quote) && <div className="grid grid-cols-[minmax(0,1fr)_340px] items-start gap-6">
                     <div className="min-w-0 space-y-5">
                         {step === 0 && (reorderQuoteId && quote ? (
                             <section className="rounded-2xl border border-store-ink/20 bg-white p-6">

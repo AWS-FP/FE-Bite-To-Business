@@ -173,6 +173,13 @@
         "cartTitle": "Items in this reorder",
         "cartHint": "Change quantities here. Enter 0 to remove an item. Your regular cart is unchanged.",
         "allocationReset": "Packages containing changed items will need to be allocated again. Unaffected packages are kept.",
-        "invalidCart": "Enter valid quantities and keep at least one product."
-    }
+        "invalidCart": "Each product needs at least its minimum order quantity (or 0 to remove it), and keep at least one product.",
+        "closedTitle": "This quote has already been ordered.",
+        "closedHint": "It can no longer be edited or paid again. Open your orders to pay, or go back to the cart to place a new order.",
+        "viewOrders": "View orders",
+        "backToCart": "Back to cart"
+    },
+    "quantityInput": "Quantity of {{name}}",
+    "quantityOverStock": "Only {{stock}} in stock, not enough for {{quantity}}. Set to {{stock}}.",
+    "quantityBelowMinimum": "The minimum quantity is {{min}}. Set to {{min}}."
 }
