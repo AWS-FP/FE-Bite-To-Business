@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import RootLayout from '@/layouts/RootLayout';
+import { NotFoundPage, RouteErrorPage } from '@/pages/ErrorPages';
 import MyProductRequestsPage from '@/pages/customer/MyProductRequestsPage';
 
 import { AUTH_ROLES } from '@/constants/roles';
@@ -73,6 +74,8 @@ export const router = createBrowserRouter([
     {
         // Bọc mọi route để ScrollRestoration cuộn lên đầu khi chuyển trang.
         Component: RootLayout,
+        // Lỗi khi hiển thị bất kỳ trang nào → màn hình lỗi thân thiện thay cho màn hình mặc định.
+        errorElement: <RouteErrorPage />,
         children: [
             // ==========================================
             // 1. AUTHENTICATION
@@ -363,7 +366,7 @@ export const router = createBrowserRouter([
             // ==========================================
             {
                 path: '*',
-                element: <Navigate to={ROUTES.HOME} replace />,
+                Component: NotFoundPage,
             },
         ],
     },
