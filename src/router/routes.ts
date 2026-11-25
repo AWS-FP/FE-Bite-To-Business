@@ -9,6 +9,7 @@ export const ROUTES = {
     BTB_MODEL: '/btb-model',
     DISTRIBUTION_NETWORK: '/distributionNetwork',
     CATALOG: '/products',
+    AI_PAGE: '/ai',
     CUSTOMER_COLLECTION: '/collections/:kind',
     PRODUCT_DETAIL: '/products/:productId',
 

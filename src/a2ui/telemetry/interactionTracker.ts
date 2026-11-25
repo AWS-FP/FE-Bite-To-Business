@@ -122,3 +122,11 @@ if (typeof window !== 'undefined') {
         if (document.visibilityState === 'hidden') void flush(true);
     });
 }
+
+/**
+ * anonId gửi kèm request AI để BE đọc hồ sơ thói quen của trình duyệt này (Guest).
+ * Khách tắt cá nhân hóa thì không gửi, BE coi như chưa có thói quen.
+ */
+export function personalizationAnonId(): string | undefined {
+    return personalizationEnabled() ? anonId() : undefined;
+}

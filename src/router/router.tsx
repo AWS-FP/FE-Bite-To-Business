@@ -27,6 +27,7 @@ import CustomerCollectionPage from '@/pages/customer/CustomerCollectionPage';
 import CustomerProductDetailPage from '@/pages/customer/CustomerProductDetailPage';
 import CustomerFavoritesPage from '@/pages/customer/CustomerFavoritesPage';
 import CartPage from '@/pages/CartPage';
+import AiGeneratedPage from '@/pages/customer/AiGeneratedPage';
 
 // Orders Pages - NEW
 import OrderHistoryPage from '@/pages/customer/order/OrderHistoryPage';
@@ -68,291 +69,302 @@ import EcommerceCouponsPage from '@/pages/e-commerce/EcommerceCouponsPage';
 import EcommerceReviewsPage from '@/pages/e-commerce/EcommerceReviewsPage';
 import EcommerceRefundsPage from '@/pages/e-commerce/EcommerceRefundsPage';
 
-export const router = createBrowserRouter([{
-    // Bọc mọi route để ScrollRestoration cuộn lên đầu khi chuyển trang.
-    Component: RootLayout,
-    children: [
-    // ==========================================
-    // 1. AUTHENTICATION
-    // ==========================================
+export const router = createBrowserRouter([
     {
-        path: ROUTES.LOGIN,
-        Component: LoginPage,
-    },
-    {
-        path: ROUTES.REGISTER,
-        Component: RegisterPage,
-    },
-    {
-        path: ROUTES.VERIFY_OTP,
-        Component: VerifyOtpPage,
-    },
-    {
-        path: ROUTES.SET_PASSWORD,
-        Component: ActivationPage,
-    },
-    {
-        path: ROUTES.FORGOT_PASSWORD,
-        Component: ForgotPasswordPage,
-    },
-
-    // ==========================================
-    // 2. PUBLIC CUSTOMER PAGES
-    // Guests/Customers may browse; E-commerce staff stay in their workspace.
-    // ==========================================
-    {
-        element: <StorefrontRoleGuard />,
+        // Bọc mọi route để ScrollRestoration cuộn lên đầu khi chuyển trang.
+        Component: RootLayout,
         children: [
+            // ==========================================
+            // 1. AUTHENTICATION
+            // ==========================================
             {
-                path: ROUTES.HOME,
-                Component: HomePage,
+                path: ROUTES.LOGIN,
+                Component: LoginPage,
             },
             {
-                path: ROUTES.LANDING,
-                Component: LandingPage,
+                path: ROUTES.REGISTER,
+                Component: RegisterPage,
             },
             {
-                path: ROUTES.WHY_BTB,
-                Component: WhyBTBPage,
+                path: ROUTES.VERIFY_OTP,
+                Component: VerifyOtpPage,
             },
             {
-                path: ROUTES.BTB_MODEL,
-                Component: BTBModelPage,
+                path: ROUTES.SET_PASSWORD,
+                Component: ActivationPage,
             },
             {
-                path: ROUTES.BRANDS,
-                Component: BrandsPage,
+                path: ROUTES.FORGOT_PASSWORD,
+                Component: ForgotPasswordPage,
             },
+
+            // ==========================================
+            // 2. PUBLIC CUSTOMER PAGES
+            // Guests/Customers may browse; E-commerce staff stay in their workspace.
+            // ==========================================
             {
-                path: ROUTES.BRAND_DETAIL,
-                Component: BrandDetailPage,
-            },
-            {
-                path: ROUTES.BRAND_DETAIL_LEGACY,
-                Component: BrandDetailPage,
-            },
-            {
-                path: ROUTES.CATALOG,
-                Component: CustomerCatalogPage,
-            },
-            {
-                path: ROUTES.CUSTOMER_COLLECTION,
-                Component: CustomerCollectionPage,
-            },
-            {
-                path: ROUTES.PRODUCT_DETAIL,
-                Component: CustomerProductDetailPage,
-            },
-            {
-                path: ROUTES.QUOTES,
-                Component: CartPage,
-            },
-            {
-                element: <ProtectedRoute allowedRoles={Object.values(AUTH_ROLES)} />,
+                element: <StorefrontRoleGuard />,
                 children: [
                     {
-                        path: ROUTES.DISTRIBUTION_NETWORK,
-                        Component: DistributionNetworkPage,
-                    },
-                ],
-            },
-        ],
-    },
-
-    // ==========================================
-    // 3. CUSTOMER PROTECTED ROUTES
-    // Cần đăng nhập với role CUSTOMER
-    // ==========================================
-    {
-        element: <ProtectedRoute allowedRoles={[AUTH_ROLES.CUSTOMER]} />,
-
-        children: [
-            {
-                path: ROUTES.QUOTE_DETAIL,
-                Component: PendingPage,
-            },
-
-            // Lịch sử đơn hàng
-            {
-                path: ROUTES.ORDERS,
-                Component: OrderHistoryPage,
-            },
-
-            // Trạng thái / Chi tiết đơn hàng
-            {
-                path: ROUTES.ORDER_DETAIL,
-                Component: OrderStatusPage,
-            },
-
-            {
-                path: ROUTES.FAVORITES,
-                Component: CustomerFavoritesPage,
-            },
-            {
-                path: ROUTES.MY_PRODUCT_REQUESTS,
-                Component: MyProductRequestsPage,
-            },
-            {
-                path: ROUTES.PROFILE,
-                Component: ProfilePage,
-            },
-        ],
-    },
-
-    // ==========================================
-    // 4. ADMIN
-    // ==========================================
-    {
-        element: <ProtectedRoute allowedRoles={[AUTH_ROLES.ADMIN]} />,
-
-        children: [
-            {
-                path: ROUTES.ADMIN,
-                element: <AdminLayout />,
-
-                children: [
-                    {
-                        index: true,
-                        element: <Navigate to={ROUTES.ADMIN_REGISTRATIONS} replace />,
+                        path: ROUTES.HOME,
+                        Component: HomePage,
                     },
                     {
-                        path: ROUTES.ADMIN_REGISTRATIONS,
-                        Component: RegistrationsPage,
-
+                        path: ROUTES.LANDING,
+                        Component: LandingPage,
+                    },
+                    {
+                        path: ROUTES.WHY_BTB,
+                        Component: WhyBTBPage,
+                    },
+                    {
+                        path: ROUTES.BTB_MODEL,
+                        Component: BTBModelPage,
+                    },
+                    {
+                        path: ROUTES.BRANDS,
+                        Component: BrandsPage,
+                    },
+                    {
+                        path: ROUTES.BRAND_DETAIL,
+                        Component: BrandDetailPage,
+                    },
+                    {
+                        path: ROUTES.BRAND_DETAIL_LEGACY,
+                        Component: BrandDetailPage,
+                    },
+                    {
+                        path: ROUTES.CATALOG,
+                        Component: CustomerCatalogPage,
+                    },
+                    {
+                        // Trang do AI dựng thay trang mặc định (Generative UI, chế độ Page).
+                        path: ROUTES.AI_PAGE,
+                        Component: AiGeneratedPage,
+                    },
+                    {
+                        path: ROUTES.CUSTOMER_COLLECTION,
+                        Component: CustomerCollectionPage,
+                    },
+                    {
+                        path: ROUTES.PRODUCT_DETAIL,
+                        Component: CustomerProductDetailPage,
+                    },
+                    {
+                        path: ROUTES.QUOTES,
+                        Component: CartPage,
+                    },
+                    {
+                        element: <ProtectedRoute allowedRoles={Object.values(AUTH_ROLES)} />,
                         children: [
                             {
-                                path: ':requestId',
-                                Component: RegistrationDetailPage,
+                                path: ROUTES.DISTRIBUTION_NETWORK,
+                                Component: DistributionNetworkPage,
                             },
                         ],
                     },
-                    {
-                        path: ROUTES.ADMIN_STAFF,
-                        Component: StaffPage,
-                    },
-                    {
-                        path: ROUTES.ADMIN_PACKAGE_RETURNS,
-                        Component: PackageReturnsPage,
-                    },
-                    {
-                        path: ROUTES.ADMIN_SYSTEM,
-                        Component: SystemMetricsPage,
-                    },
                 ],
             },
-        ],
-    },
 
-    // ==========================================
-    // 5. E-COMMERCE EXECUTIVE
-    // ==========================================
-    {
-        element: <ProtectedRoute allowedRoles={[AUTH_ROLES.ECOMMERCE_EXECUTIVE]} />,
-
-        children: [
+            // ==========================================
+            // 3. CUSTOMER PROTECTED ROUTES
+            // Cần đăng nhập với role CUSTOMER
+            // ==========================================
             {
-                path: ROUTES.ECOMMERCE,
-                element: <EcommerceLayout />,
+                element: <ProtectedRoute allowedRoles={[AUTH_ROLES.CUSTOMER]} />,
 
                 children: [
                     {
-                        index: true,
-                        element: <Navigate to={ROUTES.ECOMMERCE_DASHBOARD} replace />,
+                        path: ROUTES.QUOTE_DETAIL,
+                        Component: PendingPage,
+                    },
+
+                    // Lịch sử đơn hàng
+                    {
+                        path: ROUTES.ORDERS,
+                        Component: OrderHistoryPage,
+                    },
+
+                    // Trạng thái / Chi tiết đơn hàng
+                    {
+                        path: ROUTES.ORDER_DETAIL,
+                        Component: OrderStatusPage,
+                    },
+
+                    {
+                        path: ROUTES.FAVORITES,
+                        Component: CustomerFavoritesPage,
                     },
                     {
-                        path: ROUTES.ECOMMERCE_DASHBOARD,
-                        Component: EcommerceDashboardPage,
+                        path: ROUTES.MY_PRODUCT_REQUESTS,
+                        Component: MyProductRequestsPage,
                     },
-                    { path: ROUTES.ECOMMERCE_QUOTES, Component: EcommerceQuotesPage },
-                    { path: ROUTES.ECOMMERCE_PRODUCTS, Component: EcommerceProductsPage },
                     {
-                        path: ROUTES.ECOMMERCE_PROMOTIONS,
-                        Component: EcommercePromotionsPage,
+                        path: ROUTES.PROFILE,
+                        Component: ProfilePage,
                     },
-                    { path: ROUTES.ECOMMERCE_COUPONS, Component: EcommerceCouponsPage },
-                    {
-                        path: ROUTES.ECOMMERCE_POSTER,
-                        element: <Navigate to={ROUTES.ECOMMERCE_PROMOTIONS} replace />,
-                    },
-                    { path: ROUTES.ECOMMERCE_REQUESTS, element: <Navigate to={ROUTES.ECOMMERCE_DASHBOARD} replace /> },
-                    { path: ROUTES.ECOMMERCE_REVIEWS, Component: EcommerceReviewsPage },
-                    { path: ROUTES.ECOMMERCE_REFUNDS, Component: EcommerceRefundsPage },
                 ],
             },
-        ],
-    },
 
-    // ==========================================
-    // 6. LOGISTICS STAFF
-    // ==========================================
-    {
-        element: <ProtectedRoute allowedRoles={[AUTH_ROLES.LOGISTICS_STAFF]} />,
-
-        children: [
+            // ==========================================
+            // 4. ADMIN
+            // ==========================================
             {
-                path: ROUTES.LOGISTICS,
-                element: <LogisticsLayout />,
+                element: <ProtectedRoute allowedRoles={[AUTH_ROLES.ADMIN]} />,
 
                 children: [
                     {
-                        index: true,
-                        element: <Navigate to={ROUTES.LOGISTICS_INVENTORY} replace />,
-                    },
-                    {
-                        path: ROUTES.LOGISTICS_INVENTORY,
-                        Component: InventoryPage,
-                    },
-                    {
-                        path: ROUTES.LOGISTICS_RECEIVE,
-                        Component: ReceivePage,
-                    },
-                    {
-                        path: ROUTES.LOGISTICS_PRODUCT_REQUESTS,
-                        Component: ProductRequestsPage,
+                        path: ROUTES.ADMIN,
+                        element: <AdminLayout />,
+
+                        children: [
+                            {
+                                index: true,
+                                element: <Navigate to={ROUTES.ADMIN_REGISTRATIONS} replace />,
+                            },
+                            {
+                                path: ROUTES.ADMIN_REGISTRATIONS,
+                                Component: RegistrationsPage,
+
+                                children: [
+                                    {
+                                        path: ':requestId',
+                                        Component: RegistrationDetailPage,
+                                    },
+                                ],
+                            },
+                            {
+                                path: ROUTES.ADMIN_STAFF,
+                                Component: StaffPage,
+                            },
+                            {
+                                path: ROUTES.ADMIN_PACKAGE_RETURNS,
+                                Component: PackageReturnsPage,
+                            },
+                            {
+                                path: ROUTES.ADMIN_SYSTEM,
+                                Component: SystemMetricsPage,
+                            },
+                        ],
                     },
                 ],
             },
-        ],
-    },
 
-    // ==========================================
-    // 7. DELIVERY STAFF
-    // ==========================================
-    {
-        element: <ProtectedRoute allowedRoles={[AUTH_ROLES.DELIVERY_STAFF]} />,
-
-        children: [
+            // ==========================================
+            // 5. E-COMMERCE EXECUTIVE
+            // ==========================================
             {
-                path: ROUTES.DELIVERY,
-                element: <DeliveryLayout />,
+                element: <ProtectedRoute allowedRoles={[AUTH_ROLES.ECOMMERCE_EXECUTIVE]} />,
 
                 children: [
                     {
-                        index: true,
-                        element: <Navigate to={ROUTES.DELIVERY_TRIPS} replace />,
-                    },
-                    {
-                        path: ROUTES.DELIVERY_TRIPS,
-                        Component: CurrentTripPage,
-                    },
-                    {
-                        path: ROUTES.DELIVERY_HISTORY,
-                        Component: DeliveryHistoryPage,
-                    },
-                    {
-                        path: ROUTES.DELIVERY_TRIP_DETAIL,
-                        Component: DeliveryPackagePage,
+                        path: ROUTES.ECOMMERCE,
+                        element: <EcommerceLayout />,
+
+                        children: [
+                            {
+                                index: true,
+                                element: <Navigate to={ROUTES.ECOMMERCE_DASHBOARD} replace />,
+                            },
+                            {
+                                path: ROUTES.ECOMMERCE_DASHBOARD,
+                                Component: EcommerceDashboardPage,
+                            },
+                            { path: ROUTES.ECOMMERCE_QUOTES, Component: EcommerceQuotesPage },
+                            { path: ROUTES.ECOMMERCE_PRODUCTS, Component: EcommerceProductsPage },
+                            {
+                                path: ROUTES.ECOMMERCE_PROMOTIONS,
+                                Component: EcommercePromotionsPage,
+                            },
+                            { path: ROUTES.ECOMMERCE_COUPONS, Component: EcommerceCouponsPage },
+                            {
+                                path: ROUTES.ECOMMERCE_POSTER,
+                                element: <Navigate to={ROUTES.ECOMMERCE_PROMOTIONS} replace />,
+                            },
+                            {
+                                path: ROUTES.ECOMMERCE_REQUESTS,
+                                element: <Navigate to={ROUTES.ECOMMERCE_DASHBOARD} replace />,
+                            },
+                            { path: ROUTES.ECOMMERCE_REVIEWS, Component: EcommerceReviewsPage },
+                            { path: ROUTES.ECOMMERCE_REFUNDS, Component: EcommerceRefundsPage },
+                        ],
                     },
                 ],
             },
+
+            // ==========================================
+            // 6. LOGISTICS STAFF
+            // ==========================================
+            {
+                element: <ProtectedRoute allowedRoles={[AUTH_ROLES.LOGISTICS_STAFF]} />,
+
+                children: [
+                    {
+                        path: ROUTES.LOGISTICS,
+                        element: <LogisticsLayout />,
+
+                        children: [
+                            {
+                                index: true,
+                                element: <Navigate to={ROUTES.LOGISTICS_INVENTORY} replace />,
+                            },
+                            {
+                                path: ROUTES.LOGISTICS_INVENTORY,
+                                Component: InventoryPage,
+                            },
+                            {
+                                path: ROUTES.LOGISTICS_RECEIVE,
+                                Component: ReceivePage,
+                            },
+                            {
+                                path: ROUTES.LOGISTICS_PRODUCT_REQUESTS,
+                                Component: ProductRequestsPage,
+                            },
+                        ],
+                    },
+                ],
+            },
+
+            // ==========================================
+            // 7. DELIVERY STAFF
+            // ==========================================
+            {
+                element: <ProtectedRoute allowedRoles={[AUTH_ROLES.DELIVERY_STAFF]} />,
+
+                children: [
+                    {
+                        path: ROUTES.DELIVERY,
+                        element: <DeliveryLayout />,
+
+                        children: [
+                            {
+                                index: true,
+                                element: <Navigate to={ROUTES.DELIVERY_TRIPS} replace />,
+                            },
+                            {
+                                path: ROUTES.DELIVERY_TRIPS,
+                                Component: CurrentTripPage,
+                            },
+                            {
+                                path: ROUTES.DELIVERY_HISTORY,
+                                Component: DeliveryHistoryPage,
+                            },
+                            {
+                                path: ROUTES.DELIVERY_TRIP_DETAIL,
+                                Component: DeliveryPackagePage,
+                            },
+                        ],
+                    },
+                ],
+            },
+
+            // ==========================================
+            // 8. FALLBACK
+            // ==========================================
+            {
+                path: '*',
+                element: <Navigate to={ROUTES.HOME} replace />,
+            },
         ],
     },
-
-    // ==========================================
-    // 8. FALLBACK
-    // ==========================================
-    {
-        path: '*',
-        element: <Navigate to={ROUTES.HOME} replace />,
-    },
-]}]);
+]);

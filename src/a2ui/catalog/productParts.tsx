@@ -1,3 +1,7 @@
+/**
+ * Mảnh giao diện dùng lại trong các widget sản phẩm (ProductGrid, ProductTable, ProductCarousel, ProductCard…).
+ * Tách riêng file để React Fast Refresh hoạt động (file chỉ export component).
+ */
 import type { ComponentContext } from '@a2ui/web_core/v0_9';
 import { CheckCircle2, PackageX, Plus } from 'lucide-react';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
@@ -10,6 +14,7 @@ import {
     type A2uiProduct,
 } from './productTypes';
 
+/** Giá theo đơn vị bán; có sale thì hiện giá gạch. Chưa có giá thì báo rõ, không hiện 0đ. */
 export function Price({ product }: { product: A2uiProduct }) {
     const price = unitPrice(product);
     if (!product.priceAvailable || price == null) {
@@ -26,6 +31,7 @@ export function Price({ product }: { product: A2uiProduct }) {
     );
 }
 
+/** Nhãn còn hàng/hết hàng/chưa rõ tồn, tính từ availableQuantity backend gửi. */
 export function Stock({ product }: { product: A2uiProduct }) {
     if (product.availableQuantity == null) {
         return <span className="text-xs text-store-muted">Chưa rõ tồn kho</span>;
@@ -41,6 +47,7 @@ export function Stock({ product }: { product: A2uiProduct }) {
     );
 }
 
+/** Bảng giá theo bậc số lượng (priceTiers); không có bậc thì không hiện gì. */
 export function Tiers({ product }: { product: A2uiProduct }) {
     if (!product.priceTiers?.length) return null;
     const unit = unitLabel(product.unitCode);
@@ -64,6 +71,7 @@ export function Tiers({ product }: { product: A2uiProduct }) {
     );
 }
 
+/** Nút thêm vào giỏ; tắt khi hết hàng hoặc chưa có giá. */
 export function AddButton({
     context,
     product,
@@ -84,6 +92,7 @@ export function AddButton({
     );
 }
 
+/** Thẻ sản phẩm gọn cho lưới/dải: ảnh, tên (mở chi tiết), giá, tồn, bậc giá tùy chọn, nút thêm giỏ. */
 export function ProductTile({
     context,
     product,

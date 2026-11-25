@@ -9,6 +9,7 @@ import { canSuggest } from '@/validations/catalogSearch';
 import { getCatalogSuggestions } from '@/services/customer/catalogReadService';
 import useSearchHistory from '@/hooks/useSearchHistory';
 import { useCatalogQuery } from './useCatalogQuery';
+import { aiPagePath } from '@/a2ui/runtime/useA2uiActions';
 
 export function useStoreSearch() {
     const [open, setOpen] = useState(false);
@@ -90,7 +91,9 @@ export function useStoreSearch() {
         if (!searchText) return;
 
         if (searchMode === 'ai') {
-            setShowAINotice(true);
+            // Chế độ AI: AI ghép cả trang theo yêu cầu thay trang kết quả mặc định.
+            setOpen(false);
+            navigate(aiPagePath(searchText));
             return;
         }
 
@@ -184,7 +187,8 @@ export function useStoreSearch() {
 
     return {
         open,
-        suggestionLoading: open && searchMode === 'products' && canSuggest(term) && (!enabled || isFetching),
+        suggestionLoading:
+            open && searchMode === 'products' && canSuggest(term) && (!enabled || isFetching),
         suggestionError: enabled && isError,
         showSuggestionMenu: open && searchMode === 'products' && canSuggest(term),
         showRecentSearches: open && searchMode === 'products' && !term && historyEntries.length > 0,
