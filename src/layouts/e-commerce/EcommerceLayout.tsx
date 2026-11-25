@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { ClipboardList, LayoutDashboard, LogOut, Megaphone, Menu, MessageSquare, Package, Search, TicketPercent, Undo2 } from 'lucide-react';
+import { ClipboardList, LayoutDashboard, LogOut, Megaphone, Menu, MessageSquare, Package, TicketPercent, Undo2 } from 'lucide-react';
 import { ROUTES } from '@/router/routes';
 import { logout } from '@/services/admin/authService';
 import { useAuthStore } from '@/store/admin/authStore';
@@ -10,6 +10,7 @@ import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 import WorkspaceAccountMenu from '@/components/common/WorkspaceAccountMenu';
 import LogoutConfirmation from '@/components/common/LogoutConfirmation';
 import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
+import EcommerceWorkspaceSearch from '@/components/e-commerce/EcommerceWorkspaceSearch';
 import '@/components/logistic/logistics.css';
 
 function EcommerceWorkspace() {
@@ -22,7 +23,6 @@ function EcommerceWorkspace() {
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const [confirmLogout, setConfirmLogout] = useState(false);
-    const [globalSearch, setGlobalSearch] = useState('');
     const loggingOut = useRef(false);
     const navigation = [
         { path: ROUTES.ECOMMERCE_DASHBOARD, label: tr('Tổng quan', 'Overview'), icon: <LayoutDashboard size={18} /> },
@@ -47,11 +47,6 @@ function EcommerceWorkspace() {
             loggingOut.current = false;
         }
     }
-    function handleSearch(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault();
-        navigate(`${ROUTES.ECOMMERCE_PRODUCTS}?q=${encodeURIComponent(globalSearch.trim())}`);
-    }
-
     return (
         <div data-role="ECOMMERCE_EXECUTIVE" data-layout="staff" className={`lg-workspace ${collapsed ? 'is-collapsed' : ''}`}>
             <a href="#ecommerce-main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-3 focus:z-[200] focus:bg-store-yellow focus:p-3">{tr('Bỏ qua menu', 'Skip navigation')}</a>
@@ -78,11 +73,7 @@ function EcommerceWorkspace() {
                         <div><div className="lg-topbar-eyebrow">{tr('KHÔNG GIAN QUẢN TRỊ', 'OPERATIONS WORKSPACE')}</div><div className="lg-topbar-script">{tr('Góc kinh doanh.', 'Commerce desk.')}</div></div>
                     </div>
                     <div className="lg-topbar-actions">
-                        <form role="search" onSubmit={handleSearch} className="hidden h-10 items-center gap-2 rounded border border-store-line bg-white px-3 xl:flex">
-                            <Search size={16} aria-hidden="true" />
-                            <input value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)} placeholder={tr('Tìm tên sản phẩm, SKU...', 'Find products or SKU...')} aria-label={tr('Tìm nhanh sản phẩm', 'Search products')} autoComplete="off" className="w-40 border-0 bg-transparent outline-none" />
-                            <button type="submit" className="font-bold text-store-green">{tr('Tìm', 'Search')}</button>
-                        </form>
+                        <EcommerceWorkspaceSearch />
                         <LanguageSwitcher />
                         <WorkspaceAccountMenu user={user} roleLabel={tr('Nhân viên E-commerce', 'E-commerce executive')} />
                         <button type="button" className="lg-logout" onClick={() => setConfirmLogout(true)}><LogOut size={16} />{tr('Đăng xuất', 'Sign out')}</button>

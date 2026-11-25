@@ -88,7 +88,11 @@
         "addressFromDistribution": "Uses the exact location chosen on the Distribution page. Editing the address will locate it again.",
         "creating": "Creating package...",
         "pickOnMap": "Pick on map",
-        "defaultPackageName": "Default delivery package"
+        "defaultPackageName": "Default delivery package",
+        "editTitle": "Edit package",
+        "saveEdit": "Save package",
+        "cancelEdit": "Cancel editing",
+        "finishEditing": "Save or cancel your package changes before continuing."
     },
     "review": {
         "title": "Review before checkout",
@@ -124,7 +128,8 @@
     "notices": {
         "couponsUpdated": "Discounts updated.",
         "couponsRemoved": "All coupons removed from the quote.",
-        "packageAdded": "Delivery package added."
+        "packageAdded": "Delivery package added.",
+        "packageUpdated": "Delivery package updated."
     },
     "lineVat": "VAT {{rate}}%: {{amount}}",
     "lineVatMissing": "VAT rate not set",
@@ -133,7 +138,7 @@
     "couponPicker": {
         "productTitle": "Product coupon",
         "shippingTitle": "Shipping coupon",
-        "selectOrEnter": "Select or enter",
+        "selectOrEnter": "Enter a code",
         "appliedUnknown": "Applied",
         "inputLabel": "Coupon code",
         "inputPlaceholder": "Enter 8-character code",
@@ -157,6 +162,17 @@
         "choose": "Use",
         "inUse": "In use",
         "remove": "Remove current code",
-        "close": "Close"
+        "close": "Close",
+        "privateNotice": "Enter the exact code you received. Coupon codes are not listed publicly.",
+        "savedCodes": "Your reusable codes"
+    },
+    "reorder": {
+        "title": "Reorder",
+        "summary": "Your previous delivery details were reused. Prices, stock and delivery dates were rechecked.",
+        "loading": "Checking your reorder...",
+        "cartTitle": "Items in this reorder",
+        "cartHint": "Change quantities here. Enter 0 to remove an item. Your regular cart is unchanged.",
+        "allocationReset": "Packages containing changed items will need to be allocated again. Unaffected packages are kept.",
+        "invalidCart": "Enter valid quantities and keep at least one product."
     }
 }

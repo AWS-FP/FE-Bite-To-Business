@@ -40,16 +40,16 @@ export default function StoreSearch() {
             className="relative min-w-0 max-w-[720px] flex-[1_1_720px]"
         >
             <form
-                className="focus-border-group flex h-[52px] min-w-0 items-center rounded-full border-2 border-solid border-store-ink bg-store-cream shadow-[3px_3px_0_var(--color-store-ink)] focus-within:border-store-green"
+                className="flex h-[52px] min-w-0 items-center rounded-full border-2 border-solid border-store-ink bg-store-cream shadow-[3px_3px_0_var(--color-store-ink)] focus-within:border-store-green"
                 role="search"
                 aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.label')}
                 onSubmit={handleSearch}
             >
-                <SearchModeDropdown value={searchMode} onChange={changeMode} />
+                <SearchModeDropdown value={searchMode} onChange={changeMode} onOpen={() => setOpen(false)} />
 
                 <input
                     ref={inputRef}
-                    className="h-9 min-w-0 flex-1 rounded-full border-0 bg-transparent px-2.5 text-[12px] text-store-ink outline-none placeholder:text-store-muted"
+                    className="h-9 min-w-0 flex-1 rounded-full !border-0 bg-transparent px-2.5 text-[12px] text-store-ink !outline-none !shadow-none focus:!border-0 focus:!outline-none focus:!shadow-none placeholder:text-store-muted"
                     type="search"
                     name="q"
                     aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.label')}

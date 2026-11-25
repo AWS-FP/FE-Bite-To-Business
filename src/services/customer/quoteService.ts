@@ -1,6 +1,6 @@
 import { http } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
-import type { AvailableCoupon, CreatedOrder, CustomerQuotePage, Quote, QuoteAvailability, QuotePackage, QuotePackageAmount } from '@/types/customer/quote';
+import type { CreatedOrder, CustomerQuotePage, Quote, QuoteAvailability, QuotePackage, QuotePackageAmount } from '@/types/customer/quote';
 
 export async function getQuotePackageTotals(id: string, signal?: AbortSignal) {
     const response = await http.get<ApiResponse<Record<string, QuotePackageAmount>>>(
@@ -49,14 +49,6 @@ export async function saveQuoteContact(
     const response = await http.put<ApiResponse<Quote>>(
         `/api/customer/quotes/${id}/contact`,
         contact,
-    );
-    return response.data.data;
-}
-
-export async function getAvailableCoupons(id: string, signal?: AbortSignal) {
-    const response = await http.get<ApiResponse<AvailableCoupon[]>>(
-        `/api/customer/quotes/${id}/coupons/available`,
-        { signal },
     );
     return response.data.data;
 }
@@ -145,6 +137,20 @@ export async function updateQuotePackage(
             latitude: Number(parcel.latitude.toFixed(6)),
             longitude: Number(parcel.longitude.toFixed(6)),
         },
+    );
+    return data.data;
+}
+
+export async function getReusableCoupons(quoteId: string, signal?: AbortSignal) {
+    const { data } = await http.get<ApiResponse<{ code: string; scope: 'PRODUCT' | 'SHIPPING' }[]>>(
+        `/api/customer/quotes/${encodeURIComponent(quoteId)}/coupons/reusable`, { signal },
+    );
+    return data.data;
+}
+
+export async function replaceQuoteCart(quoteId: string, revision: number, items: { productId: string; quantity: number }[]) {
+    const { data } = await http.put<ApiResponse<Quote>>(
+        `/api/customer/quotes/${encodeURIComponent(quoteId)}/cart`, { items }, { params: { revision } },
     );
     return data.data;
 }

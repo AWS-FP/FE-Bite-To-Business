@@ -6,9 +6,10 @@ import { useTranslation } from 'react-i18next';
 interface SearchModeDropdownProps {
     value: 'products' | 'ai';
     onChange: (value: 'products' | 'ai') => void;
+    onOpen?: () => void;
 }
 
-export default function SearchModeDropdown({ value, onChange }: SearchModeDropdownProps) {
+export default function SearchModeDropdown({ value, onChange, onOpen }: SearchModeDropdownProps) {
     const { t } = useTranslation('storefront');
     const [isOpen, setIsOpen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -57,6 +58,7 @@ export default function SearchModeDropdown({ value, onChange }: SearchModeDropdo
         event.preventDefault();
 
         if (!isOpen) {
+            onOpen?.();
             setIsOpen(true);
             return;
         }
@@ -78,7 +80,7 @@ export default function SearchModeDropdown({ value, onChange }: SearchModeDropdo
     return (
         <div
             ref={wrapperRef}
-            className="relative ml-2 w-[136px] shrink-0 border-0 border-r border-solid border-store-ink/20 pr-2 font-body"
+            className={`relative ml-2 w-[136px] shrink-0 border-0 border-r border-solid border-store-ink/20 pr-2 font-body ${isOpen ? 'z-[120]' : ''}`}
             onKeyDown={handleKeyDown}
             onBlur={(event) => {
                 if (!event.currentTarget.contains(event.relatedTarget)) setIsOpen(false);
@@ -91,7 +93,10 @@ export default function SearchModeDropdown({ value, onChange }: SearchModeDropdo
                 aria-haspopup="menu"
                 aria-expanded={isOpen}
                 aria-controls={isOpen ? menuId : undefined}
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => {
+                    if (!isOpen) onOpen?.();
+                    setIsOpen(!isOpen);
+                }}
                 className="relative flex h-8 w-full cursor-pointer items-center justify-center rounded-full border-2 border-solid border-transparent bg-store-cream px-5 text-[11px] leading-4 font-bold text-store-green transition-colors hover:bg-surface-yellow aria-expanded:bg-store-yellow"
             >
                 <span className="truncate">
@@ -110,7 +115,7 @@ export default function SearchModeDropdown({ value, onChange }: SearchModeDropdo
                     id={menuId}
                     role="menu"
                     aria-label={t('search.mode')}
-                    className="absolute top-[calc(100%+12px)] left-0 z-[80] w-[224px] overflow-hidden rounded-2xl border-2 border-solid border-store-ink bg-store-cream p-1.5 text-store-green"
+                    className="absolute top-[calc(100%+12px)] left-0 z-[130] w-[224px] overflow-hidden rounded-2xl border-2 border-solid border-store-ink bg-store-cream p-1.5 text-store-green"
                 >
                     <p className="m-0 border-0 border-b border-solid border-store-green/15 px-3 pt-1.5 pb-2.5 font-label text-[10px] leading-4 font-semibold tracking-[1px] uppercase">
                         {t('search.mode')}

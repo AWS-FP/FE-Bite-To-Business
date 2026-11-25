@@ -30,6 +30,7 @@ import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 import type { Promotion, PromotionWrite } from '@/types/e-commerce/executiveAdmin';
 import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
 import PromotionProductManager from '@/components/e-commerce/PromotionProductManager';
+import { promotionDisplayStatus } from '@/utils/e-commerce/promotionLifecycle';
 import PromotionImageCropper from '@/components/e-commerce/PromotionImageCropper';
 
 function localValue(iso: string) {
@@ -96,6 +97,7 @@ export default function EcommercePromotionsPage() {
     const list = useQuery({
         queryKey: ['ecom', 'promotions', status, page, debouncedSearch],
         queryFn: () => executiveApi.promotions(status || undefined, page, 20, debouncedSearch),
+        refetchInterval: 60_000,
     });
     function reset() {
         setDraftOpen(false);
@@ -577,7 +579,7 @@ export default function EcommercePromotionsPage() {
                                 <div className="p-5">
                                     <div className="flex flex-wrap items-center justify-between gap-2">
                                         <div className="flex items-center gap-2">
-                                            <ExecutiveBadge status={p.status} />
+                                            <ExecutiveBadge status={promotionDisplayStatus(p)} />
                                             <span className="rounded-full bg-[#e7f1e9] px-2 py-1 text-[10px] font-bold text-[#165b3d]">
                                                 {p.promotionType === 'FLASH_SALE'
                                                     ? 'FLASH SALE'

@@ -2,8 +2,8 @@ import { http } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
 import type { AdminPage, AdminPricing, AdminProduct, Coupon, CouponWrite, DashboardMetrics, ExecutiveRefund, ExecutiveReview, PricingWrite, Promotion, PromotionPriceUpdate, PromotionProductChoice, PromotionProductFilter, PromotionWrite, Quote } from '@/types/e-commerce/executiveAdmin';
 
-async function getData<T>(url: string, params?: Record<string, unknown>): Promise<T> {
-    const { data } = await http.get<ApiResponse<T>>(url, { params });
+async function getData<T>(url: string, params?: Record<string, unknown>, signal?: AbortSignal): Promise<T> {
+    const { data } = await http.get<ApiResponse<T>>(url, { params, signal });
     return data.data;
 }
 async function postData<T>(url: string, payload?: unknown): Promise<T> {
@@ -27,8 +27,8 @@ const api = '/api/ecommerce';
 export const executiveApi = {
     metrics: (from: string, to: string) =>
         getData<DashboardMetrics>(`${api}/dashboard/metrics`, { from, to }),
-    products: (params: { q?: string; status?: string; page: number; size: number }) =>
-        getData<AdminPage<AdminProduct>>(`${api}/products`, params),
+    products: (params: { q?: string; status?: string; page: number; size: number }, signal?: AbortSignal) =>
+        getData<AdminPage<AdminProduct>>(`${api}/products`, params, signal),
     productPricing: (id: string) => getData<AdminPricing>(`${api}/products/${id}/manage-pricing`),
     savePricing: (id: string, payload: PricingWrite) =>
         putData<AdminPricing>(`${api}/products/${id}/pricing`, payload),
@@ -48,12 +48,13 @@ export const executiveApi = {
         await http.delete(`${api}/promotions/${encodeURIComponent(id)}`);
     },
     promotionProductIds: (id: string) => getData<string[]>(`${api}/promotions/${id}/product-ids`),
-    promotionProductOptions: (id: string, filter: PromotionProductFilter, page = 0, size = 20) =>
-        getData<AdminPage<PromotionProductChoice>>(`${api}/promotions/${id}/products`, {
-            ...filter,
-            page,
-            size,
-        }),
+    promotionProductOptions: (
+        id: string, filter: PromotionProductFilter, page = 0, size = 20, signal?: AbortSignal,
+    ) => getData<AdminPage<PromotionProductChoice>>(`${api}/promotions/${id}/products`, {
+        ...filter,
+        page,
+        size,
+    }, signal),
     promotionProductDetails: (id: string, productIds: string[]) =>
         postData<PromotionProductChoice[]>(`${api}/promotions/${id}/products/resolve`, {
             productIds,
@@ -116,6 +117,9 @@ export const executiveApi = {
         getData<AdminPage<ExecutiveReview>>(`${api}/reviews`, { status, stars, page, size }),
     moderateReview: (id: string, action: 'HIDE' | 'RESTORE', reason?: string) =>
         patchData<ExecutiveReview>(`${api}/reviews/${id}/moderation`, { action, reason }),
+    deleteReview: async (id: string): Promise<void> => {
+        await http.delete(`${api}/reviews/${encodeURIComponent(id)}`);
+    },
     refundRequests: (status?: string, page = 0, size = 20) =>
         getData<AdminPage<ExecutiveRefund>>(`${api}/refund-requests`, { status, page, size }),
     approveRefund: (id: string, note?: string) =>

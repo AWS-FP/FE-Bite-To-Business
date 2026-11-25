@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { RotateCw } from 'lucide-react';
+import { RotateCw, RotateCcw } from 'lucide-react';
 import { isAxiosError } from 'axios';
 import { useLocation, useParams } from 'react-router-dom';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
@@ -17,6 +17,7 @@ import OrderCancellationSection from '@/components/customer/order/OrderCancellat
 import { useOrderCancellation } from '@/hooks/customer/useOrderCancellation';
 import OrderPackageList from '@/components/customer/order/OrderPackageList';
 import { usePackageReturn } from '@/hooks/customer/usePackageReturn';
+import { useReorderOrder } from '@/hooks/customer/useReorderOrder';
 
 const money = (value: number) => `${value.toLocaleString('vi-VN')}đ`;
 const QR_LIFETIME_MS = 5 * 60 * 1000;
@@ -49,6 +50,7 @@ export default function OrderStatusPage() {
         if (orderId) void getCustomerOrder(orderId).then(setDetail).catch(() => undefined);
     });
     const cancellation = useOrderCancellation(detail?.order.orderId === orderId ? detail : null);
+    const reordering = useReorderOrder();
 
     useEffect(() => {
         const abort = new AbortController();
@@ -210,6 +212,15 @@ export default function OrderStatusPage() {
                                 status={detail.order.status}
                                 paymentStatus={detail.order.paymentStatus}
                             />
+                        </div>
+                        {reordering.error && <p role="alert" className="mb-4 rounded-xl border border-red-300 bg-red-50 p-4 text-sm text-red-800">{reordering.error}</p>}
+                        <div className="mb-5 flex flex-wrap items-center justify-end gap-3">
+                            <button type="button" disabled={reordering.pendingOrderId !== null}
+                                onClick={() => { if (orderId) void reordering.reorder(orderId); }}
+                                className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-store-green bg-white px-5 py-2 font-bold text-store-green hover:bg-surface-green disabled:cursor-not-allowed disabled:opacity-50">
+                                <RotateCcw size={18} aria-hidden="true" />
+                                {reordering.pendingOrderId ? 'Đang chuẩn bị...' : 'Đặt lại đơn hàng'}
+                            </button>
                         </div>
                         <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
                             <div className="space-y-5">
