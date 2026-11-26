@@ -4,20 +4,20 @@ import { useTranslation } from 'react-i18next';
 export default function LandingImpact() {
     const { t } = useTranslation('storefront');
     return (
-        <section className="py-[72px] !pt-4">
-            <div className="mx-auto max-w-[1240px] px-6">
+        <section className="py-12 sm:py-16 !pt-4">
+            <div className="mx-auto max-w-[1320px] px-6">
                 <div className="mx-auto mb-11 max-w-[720px] text-center">
-                    <span className="mb-2.5 inline-block rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3.5 py-1 font-label text-[15px] font-normal text-store-ink shadow-[3px_3px_0_var(--color-store-ink)]">{t('introPages.impact.eyebrow')}</span>
-                    <h2 className="mb-2.5 font-subheading text-[clamp(28px,3.2vw,40px)] font-normal leading-[1.22] text-store-cream">
+                    <span className="mb-2.5 inline-block rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3.5 py-1 font-label text-[15px] font-normal text-store-ink shadow-sm">{t('introPages.impact.eyebrow')}</span>
+                    <h2 className="mb-2.5 font-subheading text-[clamp(26px,3vw,36px)] font-bold leading-[1.22] text-store-cream">
                         {t('introPages.impact.title')}
                     </h2>
-                    <p className="font-heading text-lg font-bold not-italic text-store-pink">
+                    <p className="font-body text-sm leading-relaxed text-store-muted-light">
                         {t('introPages.impact.description')}
                     </p>
                 </div>
-                <div className="grid grid-cols-4 gap-5">
-                    <div className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream shadow-[5px_5px_0_var(--color-store-ink)] transition-transform hover:-translate-y-[3px]">
-                        <div className="has-svg-bg flex h-[150px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[46px]">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border border-solid border-store-line bg-store-cream shadow-sm transition-transform hover:-translate-y-[3px]">
+                        <div className="has-svg-bg flex h-[110px] items-center justify-center border-b border-solid border-store-line bg-store-cream text-[46px]">
                             <div className="svg-bg-watermark watermark-center">
                                 <svg
                                     viewBox="0 0 24 24"
@@ -34,17 +34,17 @@ export default function LandingImpact() {
                                 </svg>
                             </div>
                         </div>
-                        <div className="flex-1 bg-store-ink px-[18px] py-5 text-center text-white">
-                            <div className="mb-1.5 font-price text-[34px] font-normal leading-[1.1] text-store-yellow tabular-nums">
-                                ↓ 50%
+                        <div className="flex-1 bg-store-dark px-[18px] py-5 text-center text-white">
+                            <div className="mb-1.5 font-price text-[clamp(20px,2.2vw,28px)] font-normal leading-[1.1] text-store-yellow tabular-nums">
+                                {t('introPages.impact.timeHeading')}
                             </div>
                             <div className="text-[13px] text-store-cream">
                                 {t('introPages.impact.time')}
                             </div>
                         </div>
                     </div>
-                    <div className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream shadow-[5px_5px_0_var(--color-store-ink)] transition-transform hover:-translate-y-[3px]">
-                        <div className="has-svg-bg flex h-[150px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[46px]">
+                    <div className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border border-solid border-store-line bg-store-cream shadow-sm transition-transform hover:-translate-y-[3px]">
+                        <div className="has-svg-bg flex h-[110px] items-center justify-center border-b border-solid border-store-line bg-store-cream text-[46px]">
                             <div className="svg-bg-watermark watermark-center">
                                 <svg
                                     viewBox="0 0 24 24"
@@ -61,17 +61,17 @@ export default function LandingImpact() {
                                 </svg>
                             </div>
                         </div>
-                        <div className="flex-1 bg-store-ink px-[18px] py-5 text-center text-white">
-                            <div className="mb-1.5 font-price text-[34px] font-normal leading-[1.1] text-store-yellow tabular-nums">
-                                ↓ 15%
+                        <div className="flex-1 bg-store-dark px-[18px] py-5 text-center text-white">
+                            <div className="mb-1.5 font-price text-[clamp(20px,2.2vw,28px)] font-normal leading-[1.1] text-store-yellow tabular-nums">
+                                {t('introPages.impact.costHeading')}
                             </div>
                             <div className="text-[13px] text-store-cream">
                                 {t('introPages.impact.cost')}
                             </div>
                         </div>
                     </div>
-                    <div className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream shadow-[5px_5px_0_var(--color-store-ink)] transition-transform hover:-translate-y-[3px]">
-                        <div className="has-svg-bg flex h-[150px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[46px]">
+                    <div className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border border-solid border-store-line bg-store-cream shadow-sm transition-transform hover:-translate-y-[3px]">
+                        <div className="has-svg-bg flex h-[110px] items-center justify-center border-b border-solid border-store-line bg-store-cream text-[46px]">
                             <div className="svg-bg-watermark watermark-center">
                                 <svg
                                     viewBox="0 0 24 24"
@@ -88,17 +88,17 @@ export default function LandingImpact() {
                                 </svg>
                             </div>
                         </div>
-                        <div className="flex-1 bg-store-ink px-[18px] py-5 text-center text-white">
-                            <div className="mb-1.5 font-price text-[34px] font-normal leading-[1.1] text-store-yellow tabular-nums">
-                                ↑ 99%
+                        <div className="flex-1 bg-store-dark px-[18px] py-5 text-center text-white">
+                            <div className="mb-1.5 font-price text-[clamp(20px,2.2vw,28px)] font-normal leading-[1.1] text-store-yellow tabular-nums">
+                                {t('introPages.impact.deliveryHeading')}
                             </div>
                             <div className="text-[13px] text-store-cream">
                                 {t('introPages.impact.delivery')}
                             </div>
                         </div>
                     </div>
-                    <div className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream shadow-[5px_5px_0_var(--color-store-ink)] transition-transform hover:-translate-y-[3px]">
-                        <div className="has-svg-bg flex h-[150px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[46px]">
+                    <div className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border border-solid border-store-line bg-store-cream shadow-sm transition-transform hover:-translate-y-[3px]">
+                        <div className="has-svg-bg flex h-[110px] items-center justify-center border-b border-solid border-store-line bg-store-cream text-[46px]">
                             <div className="svg-bg-watermark watermark-center">
                                 <svg
                                     viewBox="0 0 24 24"
@@ -115,9 +115,9 @@ export default function LandingImpact() {
                                 </svg>
                             </div>
                         </div>
-                        <div className="flex-1 bg-store-ink px-[18px] py-5 text-center text-white">
-                            <div className="mb-1.5 font-price text-[34px] font-normal leading-[1.1] text-store-yellow tabular-nums">
-                                ↑ 20%
+                        <div className="flex-1 bg-store-dark px-[18px] py-5 text-center text-white">
+                            <div className="mb-1.5 font-price text-[clamp(20px,2.2vw,28px)] font-normal leading-[1.1] text-store-yellow tabular-nums">
+                                {t('introPages.impact.financeHeading')}
                             </div>
                             <div className="text-[13px] text-store-cream">
                                 {t('introPages.impact.finance')}

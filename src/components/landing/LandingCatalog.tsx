@@ -20,7 +20,7 @@ export default function LandingCatalog({
     const { t } = useTranslation('storefront');
     return (
         <section
-            className="py-[72px]"
+            className="py-12 sm:py-16"
             id="categories"
             style={{
                 background: 'var(--bg-cream)',
@@ -28,11 +28,11 @@ export default function LandingCatalog({
                 borderBottom: 'var(--border-subtle)',
             }}
         >
-            <div className="mx-auto max-w-[1240px] px-6">
-                <div className="mb-8 grid grid-cols-[5fr_7fr] items-end gap-8">
+            <div className="mx-auto max-w-[1320px] px-6">
+                <div className="mb-8 grid grid-cols-1 lg:grid-cols-[5fr_7fr] items-end gap-8">
                     <div>
-                        <span className="mb-2.5 inline-block rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3.5 py-1 font-label text-[15px] font-normal text-store-ink shadow-[3px_3px_0_var(--color-store-ink)]">{t('landing.catalog.eyebrow')}</span>
-                        <h2 className="mb-2.5 font-subheading text-[clamp(28px,3.2vw,40px)] font-normal leading-[1.22] text-store-ink" style={{ marginBottom: '0' }}>
+                        <span className="mb-2.5 inline-block rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3.5 py-1 font-label text-[15px] font-normal text-store-ink shadow-sm">{t('landing.catalog.eyebrow')}</span>
+                        <h2 className="mb-2.5 font-subheading text-[clamp(26px,3vw,36px)] font-bold leading-[1.22] text-store-ink" style={{ marginBottom: '0' }}>
                             {t('landing.catalog.title')}
                         </h2>
                     </div>
@@ -44,7 +44,7 @@ export default function LandingCatalog({
                 </div>
                 <div className="mb-8 flex flex-wrap gap-3" id="categoryPillCloud">
                     <button
-                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'all' ? ' active' : '')}
+                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border border-solid border-store-line bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'all' ? ' active' : '')}
                         data-cat="all"
                         type="button"
                         onClick={() => setCategory('all')}
@@ -66,7 +66,7 @@ export default function LandingCatalog({
                         </span>
                     </button>
                     <button
-                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'meat' ? ' active' : '')}
+                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border border-solid border-store-line bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'meat' ? ' active' : '')}
                         data-cat="meat"
                         type="button"
                         onClick={() => setCategory('meat')}
@@ -90,7 +90,7 @@ export default function LandingCatalog({
                         </span>
                     </button>
                     <button
-                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'seafood' ? ' active' : '')}
+                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border border-solid border-store-line bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'seafood' ? ' active' : '')}
                         data-cat="seafood"
                         type="button"
                         onClick={() => setCategory('seafood')}
@@ -113,7 +113,7 @@ export default function LandingCatalog({
                         </span>
                     </button>
                     <button
-                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'prepared' ? ' active' : '')}
+                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border border-solid border-store-line bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'prepared' ? ' active' : '')}
                         data-cat="prepared"
                         type="button"
                         onClick={() => setCategory('prepared')}
@@ -137,7 +137,7 @@ export default function LandingCatalog({
                         </span>
                     </button>
                     <button
-                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'veg' ? ' active' : '')}
+                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border border-solid border-store-line bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'veg' ? ' active' : '')}
                         data-cat="veg"
                         type="button"
                         onClick={() => setCategory('veg')}
@@ -160,7 +160,7 @@ export default function LandingCatalog({
                         </span>
                     </button>
                     <button
-                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'dairy' ? ' active' : '')}
+                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border border-solid border-store-line bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'dairy' ? ' active' : '')}
                         data-cat="dairy"
                         type="button"
                         onClick={() => setCategory('dairy')}
@@ -186,7 +186,7 @@ export default function LandingCatalog({
                         </span>
                     </button>
                     <button
-                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'bakery' ? ' active' : '')}
+                        className={'group relative isolate inline-flex cursor-pointer items-center gap-2.5 overflow-hidden rounded-full border border-solid border-store-line bg-store-cream px-[22px] py-3 text-[14.5px] font-bold text-store-ink shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:-translate-x-0.5 [&.active]:-translate-y-0.5 [&.active]:bg-store-yellow' + (category === 'bakery' ? ' active' : '')}
                         data-cat="bakery"
                         type="button"
                         onClick={() => setCategory('bakery')}
@@ -227,7 +227,7 @@ export default function LandingCatalog({
                         <div style={{ display: 'flex', gap: '8px' }}>
                             <button
                                 type="button"
-                                className={view === 'grid' ? 'inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white' : 'inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-cream text-store-ink hover:bg-store-yellow'}
+                                className={view === 'grid' ? 'inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-solid border-store-line px-6 py-3 font-body text-[15px] font-bold no-underline shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm bg-store-yellow text-store-ink' : 'inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-solid border-store-line px-6 py-3 font-body text-[15px] font-bold no-underline shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm bg-store-cream text-store-ink hover:bg-store-yellow'}
                                 id="btnModeGrid"
                                 style={{ padding: '7px 16px', fontSize: '12.5px' }}
                                 onClick={() => setView('grid')}
@@ -236,7 +236,7 @@ export default function LandingCatalog({
                             </button>
                             <button
                                 type="button"
-                                className={view === 'table' ? 'inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white' : 'inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-cream text-store-ink hover:bg-store-yellow'}
+                                className={view === 'table' ? 'inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-solid border-store-line px-6 py-3 font-body text-[15px] font-bold no-underline shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm bg-store-yellow text-store-ink' : 'inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-solid border-store-line px-6 py-3 font-body text-[15px] font-bold no-underline shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm bg-store-cream text-store-ink hover:bg-store-yellow'}
                                 id="btnModeTable"
                                 style={{ padding: '7px 16px', fontSize: '12.5px' }}
                                 onClick={() => setView('table')}
@@ -246,21 +246,21 @@ export default function LandingCatalog({
                         </div>
                     </div>
                     <div
-                        className="grid grid-cols-4 gap-5"
+                        className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4"
                         id="productGridContainer"
                         style={{ display: view === 'grid' ? 'grid' : 'none' }}
                     >
                         <div
-                            className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream shadow-[5px_5px_0_var(--color-store-ink)] transition-transform hover:-translate-y-1"
+                            className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border border-solid border-store-line bg-white shadow-sm transition-transform hover:-translate-y-1"
                             data-category="meat"
                             style={{
                                 display:
                                     category === 'all' || category === 'meat' ? 'flex' : 'none',
                             }}
                         >
-                            <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[50px]">
+                            <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b border-solid border-store-line bg-surface-green text-[50px]">
                                 <div className="absolute top-3 left-3 flex gap-1.5" style={{ zIndex: '3' }}>
-                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-coral px-2.5 py-[3px] text-[11px] font-extrabold text-white shadow-[2px_2px_0_var(--color-store-ink)]">{t('landing.catalog.bestSeller')}</span>
+                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-coral px-2.5 py-[3px] text-[11px] font-extrabold text-white shadow-none">{t('landing.catalog.bestSeller')}</span>
                                 </div>
                                 <div className="svg-bg-watermark watermark-center">
                                     <svg
@@ -302,7 +302,7 @@ export default function LandingCatalog({
                                 </div>
                                 <button
                                     type="button"
-                                    className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
+                                    className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-solid border-store-line px-6 py-3 font-body text-[15px] font-bold no-underline shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm bg-store-yellow text-store-ink"
                                     data-item={t('landing.catalog.porkName')}
                                     style={{
                                         width: '100%',
@@ -317,17 +317,17 @@ export default function LandingCatalog({
                             </div>
                         </div>
                         <div
-                            className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream shadow-[5px_5px_0_var(--color-store-ink)] transition-transform hover:-translate-y-1"
+                            className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border border-solid border-store-line bg-white shadow-sm transition-transform hover:-translate-y-1"
                             data-category="prepared"
                             style={{
                                 display:
                                     category === 'all' || category === 'prepared' ? 'flex' : 'none',
                             }}
                         >
-                            <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[50px]">
+                            <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b border-solid border-store-line bg-surface-green text-[50px]">
                                 <div className="absolute top-3 left-3 flex gap-1.5" style={{ zIndex: '3' }}>
-                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-yellow px-2.5 py-[3px] text-[11px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">{t('landing.catalog.new')}</span>
-                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-pink px-2.5 py-[3px] text-[11px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">{t('landing.catalog.preparedBadge')}</span>
+                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-yellow px-2.5 py-[3px] text-[11px] font-extrabold text-store-ink shadow-none">{t('landing.catalog.new')}</span>
+                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-pink px-2.5 py-[3px] text-[11px] font-extrabold text-store-ink shadow-none">{t('landing.catalog.preparedBadge')}</span>
                                 </div>
                                 <div className="svg-bg-watermark watermark-center">
                                     <svg
@@ -371,7 +371,7 @@ export default function LandingCatalog({
                                 </div>
                                 <button
                                     type="button"
-                                    className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
+                                    className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-solid border-store-line px-6 py-3 font-body text-[15px] font-bold no-underline shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm bg-store-yellow text-store-ink"
                                     data-item={t('landing.catalog.springRollName')}
                                     style={{
                                         width: '100%',
@@ -386,16 +386,16 @@ export default function LandingCatalog({
                             </div>
                         </div>
                         <div
-                            className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream shadow-[5px_5px_0_var(--color-store-ink)] transition-transform hover:-translate-y-1"
+                            className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border border-solid border-store-line bg-white shadow-sm transition-transform hover:-translate-y-1"
                             data-category="prepared"
                             style={{
                                 display:
                                     category === 'all' || category === 'prepared' ? 'flex' : 'none',
                             }}
                         >
-                            <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[50px]">
+                            <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b border-solid border-store-line bg-surface-green text-[50px]">
                                 <div className="absolute top-3 left-3 flex gap-1.5" style={{ zIndex: '3' }}>
-                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-pink px-2.5 py-[3px] text-[11px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">{t('landing.catalog.preparedBadge')}</span>
+                                    <span className="rounded-full border-[1.5px] border-solid border-store-ink bg-store-pink px-2.5 py-[3px] text-[11px] font-extrabold text-store-ink shadow-none">{t('landing.catalog.preparedBadge')}</span>
                                 </div>
                                 <div className="svg-bg-watermark watermark-center">
                                     <svg
@@ -437,7 +437,7 @@ export default function LandingCatalog({
                                 </div>
                                 <button
                                     type="button"
-                                    className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
+                                    className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-solid border-store-line px-6 py-3 font-body text-[15px] font-bold no-underline shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm bg-store-yellow text-store-ink"
                                     data-item={t('landing.catalog.beefBallName')}
                                     style={{
                                         width: '100%',
@@ -452,7 +452,7 @@ export default function LandingCatalog({
                             </div>
                         </div>
                         <div
-                            className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream shadow-[5px_5px_0_var(--color-store-ink)] transition-transform hover:-translate-y-1"
+                            className="flex flex-col overflow-hidden rounded-[var(--radius-md)] border border-solid border-store-line bg-white shadow-sm transition-transform hover:-translate-y-1"
                             data-category="bakery"
                             style={{
                                 display:
@@ -460,7 +460,7 @@ export default function LandingCatalog({
                             }}
                         >
 
-                            <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b-[2.5px] border-solid border-store-ink bg-store-cream text-[50px]">
+                            <div className="has-svg-bg relative flex h-[155px] items-center justify-center border-b border-solid border-store-line bg-surface-green text-[50px]">
                                 <div className="svg-bg-watermark watermark-center">
                                     <svg
                                         viewBox="0 0 24 24"
@@ -515,7 +515,7 @@ export default function LandingCatalog({
                                 </div>
                                 <button
                                     type="button"
-                                    className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)]"
+                                    className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-solid border-store-line px-6 py-3 font-body text-[15px] font-bold no-underline shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm"
                                     disabled
                                     style={{
                                         width: '100%',
@@ -559,13 +559,13 @@ export default function LandingCatalog({
                             </div>
                             <div style={{ fontSize: '13.5px', color: 'var(--text-body)' }}>
                                 {t('landing.catalog.requestStart')}{' '}
-                                <strong>Logistics Staff</strong>
+                                <strong>Bite to Business</strong>
                                 {' '}{t('landing.catalog.requestEnd')}
                             </div>
                         </div>
                         <button
                             type="button"
-                            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-cream text-store-ink hover:bg-store-yellow"
+                            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-solid border-store-line px-6 py-3 font-body text-[15px] font-bold no-underline shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm bg-store-cream text-store-ink hover:bg-store-yellow"
                             id="btnRequestNewProduct"
                             style={{ padding: '9px 18px', fontSize: '13px' }}
                             onClick={() =>
@@ -578,7 +578,7 @@ export default function LandingCatalog({
                         </button>
                     </div>
                     <div
-                        className="hidden overflow-x-auto rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream shadow-[5px_5px_0_var(--color-store-ink)]"
+                        className="hidden overflow-x-auto rounded-[var(--radius-md)] border border-solid border-store-line bg-store-cream shadow-sm"
                         id="productTableContainer"
                         style={{ display: view === 'table' ? 'block' : 'none' }}
                     >
@@ -615,7 +615,7 @@ export default function LandingCatalog({
                                     <td>
                                         <button
                                             type="button"
-                                            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
+                                            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-solid border-store-line px-6 py-3 font-body text-[15px] font-bold no-underline shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm bg-store-yellow text-store-ink"
                                             data-item={t('landing.catalog.porkBulkName')}
                                             style={{ padding: '6px 14px', fontSize: '12px' }}
                                             onClick={() =>
@@ -647,7 +647,7 @@ export default function LandingCatalog({
                                     <td>
                                         <button
                                             type="button"
-                                            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
+                                            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-solid border-store-line px-6 py-3 font-body text-[15px] font-bold no-underline shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm bg-store-yellow text-store-ink"
                                             data-item={t('landing.catalog.springRollBulkName')}
                                             style={{ padding: '6px 14px', fontSize: '12px' }}
                                             onClick={() =>
@@ -679,7 +679,7 @@ export default function LandingCatalog({
                                     <td>
                                         <button
                                             type="button"
-                                            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
+                                            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-solid border-store-line px-6 py-3 font-body text-[15px] font-bold no-underline shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm bg-store-yellow text-store-ink"
                                             data-item={t('landing.catalog.beefBallBulkName')}
                                             style={{ padding: '6px 14px', fontSize: '12px' }}
                                             onClick={() => onAddToQuote('landing.catalog.beefBallBulkName')}
