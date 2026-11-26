@@ -62,9 +62,10 @@ export default function ApiDiagnosticsPanel({ hours }: { hours: number }) {
                 <>
                     <header className="system-panel-heading">
                         <h3>{label('errors')}</h3>
-                        <label className="monitoring-range">
+                        <label className="flex items-center gap-2 text-xs">
                             {label('http')}
                             <select
+                                className="rounded-[3px] border border-solid border-black bg-white p-2.5"
                                 value={family}
                                 onChange={(event) => setFamily(event.target.value)}
                             >
@@ -75,7 +76,7 @@ export default function ApiDiagnosticsPanel({ hours }: { hours: number }) {
                         </label>
                     </header>
                     <div className="system-table-scroll">
-                        <table className="system-log-table monitoring-log-table">
+                        <table className="system-log-table [&_td]:border-t [&_td]:[border-top-style:solid] [&_td]:border-store-line [&_td]:px-6 [&_td]:py-3.5 [&_td]:text-xs [&_td]:wrap-anywhere">
                             <thead>
                                 <tr>
                                     {['route', 'http', 'source', 'count', 'last'].map((key) => (
@@ -119,7 +120,7 @@ export default function ApiDiagnosticsPanel({ hours }: { hours: number }) {
                         <h3>{label('slowest')}</h3>
                     </header>
                     <div className="system-table-scroll">
-                        <table className="system-log-table monitoring-log-table">
+                        <table className="system-log-table [&_td]:border-t [&_td]:[border-top-style:solid] [&_td]:border-store-line [&_td]:px-6 [&_td]:py-3.5 [&_td]:text-xs [&_td]:wrap-anywhere">
                             <thead>
                                 <tr>
                                     {['route', 'count', 'avg', 'p95'].map((key) => (
