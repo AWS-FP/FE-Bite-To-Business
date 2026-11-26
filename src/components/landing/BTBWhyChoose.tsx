@@ -1,68 +1,115 @@
-import EditorialPhoto from './EditorialPhoto';
-import { Link } from 'react-router-dom';
-import { ROUTES } from '@/router/routes';
-import { useLandingAudience } from '@/hooks/useLandingAudience';
-import { useTranslation } from 'react-i18next';
 
-const advantages = ['01', '02', '03', '04', '05', '06'];
+import { useTranslation } from 'react-i18next';
+import EditorialPhoto from './EditorialPhoto';
+
+const benefits = [
+    { id: 'catalog', icon: 'list-svgrepo-com.svg' },
+    { id: 'pricing', icon: 'cashier-svgrepo-com.svg' },
+    { id: 'stock', icon: 'check.svg' },
+    { id: 'delivery', icon: 'landingpainpoints-icon-2.svg' },
+    { id: 'history', icon: 'history-svgrepo-com.svg' },
+    { id: 'direct', icon: 'cart-large-svgrepo-com.svg' },
+] as const;
+
+const audiences = [
+    { id: 'business', photo: 'kitchen' },
+    { id: 'personal', photo: 'vegetables' },
+] as const;
 
 export default function BTBWhyChoose() {
-    const { audience } = useLandingAudience();
     const { t } = useTranslation('storefront');
-    const isBusiness = audience === 'business';
+    const prefix = 'introPages.aboutV2.why';
 
     return (
         <>
-            <section className="py-18 sm:py-24" aria-labelledby="btb-why-title">
-                <div className="mx-auto max-w-[1240px] px-6 md:px-8">
-                    <div className="grid gap-6 lg:grid-cols-[.9fr_1.1fr] lg:items-end lg:gap-20">
-                        <div>
-                            <span className="font-label text-xs font-semibold tracking-[.16em] text-store-green uppercase">{t('introPages.why.eyebrow')}</span>
-                            <h2 id="btb-why-title" className="mt-4 font-heading text-[clamp(2rem,3.5vw,3.35rem)] leading-[1.3] tracking-[-.04em] text-store-ink">
-                                {t('introPages.why.heading')} <em className="not-italic text-store-coral">{t('introPages.why.highlight')}</em>
-                            </h2>
-                        </div>
-                        <p className="max-w-[590px] border-l-2 border-store-coral pl-6 text-[15px] leading-[1.95] text-store-muted sm:text-[16px]">{t('introPages.why.description')}</p>
+            {/* Customer benefits */}
+            <section className="bg-store-cream px-5 py-14 sm:py-20">
+                <div className="mx-auto max-w-[1320px]">
+                    <div className="mb-10 max-w-3xl">
+                        <h2 className="font-heading text-3xl font-bold tracking-tight text-store-green sm:text-4xl">
+                            {t(`${prefix}.benefitsTitle`)}
+                        </h2>
+
+                        <p className="mt-4 text-base leading-relaxed text-store-muted">
+                            {t(`${prefix}.benefitsIntro`)}
+                        </p>
                     </div>
-                    <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {advantages.map((number, index) => (
-                            <article key={number} className="group relative flex min-h-[238px] flex-col overflow-hidden rounded-[22px] border border-store-line bg-white p-7 shadow-[0_10px_28px_rgba(20,19,43,0.04)] transition duration-300 hover:-translate-y-1.5 hover:border-store-green/60 hover:shadow-[0_18px_34px_rgba(20,19,43,0.10)]">
-                                <div aria-hidden="true" className={`absolute top-0 right-0 h-1.5 w-full ${index % 3 === 0 ? 'bg-store-yellow' : index % 3 === 1 ? 'bg-store-mint' : 'bg-store-pink'}`} />
-                                <div className="flex items-center justify-between">
-                                    <span className="font-price text-[15px] font-extrabold tracking-wider text-store-coral">{number} / 06</span>
-                                    <span aria-hidden="true" className="grid size-9 place-items-center rounded-full bg-store-cream text-lg text-store-green transition group-hover:bg-store-green group-hover:text-white">↗</span>
+
+                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                        {benefits.map(({ id, icon }) => (
+                            <article
+                                key={id}
+                                className="group rounded-2xl border border-store-line bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-store-green/30 hover:shadow-lg"
+                            >
+                                <div className="flex size-14 items-center justify-center rounded-xl bg-surface-green transition-colors group-hover:bg-store-yellow">
+                                    <img
+                                        src={`/icons/${icon}`}
+                                        alt=""
+                                        aria-hidden="true"
+                                        className="size-7 object-contain"
+                                        loading="lazy"
+                                    />
                                 </div>
-                                <h3 className="mt-7 max-w-[285px] font-display text-[19px] leading-[1.35] font-bold tracking-tight text-store-ink">{t(`introPages.why.benefits.${index}.title`)}</h3>
-                                <p className="mt-3 text-[13px] leading-[1.85] text-store-muted">{t(`introPages.why.benefits.${index}.description`)}</p>
+
+                                <h3 className="mt-6 text-xl font-bold leading-snug text-store-green">
+                                    {t(`${prefix}.benefits.${id}.title`)}
+                                </h3>
+
+                                <p className="mt-3 text-sm leading-relaxed text-store-muted sm:text-base">
+                                    {t(`${prefix}.benefits.${id}.text`)}
+                                </p>
                             </article>
                         ))}
                     </div>
                 </div>
             </section>
 
-            <section className="border-y border-store-line bg-[#EAF1E8] py-18 sm:py-22">
-                <div className="mx-auto grid max-w-[1240px] items-center gap-12 px-6 md:px-8 lg:grid-cols-2 lg:gap-20">
-                    <div className="relative order-2 lg:order-1">
-                        <div className="relative overflow-hidden rounded-[28px] bg-store-green shadow-[0_22px_55px_rgba(18,55,42,.15)]">
-                            <EditorialPhoto photo={isBusiness ? 'seafood' : 'produce'} alt={t('introPages.why.imageLabel')} loading="lazy" decoding="async" className="aspect-[5/4] w-full object-cover" />
-                            <div className="absolute inset-0 bg-linear-to-t from-store-dark/55 via-transparent to-transparent" />
-                            <span className="absolute bottom-6 left-6 rounded-full border border-white/35 bg-white/90 px-4 py-2 text-[11px] font-extrabold tracking-[.08em] text-store-green uppercase backdrop-blur-sm">{t(isBusiness ? 'introPages.personal.business' : 'introPages.personal.personal')}</span>
-                        </div>
-                        <div aria-hidden="true" className="absolute -right-4 -bottom-5 -z-10 h-36 w-36 rounded-[28px] bg-store-yellow sm:-right-6" />
-                    </div>
-                    <div className="order-1 lg:order-2">
-                        <span className="font-label text-xs tracking-[.16em] text-store-green uppercase">{t('introPages.why.audienceEyebrow')}</span>
-                        <h2 className="mt-5 font-heading text-[clamp(2rem,3.7vw,3.6rem)] leading-[1.25] tracking-[-.04em]">{t(isBusiness ? 'introPages.why.businessTitle' : 'introPages.why.personalTitle')}</h2>
-                        <p className="mt-6 max-w-[500px] text-[15px] leading-[1.9] text-store-muted">{t(isBusiness ? 'introPages.why.businessDescription' : 'introPages.why.personalDescription')}</p>
-                        <Link className="mt-8 inline-flex items-center gap-3 border-b-2 border-store-green pb-2 text-[13px] font-bold text-store-green transition hover:gap-5" to={ROUTES.BTB_MODEL}>{t('introPages.why.viewModel')} <span aria-hidden="true">↗</span></Link>
-                    </div>
-                </div>
-            </section>
+            {/* Customer groups */}
+            <section className="border-y border-store-line bg-surface-green px-5 py-14 sm:py-20">
+                <div className="mx-auto max-w-[1320px]">
+                    <div className="mx-auto mb-10 max-w-3xl text-center">
+                        <h2 className="font-heading text-3xl font-bold tracking-tight text-store-green sm:text-4xl">
+                            {t(`${prefix}.audiencesTitle`)}
+                        </h2>
 
-            <section className="bg-store-yellow/65 py-6">
-                <div className="mx-auto flex max-w-[1240px] gap-3 px-6 text-[12px] leading-[1.85] text-store-ink/80 md:px-8">
-                    <span aria-hidden="true" className="mt-[1px] text-lg font-black">ⓘ</span>
-                    <p><strong className="font-bold">{t('introPages.why.noticeTitle')}</strong> {t('introPages.why.notice')}</p>
+                        <p className="mt-4 text-base leading-relaxed text-store-muted">
+                            {t(`${prefix}.audiencesIntro`)}
+                        </p>
+                    </div>
+
+                    <div className="grid gap-6 md:grid-cols-2">
+                        {audiences.map(({ id, photo }) => (
+                            <article
+                                key={id}
+                                className="group overflow-hidden rounded-3xl border border-store-line bg-white shadow-sm"
+                            >
+                                <div className="relative h-60 overflow-hidden sm:h-72">
+                                    <EditorialPhoto
+                                        photo={photo}
+                                        alt={t(`${prefix}.audiences.${id}.imageAlt`)}
+                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        loading="lazy"
+                                    />
+
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+
+                                    <span className="absolute right-4 top-4 rounded-full bg-store-dark/85 px-3 py-1.5 text-xs text-white">
+                                        {t('landing.carousel.illustration')}
+                                    </span>
+                                </div>
+
+                                <div className="p-7 sm:p-9">
+                                    <h3 className="text-2xl font-bold text-store-green">
+                                        {t(`${prefix}.audiences.${id}.title`)}
+                                    </h3>
+
+                                    <p className="mt-4 text-base leading-relaxed text-store-muted">
+                                        {t(`${prefix}.audiences.${id}.text`)}
+                                    </p>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
                 </div>
             </section>
         </>
