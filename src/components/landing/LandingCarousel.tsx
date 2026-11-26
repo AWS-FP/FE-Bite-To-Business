@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next';
+import { useAuthStore } from '@/store/admin/authStore';
 import BtbImagePlaceholder from './BtbImagePlaceholder';
 /* Generated from the supplied HTML layout. Edit this section independently. */
 import { useEffect, useRef, useState } from 'react';
 export default function LandingCarousel() {
     const { t } = useTranslation('storefront');
+    const isLoggedIn = useAuthStore((state) => Boolean(state.session?.user));
     const [slide, setSlide] = useState(0);
     const [progress, setProgress] = useState(0);
     const [playing, setPlaying] = useState(true);
@@ -27,7 +29,7 @@ export default function LandingCarousel() {
     }, [playing]);
     return (
         <div className="mb-8 text-left">
-            <div className="relative h-[570px] w-full overflow-hidden sm:h-[520px] lg:h-[500px] rounded-[var(--radius-lg)] border-[3px] border-solid border-store-ink bg-store-ink shadow-[8px_8px_0_var(--color-store-ink)]" id="heroCarouselViewport">
+            <div className="relative h-[650px] w-full overflow-hidden sm:h-[570px] lg:h-[500px] rounded-[var(--radius-lg)] border border-solid border-store-line bg-store-dark shadow-sm" id="heroCarouselViewport">
                 <span className="pointer-events-none absolute top-9 right-5 z-[25] rounded-full bg-black/45 px-3 py-1 text-[10px] font-semibold tracking-wide text-white/85 backdrop-blur-sm">{t('landing.carousel.illustration')}</span>
                 <div className="absolute top-4 right-5 left-5 z-20 grid grid-cols-5 gap-2">
                     <div
@@ -142,14 +144,14 @@ export default function LandingCarousel() {
                     </div>
                 </div>
                 <div className="pointer-events-none absolute top-8 right-6 left-6 z-20 flex items-center justify-between">
-                    <div className="pointer-events-auto inline-flex items-center gap-2 rounded-full border-2 border-solid border-store-yellow bg-store-ink px-3.5 py-1.5 text-xs font-bold text-store-cream shadow-[3px_3px_0_var(--color-store-ink)]">
+                    <div className="pointer-events-auto inline-flex items-center gap-2 rounded-full border-2 border-solid border-store-yellow bg-store-ink px-3.5 py-1.5 text-xs font-bold text-store-cream shadow-sm">
                         <span className="h-2 w-2 rounded-full bg-[var(--green-ok)] shadow-[0_0_0_4px_color-mix(in_srgb,var(--color-status-active)_25%,transparent)]"></span>
                         <span id="carouselStatusText">{t('landing.carousel.status', { current: String(slide + 1).padStart(2, '0'), total: '05' })}</span>
                     </div>
                 </div>
                 <button
                     type="button"
-                    className="absolute top-1/2 left-[18px] z-[25] flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-[2.5px] border-solid border-store-ink bg-store-yellow text-[22px] font-extrabold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-transform hover:scale-[1.06] hover:bg-store-coral hover:text-white"
+                    className="absolute top-[42%] left-2 sm:top-1/2 sm:left-[18px] z-[25] flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-solid border-store-line bg-store-cream text-[22px] font-extrabold text-store-ink shadow-sm transition-transform hover:scale-[1.06] hover:bg-store-coral hover:text-white"
                     id="btnPrevSlide"
                     aria-label={t('landing.carousel.previous')}
                     onClick={() => changeSlide(slide - 1)}
@@ -158,12 +160,12 @@ export default function LandingCarousel() {
                         src="/icons/chevron-left.svg"
                         alt=""
                         aria-hidden="true"
-                        className="btb-ui-icon"
+                        className="h-4 w-4 shrink-0 object-contain"
                     />
                 </button>
                 <button
                     type="button"
-                    className="absolute top-1/2 right-[18px] z-[25] flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-[2.5px] border-solid border-store-ink bg-store-yellow text-[22px] font-extrabold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-transform hover:scale-[1.06] hover:bg-store-coral hover:text-white"
+                    className="absolute top-[42%] right-2 sm:top-1/2 sm:right-[18px] z-[25] flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-solid border-store-line bg-store-cream text-[22px] font-extrabold text-store-ink shadow-sm transition-transform hover:scale-[1.06] hover:bg-store-coral hover:text-white"
                     id="btnNextSlide"
                     aria-label={t('landing.carousel.next')}
                     onClick={() => changeSlide(slide + 1)}
@@ -172,7 +174,7 @@ export default function LandingCarousel() {
                         src="/icons/chevron-right.svg"
                         alt=""
                         aria-hidden="true"
-                        className="btb-ui-icon"
+                        className="h-4 w-4 shrink-0 object-contain"
                     />
                 </button>
                 <div
@@ -183,9 +185,9 @@ export default function LandingCarousel() {
                     <div className={'group relative flex h-full w-1/5 items-end overflow-hidden' + (slide === 0 ? ' active' : '')}>
                         <BtbImagePlaceholder className="absolute inset-0 h-full w-full scale-[1.02] object-cover transition-transform duration-[5000ms] ease-out group-[.active]:scale-[1.11]" label={t('landing.carousel.warehouseAlt')} photo="warehouse" />
                         <div className="absolute inset-0 z-[2] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-store-ink)_30%,transparent)_0%,color-mix(in_srgb,var(--color-store-ink)_15%,transparent)_40%,color-mix(in_srgb,var(--color-store-green)_88%,transparent)_85%,color-mix(in_srgb,var(--color-store-ink)_96%,transparent)_100%)]"></div>
-                        <div className="relative z-[5] flex w-full flex-wrap items-end justify-between gap-7 pt-12 pr-6 pb-7 pl-6 sm:pr-[76px] sm:pb-9 sm:pl-10 text-white">
+                        <div className="relative z-[5] flex w-full flex-wrap items-end justify-between gap-7 pt-12 pr-6 pb-20 pl-6 sm:pr-[76px] sm:pb-16 sm:pl-10 text-white">
                             <div className="max-w-[640px]">
-                                <span className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3 py-1 font-label text-xs font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">
+                                <span className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3 py-1 font-label text-xs font-extrabold text-store-ink shadow-none">
                                     {t('landing.carousel.warehouseScene')}
                                 </span>
                                 <h2 className="mb-2.5 font-subheading text-[clamp(24px,3vw,34px)] font-normal leading-[1.22] text-store-cream">
@@ -195,8 +197,8 @@ export default function LandingCarousel() {
                                     {t('landing.carousel.warehouseDescription')}
                                 </p>
                             </div>
-                            <div className="relative min-w-[280px] max-w-[340px] rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-4 text-store-ink shadow-[6px_6px_0_var(--color-store-ink)]">
-                                <span className="absolute -top-[11px] right-3.5 rotate-2 rounded border-2 border-solid border-store-ink bg-store-pink px-2.5 py-0.5 text-[10px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">Real-time Stock</span>
+                            <div className="relative w-full max-w-[340px] rounded-[var(--radius-md)] border border-solid border-store-line bg-store-cream px-5 py-4 text-store-ink shadow-sm">
+                                <span className="absolute -top-[11px] right-3.5 rotate-2 rounded border-2 border-solid border-store-ink bg-store-pink px-2.5 py-0.5 text-[10px] font-extrabold text-store-ink shadow-none">Real-time Stock</span>
                                 <div
                                     style={{
                                         fontSize: '11px',
@@ -226,9 +228,9 @@ export default function LandingCarousel() {
                     <div className={'group relative flex h-full w-1/5 items-end overflow-hidden' + (slide === 1 ? ' active' : '')}>
                         <BtbImagePlaceholder className="absolute inset-0 h-full w-full scale-[1.02] object-cover transition-transform duration-[5000ms] ease-out group-[.active]:scale-[1.11]" label={t('landing.carousel.coldStorageAlt')} photo="seafood" />
                         <div className="absolute inset-0 z-[2] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-store-ink)_30%,transparent)_0%,color-mix(in_srgb,var(--color-store-ink)_15%,transparent)_40%,color-mix(in_srgb,var(--color-store-green)_88%,transparent)_85%,color-mix(in_srgb,var(--color-store-ink)_96%,transparent)_100%)]"></div>
-                        <div className="relative z-[5] flex w-full flex-wrap items-end justify-between gap-7 pt-12 pr-6 pb-7 pl-6 sm:pr-[76px] sm:pb-9 sm:pl-10 text-white">
+                        <div className="relative z-[5] flex w-full flex-wrap items-end justify-between gap-7 pt-12 pr-6 pb-20 pl-6 sm:pr-[76px] sm:pb-16 sm:pl-10 text-white">
                             <div className="max-w-[640px]">
-                                <span className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3 py-1 font-label text-xs font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">
+                                <span className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3 py-1 font-label text-xs font-extrabold text-store-ink shadow-none">
                                     {t('landing.carousel.coldScene')}
                                 </span>
                                 <h2 className="mb-2.5 font-subheading text-[clamp(24px,3vw,34px)] font-normal leading-[1.22] text-store-cream">
@@ -238,9 +240,9 @@ export default function LandingCarousel() {
                                     {t('landing.carousel.coldDescription')}
                                 </p>
                             </div>
-                            <div className="relative min-w-[280px] max-w-[340px] rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-4 text-store-ink shadow-[6px_6px_0_var(--color-store-ink)]">
+                            <div className="relative w-full max-w-[340px] rounded-[var(--radius-md)] border border-solid border-store-line bg-store-cream px-5 py-4 text-store-ink shadow-sm">
                                 <span
-                                    className="absolute -top-[11px] right-3.5 rotate-2 rounded border-2 border-solid border-store-ink bg-store-pink px-2.5 py-0.5 text-[10px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]"
+                                    className="absolute -top-[11px] right-3.5 rotate-2 rounded border-2 border-solid border-store-ink bg-store-pink px-2.5 py-0.5 text-[10px] font-extrabold text-store-ink shadow-none"
                                     style={{ background: 'var(--yellow-soft)' }}
                                 >
                                     {t('landing.carousel.haccp')}
@@ -274,9 +276,9 @@ export default function LandingCarousel() {
                     <div className={'group relative flex h-full w-1/5 items-end overflow-hidden' + (slide === 2 ? ' active' : '')}>
                         <BtbImagePlaceholder className="absolute inset-0 h-full w-full scale-[1.02] object-cover transition-transform duration-[5000ms] ease-out group-[.active]:scale-[1.11]" label={t('landing.carousel.ingredientsAlt')} photo="market" />
                         <div className="absolute inset-0 z-[2] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-store-ink)_30%,transparent)_0%,color-mix(in_srgb,var(--color-store-ink)_15%,transparent)_40%,color-mix(in_srgb,var(--color-store-green)_88%,transparent)_85%,color-mix(in_srgb,var(--color-store-ink)_96%,transparent)_100%)]"></div>
-                        <div className="relative z-[5] flex w-full flex-wrap items-end justify-between gap-7 pt-12 pr-6 pb-7 pl-6 sm:pr-[76px] sm:pb-9 sm:pl-10 text-white">
+                        <div className="relative z-[5] flex w-full flex-wrap items-end justify-between gap-7 pt-12 pr-6 pb-20 pl-6 sm:pr-[76px] sm:pb-16 sm:pl-10 text-white">
                             <div className="max-w-[640px]">
-                                <span className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3 py-1 font-label text-xs font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">
+                                <span className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3 py-1 font-label text-xs font-extrabold text-store-ink shadow-none">
                                     {t('landing.carousel.foodScene')}
                                 </span>
                                 <h2 className="mb-2.5 font-subheading text-[clamp(24px,3vw,34px)] font-normal leading-[1.22] text-store-cream">
@@ -286,8 +288,8 @@ export default function LandingCarousel() {
                                     {t('landing.carousel.foodDescription')}
                                 </p>
                             </div>
-                            <div className="relative min-w-[280px] max-w-[340px] rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-4 text-store-ink shadow-[6px_6px_0_var(--color-store-ink)]">
-                                <span className="absolute -top-[11px] right-3.5 rotate-2 rounded border-2 border-solid border-store-ink bg-store-pink px-2.5 py-0.5 text-[10px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">{t('landing.carousel.poster')}</span>
+                            <div className="relative w-full max-w-[340px] rounded-[var(--radius-md)] border border-solid border-store-line bg-store-cream px-5 py-4 text-store-ink shadow-sm">
+                                <span className="absolute -top-[11px] right-3.5 rotate-2 rounded border-2 border-solid border-store-ink bg-store-pink px-2.5 py-0.5 text-[10px] font-extrabold text-store-ink shadow-none">{t('landing.carousel.poster')}</span>
                                 <div
                                     style={{
                                         fontSize: '11px',
@@ -306,11 +308,10 @@ export default function LandingCarousel() {
                                         marginBottom: '6px',
                                     }}
                                 >
-                                    Volume Pricing + Sale + Coupon
+                                    {t('landing.carousel.offerTitle')}
                                 </div>
                                 <div style={{ fontSize: '12.5px', color: 'var(--text-body)' }}>
-                                    {t('landing.carousel.stackedDescription')}{' '}
-                                    <code>MDFOOD10</code>.
+                                    {t('landing.carousel.stackedDescription')}
                                 </div>
                             </div>
                         </div>
@@ -318,9 +319,9 @@ export default function LandingCarousel() {
                     <div className={'group relative flex h-full w-1/5 items-end overflow-hidden' + (slide === 3 ? ' active' : '')}>
                         <BtbImagePlaceholder className="absolute inset-0 h-full w-full scale-[1.02] object-cover transition-transform duration-[5000ms] ease-out group-[.active]:scale-[1.11]" label={t('landing.carousel.deliveryAlt')} photo="warehouse" />
                         <div className="absolute inset-0 z-[2] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-store-ink)_30%,transparent)_0%,color-mix(in_srgb,var(--color-store-ink)_15%,transparent)_40%,color-mix(in_srgb,var(--color-store-green)_88%,transparent)_85%,color-mix(in_srgb,var(--color-store-ink)_96%,transparent)_100%)]"></div>
-                        <div className="relative z-[5] flex w-full flex-wrap items-end justify-between gap-7 pt-12 pr-6 pb-7 pl-6 sm:pr-[76px] sm:pb-9 sm:pl-10 text-white">
+                        <div className="relative z-[5] flex w-full flex-wrap items-end justify-between gap-7 pt-12 pr-6 pb-20 pl-6 sm:pr-[76px] sm:pb-16 sm:pl-10 text-white">
                             <div className="max-w-[640px]">
-                                <span className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3 py-1 font-label text-xs font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]">
+                                <span className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border-2 border-solid border-store-ink bg-store-yellow px-3 py-1 font-label text-xs font-extrabold text-store-ink shadow-none">
                                     {t('landing.carousel.deliveryScene')}
                                 </span>
                                 <h2 className="mb-2.5 font-subheading text-[clamp(24px,3vw,34px)] font-normal leading-[1.22] text-store-cream">
@@ -330,9 +331,9 @@ export default function LandingCarousel() {
                                     {t('landing.carousel.deliveryDescription')}
                                 </p>
                             </div>
-                            <div className="relative min-w-[280px] max-w-[340px] rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-4 text-store-ink shadow-[6px_6px_0_var(--color-store-ink)]">
+                            <div className="relative w-full max-w-[340px] rounded-[var(--radius-md)] border border-solid border-store-line bg-store-cream px-5 py-4 text-store-ink shadow-sm">
                                 <span
-                                    className="absolute -top-[11px] right-3.5 rotate-2 rounded border-2 border-solid border-store-ink bg-store-pink px-2.5 py-0.5 text-[10px] font-extrabold text-store-ink shadow-[2px_2px_0_var(--color-store-ink)]"
+                                    className="absolute -top-[11px] right-3.5 rotate-2 rounded border-2 border-solid border-store-ink bg-store-pink px-2.5 py-0.5 text-[10px] font-extrabold text-store-ink shadow-none"
                                     style={{
                                         background: 'var(--green-soft-bg)',
                                         color: 'var(--forest)',
@@ -348,7 +349,7 @@ export default function LandingCarousel() {
                                         marginBottom: '4px',
                                     }}
                                 >
-                                    VIETMAP ROUTE &amp; ETA
+                                    {t('landing.carousel.routeLabel')}
                                 </div>
                                 <div
                                     style={{
@@ -369,7 +370,7 @@ export default function LandingCarousel() {
                     <div className={'group relative flex h-full w-1/5 items-end overflow-hidden' + (slide === 4 ? ' active' : '')}>
                         <div className="relative z-[5] flex h-full w-full flex-col items-center justify-center bg-store-cream px-6 py-10 text-center text-store-ink">
                             <span
-                                className="mb-[18px] inline-flex items-center gap-2 rounded-full border-2 border-solid border-store-ink bg-store-yellow px-4 py-1.5 text-[13px] font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)]"
+                                className="mb-[18px] inline-flex items-center gap-2 rounded-full border-2 border-solid border-store-ink bg-store-yellow px-4 py-1.5 text-[13px] font-bold text-store-ink shadow-sm"
                                 style={{
                                     background: 'var(--green-soft-bg)',
                                     color: 'var(--forest)',
@@ -387,7 +388,7 @@ export default function LandingCarousel() {
                                 <div className="font-heading text-[clamp(36px,5vw,58px)] font-bold leading-none tracking-[0.02em] text-store-ink">BITE TO BUSINESS</div>
                             </div>
                             <div className="mb-[18px] font-body text-[clamp(18px,2.4vw,26px)] font-extrabold tracking-[0.12em] text-store-coral">
-                                HACCP CODEX &amp; AI A2UI PLATFORM 2026
+                                {t('landing.carousel.brandTagline')}
                             </div>
                             <p
                                 style={{
@@ -407,10 +408,10 @@ export default function LandingCarousel() {
                                     justifyContent: 'center',
                                 }}
                             >
-                                <a href="#onboarding-cta" className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white">
-                                    {t('landing.carousel.openAccount')}{' '}
+                                <a href={isLoggedIn ? "#categories" : "#onboarding-cta"} className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-solid border-store-line px-6 py-3 font-body text-[15px] font-bold no-underline shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm bg-store-yellow text-store-ink">
+                                    {t(isLoggedIn ? 'introPages.hero.catalog' : 'landing.carousel.openAccount')}{' '}
                                     <img
-                                        className="btb-ui-icon"
+                                        className="h-4 w-4 shrink-0 object-contain"
                                         src="/icons/arrow-right.svg"
                                         alt=""
                                         aria-hidden="true"
@@ -418,7 +419,7 @@ export default function LandingCarousel() {
                                 </a>
                                 <button
                                     type="button"
-                                    className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-cream text-store-ink hover:bg-store-yellow"
+                                    className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-solid border-store-line px-6 py-3 font-body text-[15px] font-bold no-underline shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm bg-store-cream text-store-ink hover:bg-store-yellow"
                                     id="btnReplayCarousel"
                                     onClick={() => {
                                         setPlaying(true);
@@ -426,7 +427,7 @@ export default function LandingCarousel() {
                                     }}
                                 >
                                     <img
-                                        className="btb-ui-icon"
+                                        className="h-4 w-4 shrink-0 object-contain"
                                         src="/icons/rotate-ccw.svg"
                                         alt=""
                                         aria-hidden="true"
@@ -437,17 +438,17 @@ export default function LandingCarousel() {
                         </div>
                     </div>
                 </div>
-                <div className="absolute right-6 bottom-6 z-[25] flex items-center gap-2.5">
+                <div className="absolute right-4 bottom-4 z-[25] flex items-center gap-2.5">
                     <button
                         type="button"
-                        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-2 border-solid border-store-ink bg-store-cream text-[15px] text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors hover:bg-store-coral hover:text-white"
+                        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-2 border-solid border-store-ink bg-store-cream text-[15px] text-store-ink shadow-sm transition-colors hover:bg-store-coral hover:text-white"
                         id="btnPlayPauseCarousel"
                         title={t('landing.carousel.playPause')}
                         aria-label={t('landing.carousel.playPause')}
                         onClick={() => setPlaying((v) => !v)}
                     >
                         <img
-                            className="btb-ui-icon"
+                            className="h-4 w-4 shrink-0 object-contain"
                             src={playing ? '/icons/pause.svg' : '/icons/play.svg'}
                             alt=""
                             aria-hidden="true"
@@ -455,7 +456,7 @@ export default function LandingCarousel() {
                     </button>
                     <button
                         type="button"
-                        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-2 border-solid border-store-ink bg-store-cream text-[15px] text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors hover:bg-store-coral hover:text-white"
+                        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-2 border-solid border-store-ink bg-store-cream text-[15px] text-store-ink shadow-sm transition-colors hover:bg-store-coral hover:text-white"
                         id="btnMuteCarousel"
                         disabled
                         title={t('landing.carousel.muted')}
@@ -465,15 +466,15 @@ export default function LandingCarousel() {
                             src="/icons/volume-off.svg"
                             alt=""
                             aria-hidden="true"
-                            className="btb-ui-icon"
+                            className="h-4 w-4 shrink-0 object-contain"
                         />
                     </button>
                 </div>
             </div>
-            <div className="mt-3.5 grid grid-cols-5 gap-2.5">
+            <div className="mt-3.5 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
                 <button
                     type="button"
-                    className={'flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border-[2.5px] border-solid border-store-ink bg-store-cream px-3 py-2.5 text-left font-body text-[12.5px] font-bold text-store-ink shadow-[5px_5px_0_var(--color-store-ink)] transition-colors hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:bg-store-coral [&.active]:text-white' + (slide === 0 ? ' active' : '')}
+                    className={'flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border border-solid border-store-line bg-store-cream px-3 py-2.5 text-left font-body text-[12.5px] font-bold text-store-ink shadow-sm transition-colors hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:bg-store-yellow [&.active]:text-store-ink' + (slide === 0 ? ' active' : '')}
                     data-chapter="0"
                     onClick={() => changeSlide(0)}
                 >
@@ -482,7 +483,7 @@ export default function LandingCarousel() {
                 </button>
                 <button
                     type="button"
-                    className={'flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border-[2.5px] border-solid border-store-ink bg-store-cream px-3 py-2.5 text-left font-body text-[12.5px] font-bold text-store-ink shadow-[5px_5px_0_var(--color-store-ink)] transition-colors hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:bg-store-coral [&.active]:text-white' + (slide === 1 ? ' active' : '')}
+                    className={'flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border border-solid border-store-line bg-store-cream px-3 py-2.5 text-left font-body text-[12.5px] font-bold text-store-ink shadow-sm transition-colors hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:bg-store-yellow [&.active]:text-store-ink' + (slide === 1 ? ' active' : '')}
                     data-chapter="1"
                     onClick={() => changeSlide(1)}
                 >
@@ -491,7 +492,7 @@ export default function LandingCarousel() {
                 </button>
                 <button
                     type="button"
-                    className={'flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border-[2.5px] border-solid border-store-ink bg-store-cream px-3 py-2.5 text-left font-body text-[12.5px] font-bold text-store-ink shadow-[5px_5px_0_var(--color-store-ink)] transition-colors hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:bg-store-coral [&.active]:text-white' + (slide === 2 ? ' active' : '')}
+                    className={'flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border border-solid border-store-line bg-store-cream px-3 py-2.5 text-left font-body text-[12.5px] font-bold text-store-ink shadow-sm transition-colors hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:bg-store-yellow [&.active]:text-store-ink' + (slide === 2 ? ' active' : '')}
                     data-chapter="2"
                     onClick={() => changeSlide(2)}
                 >
@@ -500,7 +501,7 @@ export default function LandingCarousel() {
                 </button>
                 <button
                     type="button"
-                    className={'flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border-[2.5px] border-solid border-store-ink bg-store-cream px-3 py-2.5 text-left font-body text-[12.5px] font-bold text-store-ink shadow-[5px_5px_0_var(--color-store-ink)] transition-colors hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:bg-store-coral [&.active]:text-white' + (slide === 3 ? ' active' : '')}
+                    className={'flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border border-solid border-store-line bg-store-cream px-3 py-2.5 text-left font-body text-[12.5px] font-bold text-store-ink shadow-sm transition-colors hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:bg-store-yellow [&.active]:text-store-ink' + (slide === 3 ? ' active' : '')}
                     data-chapter="3"
                     onClick={() => changeSlide(3)}
                 >
@@ -509,7 +510,7 @@ export default function LandingCarousel() {
                 </button>
                 <button
                     type="button"
-                    className={'flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border-[2.5px] border-solid border-store-ink bg-store-cream px-3 py-2.5 text-left font-body text-[12.5px] font-bold text-store-ink shadow-[5px_5px_0_var(--color-store-ink)] transition-colors hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:bg-store-coral [&.active]:text-white' + (slide === 4 ? ' active' : '')}
+                    className={'flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border border-solid border-store-line bg-store-cream px-3 py-2.5 text-left font-body text-[12.5px] font-bold text-store-ink shadow-sm transition-colors hover:-translate-y-0.5 hover:bg-store-yellow [&.active]:bg-store-yellow [&.active]:text-store-ink' + (slide === 4 ? ' active' : '')}
                     data-chapter="4"
                     onClick={() => changeSlide(4)}
                 >
