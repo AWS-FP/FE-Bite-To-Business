@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { RefreshCw } from 'lucide-react';
+import {
+    Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis,
+} from 'recharts';
 import AdminButton from './AdminButton';
 import { getSystemMonitoring } from '@/services/admin/systemService';
 import { useAuthStore } from '@/store/admin/authStore';
@@ -276,16 +279,21 @@ function MetricChart({
     const { t, i18n } = useTranslation('admin');
     const from = Date.parse(data.from);
     const to = Date.parse(data.to);
-    const bucketCount = 24;
-    const step = (to - from) / bucketCount;
-    const points = metricPoints(data, id).filter((point) => Date.parse(point.time) >= from);
-    const buckets = Array.from({ length: bucketCount }, (_, index) => ({
-        time: new Date(from + index * step).toISOString(),
-        value: total(
-            points.filter((point) => Math.floor((Date.parse(point.time) - from) / step) === index),
-        ),
-    }));
-    const max = Math.max(1, ...buckets.map((point) => point.value ?? 0));
+    const points = metricPoints(data, id).filter(
+        (point) => Date.parse(point.time) >= from && Date.parse(point.time) < to,
+    );
+    const values = new Map(points.map((point) => [Date.parse(point.time), point.value]));
+    const buckets: { time: string; timestamp: number; value: number | null }[] = [];
+    for (let timestamp = from; timestamp < to; timestamp += data.periodSeconds * 1000) {
+        buckets.push({
+            time: new Date(timestamp).toISOString(),
+            timestamp,
+            value: values.get(timestamp) ?? null,
+        });
+    }
+    const gauge = ['cpu', 'memory', 'latency'].includes(id);
+    const unit = data.metrics.find((metric) => metric.id === id)?.unit;
+    const suffix = unit === 'percent' ? '%' : unit === 'seconds' ? 's' : '';
     const number = new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 2 });
     return (
         <section className="system-panel">
@@ -298,16 +306,38 @@ function MetricChart({
                 </div>
             ) : (
                 <>
-                    <div className="monitoring-bars" aria-hidden="true">
-                        {buckets.map((point) => (
-                            <div
-                                className={`monitoring-bar ${point.value === undefined ? 'monitoring-bar-missing' : ''}`}
-                                key={point.time}
-                                title={`${date(point.time)} · ${point.value === undefined ? '—' : number.format(point.value)}`}
-                            >
-                                <span style={{ height: `${((point.value ?? 0) / max) * 100}%` }} />
-                            </div>
-                        ))}
+                    <div className="h-64 min-w-0 px-2 pt-4">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                            <ComposedChart data={buckets} accessibilityLayer margin={{ top: 8, right: 16, bottom: 8, left: 8 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#d1dcd5" />
+                                <XAxis
+                                    dataKey="timestamp"
+                                    type="number"
+                                    domain={[from, to]}
+                                    tickFormatter={(value) => date(new Date(Number(value)).toISOString())}
+                                    minTickGap={60}
+                                    tick={{ fontSize: 11, fill: '#526579' }}
+                                />
+                                <YAxis
+                                    width={60}
+                                    tickFormatter={(value) => `${number.format(Number(value))}${suffix}`}
+                                    allowDecimals={gauge}
+                                    tick={{ fontSize: 11, fill: '#526579' }}
+                                />
+                                <Tooltip
+                                    labelFormatter={(value) => date(new Date(Number(value)).toISOString())}
+                                    formatter={(value) => [
+                                        `${number.format(Number(value))}${suffix}`,
+                                        t(`system.monitoring.metrics.${id}`),
+                                    ]}
+                                />
+                                {gauge ? (
+                                    <Line dataKey="value" stroke="#123b2e" strokeWidth={2} dot={false} connectNulls={false} isAnimationActive={false} />
+                                ) : (
+                                    <Bar dataKey="value" fill="#123b2e" maxBarSize={24} isAnimationActive={false} />
+                                )}
+                            </ComposedChart>
+                        </ResponsiveContainer>
                     </div>
                     <div className="monitoring-chart-axis">
                         <span>{date(data.from)}</span>
@@ -327,7 +357,7 @@ function MetricChart({
                                     <tr key={point.time}>
                                         <td>{date(point.time)}</td>
                                         <td>
-                                            {point.value === undefined
+                                            {point.value == null
                                                 ? '—'
                                                 : number.format(point.value)}
                                         </td>

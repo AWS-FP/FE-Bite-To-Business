@@ -24,11 +24,12 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 }
 
 /** Form khách đã gửi, kèm nút chấp nhận (nhập lại kho + email cho khách) hoặc từ chối. */
-function ReturnDetail({ item, busy, onAccept, onReject, onClose }: {
+function ReturnDetail({ item, busy, onAccept, onReject, onRefund, onClose }: {
     item: PackageReturn;
     busy: boolean;
     onAccept: () => void;
     onReject: (note: string) => void;
+    onRefund: () => void;
     onClose: () => void;
 }) {
     const [rejecting, setRejecting] = useState(false);
@@ -44,6 +45,7 @@ function ReturnDetail({ item, busy, onAccept, onReject, onClose }: {
             </div>
             <dl className="mt-4">
                 <Row label="Trạng thái">{STATUS_LABEL[item.status]}</Row>
+                {item.status === 'ACCEPTED' && <Row label="Hoàn tiền">{item.refundedAt ? 'Đã hoàn tiền' : 'Chờ hoàn tiền'}</Row>}
                 <Row label="Khách hàng">{item.companyName ? `${item.companyName} · ` : ''}{item.contactName}</Row>
                 <Row label="Liên hệ">{item.contactPhone} · {item.contactEmail}</Row>
                 <Row label="Mã giao dịch">{item.paymentNumber ?? '—'}</Row>
@@ -51,15 +53,19 @@ function ReturnDetail({ item, busy, onAccept, onReject, onClose }: {
                 <Row label="Ngày giao">{item.deliveryDate} · giao lúc {time(item.deliveredAt)}</Row>
                 <Row label="Gửi yêu cầu lúc">{time(item.createdAt)}</Row>
                 <Row label="Lý do trả hàng"><span className="whitespace-pre-wrap">{item.reason}</span></Row>
-                <Row label="Tiền hàng của kiện"><strong>{money(item.packageAmount)}</strong></Row>
+                <Row label="Tiền hàng của kiện"><strong>{item.packageAmount == null ? 'Cần đối soát' : money(item.packageAmount)}</strong></Row>
+                <Row label="Phí trả hàng (2%)">{item.returnFee == null ? 'Cần đối soát' : money(item.returnFee)}</Row>
+                <Row label="Tiền dự kiến hoàn"><strong>{item.refundAmount == null ? 'Cần đối soát' : money(item.refundAmount)}</strong></Row>
                 <Row label="Hoàn tiền về">{item.recipientBank} · {item.recipientAccount} · {item.recipientName}</Row>
                 {item.reviewNote && <Row label="Lý do từ chối">{item.reviewNote}</Row>}
                 {item.reviewedAt && <Row label="Xử lý lúc">{time(item.reviewedAt)}</Row>}
+                {item.refundedAt && <Row label="Hoàn tiền lúc">{time(item.refundedAt)}</Row>}
+                {item.transferReference && <Row label="Mã giao dịch hoàn">{item.transferReference}</Row>}
             </dl>
             {item.status === 'REQUESTED' && !rejecting && (
                 <div className="mt-5 flex flex-wrap gap-3">
                     <button type="button" disabled={busy} onClick={onAccept} className="rounded-[3px] border border-black bg-store-green px-4 py-2 text-sm font-bold text-white disabled:opacity-50">
-                        {busy ? 'Đang xử lý...' : 'Xác nhận hoàn tiền'}
+                        {busy ? 'Đang xử lý...' : 'Chấp nhận trả hàng'}
                     </button>
                     <button type="button" disabled={busy} onClick={() => setRejecting(true)} className="rounded-[3px] border border-red-700 bg-white px-4 py-2 text-sm font-bold text-red-700">
                         Từ chối
@@ -82,6 +88,12 @@ function ReturnDetail({ item, busy, onAccept, onReject, onClose }: {
                         </button>
                     </div>
                 </form>
+            )}
+            {item.status === 'ACCEPTED' && !item.refundedAt && item.refundAmount != null && (
+                <div className="mt-5 space-y-3">
+                    <p className="text-sm">Sau khi chuyển khoản thủ công, bấm nút bên dưới để ghi nhận khoản tiền đã hoàn.</p>
+                    <button type="button" onClick={onRefund} disabled={busy} className="rounded-[3px] border border-black bg-store-green px-4 py-2 text-sm font-bold text-white disabled:opacity-50">{busy ? 'Đang ghi nhận...' : 'Đã hoàn tiền'}</button>
+                </div>
             )}
         </section>
     );
@@ -148,9 +160,10 @@ export default function PackageReturnsPage() {
                     <ReturnDetail
                         key={r.selected.id}
                         item={r.selected}
-                        busy={r.decide.isPending}
+                        busy={r.decide.isPending || r.confirmRefund.isPending}
                         onAccept={() => r.decide.mutate({ id: r.selected!.id, accept: true })}
                         onReject={(note) => r.decide.mutate({ id: r.selected!.id, accept: false, note })}
+                        onRefund={() => r.confirmRefund.mutate(r.selected!.id)}
                         onClose={() => r.setSelectedId(null)}
                     />
                 ) : (

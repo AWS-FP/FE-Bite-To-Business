@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
     Activity,
     ArrowUpRight,
-    CheckCircle2,
     CircleHelp,
     Clock3,
     Cpu,
@@ -13,7 +12,6 @@ import {
     FileText,
     Info,
     RefreshCw,
-    Search,
     Server,
     ShieldCheck,
     SlidersHorizontal,
@@ -25,6 +23,7 @@ import AdminButton from '@/components/admin/AdminButton';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import SystemMonitoringDashboard from '@/components/admin/SystemMonitoringDashboard';
 import SystemSettingsForm from '@/components/admin/SystemSettingsForm';
+import FinanceReport from '@/components/admin/FinanceReport';
 import { useSystemMetrics } from '@/hooks/admin/useSystemMetrics';
 import { useRegistrationStats } from '@/hooks/admin/useRegistrations';
 import { useStaff } from '@/hooks/admin/useStaff';
@@ -43,8 +42,9 @@ export default function SystemMetricsPage() {
     const staff = useStaff({ page: 0, size: 1 });
     const session = useAuthStore((state) => state.session);
     const sessionVersion = useAuthStore((state) => state.sessionVersion);
-    const currentTab = searchParams.get('tab') || 'overview';
-    const tab = ['overview', 'reports', 'ai', 'settings', 'logs'].includes(currentTab)
+    const requestedTab = searchParams.get('tab') || 'overview';
+    const currentTab = requestedTab === 'reports' ? 'revenue' : requestedTab;
+    const tab = ['overview', 'revenue', 'ai', 'settings', 'logs'].includes(currentTab)
         ? currentTab
         : 'overview';
     const refreshing = health.isFetching || registrations.isFetching || staff.isFetching;
@@ -103,9 +103,9 @@ export default function SystemMetricsPage() {
                     <Activity size={17} />
                     {t('system.tabs.overview')}
                 </Link>
-                <Link to="?tab=reports" aria-current={tab === 'reports' ? 'page' : undefined}>
+                <Link to="?tab=revenue" aria-current={tab === 'revenue' ? 'page' : undefined}>
                     <FileBarChart2 size={17} />
-                    {t('system.tabs.reports')}
+                    {t('system.tabs.revenue')}
                 </Link>
                 <Link to="?tab=ai" aria-current={tab === 'ai' ? 'page' : undefined}>
                     <Cpu size={17} />
@@ -320,7 +320,7 @@ export default function SystemMetricsPage() {
                     </p>
                 </>
             )}
-            {tab === 'reports' && <SystemReports />}
+            {tab === 'revenue' && <FinanceReport />}
             {tab === 'ai' && <SystemMonitoringDashboard mode="ai" />}
             {tab === 'settings' && (
                 <SystemSettingsForm
@@ -414,148 +414,5 @@ function RegistrationChart({ stats, loading }: { stats?: RegistrationStats; load
                 </div>
             </div>
         </div>
-    );
-}
-
-function SystemReports() {
-    const { t } = useTranslation('admin');
-    const [filters, setFilters] = useState(() => {
-        const today = new Intl.DateTimeFormat('en-CA', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            timeZone: 'Asia/Ho_Chi_Minh',
-        }).format(new Date());
-        return { from: `${today.slice(0, 8)}01`, to: today, group: 'day', basis: 'payments' };
-    });
-    return (
-        <>
-            <div className="system-section-toolbar">
-                <div>
-                    <h2>{t('system.reports.title')}</h2>
-                    <p>{t('system.reports.description')}</p>
-                </div>
-                <span className="system-badge">VND · Asia/Saigon</span>
-            </div>
-            <section className="system-panel">
-                <header className="system-panel-heading">
-                    <div>
-                        <h2>{t('system.reports.filters')}</h2>
-                        <p>{t('system.reports.filtersHint')}</p>
-                    </div>
-                    <FileBarChart2 size={24} aria-hidden="true" />
-                </header>
-                <div className="system-form-body system-report-filters">
-                    <label>
-                        {t('system.filters.from')}
-                        <input
-                            type="date"
-                            value={filters.from}
-                            max={filters.to || undefined}
-                            onChange={(event) =>
-                                setFilters({ ...filters, from: event.target.value })
-                            }
-                        />
-                    </label>
-                    <label>
-                        {t('system.filters.to')}
-                        <input
-                            type="date"
-                            value={filters.to}
-                            min={filters.from || undefined}
-                            onChange={(event) => setFilters({ ...filters, to: event.target.value })}
-                        />
-                    </label>
-                    <label>
-                        {t('system.filters.group')}
-                        <select
-                            value={filters.group}
-                            onChange={(event) =>
-                                setFilters({ ...filters, group: event.target.value })
-                            }
-                        >
-                            <option value="day">{t('system.filters.day')}</option>
-                            <option value="week">{t('system.filters.week')}</option>
-                            <option value="month">{t('system.filters.month')}</option>
-                        </select>
-                    </label>
-                    <label>
-                        {t('system.reports.basis')}
-                        <select
-                            value={filters.basis}
-                            onChange={(event) =>
-                                setFilters({ ...filters, basis: event.target.value })
-                            }
-                        >
-                            <option value="payments">{t('system.reports.paymentsBasis')}</option>
-                            <option value="orders">{t('system.reports.completedBasis')}</option>
-                        </select>
-                    </label>
-                </div>
-                <footer className="system-panel-footer">
-                    <p className="system-muted">{t('system.reports.waitingHint')}</p>
-                    <div className="system-button-row">
-                        <AdminButton disabled>
-                            <Search size={16} />
-                            {t('system.reports.preview')}
-                        </AdminButton>
-                        <AdminButton disabled tone="primary">
-                            <Download size={16} />
-                            {t('system.reports.export')}
-                        </AdminButton>
-                    </div>
-                </footer>
-            </section>
-            <div className="system-metric-grid system-metric-grid-three">
-                <article className="system-metric-card">
-                    <div className="system-metric-label">
-                        <span>{t('system.reports.paid')}</span>
-                        <Wallet size={20} />
-                    </div>
-                    <strong>—</strong>
-                    <p>{t('system.reports.paidHint')}</p>
-                </article>
-                <article className="system-metric-card">
-                    <div className="system-metric-label">
-                        <span>{t('system.reports.completed')}</span>
-                        <CheckCircle2 size={20} />
-                    </div>
-                    <strong>—</strong>
-                    <p>{t('system.reports.completedHint')}</p>
-                </article>
-                <article className="system-metric-card">
-                    <div className="system-metric-label">
-                        <span>{t('system.reports.cancelled')}</span>
-                        <FileText size={20} />
-                    </div>
-                    <strong>—</strong>
-                    <p>{t('system.noData')}</p>
-                </article>
-            </div>
-            <section className="system-panel">
-                <header className="system-panel-heading">
-                    <div>
-                        <h2>
-                            {t(
-                                filters.basis === 'payments'
-                                    ? 'system.reports.paymentChart'
-                                    : 'system.reports.orderChart',
-                            )}
-                        </h2>
-                        <p>{t('system.reports.chartHint')}</p>
-                    </div>
-                    <span className="system-badge">{t('system.status.notConnected')}</span>
-                </header>
-                <div className="system-chart-empty">
-                    <FileBarChart2 size={40} strokeWidth={1.3} />
-                    <h3>{t('system.reports.empty')}</h3>
-                    <p>{t('system.reports.emptyHint')}</p>
-                </div>
-            </section>
-            <div className="system-notice">
-                <Info size={20} />
-                <p>{t('system.reports.definition')}</p>
-            </div>
-        </>
     );
 }

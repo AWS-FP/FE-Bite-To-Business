@@ -40,6 +40,9 @@ export interface CustomerOrderPackage {
     deliveredAt: string | null;
     returnStatus: 'REQUESTED' | 'ACCEPTED' | 'REJECTED' | null;
     returnable: boolean;
+    packageAmount: number | null;
+    returnFee: number | null;
+    refundAmount: number | null;
 }
 
 export interface CustomerOrderDetail {
