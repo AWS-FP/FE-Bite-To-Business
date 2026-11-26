@@ -44,12 +44,15 @@ export const ProductGrid = createComponentImplementation(ProductGridApi, ({ prop
             <p className="text-sm text-store-muted">{props.emptyText ?? 'Không có sản phẩm.'}</p>
         );
     const compact = props.density === 'compact';
-    // Khung chat hẹp: tối đa 2 cột (gọn: 3) bất kể model chọn bao nhiêu cột.
-    const columns = Math.min(props.columns ?? 3, compact ? 3 : 2);
+    // Cột do model chọn chỉ là độ rộng thẻ mong muốn; lưới tự co theo chỗ đặt
+    // (khung chat hẹp ~2 cột, trang rộng 4–5 cột) để không vỡ bố cục.
+    const minWidth = compact ? 140 : props.columns === 2 ? 260 : props.columns === 4 ? 170 : 200;
     return (
         <div
-            className="grid gap-2"
-            style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+            className="grid gap-3"
+            style={{
+                gridTemplateColumns: `repeat(auto-fill, minmax(min(${minWidth}px, 100%), 1fr))`,
+            }}
         >
             {items.map((product) => (
                 <ProductTile
@@ -65,11 +68,12 @@ export const ProductGrid = createComponentImplementation(ProductGridApi, ({ prop
     );
 });
 
-type Column = 'image' | 'name' | 'spec' | 'price' | 'priceTiers' | 'moq' | 'stock';
+type Column = 'image' | 'name' | 'spec' | 'origin' | 'price' | 'priceTiers' | 'moq' | 'stock';
 const COLUMN_LABEL: Record<Column, string> = {
     image: '',
     name: 'Sản phẩm',
     spec: 'Quy cách',
+    origin: 'Xuất xứ',
     price: 'Giá',
     priceTiers: 'Bậc giá',
     moq: 'Tối thiểu',
@@ -81,7 +85,9 @@ export const ProductTableApi = {
     schema: z.object({
         ...common,
         items: CommonSchemas.DynamicValue,
-        columns: z.array(z.enum(['image', 'name', 'spec', 'price', 'priceTiers', 'moq', 'stock'])),
+        columns: z.array(
+            z.enum(['image', 'name', 'spec', 'origin', 'price', 'priceTiers', 'moq', 'stock']),
+        ),
         highlight: z.enum(['none', 'lowestPrice', 'inStock']).optional(),
         maxItems: z.number().optional(),
         showAddToCart: z.boolean().optional(),
@@ -145,6 +151,8 @@ export const ProductTable = createComponentImplementation(ProductTableApi, ({ pr
                                         </button>
                                     )}
                                     {column === 'spec' && (product.spec ?? '—')}
+                                    {column === 'origin' &&
+                                        (product.facts?.origin ?? product.origin ?? '—')}
                                     {column === 'price' && <Price product={product} />}
                                     {column === 'priceTiers' && <Tiers product={product} />}
                                     {column === 'moq' &&

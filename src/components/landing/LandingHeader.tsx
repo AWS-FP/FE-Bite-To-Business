@@ -3,9 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/router/routes';
 import LanguageSwitcher from '../common/LanguageSwitcher';
+import StoreAccountActions from '@/components/layout/header/StoreAccountActions';
+import { useAuthStore } from '@/store/admin/authStore';
 
 export default function LandingHeader() {
     const { t } = useTranslation('storefront');
+    const session = useAuthStore((state) => state.session);
+    const restoring = useAuthStore((state) => state.restoring);
 
     return (
         <header className="fixed inset-x-0 top-0 z-[1000] h-[104px] border-b-[3px] border-solid border-store-ink bg-store-green py-3.5">
@@ -44,7 +48,7 @@ export default function LandingHeader() {
                 </nav>
                 <div className="flex shrink-0 items-center gap-3">
                     <LanguageSwitcher />
-                    <div className="flex shrink-0 items-center gap-1.5">
+                    {session ? <StoreAccountActions /> : !restoring && <div className="flex shrink-0 items-center gap-1.5">
                         <Link
                             className="store-sign-up flex min-h-[40px] items-center justify-center rounded-full border-2 border-solid border-store-ink bg-status-active px-3 text-[12px] font-bold whitespace-nowrap text-store-ink no-underline shadow-[2px_2px_0_var(--color-store-ink)] hover:bg-surface-green"
                             to={ROUTES.REGISTER}
@@ -57,7 +61,7 @@ export default function LandingHeader() {
                         >
                             {t('header.login')}
                         </Link>
-                    </div>
+                    </div>}
                 </div>
             </div>
         </header>

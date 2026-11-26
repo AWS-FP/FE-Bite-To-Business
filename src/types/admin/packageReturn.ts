@@ -25,5 +25,10 @@ export interface PackageReturn {
     contactEmail: string;
     companyName: string | null;
     paymentNumber: string | null;
-    packageAmount: number;
+    packageAmount: number | null;
+    returnFee: number | null;
+    refundAmount: number | null;
+    refundedAt: string | null;
+    refundedBy: string | null;
+    transferReference: string | null;
 }

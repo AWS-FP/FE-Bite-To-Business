@@ -22,3 +22,8 @@ export async function rejectPackageReturn(id: string, note: string) {
     const response = await http.patch<ApiResponse<PackageReturn>>(`${endpoint}/${encodeURIComponent(id)}/reject`, { note });
     return response.data.data;
 }
+
+export async function confirmPackageReturnRefund(id: string) {
+    const response = await http.patch<ApiResponse<PackageReturn>>(`${endpoint}/${encodeURIComponent(id)}/refunded`);
+    return response.data.data;
+}

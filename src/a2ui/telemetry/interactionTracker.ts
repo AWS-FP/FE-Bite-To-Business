@@ -1,4 +1,5 @@
 import { env } from '@/lib/env';
+import { useAuthStore } from '@/store/admin/authStore';
 
 /**
  * Ghi tín hiệu tương tác để BE tổng hợp hồ sơ giao diện (ui_profiles) và AI sinh UI hợp thói quen hơn.
@@ -27,7 +28,6 @@ type InteractionEvent = {
 };
 
 const OPT_OUT_KEY = 'btb.personalization';
-const ANON_KEY = 'btb.anonId';
 const FLUSH_MS = 10_000;
 const MAX_BATCH = 50;
 const STAFF_ROUTE =
@@ -48,6 +48,18 @@ export function personalizationEnabled() {
     return storage()?.getItem(OPT_OUT_KEY) !== 'off';
 }
 
+export function subscribePersonalization(notify: () => void) {
+    const onStorage = (event: StorageEvent) => {
+        if (event.key === OPT_OUT_KEY || event.key === null) notify();
+    };
+    window.addEventListener('btb-personalization-change', notify);
+    window.addEventListener('storage', onStorage);
+    return () => {
+        window.removeEventListener('btb-personalization-change', notify);
+        window.removeEventListener('storage', onStorage);
+    };
+}
+
 export function setPersonalizationEnabled(enabled: boolean) {
     try {
         if (enabled) storage()?.removeItem(OPT_OUT_KEY);
@@ -56,21 +68,7 @@ export function setPersonalizationEnabled(enabled: boolean) {
         /* storage bị chặn: coi như vẫn bật, BE vẫn có quyền xóa dữ liệu */
     }
     if (!enabled) queue = [];
-}
-
-/** ID ẩn danh cho Guest, chỉ nằm ở trình duyệt; BE gắn user thật từ cookie đăng nhập. */
-function anonId() {
-    const store = storage();
-    let id = store?.getItem(ANON_KEY);
-    if (!id) {
-        id = crypto.randomUUID();
-        try {
-            store?.setItem(ANON_KEY, id);
-        } catch {
-            /* ignore */
-        }
-    }
-    return id;
+    window.dispatchEvent(new Event('btb-personalization-change'));
 }
 
 export function trackEvent(
@@ -78,6 +76,8 @@ export function trackEvent(
     detail: Partial<Omit<InteractionEvent, 'eventId' | 'type' | 'occurredAt'>> = {},
 ) {
     if (typeof window === 'undefined' || !personalizationEnabled()) return;
+    // AI chỉ dành cho Customer nên chỉ ghi hành vi của Customer đã đăng nhập (Guest/nhân viên: bỏ qua).
+    if (useAuthStore.getState().session?.user.role !== 'CUSTOMER') return;
     const route = detail.route ?? window.location.pathname;
     // Chỉ cá nhân hóa trải nghiệm mua hàng; bỏ qua khu vực nhân viên và trang đăng nhập.
     if (STAFF_ROUTE.test(route)) return;
@@ -108,7 +108,7 @@ export async function flush(onUnload = false) {
             credentials: 'include',
             keepalive: onUnload,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ anonId: anonId(), events: batch }),
+            body: JSON.stringify({ events: batch }),
         });
     } catch {
         // Mất mạng: bỏ lô này, không ảnh hưởng thao tác mua hàng.

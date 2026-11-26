@@ -5,6 +5,7 @@
         "registrations": "Customer management",
         "staff": "Staff accounts",
         "returns": "Return requests",
+        "paymentReviews": "Payments to review",
         "system": "System & Reports"
     },
     "header": {
@@ -23,6 +24,7 @@
         "systemManagement": "SYSTEM OPERATIONS",
         "pendingRegistrations": "Customer registrations, {{count}} applications awaiting approval",
         "collapse": "Collapse sidebar",
-        "expand": "Expand sidebar"
+        "expand": "Expand sidebar",
+        "openPaymentReviews": "Payments to review: {{count}} open"
     }
 }

@@ -87,7 +87,11 @@
         "addressFromDistribution": "Dùng đúng vị trí đã chọn ở trang Phân phối. Sửa địa chỉ sẽ tìm lại tọa độ.",
         "creating": "Đang tạo gói...",
         "pickOnMap": "Chọn trên bản đồ",
-        "defaultPackageName": "Gói giao hàng mặc định"
+        "defaultPackageName": "Gói giao hàng mặc định",
+        "editTitle": "Chỉnh sửa kiện giao hàng",
+        "saveEdit": "Lưu kiện giao hàng",
+        "cancelEdit": "Hủy chỉnh sửa",
+        "finishEditing": "Lưu hoặc hủy chỉnh sửa kiện giao hàng trước khi tiếp tục."
     },
     "review": {
         "title": "Kiểm tra trước khi thanh toán",
@@ -117,22 +121,58 @@
         "shippingUnavailable": "Không thể tính phí giao hàng lúc này. Vui lòng thử lại sau.",
         "vatMissing": "Một số sản phẩm chưa được cấu hình thuế suất VAT nên chưa thể đặt hàng. Vui lòng liên hệ Bite to Business.",
         "stockUnavailable": "Một số sản phẩm không còn đủ hàng. Vui lòng quay lại giỏ hàng để điều chỉnh số lượng.",
+        "stockShortItem": "{{name}}: đặt {{requested}} {{unit}}, chỉ còn {{available}} {{unit}}",
+        "stockOutItem": "{{name}}: đã hết hàng (đặt {{requested}} {{unit}})",
         "revisionConflict": "Báo giá vừa thay đổi. Vui lòng kiểm tra lại tổng tiền rồi thử lại.",
         "quoteIncomplete": "Báo giá chưa đầy đủ. Vui lòng kiểm tra thông tin liên hệ và phân bổ đủ sản phẩm vào gói giao."
     },
     "notices": {
         "couponsUpdated": "Đã cập nhật ưu đãi.",
         "couponsRemoved": "Đã bỏ các coupon khỏi báo giá.",
-        "packageAdded": "Đã thêm gói giao hàng."
+        "packageAdded": "Đã thêm gói giao hàng.",
+        "packageUpdated": "Đã cập nhật kiện giao hàng."
     },
     "lineVat": "VAT {{rate}}%: {{amount}}",
     "lineVatMissing": "Chưa có thuế suất VAT",
     "vatIncomplete": "Thiếu VAT một số sản phẩm",
     "totalBeforeShipping": "Tạm tính",
     "couponPicker": {
+        "listTitle": "Mã coupon của bạn",
+        "details": {
+            "discount": "Mức giảm",
+            "cap": "Giảm tối đa",
+            "minimum": "Đơn tối thiểu",
+            "campaignLimit": "Giới hạn chương trình",
+            "userLimit": "Giới hạn của bạn",
+            "used": "Đã sử dụng",
+            "reserved": "Đang giữ",
+            "remaining": "Lượt còn lại",
+            "validity": "Thời gian hiệu lực",
+            "scope": "Phạm vi áp dụng"
+        },
+        "historyError": "Chưa tải được danh sách mã đã lưu của bạn.",
+        "inspect": "Xem điều kiện",
+        "lookupError": "Không tra được mã. Kiểm tra mã hoặc thử lại.",
+        "unlimited": "Không giới hạn",
+        "terms": "Giảm {{discount}} · Tối đa {{cap}} · Đơn từ {{min}}",
+        "usage": "Tổng lượt chương trình: {{total}} · Giới hạn của bạn: {{limit}} · Đã dùng {{used}} · Đang giữ {{reserved}} · Còn {{left}}",
+        "dates": "Hiệu lực từ {{start}} đến {{end}}",
+        "all": "Áp dụng cho mọi sản phẩm.",
+        "products": "Sản phẩm áp dụng: {{names}}",
+        "reasons": {
+            "VALID": "Có thể áp dụng.",
+            "WRONG_SCOPE": "Mã này dành cho loại giảm giá khác.",
+            "INACTIVE": "Mã đang tắt.",
+            "NOT_STARTED": "Chưa đến ngày áp dụng.",
+            "EXPIRED": "Mã đã hết hạn.",
+            "GLOBAL_LIMIT": "Đã hết lượt toàn chương trình.",
+            "USER_LIMIT": "Bạn đã hết lượt khả dụng.",
+            "MINIMUM": "Đơn chưa đạt giá trị tối thiểu.",
+            "PRODUCT_SCOPE": "Đơn chưa có sản phẩm đủ điều kiện."
+        },
         "productTitle": "Coupon sản phẩm",
         "shippingTitle": "Coupon phí giao hàng",
-        "selectOrEnter": "Chọn hoặc nhập mã",
+        "selectOrEnter": "Nhập mã",
         "appliedUnknown": "Đã áp dụng",
         "inputLabel": "Mã coupon",
         "inputPlaceholder": "Nhập mã 8 ký tự",
@@ -156,6 +196,24 @@
         "choose": "Chọn",
         "inUse": "Đang dùng",
         "remove": "Bỏ mã đang dùng",
-        "close": "Đóng"
-    }
+        "close": "Đóng",
+        "privateNotice": "Nhập chính xác mã được cung cấp. Mã khuyến mãi sẽ không hiển thị công khai.",
+        "savedCodes": "Mã của bạn còn sử dụng được"
+    },
+    "reorder": {
+        "title": "Đặt lại đơn hàng",
+        "summary": "Đã lấy thông tin giao hàng cũ. Giá, tồn kho và ngày giao được kiểm tra lại trước khi thanh toán.",
+        "loading": "Đang kiểm tra đơn đặt lại...",
+        "cartTitle": "Sản phẩm đặt hàng lại",
+        "cartHint": "Chỉnh số lượng tại đây. Nhập 0 để bỏ sản phẩm. Giỏ hàng thường không thay đổi.",
+        "allocationReset": "Kiện chứa sản phẩm thay đổi cần được phân bổ lại. Các kiện không bị ảnh hưởng vẫn được giữ.",
+        "invalidCart": "Mỗi sản phẩm cần số lượng từ mức tối thiểu trở lên (hoặc 0 để bỏ), và giữ ít nhất một sản phẩm.",
+        "closedTitle": "Báo giá này đã được đặt hàng.",
+        "closedHint": "Không thể sửa hay thanh toán lại báo giá này. Xem đơn hàng để thanh toán, hoặc quay lại giỏ hàng để đặt đơn mới.",
+        "viewOrders": "Xem đơn hàng",
+        "backToCart": "Về giỏ hàng"
+    },
+    "quantityInput": "Số lượng {{name}}",
+    "quantityOverStock": "Kho chỉ còn {{stock}}, không đủ {{quantity}}. Đã chỉnh về {{stock}}.",
+    "quantityBelowMinimum": "Số lượng tối thiểu là {{min}}. Đã chỉnh về {{min}}."
 }

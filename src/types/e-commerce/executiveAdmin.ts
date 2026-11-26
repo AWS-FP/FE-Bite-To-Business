@@ -58,6 +58,8 @@ export type PricingWrite = {
 };
 
 export type Coupon = {
+    nameVi?: string | null;
+    nameEn?: string | null;
     id: string;
     code: string;
     discountType: string;
@@ -86,6 +88,8 @@ export type Promotion = {
     contentEn: string | null;
     startsAt: string;
     endsAt: string;
+    /** Supabase server clock determines expiry (not the browser clock). */
+    expired?: boolean;
     imageUrl: string | null;
     status: string;
     promotionType: 'STANDARD' | 'FLASH_SALE';
@@ -190,17 +194,6 @@ export type ExecutiveReview = {
     updatedAt: string;
     productNameVi: string;
     productNameEn: string;
-};
-
-export type ProductRequest = {
-    id: string;
-    customerId: string;
-    productName: string;
-    referenceUrl: string | null;
-    status: string;
-    customerNote: string | null;
-    createdAt: string;
-    updatedAt: string;
 };
 
 export type DashboardMetrics = {

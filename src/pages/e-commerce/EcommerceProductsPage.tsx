@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ClipboardList, Package, RefreshCw, Search, X, Plus, Trash2, Save } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
 import { executiveUi } from '@/constants/e-commerce/executiveUi';
 import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 import {
@@ -24,10 +23,9 @@ import {
     getExecutiveVat,
     updateExecutiveVat,
 } from '@/services/e-commerce/executiveReadService';
-import { getCatalogBrands } from '@/services/customer/catalogReadService';
 import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
-import { getHomeCategories } from '@/services/customer/homeService';
-import type { HomeCategory } from '@/types/customer/home';
+import { invalidatePublicCatalog } from '@/hooks/customer/useCatalogQuery';
+import { useExecutiveProductCatalog } from '@/hooks/e-commerce/useExecutiveProductCatalog';
 
 function ProductDrawer({
     product,
@@ -103,6 +101,7 @@ function ProductDrawer({
         mutationFn: (status: string) => executiveApi.setProductStatus(product.id, status),
         onSuccess: (_, status) => {
             setLocalStatus(status as AdminProduct['status']);
+            void invalidatePublicCatalog();
             setFeedback(tr('Đã cập nhật trạng thái sản phẩm.', 'Publication status updated.'));
             setFailed(false);
             void qc.invalidateQueries({ queryKey: ['ecom', 'products'] });
@@ -229,12 +228,6 @@ function ProductDrawer({
                                 <strong className="block">
                                     {product.minOrderQuantity} {product.unitCode}
                                 </strong>
-                            </div>
-                            <div>
-                                <span className="text-xs text-[#728576]">
-                                    {tr('Bước số lượng', 'Quantity step')}
-                                </span>
-                                <strong className="block">{product.quantityStep}</strong>
                             </div>
                             <div>
                                 <span className="text-xs text-[#728576]">
@@ -608,35 +601,9 @@ function ProductDrawer({
 export default function EcommerceProductsPage() {
     const tr = useExecutiveText(),
         qc = useQueryClient();
-    const [params, setParams] = useSearchParams();
-    const q = params.get('q') ?? '';
-    const [draft, setDraft] = useState(q),
-        [status, setStatus] = useState(''),
-        [page, setPage] = useState(0),
-        [selected, setSelected] = useState<AdminProduct | null>(null);
-    const products = useQuery({
-        queryKey: ['ecom', 'products', q, status, page],
-        queryFn: () =>
-            executiveApi.products({
-                q: q || undefined,
-                status: status || undefined,
-                page,
-                size: 20,
-            }),
-    });
-    const brands = useQuery({ queryKey: ['ecom', 'brands'], queryFn: () => getCatalogBrands() });
-    const categories = useQuery({
-        queryKey: ['ecom', 'categories'],
-        queryFn: () => getHomeCategories(),
-    });
-    const brandMap = new Map(brands.data?.map((b) => [b.id, b.name]));
-    const categoryMap = new Map<string, HomeCategory>();
-    const add = (items: HomeCategory[]) =>
-        items.forEach((item) => {
-            categoryMap.set(item.id, item);
-            add(item.children);
-        });
-    add(categories.data ?? []);
+    const { q, draft, setDraft, status, changeStatus, page, setPage,
+        submitSearch, products, brandMap, categoryMap } = useExecutiveProductCatalog();
+    const [selected, setSelected] = useState<AdminProduct | null>(null);
     const rows = products.data?.items ?? [];
     return (
         <div className="space-y-6">
@@ -670,17 +637,17 @@ export default function EcommerceProductsPage() {
                 }
             >
                 <form
-                    className="grid gap-3 p-5 sm:grid-cols-[minmax(220px,1fr)_190px_auto]"
+                    className="grid items-center gap-3 bg-[#f8faf6] p-4 sm:grid-cols-[minmax(230px,1fr)_190px_auto] sm:p-5"
                     onSubmit={(e) => {
                         e.preventDefault();
-                        setPage(0);
-                        setParams(draft.trim() ? { q: draft.trim() } : {});
+                        submitSearch();
                     }}
                 >
-                    <div className="relative">
-                        <Search size={17} className="absolute left-4 top-3.5 text-[#64866e]" />
+                    <div className="relative flex min-w-0 items-center overflow-hidden rounded-xl border border-solid border-[#bdcfbf] bg-white shadow-sm transition-colors focus-within:border-[#348357] focus-within:ring-2 focus-within:ring-[#d4eddd]">
+                        <Search size={18} className="ml-3 shrink-0 text-[#517965]" aria-hidden="true" />
                         <input
-                            className={`${executiveUi.input} !pl-11`}
+                            type="search"
+                            className="h-11 min-w-0 w-full appearance-none !border-0 bg-transparent px-3 text-sm text-[#153d2a] !outline-none !shadow-none focus:!border-0 focus:!outline-none focus:!shadow-none placeholder:text-[#82978a] [&::-webkit-search-cancel-button]:hidden"
                             value={draft}
                             onChange={(e) => setDraft(e.target.value)}
                             placeholder={tr(
@@ -689,13 +656,18 @@ export default function EcommerceProductsPage() {
                             )}
                             aria-label={tr('Tìm sản phẩm', 'Search products')}
                         />
+                        {draft && (
+                            <button type="button" aria-label={tr('Xóa tìm kiếm', 'Clear search')} onClick={() => setDraft('')}
+                                className="mr-2 grid size-7 shrink-0 cursor-pointer place-items-center rounded-lg border-0 bg-transparent text-[#607d6d] hover:bg-[#e8f1e9] focus-visible:outline-2 focus-visible:outline-[#348357]">
+                                <X size={16} aria-hidden="true" />
+                            </button>
+                        )}
                     </div>
                     <ExecutiveSelect
                         value={status}
                         ariaLabel={tr('Trạng thái', 'Status')}
                         onValueChange={(value) => {
-                            setStatus(value);
-                            setPage(0);
+                            changeStatus(value);
                         }}
                     >
                         <option value="">{tr('Tất cả trạng thái', 'All statuses')}</option>
@@ -705,11 +677,17 @@ export default function EcommerceProductsPage() {
                             </option>
                         ))}
                     </ExecutiveSelect>
-                    <button type="submit" className={executiveUi.button}>
+                    <button type="submit" className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-solid border-[#153d2a] bg-[#153d2a] px-5 text-sm font-bold text-white shadow-sm transition hover:bg-[#245a40] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#153d2a]">
                         <Search size={16} />
                         {tr('Tìm kiếm', 'Search')}
                     </button>
                 </form>
+                {q && (
+                    <p className="px-5 pb-3 text-xs font-semibold text-[#40634f]" role="status">
+                        {tr('Kết quả tìm kiếm cho', 'Search results for')} “{q}”
+                        {products.data && ` · ${products.data.total.toLocaleString('vi-VN')} ${tr('sản phẩm', 'products')}`}
+                    </p>
+                )}
                 {products.isLoading ? (
                     <LoadingRows />
                 ) : products.isError ? (

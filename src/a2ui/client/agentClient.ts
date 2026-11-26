@@ -1,4 +1,5 @@
 import { env } from '@/lib/env';
+import { personalizationEnabled } from '../telemetry/interactionTracker';
 
 /** Trạng thái hiển thị BE trả qua STATE_SNAPSHOT; gửi lại ở lượt sau (khớp RunAgentInput.AgentState). */
 export type AgentState = {
@@ -38,12 +39,20 @@ export class AgentHttpError extends Error {
  * cookie đăng nhập HttpOnly được gửi qua credentials: 'include'.
  */
 export async function runAgent(
-    input: { threadId: string; runId: string; messages: AgentMessage[]; state?: AgentState },
+    input: {
+        threadId: string;
+        runId: string;
+        messages: AgentMessage[];
+        state?: AgentState;
+        /** chat: trả lời kèm khối nhỏ; page: AI ghép cả trang. */
+        mode?: 'chat' | 'page';
+    },
     onEvent: (event: AgentEvent) => void,
     signal?: AbortSignal,
 ): Promise<void> {
-    const state = { ...input.state };
+    const state = { ...input.state, personalizationEnabled: personalizationEnabled() };
     delete state.lastIntents;
+    if (state.lastQuery) state.lastQuery = state.lastQuery.slice(0, 100);
     const response = await fetch(`${env.apiBaseUrl}/api/ai/agent`, {
         method: 'POST',
         credentials: 'include',

@@ -2,6 +2,7 @@ import { ChevronLeft, ChevronRight, Megaphone } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { PROMOTION_BANNER_ASPECT } from '@/constants/customer/promotionBanner';
 import { useHomeModelContext } from './home/HomeModel';
 
 /** All slides are published banner images returned by Customer Homepage API. */
@@ -54,10 +55,12 @@ export default function CoverflowSlider() {
                     </div>
                 ) : (
                     <>
-                        <div
-                            className="relative h-[290px] overflow-hidden sm:h-[390px]"
-                            aria-live="off"
-                        >
+                        <div className="relative overflow-hidden" aria-live="off">
+                            <div
+                                aria-hidden="true"
+                                className="invisible mx-auto w-[75%] sm:w-[58%]"
+                                style={{ aspectRatio: PROMOTION_BANNER_ASPECT }}
+                            />
                             {slides.map((slide, index) => {
                                 const clockwise = (index - current + slides.length) % slides.length;
                                 const offset =
@@ -78,7 +81,7 @@ export default function CoverflowSlider() {
                                         <img
                                             src={slide.imageUrl!}
                                             alt={heading}
-                                            className="h-full w-full object-cover"
+                                            className="h-full w-full object-contain"
                                         />
                                         <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-store-dark/90 via-store-dark/30 to-transparent px-5 pb-5 pt-14 text-center text-sm font-bold text-white sm:text-lg">
                                             {heading}
@@ -89,8 +92,9 @@ export default function CoverflowSlider() {
                                     <div
                                         key={slide.id}
                                         aria-hidden={!visible}
-                                        className="absolute left-1/2 top-0 h-[95%] w-[75%] overflow-hidden rounded-2xl border border-white/20 bg-white shadow-2xl transition-[transform,opacity] duration-700 ease-out sm:w-[58%]"
+                                        className="absolute left-1/2 top-0 w-[75%] overflow-hidden rounded-2xl border border-white/20 bg-store-dark shadow-2xl transition-[transform,opacity] duration-700 ease-out sm:w-[58%]"
                                         style={{
+                                            aspectRatio: PROMOTION_BANNER_ASPECT,
                                             transform: `translateX(calc(-50% + ${offset * 55}%)) perspective(950px) rotateY(${-offset * 25}deg) scale(${offset === 0 ? 1 : 0.82})`,
                                             opacity: visible
                                                 ? Math.abs(offset) === 2

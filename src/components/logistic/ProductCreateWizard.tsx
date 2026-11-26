@@ -1,6 +1,14 @@
 import { useLogisticsText } from '@/hooks/logistic/useLogisticsText';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { ArrowLeft, ArrowRight, Check, ImagePlus, Loader2, PackagePlus, Sparkles } from 'lucide-react';
+import {
+    ArrowLeft,
+    ArrowRight,
+    Check,
+    ImagePlus,
+    Loader2,
+    PackagePlus,
+    Sparkles,
+} from 'lucide-react';
 import { suggestTranslation, translationErrorKey } from '@/services/logistic/translationService';
 import type { TranslationField, TranslationLanguage } from '@/types/logistic/translation';
 import { getHomeCategories } from '@/services/customer/homeService';
@@ -25,15 +33,22 @@ const BILINGUAL_FIELDS: [string, TranslationField][] = [
     ['spec', 'SPEC'],
     ['storage', 'STORAGE'],
 ];
-const bilingual: Record<string, { counterpart: string; lang: TranslationLanguage; field: TranslationField }> =
-    Object.fromEntries(
-        BILINGUAL_FIELDS.flatMap(([base, field]) => [
-            [`${base}Vi`, { counterpart: `${base}En`, lang: 'vi', field }],
-            [`${base}En`, { counterpart: `${base}Vi`, lang: 'en', field }],
-        ]),
-    );
+const bilingual: Record<
+    string,
+    { counterpart: string; lang: TranslationLanguage; field: TranslationField }
+> = Object.fromEntries(
+    BILINGUAL_FIELDS.flatMap(([base, field]) => [
+        [`${base}Vi`, { counterpart: `${base}En`, lang: 'vi', field }],
+        [`${base}En`, { counterpart: `${base}Vi`, lang: 'en', field }],
+    ]),
+);
 
-type Suggestion = { status: 'loading' | 'ready' | 'error'; sourceText: string; text?: string; error?: string };
+type Suggestion = {
+    status: 'loading' | 'ready' | 'error';
+    sourceText: string;
+    text?: string;
+    error?: string;
+};
 
 type Lang = TranslationLanguage;
 
@@ -42,7 +57,10 @@ const SELLING_SPEC_LABEL: Record<Lang, string> = { vi: 'Quy cách bán', en: 'Se
 
 // Ô văn bản tự do tối đa 150 chữ (đếm theo khoảng trắng) để đoạn hiển thị không phá bố cục.
 const MAX_TEXT_WORDS = 150;
-const FREE_TEXT_FIELDS: Record<number, string[]> = { 0: ['descriptionVi', 'descriptionEn', 'note'], 1: ['storageVi', 'storageEn'] };
+const FREE_TEXT_FIELDS: Record<number, string[]> = {
+    0: ['descriptionVi', 'descriptionEn', 'note'],
+    1: ['storageVi', 'storageEn'],
+};
 function countWords(text: string | undefined): number {
     return text?.trim() ? text.trim().split(/\s+/).length : 0;
 }
@@ -52,7 +70,13 @@ function requiredLabel(text: string): ReactNode {
     const parts = text.split(' *');
     return parts.flatMap((part, i) =>
         i < parts.length - 1
-            ? [part, <span key={i} className="text-red-600"> *</span>]
+            ? [
+                  part,
+                  <span key={i} className="text-red-600">
+                      {' '}
+                      *
+                  </span>,
+              ]
             : [part],
     );
 }
@@ -66,7 +90,12 @@ type Props = {
 export default function ProductCreateWizard({ request, onClose, onCreated }: Props) {
     const { tr, english } = useLogisticsText();
     const staffLang: Lang = english ? 'en' : 'vi';
-    const steps = [tr("Thông tin cơ bản"), tr("Chi tiết sản phẩm"), tr("Giá & bán hàng"), tr("Xem lại")];
+    const steps = [
+        tr('Thông tin cơ bản'),
+        tr('Chi tiết sản phẩm'),
+        tr('Giá & bán hàng'),
+        tr('Xem lại'),
+    ];
     const [step, setStep] = useState(0);
     const [values, setValues] = useState<Record<string, string>>({
         nameVi: request?.productName.replace(/^Yêu cầu quy cách mới:\s*/i, '').trim() || '',
@@ -109,6 +138,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
 
     const translationError = (err: unknown): string => tr(translationErrorKey(err));
 
+    /** Hủy gợi ý dịch đang chờ/đang hiện cho một ô (bỏ qua, nguồn đã đổi, hoặc đã dùng). */
     function dropSuggestion(targetKey: string) {
         suggestionRequests.current[targetKey]?.abort();
         delete suggestionRequests.current[targetKey];
@@ -119,6 +149,10 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         });
     }
 
+    /**
+     * Gọi /api/ai/translate (Bedrock) để gợi ý nội dung cho ô `targetKey` từ ô cùng cặp ở ngôn ngữ kia.
+     * Request cũ bị hủy khi có request mới; kết quả chỉ hiện dưới ô, không tự ghi vào form.
+     */
     async function requestSuggestion(targetKey: string) {
         const info = bilingual[targetKey];
         const sourceText = values[info.counterpart]?.trim();
@@ -126,7 +160,10 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         suggestionRequests.current[targetKey]?.abort();
         const controller = new AbortController();
         suggestionRequests.current[targetKey] = controller;
-        setSuggestions((current) => ({ ...current, [targetKey]: { status: 'loading', sourceText } }));
+        setSuggestions((current) => ({
+            ...current,
+            [targetKey]: { status: 'loading', sourceText },
+        }));
         try {
             const text = await suggestTranslation(
                 sourceText,
@@ -135,13 +172,20 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 controller.signal,
             );
             if (controller.signal.aborted) return;
-            setSuggestions((current) => ({ ...current, [targetKey]: { status: 'ready', sourceText, text } }));
+            setSuggestions((current) => ({
+                ...current,
+                [targetKey]: { status: 'ready', sourceText, text },
+            }));
         } catch (err) {
             if (controller.signal.aborted || axios.isCancel(err)) return;
             const message = translationError(err);
-            setSuggestions((current) => ({ ...current, [targetKey]: { status: 'error', sourceText, error: message } }));
+            setSuggestions((current) => ({
+                ...current,
+                [targetKey]: { status: 'error', sourceText, error: message },
+            }));
         } finally {
-            if (suggestionRequests.current[targetKey] === controller) delete suggestionRequests.current[targetKey];
+            if (suggestionRequests.current[targetKey] === controller)
+                delete suggestionRequests.current[targetKey];
         }
     }
 
@@ -167,23 +211,35 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         nutritionTranslationRequest.current = controller;
         setNutritionTranslation({ target, status: 'loading' });
         try {
-            const text = await suggestTranslation(names.join(' | '), source, 'TECHNICAL', controller.signal);
+            const text = await suggestTranslation(
+                names.join(' | '),
+                source,
+                'TECHNICAL',
+                controller.signal,
+            );
             if (controller.signal.aborted) return;
             const translated = text.split('|').map((name) => name.trim());
             if (translated.length !== names.length) {
-                setNutritionTranslation({ target, status: 'error', error: tr(translationErrorKey(null)) });
+                setNutritionTranslation({
+                    target,
+                    status: 'error',
+                    error: tr(translationErrorKey(null)),
+                });
                 return;
             }
             setNutrition((current) => ({
                 ...current,
-                rows: current.rows.map((row, i) => (names[i] ? { ...row, [target]: translated[i] } : row)),
+                rows: current.rows.map((row, i) =>
+                    names[i] ? { ...row, [target]: translated[i] } : row,
+                ),
             }));
             setNutritionTranslation(null);
         } catch (err) {
             if (controller.signal.aborted || axios.isCancel(err)) return;
             setNutritionTranslation({ target, status: 'error', error: translationError(err) });
         } finally {
-            if (nutritionTranslationRequest.current === controller) nutritionTranslationRequest.current = null;
+            if (nutritionTranslationRequest.current === controller)
+                nutritionTranslationRequest.current = null;
         }
     }
 
@@ -204,6 +260,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         };
     }
 
+    /** Nhân viên bấm "Dùng gợi ý": điền bản dịch vào ô, vẫn sửa được trước khi tạo sản phẩm. */
     function acceptSuggestion(targetKey: string) {
         const text = suggestions[targetKey]?.text;
         if (!text) return;
@@ -213,7 +270,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
 
     function validate(index: number): string {
         if ((FREE_TEXT_FIELDS[index] ?? []).some((key) => countWords(values[key]) > MAX_TEXT_WORDS))
-            return tr("Mỗi ô mô tả, ghi chú hoặc bảo quản tối đa 150 chữ.");
+            return tr('Mỗi ô mô tả, ghi chú hoặc bảo quản tối đa 150 chữ.');
         if (index === 0) {
             if (
                 !values.nameVi?.trim() ||
@@ -226,63 +283,76 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 !values.descriptionVi?.trim() ||
                 !values.descriptionEn?.trim()
             )
-                return tr("Vui lòng nhập tên, SKU, danh mục, thương hiệu, xuất xứ, nhà phân phối và mô tả (tiếng Việt và tiếng Anh).");
+                return tr(
+                    'Vui lòng nhập tên, SKU, danh mục, thương hiệu, xuất xứ, nhà phân phối và mô tả (tiếng Việt và tiếng Anh).',
+                );
             if (
                 values.nameVi.trim().length > 200 ||
                 values.nameEn.trim().length > 200 ||
                 values.sku.trim().length > 60
             )
-                return tr("Tên sản phẩm tối đa 200 ký tự và SKU tối đa 60 ký tự.");
+                return tr('Tên sản phẩm tối đa 200 ký tự và SKU tối đa 60 ký tự.');
             if (
                 image &&
                 (image.size > 5 * 1024 * 1024 ||
                     !['image/jpeg', 'image/png', 'image/webp'].includes(image.type))
             )
-                return tr("Ảnh phải là JPG, PNG hoặc WebP và không vượt quá 5 MB.");
+                return tr('Ảnh phải là JPG, PNG hoặc WebP và không vượt quá 5 MB.');
         }
         if (index === 1) {
             // Bước "Chi tiết sản phẩm": mọi thông tin đều bắt buộc.
             const required = [
-                'specVi', 'specEn', 'unit', 'minOrder', 'sellingSpec', 'netWeight', 'tareWeight',
-                'length', 'width', 'height', 'volume', 'storageVi', 'storageEn', 'vat',
+                'specVi',
+                'specEn',
+                'unit',
+                'minOrder',
+                'sellingSpec',
+                'netWeight',
+                'tareWeight',
+                'length',
+                'width',
+                'height',
+                'volume',
+                'storageVi',
+                'storageEn',
+                'vat',
             ];
             if (required.some((key) => !values[key]?.trim()))
-                return tr("Vui lòng nhập đủ mọi thông tin ở bước Chi tiết sản phẩm.");
+                return tr('Vui lòng nhập đủ mọi thông tin ở bước Chi tiết sản phẩm.');
             for (const key of ['netWeight', 'volume', 'length', 'width', 'height', 'minOrder']) {
                 if (!Number.isFinite(Number(values[key])) || Number(values[key]) <= 0)
-                    return tr("Khối lượng, kích thước, thể tích và số lượng tối thiểu phải lớn hơn 0.");
+                    return tr(
+                        'Khối lượng, kích thước, thể tích và số lượng tối thiểu phải lớn hơn 0.',
+                    );
             }
             if (!Number.isFinite(Number(values.tareWeight)) || Number(values.tareWeight) < 0)
-                return tr("Khối lượng bao bì không được âm.");
-            if (!Number.isFinite(Number(values.vat)) || Number(values.vat) < 0 || Number(values.vat) > 100)
-                return tr("Thuế suất VAT phải từ 0 đến 100%.");
+                return tr('Khối lượng bao bì không được âm.');
+            if (
+                !Number.isFinite(Number(values.vat)) ||
+                Number(values.vat) < 0 ||
+                Number(values.vat) > 100
+            )
+                return tr('Thuế suất VAT phải từ 0 đến 100%.');
             if (!nutrition.basis.trim())
-                return tr("Vui lòng nhập lượng tham chiếu cho bảng dinh dưỡng, ví dụ 100g.");
+                return tr('Vui lòng nhập lượng tham chiếu cho bảng dinh dưỡng, ví dụ 100g.');
             if (nutrition.rows.length === 0)
-                return tr("Bảng dinh dưỡng cần ít nhất một thành phần.");
-            if (nutrition.rows.some((row) => !row.vi.trim() || !row.en.trim() || !row.amount.trim()))
-                return tr("Mỗi dòng dinh dưỡng cần đủ tên tiếng Việt, tên tiếng Anh và hàm lượng.");
+                return tr('Bảng dinh dưỡng cần ít nhất một thành phần.');
+            if (
+                nutrition.rows.some((row) => !row.vi.trim() || !row.en.trim() || !row.amount.trim())
+            )
+                return tr('Mỗi dòng dinh dưỡng cần đủ tên tiếng Việt, tên tiếng Anh và hàm lượng.');
             for (const lang of ['vi', 'en'] as const) {
                 const names = nutrition.rows.map((row) => row[lang].trim().toLowerCase());
                 if (new Set(names).size !== names.length)
-                    return tr("Mỗi thành phần dinh dưỡng chỉ được nhập một lần.");
+                    return tr('Mỗi thành phần dinh dưỡng chỉ được nhập một lần.');
             }
         }
         if (index === 2) {
-            if (!values.price?.trim() || !values.quantityStep?.trim())
-                return tr("Vui lòng nhập giá và số lượng tăng thêm mỗi lần đặt.");
+            if (!values.price?.trim()) return tr('Vui lòng nhập giá niêm yết.');
             const price = Number(values.price),
-                min = Number(values.minOrder),
-                stepSize = Number(values.quantityStep);
-            if (
-                ![price, min, stepSize].every(Number.isFinite) ||
-                price < 0 ||
-                !Number.isInteger(price) ||
-                min <= 0 ||
-                stepSize <= 0 ||
-                Math.abs(min / stepSize - Math.round(min / stepSize)) > 1e-8
-            )
-                return tr("Giá phải là số nguyên không âm và số lượng tối thiểu phải chia hết cho số lượng tăng thêm mỗi lần đặt.");
+                min = Number(values.minOrder);
+            if (![price, min].every(Number.isFinite) || price < 0 || !Number.isInteger(price) || min <= 0)
+                return tr('Giá phải là số nguyên không âm và số lượng tối thiểu phải lớn hơn 0.');
             const sorted = [...tiers].sort((a, b) => Number(a.min) - Number(b.min));
             for (let i = 0; i < sorted.length; i++) {
                 const tier = sorted[i],
@@ -301,7 +371,9 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                     (high != null && (!Number.isFinite(high) || high < low)) ||
                     (i > 0 && (!sorted[i - 1].max.trim() || Number(sorted[i - 1].max) >= low))
                 )
-                    return tr("Kiểm tra bậc giá: số lượng phải hợp lệ, không chồng lấn và đơn giá không vượt giá niêm yết.");
+                    return tr(
+                        'Kiểm tra bậc giá: số lượng phải hợp lệ, không chồng lấn và đơn giá không vượt giá niêm yết.',
+                    );
             }
         }
         return '';
@@ -367,7 +439,6 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             price: Number(values.price),
             vat: Number(values.vat),
             minOrder: Number(values.minOrder),
-            quantityStep: Number(values.quantityStep),
             tiers: tiers.map((tier) => ({
                 min: Number(tier.min),
                 max: tier.max.trim() ? Number(tier.max) : null,
@@ -388,8 +459,8 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         } catch (err) {
             setError(
                 axios.isAxiosError(err) && err.response?.status === 409
-                    ? tr("SKU đã tồn tại hoặc dữ liệu bị trùng. Vui lòng kiểm tra lại.")
-                    : tr("Không thể tạo sản phẩm. Kiểm tra thông tin và thử lại."),
+                    ? tr('SKU đã tồn tại hoặc dữ liệu bị trùng. Vui lòng kiểm tra lại.')
+                    : tr('Không thể tạo sản phẩm. Kiểm tra thông tin và thử lại.'),
             );
         } finally {
             setBusy(false);
@@ -463,7 +534,9 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                             className="inline-flex shrink-0 items-center gap-1 border-0 bg-transparent p-0 text-xs font-semibold text-store-green underline underline-offset-2"
                         >
                             <Sparkles size={13} aria-hidden="true" />
-                            {pair.lang === 'en' ? tr("Dịch từ tiếng Việt") : tr("Dịch từ tiếng Anh")}
+                            {pair.lang === 'en'
+                                ? tr('Dịch từ tiếng Việt')
+                                : tr('Dịch từ tiếng Anh')}
                         </button>
                     )}
                 </div>
@@ -473,7 +546,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                         <span
                             className={`mt-1 block text-right text-xs font-normal ${countWords(values[key]) > MAX_TEXT_WORDS ? 'text-red-600' : 'text-store-muted'}`}
                         >
-                            {countWords(values[key])}/{MAX_TEXT_WORDS} {tr("chữ")}
+                            {countWords(values[key])}/{MAX_TEXT_WORDS} {tr('chữ')}
                         </span>
                     </>
                 ) : (
@@ -492,7 +565,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                         {suggestion.status === 'loading' && (
                             <span className="inline-flex items-center gap-2 text-store-muted">
                                 <Loader2 size={14} className="animate-spin" aria-hidden="true" />
-                                {tr("AI đang gợi ý bản dịch…")}
+                                {tr('AI đang gợi ý bản dịch…')}
                             </span>
                         )}
                         {suggestion.status === 'error' && (
@@ -503,30 +576,34 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     onClick={() => dropSuggestion(key)}
                                     className="shrink-0 border-0 bg-transparent p-0 text-xs font-semibold text-black underline"
                                 >
-                                    {tr("Đóng")}
+                                    {tr('Đóng')}
                                 </button>
                             </span>
                         )}
                         {suggestion.status === 'ready' && (
                             <>
                                 <p className="flex items-center gap-1 text-xs font-semibold text-store-green">
-                                    <Sparkles size={12} aria-hidden="true" /> {tr("Gợi ý từ AI")}
+                                    <Sparkles size={12} aria-hidden="true" /> {tr('Gợi ý từ AI')}
                                 </p>
-                                <p className="mt-1 whitespace-pre-line text-sm text-black">{suggestion.text}</p>
+                                <p className="mt-1 whitespace-pre-line text-sm text-black">
+                                    {suggestion.text}
+                                </p>
                                 <div className="mt-2 flex gap-3">
                                     <button
                                         type="button"
                                         onClick={() => acceptSuggestion(key)}
                                         className="rounded bg-store-green px-3 py-1 text-xs font-bold text-white"
                                     >
-                                        {values[key]?.trim() ? tr("Thay bằng gợi ý") : tr("Dùng gợi ý")}
+                                        {values[key]?.trim()
+                                            ? tr('Thay bằng gợi ý')
+                                            : tr('Dùng gợi ý')}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => dropSuggestion(key)}
                                         className="border-0 bg-transparent p-0 text-xs font-semibold underline"
                                     >
-                                        {tr("Bỏ qua")}
+                                        {tr('Bỏ qua')}
                                     </button>
                                 </div>
                             </>
@@ -547,7 +624,8 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
     }
     const categoryName = (items: HomeCategory[]): string => {
         for (const category of items) {
-            if (category.id === values.category) return english ? category.nameEn || category.nameVi : category.nameVi;
+            if (category.id === values.category)
+                return english ? category.nameEn || category.nameVi : category.nameVi;
             const child = categoryName(category.children || []);
             if (child) return child;
         }
@@ -556,15 +634,15 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
     const unitNames: Record<string, string> = {
         KG: 'kg',
         BOTTLE: 'chai',
-        PIECE: tr("cái"),
-        PACK: tr("gói"),
+        PIECE: tr('cái'),
+        PACK: tr('gói'),
         TRAY: 'khay',
-        BOX: tr("hộp"),
-        BAG: tr("túi"),
+        BOX: tr('hộp'),
+        BAG: tr('túi'),
         CAN: 'lon',
-        TIN: tr("hộp thiếc"),
-        TUB: tr("hộp nhựa"),
-        CASE: tr("thùng"),
+        TIN: tr('hộp thiếc'),
+        TUB: tr('hộp nhựa'),
+        CASE: tr('thùng'),
     };
     const cellInputClass =
         'w-full rounded border border-black/40 bg-white px-3 py-2 text-sm font-normal text-black outline-none focus:border-black focus:ring-0';
@@ -582,15 +660,15 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
     // 7 thông số kỹ thuật cố định; nhãn theo ngôn ngữ staff đang chọn ở language switcher.
     const specRows: { label: string; input: ReactNode }[] = [
         {
-            label: tr("Đơn vị bán"),
+            label: tr('Đơn vị bán'),
             input: (
                 <select
-                    aria-label={tr("Đơn vị bán")}
+                    aria-label={tr('Đơn vị bán')}
                     value={values.unit || ''}
                     onChange={(e) => setValues((current) => ({ ...current, unit: e.target.value }))}
                     className={cellInputClass}
                 >
-                    <option value="">{tr("Chọn đơn vị")}</option>
+                    <option value="">{tr('Chọn đơn vị')}</option>
                     {Object.entries(unitNames).map(([code, label]) => (
                         <option key={code} value={code}>
                             {label}
@@ -599,40 +677,51 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 </select>
             ),
         },
-        { label: tr("Số lượng đặt tối thiểu"), input: numberCell('minOrder', tr("Số lượng đặt tối thiểu")) },
         {
-            label: tr("Quy cách bán"),
+            label: tr('Số lượng đặt tối thiểu'),
+            input: numberCell('minOrder', tr('Số lượng đặt tối thiểu')),
+        },
+        {
+            label: tr('Quy cách bán'),
             input: (
                 <input
-                    aria-label={tr("Quy cách bán")}
+                    aria-label={tr('Quy cách bán')}
                     maxLength={200}
-                    placeholder={tr("Ví dụ: Thùng 24 lon")}
+                    placeholder={tr('Ví dụ: Thùng 24 lon')}
                     value={values.sellingSpec || ''}
-                    onChange={(e) => setValues((current) => ({ ...current, sellingSpec: e.target.value }))}
+                    onChange={(e) =>
+                        setValues((current) => ({ ...current, sellingSpec: e.target.value }))
+                    }
                     className={cellInputClass}
                 />
             ),
         },
-        { label: tr("Khối lượng tịnh (kg)"), input: numberCell('netWeight', tr("Khối lượng tịnh (kg)")) },
-        { label: tr("Khối lượng bao bì (kg)"), input: numberCell('tareWeight', tr("Khối lượng bao bì (kg)")) },
         {
-            label: tr("Kích thước D × R × C (cm)"),
+            label: tr('Khối lượng tịnh (kg)'),
+            input: numberCell('netWeight', tr('Khối lượng tịnh (kg)')),
+        },
+        {
+            label: tr('Khối lượng bao bì (kg)'),
+            input: numberCell('tareWeight', tr('Khối lượng bao bì (kg)')),
+        },
+        {
+            label: tr('Kích thước D × R × C (cm)'),
             input: (
                 <div className="grid grid-cols-3 gap-2">
-                    {numberCell('length', tr("Chiều dài (cm)"), tr("Dài"))}
-                    {numberCell('width', tr("Chiều rộng (cm)"), tr("Rộng"))}
-                    {numberCell('height', tr("Chiều cao (cm)"), tr("Cao"))}
+                    {numberCell('length', tr('Chiều dài (cm)'), tr('Dài'))}
+                    {numberCell('width', tr('Chiều rộng (cm)'), tr('Rộng'))}
+                    {numberCell('height', tr('Chiều cao (cm)'), tr('Cao'))}
                 </div>
             ),
         },
-        { label: tr("Thể tích (m³)"), input: numberCell('volume', tr("Thể tích (m³)")) },
+        { label: tr('Thể tích (m³)'), input: numberCell('volume', tr('Thể tích (m³)')) },
     ];
 
     return (
         <div className="mx-auto max-w-[1200px] space-y-6 text-black">
             <PageNav
                 back={{
-                    label: request ? tr("Quay lại yêu cầu") : tr("Quay lại nhập hàng"),
+                    label: request ? tr('Quay lại yêu cầu') : tr('Quay lại nhập hàng'),
                     onClick: onClose,
                     disabled: busy,
                 }}
@@ -641,25 +730,32 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 <div>
                     <p className="text-xs font-bold uppercase tracking-widest text-store-green">
                         {request
-                            ? tr("Yêu cầu khách hàng / Tạo sản phẩm")
-                            : tr("Quản lý kho / Tạo sản phẩm")}
+                            ? tr('Yêu cầu khách hàng / Tạo sản phẩm')
+                            : tr('Quản lý kho / Tạo sản phẩm')}
                     </p>
-                    <h1 className="mt-2 font-heading text-[34px]">{tr("Tạo sản phẩm mới")}</h1>
+                    <h1 className="mt-2 font-heading text-[34px]">{tr('Tạo sản phẩm mới')}</h1>
                     <p className="mt-2 text-sm text-store-muted">
-                        {tr("Điền thông tin sản phẩm theo từng bước.") + ' '}</p>
+                        {tr('Điền thông tin sản phẩm theo từng bước.') + ' '}
+                    </p>
                 </div>
             </div>
             {created ? (
                 <div className="rounded-xl border border-green-300 bg-green-50 p-6" role="status">
-                    <p className="font-bold text-green-800">{tr("Đã tạo sản phẩm nháp") + ' '}{created.sku}.</p>
+                    <p className="font-bold text-green-800">
+                        {tr('Đã tạo sản phẩm nháp') + ' '}
+                        {created.sku}.
+                    </p>
                     <p className="mt-2 text-sm text-green-800">
-                        {tr("Sản phẩm chưa được đăng bán. Bạn có thể nhập tồn kho cho sản phẩm này.") + ' '}</p>
+                        {tr(
+                            'Sản phẩm chưa được đăng bán. Bạn có thể nhập tồn kho cho sản phẩm này.',
+                        ) + ' '}
+                    </p>
                     <button
                         type="button"
                         onClick={() => (onCreated ? onCreated(created) : onClose())}
                         className="mt-4 rounded bg-store-green px-4 py-2 font-bold text-white"
                     >
-                        {onCreated ? tr("Tiếp tục nhập hàng") : tr("Quay lại yêu cầu")}
+                        {onCreated ? tr('Tiếp tục nhập hàng') : tr('Quay lại yêu cầu')}
                     </button>
                 </div>
             ) : (
@@ -687,7 +783,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                     </div>
                     {request && (
                         <div className="rounded-lg border border-store-line bg-store-cream px-5 py-4 text-sm">
-                            <span className="font-bold">{tr("Yêu cầu đang xử lý:")}</span>{' '}
+                            <span className="font-bold">{tr('Yêu cầu đang xử lý:')}</span>{' '}
                             {request.productName}
                             {request.customerNote && (
                                 <span className="ml-2 text-store-muted">
@@ -701,40 +797,42 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                         <p className="mt-1 border-b border-store-line pb-5 text-sm text-store-muted">
                             {
                                 [
-                                    tr("Nhập những thông tin nhận diện sản phẩm."),
-                                    tr("Bổ sung quy cách, bảo quản và nguồn gốc."),
-                                    tr("Thiết lập giá bán và số lượng đặt hàng."),
-                                    tr("Kiểm tra lại thông tin trước khi hoàn tất."),
+                                    tr('Nhập những thông tin nhận diện sản phẩm.'),
+                                    tr('Bổ sung quy cách, bảo quản và nguồn gốc.'),
+                                    tr('Thiết lập giá bán và số lượng đặt hàng.'),
+                                    tr('Kiểm tra lại thông tin trước khi hoàn tất.'),
                                 ][step]
                             }
                         </p>
                         {step === 0 && (
                             <div className="mt-5 space-y-5">
                                 <div className="grid grid-cols-2 gap-4">
-                                    {field('nameVi', tr("Tên sản phẩm · Tiếng Việt *"))}
-                                    {field('nameEn', tr("Tên sản phẩm · Tiếng Anh *"))}
-                                    {field('sku', tr("Mã SKU *"))}
+                                    {field('nameVi', tr('Tên sản phẩm · Tiếng Việt *'))}
+                                    {field('nameEn', tr('Tên sản phẩm · Tiếng Anh *'))}
+                                    {field('sku', tr('Mã SKU *'))}
                                     <label className="block text-sm font-semibold">
-                                        {requiredLabel(tr("Danh mục con *"))}{' '}<select
+                                        {requiredLabel(tr('Danh mục con *'))}{' '}
+                                        <select
                                             value={values.category || ''}
                                             onChange={(e) =>
                                                 setValues({ ...values, category: e.target.value })
                                             }
                                             className={inputClass}
                                         >
-                                            <option value="">{tr("Chọn danh mục con")}</option>
+                                            <option value="">{tr('Chọn danh mục con')}</option>
                                             {categoryOptions(categories)}
                                         </select>
                                     </label>
                                     <label className="block text-sm font-semibold">
-                                        {requiredLabel(tr("Thương hiệu *"))}{' '}<select
+                                        {requiredLabel(tr('Thương hiệu *'))}{' '}
+                                        <select
                                             value={values.brand || ''}
                                             onChange={(e) =>
                                                 setValues({ ...values, brand: e.target.value })
                                             }
                                             className={inputClass}
                                         >
-                                            <option value="">{tr("Chọn thương hiệu")}</option>
+                                            <option value="">{tr('Chọn thương hiệu')}</option>
                                             {brands.map((brand) => (
                                                 <option key={brand.id} value={brand.id}>
                                                     {brand.name}
@@ -743,7 +841,8 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                         </select>
                                     </label>
                                     <label className="block text-sm font-semibold">
-                                        {requiredLabel(tr("Xuất xứ *"))}{' '}<select
+                                        {requiredLabel(tr('Xuất xứ *'))}{' '}
+                                        <select
                                             value={values.origin || ''}
                                             onChange={(e) =>
                                                 setValues({ ...values, origin: e.target.value })
@@ -752,8 +851,8 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                         >
                                             <option value="">
                                                 {countries.length || countriesError
-                                                    ? tr("Chọn quốc gia")
-                                                    : tr("Đang tải danh sách quốc gia…")}
+                                                    ? tr('Chọn quốc gia')
+                                                    : tr('Đang tải danh sách quốc gia…')}
                                             </option>
                                             {countries.map((country) => (
                                                 <option key={country.code} value={country.value}>
@@ -762,20 +861,29 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                             ))}
                                         </select>
                                         {countriesError && (
-                                            <span role="alert" className="mt-1 block text-xs font-normal text-red-700">
-                                                {tr("Không tải được danh sách quốc gia. Vui lòng tải lại trang.")}
+                                            <span
+                                                role="alert"
+                                                className="mt-1 block text-xs font-normal text-red-700"
+                                            >
+                                                {tr(
+                                                    'Không tải được danh sách quốc gia. Vui lòng tải lại trang.',
+                                                )}
                                             </span>
                                         )}
                                     </label>
                                     <label className="block text-sm font-semibold">
-                                        {requiredLabel(tr("Nhà phân phối *"))}{' '}<select
+                                        {requiredLabel(tr('Nhà phân phối *'))}{' '}
+                                        <select
                                             value={values.distributor || ''}
                                             onChange={(e) =>
-                                                setValues({ ...values, distributor: e.target.value })
+                                                setValues({
+                                                    ...values,
+                                                    distributor: e.target.value,
+                                                })
                                             }
                                             className={inputClass}
                                         >
-                                            <option value="">{tr("Chọn nhà phân phối")}</option>
+                                            <option value="">{tr('Chọn nhà phân phối')}</option>
                                             {distributors.map((distributor) => (
                                                 <option key={distributor.id} value={distributor.id}>
                                                     {distributor.name}
@@ -786,14 +894,17 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                 </div>
                                 {catalogError && (
                                     <p role="alert" className="text-sm text-red-700">
-                                        {tr("Không tải được danh mục hoặc thương hiệu. Vui lòng kiểm tra kết nối.") + ' '}</p>
+                                        {tr(
+                                            'Không tải được danh mục hoặc thương hiệu. Vui lòng kiểm tra kết nối.',
+                                        ) + ' '}
+                                    </p>
                                 )}
                                 <label className="flex cursor-pointer items-center gap-4 rounded-lg border border-dashed border-black/50 bg-store-cream p-4">
                                     <span className="grid size-12 place-items-center overflow-hidden rounded bg-white">
                                         {imagePreview ? (
                                             <img
                                                 src={imagePreview}
-                                                alt={tr("Ảnh sản phẩm đã chọn")}
+                                                alt={tr('Ảnh sản phẩm đã chọn')}
                                                 className="size-full object-cover"
                                             />
                                         ) : (
@@ -801,11 +912,11 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                         )}
                                     </span>
                                     <span className="text-sm">
-                                        <strong className="block">{tr("Ảnh sản phẩm")}</strong>
+                                        <strong className="block">{tr('Ảnh sản phẩm')}</strong>
                                         <span className="text-store-muted">
                                             {image
                                                 ? image.name
-                                                : tr("Chọn ảnh JPG, PNG hoặc WebP (tối đa 5 MB)")}
+                                                : tr('Chọn ảnh JPG, PNG hoặc WebP (tối đa 5 MB)')}
                                         </span>
                                     </span>
                                     <input
@@ -822,41 +933,59 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     />
                                 </label>
                                 <div className="grid grid-cols-2 gap-4">
-                                    {field('descriptionVi', tr("Mô tả · Tiếng Việt *"), { area: true })}
-                                    {field('descriptionEn', tr("Mô tả · Tiếng Anh *"), { area: true })}
+                                    {field('descriptionVi', tr('Mô tả · Tiếng Việt *'), {
+                                        area: true,
+                                    })}
+                                    {field('descriptionEn', tr('Mô tả · Tiếng Anh *'), {
+                                        area: true,
+                                    })}
                                 </div>
-                                {field('note', tr("Ghi chú"), { area: true })}
+                                {field('note', tr('Ghi chú'), { area: true })}
                             </div>
                         )}
                         {step === 1 && (
                             <div className="mt-5 space-y-6">
                                 <div className="grid grid-cols-2 gap-4">
-                                    {field('specVi', tr("Quy cách đóng gói · Tiếng Việt *"), {
-                                        placeholder: tr("Ví dụ: Bao 10kg"),
+                                    {field('specVi', tr('Quy cách đóng gói · Tiếng Việt *'), {
+                                        placeholder: tr('Ví dụ: Bao 10kg'),
                                     })}
-                                    {field('specEn', tr("Quy cách đóng gói · Tiếng Anh *"), {
-                                        placeholder: tr("Ví dụ: 10kg bag"),
+                                    {field('specEn', tr('Quy cách đóng gói · Tiếng Anh *'), {
+                                        placeholder: tr('Ví dụ: 10kg bag'),
                                     })}
                                 </div>
                                 <div className="space-y-3 border-t border-store-line pt-5">
-                                    <h3 className="font-semibold">{requiredLabel(tr("Thông số kỹ thuật *"))}</h3>
+                                    <h3 className="font-semibold">
+                                        {requiredLabel(tr('Thông số kỹ thuật *'))}
+                                    </h3>
                                     {/* Bảng cố định 7 dòng: cột thông số theo ngôn ngữ đang chọn, staff chỉ nhập cột giá trị. */}
                                     <div className="overflow-hidden rounded border border-black/40">
                                         <table className="w-full table-fixed border-collapse text-sm">
                                             <thead className="bg-store-cream">
                                                 <tr>
-                                                    <th scope="col" className="w-[38%] px-3 py-2 text-left font-semibold">
-                                                        {tr("Thông số")}
+                                                    <th
+                                                        scope="col"
+                                                        className="w-[38%] px-3 py-2 text-left font-semibold"
+                                                    >
+                                                        {tr('Thông số')}
                                                     </th>
-                                                    <th scope="col" className="px-3 py-2 text-left font-semibold">
-                                                        {tr("Giá trị")}
+                                                    <th
+                                                        scope="col"
+                                                        className="px-3 py-2 text-left font-semibold"
+                                                    >
+                                                        {tr('Giá trị')}
                                                     </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {specRows.map((row) => (
-                                                    <tr key={row.label} className="border-t border-black/10">
-                                                        <th scope="row" className="px-3 py-2 text-left align-middle font-medium">
+                                                    <tr
+                                                        key={row.label}
+                                                        className="border-t border-black/10"
+                                                    >
+                                                        <th
+                                                            scope="row"
+                                                            className="px-3 py-2 text-left align-middle font-medium"
+                                                        >
                                                             {row.label}
                                                         </th>
                                                         <td className="px-2 py-2">{row.input}</td>
@@ -867,9 +996,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     </div>
                                 </div>
                                 <div className="space-y-5 border-t border-store-line pt-5">
-                                    {[
-                                        ['storage', tr("Bảo quản và sơ chế")],
-                                    ].map(([key, label]) => (
+                                    {[['storage', tr('Bảo quản và sơ chế')]].map(([key, label]) => (
                                         <div key={key} className="grid grid-cols-2 gap-4">
                                             {field(`${key}Vi`, `${label} · ${tr('Tiếng Việt')} *`, {
                                                 area: true,
@@ -881,20 +1008,32 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     ))}
                                 </div>
                                 <div className="space-y-3 border-t border-store-line pt-5">
-                                    <h3 className="font-semibold">{tr("An toàn thực phẩm và VAT")}</h3>
+                                    <h3 className="font-semibold">
+                                        {tr('An toàn thực phẩm và VAT')}
+                                    </h3>
                                     <div className="max-w-xs">
-                                        {field('vat', tr("Thuế suất VAT (%) *"), { type: 'number', placeholder: '8' })}
+                                        {field('vat', tr('Thuế suất VAT (%) *'), {
+                                            type: 'number',
+                                            placeholder: '8',
+                                        })}
                                     </div>
                                 </div>
                                 <div className="space-y-4 border-t border-store-line pt-5">
                                     <div>
-                                        <h3 className="font-semibold">{requiredLabel(tr("Thông tin dinh dưỡng *"))}</h3>
+                                        <h3 className="font-semibold">
+                                            {requiredLabel(tr('Thông tin dinh dưỡng *'))}
+                                        </h3>
                                     </div>
                                     <label className="block text-sm font-semibold">
-                                        {tr("Giá trị ước tính trên")}
+                                        {tr('Giá trị ước tính trên')}
                                         <input
                                             value={nutrition.basis}
-                                            onChange={(e) => setNutrition({ ...nutrition, basis: e.target.value })}
+                                            onChange={(e) =>
+                                                setNutrition({
+                                                    ...nutrition,
+                                                    basis: e.target.value,
+                                                })
+                                            }
                                             maxLength={100}
                                             placeholder="100g"
                                             className={inputClass}
@@ -905,38 +1044,62 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                         onChange={(rows) => setNutrition({ ...nutrition, rows })}
                                         labels={{
                                             heading: { vi: tr('Tiếng Việt'), en: tr('Tiếng Anh') },
-                                            nutrient: { vi: 'Thành phần dinh dưỡng', en: 'Nutrient' },
+                                            nutrient: {
+                                                vi: 'Thành phần dinh dưỡng',
+                                                en: 'Nutrient',
+                                            },
                                             amount: { vi: 'Hàm lượng', en: 'Amount' },
-                                            addRow: tr("+ Thêm thành phần"),
-                                            remove: tr("Xóa"),
-                                            nutrientPlaceholder: { vi: 'Ví dụ: Chất đạm', en: 'e.g. Protein' },
+                                            addRow: tr('+ Thêm thành phần'),
+                                            remove: tr('Xóa'),
+                                            nutrientPlaceholder: {
+                                                vi: 'Ví dụ: Chất đạm',
+                                                en: 'e.g. Protein',
+                                            },
                                             amountPlaceholder: '20g',
                                         }}
                                         headerExtra={(lang) => {
                                             const source = lang === 'en' ? 'vi' : 'en';
                                             const translation =
-                                                nutritionTranslation?.target === lang ? nutritionTranslation : null;
+                                                nutritionTranslation?.target === lang
+                                                    ? nutritionTranslation
+                                                    : null;
                                             if (translation?.status === 'loading')
                                                 return (
                                                     <span className="inline-flex items-center gap-1 text-xs font-normal text-store-muted">
-                                                        <Loader2 size={13} className="animate-spin" aria-hidden="true" />
-                                                        {tr("AI đang gợi ý bản dịch…")}
+                                                        <Loader2
+                                                            size={13}
+                                                            className="animate-spin"
+                                                            aria-hidden="true"
+                                                        />
+                                                        {tr('AI đang gợi ý bản dịch…')}
                                                     </span>
                                                 );
                                             return (
                                                 <span className="flex flex-col items-end gap-1">
-                                                    {nutrition.rows.some((row) => row[source].trim()) && (
+                                                    {nutrition.rows.some((row) =>
+                                                        row[source].trim(),
+                                                    ) && (
                                                         <button
                                                             type="button"
-                                                            onClick={() => void translateNutrition(lang)}
+                                                            onClick={() =>
+                                                                void translateNutrition(lang)
+                                                            }
                                                             className="inline-flex shrink-0 items-center gap-1 border-0 bg-transparent p-0 text-xs font-semibold text-store-green underline underline-offset-2"
                                                         >
-                                                            <Sparkles size={13} aria-hidden="true" />
-                                                            {lang === 'en' ? tr("Dịch từ tiếng Việt") : tr("Dịch từ tiếng Anh")}
+                                                            <Sparkles
+                                                                size={13}
+                                                                aria-hidden="true"
+                                                            />
+                                                            {lang === 'en'
+                                                                ? tr('Dịch từ tiếng Việt')
+                                                                : tr('Dịch từ tiếng Anh')}
                                                         </button>
                                                     )}
                                                     {translation?.status === 'error' && (
-                                                        <span role="alert" className="text-xs font-normal text-red-700">
+                                                        <span
+                                                            role="alert"
+                                                            className="text-xs font-normal text-red-700"
+                                                        >
                                                             {translation.error}
                                                         </span>
                                                     )}
@@ -950,18 +1113,10 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                         {step === 2 && (
                             <div className="mt-5 space-y-5">
                                 <div className="grid grid-cols-2 gap-4">
-                                    {field('price', tr("Giá niêm yết (đ) *"), { type: 'number' })}
-                                    <div>
-                                        {field('quantityStep', tr("Số lượng tăng thêm mỗi lần đặt *"), {
-                                            type: 'number',
-                                        })}
-                                        <p className="mt-1 text-xs text-store-muted">
-                                            {tr("Ví dụ: tối thiểu 5, tăng thêm 5 thì khách đặt được 5, 10, 15…")}
-                                        </p>
-                                    </div>
+                                    {field('price', tr('Giá niêm yết (đ) *'), { type: 'number' })}
                                 </div>
                                 <div className="flex items-center justify-between border-t border-store-line pt-5">
-                                    <h3 className="font-semibold">{tr("Bậc giá sỉ")}</h3>
+                                    <h3 className="font-semibold">{tr('Bậc giá sỉ')}</h3>
                                     <button
                                         type="button"
                                         onClick={() =>
@@ -969,7 +1124,8 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                         }
                                         className="rounded border border-black px-3 py-2 text-sm font-semibold"
                                     >
-                                        {tr("+ Thêm bậc giá") + ' '}</button>
+                                        {tr('+ Thêm bậc giá') + ' '}
+                                    </button>
                                 </div>
                                 {tiers.map((tier, index) => (
                                     <div
@@ -979,9 +1135,11 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                         {(['min', 'max', 'price'] as const).map((key, column) => (
                                             <label key={key} className="text-xs font-semibold">
                                                 {
-                                                    [tr("Từ số lượng"), tr("Đến số lượng"), tr("Đơn giá (đ)")][
-                                                        column
-                                                    ]
+                                                    [
+                                                        tr('Từ số lượng'),
+                                                        tr('Đến số lượng'),
+                                                        tr('Đơn giá (đ)'),
+                                                    ][column]
                                                 }
                                                 <input
                                                     type="number"
@@ -1010,7 +1168,8 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                             }
                                             className="mb-1 px-2 py-2 text-sm text-red-700"
                                         >
-                                            {tr("Xóa") + ' '}</button>
+                                            {tr('Xóa') + ' '}
+                                        </button>
                                     </div>
                                 ))}
                             </div>
@@ -1018,49 +1177,62 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                         {step === 3 && (
                             <div className="mt-5 space-y-4 text-sm">
                                 <div className="rounded-lg bg-store-cream p-4">
-                                    <p className="font-semibold">{tr("Thông tin cơ bản")}</p>
+                                    <p className="font-semibold">{tr('Thông tin cơ bản')}</p>
                                     <p className="mt-2">
-                                        {values.nameVi || tr("Chưa nhập tên")} ·{' '}
-                                        {values.sku || tr("Chưa nhập SKU")}
+                                        {values.nameVi || tr('Chưa nhập tên')} ·{' '}
+                                        {values.sku || tr('Chưa nhập SKU')}
                                     </p>
                                     <p className="mt-1 text-store-muted">
-                                        {tr("Danh mục:") + ' '}{categoryName(categories) || tr("Chưa chọn")} {tr("· Thương hiệu:")}{' '}
+                                        {tr('Danh mục:') + ' '}
+                                        {categoryName(categories) || tr('Chưa chọn')}{' '}
+                                        {tr('· Thương hiệu:')}{' '}
                                         {brands.find((brand) => brand.id === values.brand)?.name ||
-                                            tr("Chưa chọn")}
+                                            tr('Chưa chọn')}
                                     </p>
                                 </div>
                                 <div className="rounded-lg bg-store-cream p-4">
-                                    <p className="font-semibold">{tr("Chi tiết sản phẩm")}</p>
+                                    <p className="font-semibold">{tr('Chi tiết sản phẩm')}</p>
                                     <p className="mt-2">
-                                        {tr("Quy cách đóng gói:") + ' '}{values.specVi || tr("Chưa nhập")} {tr("· Xuất xứ:")}{' '}
-                                        {values.origin || tr("Chưa nhập")}
+                                        {tr('Quy cách đóng gói:') + ' '}
+                                        {values.specVi || tr('Chưa nhập')} {tr('· Xuất xứ:')}{' '}
+                                        {values.origin || tr('Chưa nhập')}
                                     </p>
                                     <p className="mt-1 text-store-muted">
-                                        {tr("Bảo quản:") + ' '}{values.storageVi || tr("Chưa nhập")}
+                                        {tr('Bảo quản:') + ' '}
+                                        {values.storageVi || tr('Chưa nhập')}
                                     </p>
                                     <p className="mt-1 text-store-muted">
-                                        {tr("Quy cách bán:") + ' '}{values.sellingSpec || tr("Chưa nhập")} {tr("· Nhà phân phối:")}{' '}
-                                        {distributors.find((item) => item.id === values.distributor)?.name || tr("Chưa chọn")}
+                                        {tr('Quy cách bán:') + ' '}
+                                        {values.sellingSpec || tr('Chưa nhập')}{' '}
+                                        {tr('· Nhà phân phối:')}{' '}
+                                        {distributors.find((item) => item.id === values.distributor)
+                                            ?.name || tr('Chưa chọn')}
                                     </p>
                                     <p className="mt-1 text-store-muted">
-                                        {tr("Thông tin dinh dưỡng:") + ' '}
-                                        {`${nutrition.rows.length} ${tr("thành phần")} · ${nutrition.basis}`}
+                                        {tr('Thông tin dinh dưỡng:') + ' '}
+                                        {`${nutrition.rows.length} ${tr('thành phần')} · ${nutrition.basis}`}
                                     </p>
                                 </div>
                                 <div className="rounded-lg bg-store-cream p-4">
-                                    <p className="font-semibold">{tr("Giá & bán hàng")}</p>
+                                    <p className="font-semibold">{tr('Giá & bán hàng')}</p>
                                     <p className="mt-2">
-                                        {tr("Giá:")}{' '}
+                                        {tr('Giá:')}{' '}
                                         {values.price
                                             ? `${Number(values.price).toLocaleString('vi-VN')} đ`
-                                            : tr("Chưa nhập")}{' '}
-                                        · VAT: {values.vat ? `${values.vat}%` : tr("Chưa nhập")} {tr("· Đơn vị:") + ' '}{unitNames[values.unit] || tr("Chưa chọn")}
+                                            : tr('Chưa nhập')}{' '}
+                                        · VAT: {values.vat ? `${values.vat}%` : tr('Chưa nhập')}{' '}
+                                        {tr('· Đơn vị:') + ' '}
+                                        {unitNames[values.unit] || tr('Chưa chọn')}
                                     </p>
                                     <p className="mt-1 text-store-muted">
-                                        {tiers.length} {tr("bậc giá sỉ") + ' '}</p>
+                                        {tiers.length} {tr('bậc giá sỉ') + ' '}
+                                    </p>
                                 </div>
                                 <p className="rounded-lg border border-store-line p-4 text-store-muted">
-                                    {tr("Sản phẩm sẽ được tạo ở trạng thái nháp và chưa đăng bán.") + ' '}</p>
+                                    {tr(
+                                        'Sản phẩm sẽ được tạo ở trạng thái nháp và chưa đăng bán.',
+                                    ) + ' '}
+                                </p>
                             </div>
                         )}
                         {error && (
@@ -1078,7 +1250,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                 onClick={() => (step ? go(step - 1) : onClose())}
                                 className="inline-flex items-center gap-2 rounded border border-black px-4 py-3 text-sm font-semibold"
                             >
-                                <ArrowLeft size={16} /> {step ? tr("Quay lại") : tr("Đóng")}
+                                <ArrowLeft size={16} /> {step ? tr('Quay lại') : tr('Đóng')}
                             </button>
                             {step < 3 ? (
                                 <button
@@ -1086,7 +1258,8 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     onClick={() => go(step + 1)}
                                     className="inline-flex items-center gap-2 rounded border border-black bg-store-yellow px-5 py-3 text-sm font-bold"
                                 >
-                                    {tr("Tiếp tục") + ' '}<ArrowRight size={16} />
+                                    {tr('Tiếp tục') + ' '}
+                                    <ArrowRight size={16} />
                                 </button>
                             ) : (
                                 <button
@@ -1096,7 +1269,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     className="inline-flex items-center gap-2 rounded border border-black bg-store-yellow px-5 py-3 text-sm font-bold disabled:opacity-50"
                                 >
                                     <PackagePlus size={16} />{' '}
-                                    {busy ? tr("Đang tạo...") : tr("Tạo sản phẩm nháp")}
+                                    {busy ? tr('Đang tạo...') : tr('Tạo sản phẩm nháp')}
                                 </button>
                             )}
                         </div>

@@ -6,6 +6,8 @@ export interface QuoteItem {
     unitCode: string;
     quantity: number;
     quantityStep: number | null;
+    /** Smallest quantity that can be ordered (MOQ); quantities go MOQ, MOQ + 1, ... */
+    minOrderQuantity: number | null;
     listUnitPrice: number;
     volumeUnitPrice: number;
     saleUnitPrice: number;
@@ -33,6 +35,8 @@ export interface AvailableCoupon {
 
 export interface Quote {
     id: string;
+    /** DRAFT while editable; any other value means it was already turned into an order. */
+    status: string;
     revision: number;
     contactName: string | null;
     itemsSubtotal: number;
@@ -43,6 +47,9 @@ export interface Quote {
     shippingCouponDiscountAmount: number;
     productCouponId: string | null;
     shippingCouponId: string | null;
+    /** Only codes already applied to this quote; never a list of published coupons. */
+    productCouponCode: string | null;
+    shippingCouponCode: string | null;
     /** Null until every product in the quote has a VAT rate. */
     vatAmount: number | null;
     /** VAT of the lines that do have a rate, available even when vatAmount is null. */
@@ -61,6 +68,8 @@ export interface QuotePackage {
     address: string;
     note: string | null;
     city: 'HCM';
+    latitude?: number | null;
+    longitude?: number | null;
     shippingFee: number;
     distanceMetres: number;
     items: { quoteItemId: string; quantity: number }[];
@@ -112,4 +121,26 @@ export interface CreatedOrder {
     status: string;
     totalAmount: number;
     reservationExpiresAt: string | null;
+}
+
+export interface SavedCoupon {
+    code: string;
+    scope: CouponScope;
+    nameVi: string | null;
+    nameEn: string | null;
+    discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
+    discountValue: number;
+    maxDiscountAmount: number | null;
+    minOrderAmount: number;
+    usageLimit: number | null;
+    usageLimitPerUser: number | null;
+    used: number;
+    reserved: number;
+    remaining: number | null;
+    startsAt: string;
+    endsAt: string;
+    productScope: 'ALL' | 'SELECTED';
+    products: { id: string; nameVi: string; nameEn: string }[];
+    valid: boolean;
+    reason: string | null;
 }

@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { ArrowLeft, ArrowRight, Package, Tag, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Package, Pencil, Tag, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { getCustomerProfile } from '@/services/customer/profileService';
 import Footer from '@/layouts/Footer';
 import Header from '@/layouts/Header';
@@ -21,10 +21,11 @@ import {
     applyQuoteCoupons,
     createQuoteFromCart,
     deleteQuotePackage,
-    getAvailableCoupons,
     getQuote,
     getQuotePackages,
     getQuotePackageTotals,
+    replaceQuoteCart,
+    updateQuotePackage,
     placeOrderFromQuote,
     saveQuoteContact,
     validateQuotePricing,
@@ -51,6 +52,32 @@ const checkoutErrors: Record<string, string> = {
 function errorCode(error: unknown) {
     if (!axios.isAxiosError(error)) return undefined;
     return (error.response?.data as { code?: string } | undefined)?.code;
+}
+
+interface StockShortage {
+    productId: string;
+    available: number;
+    requested: number;
+}
+
+// QUOTE_STOCK_UNAVAILABLE carries one errors[] row per short product:
+// field = productId, code = INSUFFICIENT_STOCK, message = "available=3;requested=8".
+function stockShortages(error: unknown): StockShortage[] {
+    if (!axios.isAxiosError(error)) return [];
+    const rows = (error.response?.data as { errors?: { field?: string; code?: string; message?: string }[] } | undefined)?.errors;
+    if (!Array.isArray(rows)) return [];
+    return rows
+        .filter((row) => row.code === 'INSUFFICIENT_STOCK' && row.field)
+        .map((row) => {
+            const values = Object.fromEntries(
+                (row.message ?? '').split(';').map((part) => part.split('=') as [string, string]),
+            );
+            return {
+                productId: row.field as string,
+                available: Number(values.available) || 0,
+                requested: Number(values.requested) || 0,
+            };
+        });
 }
 
 function errorMessage(error: unknown, fallback: string) {
@@ -80,6 +107,8 @@ export default function CartPage() {
             ? t(value)
             : value;
     const navigate = useNavigate();
+    const location = useLocation();
+    const restoring = useAuthStore((state) => state.restoring);
     const session = useAuthStore((state) => state.session);
     const items = useCartStore((state) => state.items);
     const updateQuantity = useCartStore((state) => state.updateQuantity);
@@ -89,14 +118,14 @@ export default function CartPage() {
     const [step, setStep] = useState(0);
     const [quote, setQuote] = useState<Quote | null>(null);
     const [packages, setPackages] = useState<QuotePackage[]>([]);
-    const owner = session?.user.id ?? 'guest';
+    const [searchParams, setSearchParams] = useSearchParams();
+    const reorderQuoteId = searchParams.get('reorderQuote');
+    const owner = `${session?.user.id ?? 'guest'}${reorderQuoteId ? `:reorder:${reorderQuoteId}` : ''}`;
+    const [editingPackageId, setEditingPackageId] = useState<string | null>(null);
+    const [reorderQuantities, setReorderQuantities] = useState<Record<string, string>>({});
     const form = useQuoteDraftStore((state) => state.forms[owner] ?? emptyQuoteForm);
     const updateForm = useQuoteDraftStore((state) => state.updateForm);
-    const { productCode, shippingCode, quantities, parcel } = form;
-    const setProductCode = (value: string) =>
-        updateForm(owner, (current) => ({ ...current, productCode: value }));
-    const setShippingCode = (value: string) =>
-        updateForm(owner, (current) => ({ ...current, shippingCode: value }));
+    const { quantities, parcel } = form;
     const setQuantities: Dispatch<SetStateAction<Record<string, string>>> = (value) =>
         updateForm(owner, (current) => ({
             ...current,
@@ -109,24 +138,60 @@ export default function CartPage() {
         }));
     const [busy, setBusy] = useState(false);
     const [message, setMessage] = useState('');
+    const [shortages, setShortages] = useState<StockShortage[]>([]);
     const [packageError, setPackageError] = useState('');
     const [mapOpen, setMapOpen] = useState(false);
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [reorderLoading, setReorderLoading] = useState(!!reorderQuoteId);
+    // Reorder quote was created atomically by BE from a previous order. Recheck it before
+    // opening the payment-confirmation screen; do not rebuild from the current cart.
+    useEffect(() => {
+        if (!reorderQuoteId) return;
+        setReorderLoading(true);
+        let active = true;
+        Promise.all([getQuote(reorderQuoteId), getQuotePackages(reorderQuoteId)])
+            .then(async ([draft, savedPackages]) => {
+                if (!active) return;
+                setQuote(draft);
+                setPackages(savedPackages);
+                // Already ordered (e.g. Back from the order page): show the notice, never re-validate it.
+                if (draft.status !== 'DRAFT') return;
+                const complete = savedPackages.length > 0 && draft.items.every(item =>
+                    Math.abs(Number(item.quantity) - savedPackages.reduce((sum, pkg) =>
+                        sum + pkg.items.filter(line => line.quoteItemId === item.id)
+                            .reduce((total, line) => total + Number(line.quantity), 0), 0)) < 1e-6);
+                if (!complete) { setStep(2); return; }
+                setStep(1);
+                const verified = await validateQuotePricing(draft.id, draft.revision);
+                if (!active) return;
+                setQuote(verified);
+                setStep(3);
+            })
+            .catch((error: unknown) => {
+                if (active) setMessage(errorMessage(error, 'errors.fallback'));
+            })
+            .finally(() => { if (active) setReorderLoading(false); });
+        return () => { active = false; };
+    }, [reorderQuoteId]);
+
     // Counts presses of "Review quote total" while the delivery step is incomplete.
     const [reviewAttempt, setReviewAttempt] = useState(0);
 
     // Back from the distribution map (?step=delivery): reopen the quote at the delivery step.
     const resumeDelivery = searchParams.get('step') === 'delivery';
     const resumed = useRef(false);
+    const checkoutLines = location.state?.checkoutLines as { productId: string; quantity: number }[] | undefined;
     useEffect(() => {
-        if (!resumeDelivery || resumed.current) return;
+        if (restoring || resumed.current || reorderQuoteId || (!resumeDelivery && !Array.isArray(checkoutLines))) return;
         resumed.current = true;
-        setSearchParams({}, { replace: true });
-        if (session?.user.role === 'CUSTOMER' && selectedItems.length > 0) {
-            void Promise.resolve().then(() => startQuote(2));
+        setSearchParams({}, { replace: true, state: null });
+        if (session?.user.role === 'CUSTOMER') {
+            const lines = Array.isArray(checkoutLines)
+                ? checkoutLines
+                : selectedItems.map(item => ({ productId: item.id, quantity: item.quantity }));
+            if (lines.length) void startQuote(resumeDelivery ? 2 : 1, lines);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps -- run once when arriving with ?step=delivery
-    }, [resumeDelivery]);
+    }, [resumeDelivery, restoring, checkoutLines, session, reorderQuoteId]);
 
     // First package: prefill it with the delivery details given at registration, so the
     // customer only enters quantities. Skipped once they clear it or after any package exists.
@@ -134,6 +199,7 @@ export default function CartPage() {
         step === 2 &&
         !!quote &&
         packages.length === 0 &&
+        !editingPackageId &&
         !form.profileDefaultDismissed &&
         !form.profilePrefillApplied &&
         session?.user.role === 'CUSTOMER';
@@ -180,11 +246,76 @@ export default function CartPage() {
         values: Record<string, QuotePackageAmount>;
     } | null>(null);
     const [packageTotalsError, setPackageTotalsError] = useState(false);
-    const subtotal = selectedItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+    const subtotal = reorderQuoteId && quote
+        ? quote.items.reduce((sum, item) => sum + Number(item.listUnitPrice) * (Number(reorderQuantities[item.productId]) || 0), 0)
+        : selectedItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+
+    const reorderLines = quote?.items.map(item => ({
+        productId: item.productId, quantity: Number(reorderQuantities[item.productId] ?? item.quantity),
+    })) ?? [];
+    // Same rule as BE: 0 removes the line, otherwise at least the MOQ and MOQ + whole steps (step is 1).
+    const reorderValid = !!quote && quote.items.every(item => {
+        const raw = reorderQuantities[item.productId] ?? String(item.quantity);
+        const quantity = Number(raw);
+        const min = Number(item.minOrderQuantity) || 0;
+        const increment = Number(item.quantityStep) || 1;
+        const steps = (quantity - min) / increment;
+        return raw.trim() !== '' && Number.isFinite(quantity) && quantity >= 0 &&
+            quantity < 1e9 && Math.abs(quantity * 1000 - Math.round(quantity * 1000)) < 1e-5 &&
+            (quantity === 0 || (quantity >= min - 1e-9 && Math.abs(steps - Math.round(steps)) < 1e-6));
+    }) && reorderLines.some(item => item.quantity > 0);
+    const quoteClosed = !!reorderQuoteId && !!quote && quote.status !== 'DRAFT';
+    const reorderChanged = !!quote && reorderLines.some((line, index) =>
+        line.quantity !== Number(quote.items[index].quantity));
+
+    function cancelPackageEdit() {
+        setEditingPackageId(null);
+        setQuantities({});
+        setParcel(emptyParcel);
+        setPackageError('');
+        setReviewAttempt(0);
+    }
+
+    function editPackage(item: QuotePackage) {
+        if (!quote) return;
+        setEditingPackageId(item.id);
+        setParcel({
+            name: item.name, recipientName: item.recipientName, recipientPhone: item.recipientPhone,
+            address: item.address, city: item.city, deliveryDate: item.deliveryDate, note: item.note ?? '',
+            latitude: item.latitude == null ? undefined : Number(item.latitude),
+            longitude: item.longitude == null ? undefined : Number(item.longitude),
+        });
+        setQuantities(Object.fromEntries(item.items.flatMap(line => {
+            const product = quote.items.find(row => row.id === line.quoteItemId);
+            return product ? [[product.productId, String(line.quantity)]] : [];
+        })));
+        setPackageError('');
+        setReviewAttempt(0);
+        requestAnimationFrame(() => document.getElementById('package-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    }
+
+    async function saveReorderCart() {
+        if (!quote || !reorderValid) return;
+        if (!reorderChanged) { go(1); return; }
+        setBusy(true);
+        setMessage('');
+        try {
+            const updated = await replaceQuoteCart(quote.id, quote.revision, reorderLines.filter(line => line.quantity > 0));
+            setQuote(updated);
+            setPackages(await getQuotePackages(quote.id));
+            cancelPackageEdit();
+            go(1);
+        } catch (error) {
+            await checkoutFailed(error);
+        } finally { setBusy(false); }
+    }
 
     function go(next: number) {
         setMessage('');
         setNotice('');
+        if (next !== 2 && editingPackageId) cancelPackageEdit();
+        if (next === 0 && reorderQuoteId && quote)
+            setReorderQuantities(Object.fromEntries(quote.items.map(item => [item.productId, String(item.quantity)])));
         setStep(next);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -199,6 +330,20 @@ export default function CartPage() {
 
     async function checkoutFailed(error: unknown) {
         const code = errorCode(error);
+        // CONFLICT on a quote = it is no longer a DRAFT (already ordered, e.g. in another tab).
+        // Reload it so the page switches to the "already ordered" notice instead of a generic error.
+        if (code === 'CONFLICT' && quote) {
+            try {
+                const latest = await getQuote(quote.id);
+                if (latest.status !== 'DRAFT') {
+                    setQuote(latest);
+                    setMessage('');
+                    return;
+                }
+            } catch {
+                // Fall through to the generic message.
+            }
+        }
         if (code === 'QUOTE_REVISION_CONFLICT' && quote) {
             try {
                 setQuote(await getQuote(quote.id));
@@ -207,7 +352,20 @@ export default function CartPage() {
                 // Giữ thông báo xung đột; khách có thể tải lại trang.
             }
         }
+        setShortages(code === 'QUOTE_STOCK_UNAVAILABLE' ? stockShortages(error) : []);
         setMessage(code && checkoutErrors[code] ? checkoutErrors[code] : errorMessage(error, t('errors.fallback')));
+    }
+
+    // Name + unit of a short product: from the quote when there is one, else from the cart.
+    function shortageLabel(row: StockShortage) {
+        const quoted = quote?.items.find((item) => item.productId === row.productId);
+        if (quoted) return { name: productName(quoted), unit: quoted.unitCode };
+        const carted = items.find((item) => item.id === row.productId);
+        const english = i18n.resolvedLanguage === 'en';
+        return {
+            name: carted ? (english ? carted.nameEn : carted.nameVi) || carted.name : row.productId,
+            unit: '',
+        };
     }
 
     async function reviewQuote() {
@@ -232,9 +390,14 @@ export default function CartPage() {
         setMessage('');
         try {
             const order = await placeOrderFromQuote(quote.id, quote.revision);
-            removePurchased(quote.items.map((item) => item.productId));
+            // A reorder does not consume the customer's current shopping cart or its saved form.
+            if (!reorderQuoteId) {
+                removePurchased(quote.items.map((item) => item.productId));
+            }
             resetForm(owner);
+            // replace: Back from the order page must not reopen this quote, which is no longer editable.
             navigate(ROUTES.ORDER_DETAIL.replace(':orderId', order.orderId), {
+                replace: true,
                 state: { showPayment: true },
             });
         } catch (error) {
@@ -248,19 +411,29 @@ export default function CartPage() {
         for (const parcel of packages) {
             for (const item of parcel.items) {
                 if (item.quoteItemId === itemId) {
-                    total += item.quantity;
+                    total += Number(item.quantity);
                 }
             }
         }
         return total;
     }
 
-    async function startQuote(targetStep = 1) {
-        if (selectedItems.length === 0) return;
+    function allocatedOutsideEdit(itemId: string) {
+        const current = packages.find(item => item.id === editingPackageId);
+        const own = current?.items.find(line => line.quoteItemId === itemId)?.quantity ?? 0;
+        return Math.max(0, allocated(itemId) - Number(own));
+    }
+
+    async function startQuote(targetStep = 1, lines = selectedItems.map(item => ({ productId: item.id, quantity: item.quantity }))) {
+        if (restoring) return;
         if (!session) {
-            navigate(ROUTES.LOGIN, { state: { from: { pathname: ROUTES.QUOTES } } });
+            navigate(ROUTES.LOGIN, { state: {
+                from: { pathname: ROUTES.QUOTES },
+                checkoutLines: lines,
+            } });
             return;
         }
+        if (lines.length === 0) return;
         if (session.user.role !== 'CUSTOMER') {
             setMessage('errors.customer');
             return;
@@ -268,9 +441,7 @@ export default function CartPage() {
         setBusy(true);
         setMessage('');
         try {
-            let draft = await createQuoteFromCart(
-                selectedItems.map((item) => ({ productId: item.id, quantity: item.quantity })),
-            );
+            let draft = await createQuoteFromCart(lines);
             if (!draft.contactName) {
                 draft = await saveQuoteContact(draft.id, {
                     name: `${session.user.firstName} ${session.user.lastName}`.trim(),
@@ -284,32 +455,23 @@ export default function CartPage() {
             setStep(targetStep);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
-            setMessage(errorMessage(error, t('errors.fallback')));
+            await checkoutFailed(error);
         } finally {
             setBusy(false);
         }
     }
 
-    // The PUT sends both scopes, so the code of the other scope must be known before changing one.
+    // Coupon codes come only from the current customer's own quote. Never enumerate all coupons.
     async function applyCoupon(scope: CouponScope, code: string): Promise<string | null> {
         if (!quote) return t('errors.fallback');
-        const otherMissing =
-            scope === 'PRODUCT'
-                ? quote.shippingCouponId && !shippingCode.trim()
-                : quote.productCouponId && !productCode.trim();
-        if (otherMissing) return t('errors.savedCoupon');
         setBusy(true);
         setMessage('');
         try {
-            setQuote(
-                await applyQuoteCoupons(
-                    quote.id,
-                    scope === 'PRODUCT' ? code : productCode,
-                    scope === 'SHIPPING' ? code : shippingCode,
-                ),
-            );
-            if (scope === 'PRODUCT') setProductCode(code);
-            else setShippingCode(code);
+            setQuote(await applyQuoteCoupons(
+                quote.id,
+                scope === 'PRODUCT' ? code : (quote.productCouponCode ?? ''),
+                scope === 'SHIPPING' ? code : (quote.shippingCouponCode ?? ''),
+            ));
             setNotice(code ? 'notices.couponsUpdated' : 'notices.couponsRemoved');
             return null;
         } catch (error) {
@@ -321,29 +483,6 @@ export default function CartPage() {
         }
     }
 
-    // A coupon saved on the quote from another device has no code in local storage; recover it so
-    // changing the other scope does not drop it.
-    const quoteIdForCoupons = quote?.id;
-    const missingProductCode = !!quote?.productCouponId && !productCode;
-    const missingShippingCode = !!quote?.shippingCouponId && !shippingCode;
-    const productCouponId = quote?.productCouponId;
-    const shippingCouponId = quote?.shippingCouponId;
-    useEffect(() => {
-        if (!quoteIdForCoupons || (!missingProductCode && !missingShippingCode)) return;
-        const controller = new AbortController();
-        getAvailableCoupons(quoteIdForCoupons, controller.signal)
-            .then((list) => {
-                const byId = new Map(list.map((item) => [item.id, item.code]));
-                if (missingProductCode && productCouponId && byId.has(productCouponId))
-                    setProductCode(byId.get(productCouponId)!);
-                if (missingShippingCode && shippingCouponId && byId.has(shippingCouponId))
-                    setShippingCode(byId.get(shippingCouponId)!);
-            })
-            .catch(() => {});
-        return () => controller.abort();
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- setters come from the draft store
-    }, [quoteIdForCoupons, missingProductCode, missingShippingCode, productCouponId, shippingCouponId]);
-
     async function createPackage(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         if (!quote) return;
@@ -351,7 +490,7 @@ export default function CartPage() {
         const selected: { quoteItemId: string; quantity: number }[] = [];
         for (const item of quote.items) {
             const quantity = Number(quantities[item.productId] || 0);
-            const remaining = Number(item.quantity) - allocated(item.id);
+            const remaining = Number(item.quantity) - allocatedOutsideEdit(item.id);
             if (quantity > remaining) {
                 setPackageError('errors.invalidQuantity');
                 return;
@@ -387,7 +526,7 @@ export default function CartPage() {
             return;
         }
         try {
-            await addQuotePackage(quote.id, {
+            const payload = {
                 name: parcel.name,
                 recipientName: parcel.recipientName,
                 recipientPhone: parcel.recipientPhone,
@@ -398,12 +537,16 @@ export default function CartPage() {
                 latitude: location.lat,
                 longitude: location.lng,
                 items: selected,
-            });
+            };
+            if (editingPackageId) await updateQuotePackage(quote.id, editingPackageId, payload);
+            else await addQuotePackage(quote.id, payload);
             setPackages(await getQuotePackages(quote.id));
             setQuote(await getQuote(quote.id));
             setQuantities({});
             setParcel(emptyParcel);
-            setNotice('notices.packageAdded');
+            setNotice(editingPackageId ? 'notices.packageUpdated' : 'notices.packageAdded');
+            setEditingPackageId(null);
+            setReviewAttempt(0);
         } catch (error) {
             setPackageError(
                 axios.isAxiosError(error) &&
@@ -424,6 +567,7 @@ export default function CartPage() {
         setMessage('');
         try {
             await deleteQuotePackage(quote.id, packageId);
+            if (editingPackageId === packageId) cancelPackageEdit();
             setPackages(await getQuotePackages(quote.id));
             setQuote(await getQuote(quote.id));
         } catch (error) {
@@ -489,14 +633,51 @@ export default function CartPage() {
                     <h1 className="m-0 font-subheading text-3xl font-bold sm:text-4xl">{t('title')}</h1>
                     <p className="mb-0 mt-3 text-store-muted">{t('subtitle')}</p>
                 </div>
-                <QuoteSteps step={step} busy={busy} onSelectStep={selectStep} />
+                {reorderQuoteId && <div className="mb-5 mt-5 rounded-xl border border-store-green/25 bg-surface-green p-4 text-sm text-store-green" role="status">
+                    <strong>{t('reorder.title')}</strong> — {t('reorder.summary')}
+                </div>}
+                {reorderLoading && <p role="status" className="my-5 text-store-muted">{t('reorder.loading')}</p>}
+                {quoteClosed && (
+                    <div role="status" className="my-5 rounded-xl border border-black bg-white p-5">
+                        <p className="m-0 font-semibold">{t('reorder.closedTitle')}</p>
+                        <p className="mb-4 mt-2 text-sm text-store-muted">{t('reorder.closedHint')}</p>
+                        <div className="flex flex-wrap gap-3">
+                            <button type="button" onClick={() => navigate(ROUTES.ORDERS)}
+                                className="rounded-lg bg-store-green px-4 py-2 text-sm font-bold text-white">
+                                {t('reorder.viewOrders')}
+                            </button>
+                            <button type="button" onClick={() => { setQuote(null); setStep(0); setSearchParams({}); }}
+                                className="rounded-lg border border-black px-4 py-2 text-sm font-bold">
+                                {t('reorder.backToCart')}
+                            </button>
+                        </div>
+                    </div>
+                )}
+                {!reorderLoading && !quoteClosed && <QuoteSteps step={step} busy={busy} onSelectStep={selectStep} />}
                 {message && (
-                    <p
+                    <div
                         role="alert"
                         className="mb-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800"
                     >
                         {displayMessage(message)}
-                    </p>
+                        {message === 'errors.stockUnavailable' && shortages.length > 0 && (
+                            <ul className="mb-0 mt-2 list-disc space-y-1 pl-5 font-semibold">
+                                {shortages.map((row) => {
+                                    const { name, unit } = shortageLabel(row);
+                                    return (
+                                        <li key={row.productId}>
+                                            {t(row.available > 0 ? 'errors.stockShortItem' : 'errors.stockOutItem', {
+                                                name,
+                                                requested: row.requested,
+                                                available: row.available,
+                                                unit,
+                                            })}
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        )}
+                    </div>
                 )}
                 {notice && (
                     <p
@@ -506,9 +687,27 @@ export default function CartPage() {
                         {displayMessage(notice)}
                     </p>
                 )}
-                <div className="grid grid-cols-[minmax(0,1fr)_340px] items-start gap-6">
+                {!reorderLoading && !quoteClosed && (!reorderQuoteId || quote) && <div className="grid grid-cols-[minmax(0,1fr)_340px] items-start gap-6">
                     <div className="min-w-0 space-y-5">
-                        {step === 0 && <CartItems items={items} updateQuantity={updateQuantity} />}
+                        {step === 0 && (reorderQuoteId && quote ? (
+                            <section className="rounded-2xl border border-store-ink/20 bg-white p-6">
+                                <h2 className="m-0 font-subheading text-xl font-bold">{t('reorder.cartTitle')}</h2>
+                                <p className="mt-2 text-sm text-store-muted">{t('reorder.cartHint')}</p>
+                                {quote.items.map(item => (
+                                    <label key={item.id} className="flex items-center justify-between gap-4 border-b border-store-ink/10 py-4 last:border-0">
+                                        <span><strong>{productName(item)}</strong><span className="block text-sm text-store-muted">{formatCurrencyVnd(Number(item.listUnitPrice))} / {item.unitCode}</span></span>
+                                        <input type="number" min={0} step={Number(item.quantityStep) || 'any'}
+                                            value={reorderQuantities[item.productId] ?? String(item.quantity)}
+                                            disabled={busy}
+                                            onChange={event => setReorderQuantities(current => ({ ...current, [item.productId]: event.target.value }))}
+                                            aria-label={t('form.quantityLabel', { name: productName(item) })}
+                                            className="w-28 rounded-lg border border-store-ink/25 px-3 py-2 text-store-ink" />
+                                    </label>
+                                ))}
+                                {reorderChanged && <p role="status" className="text-sm text-store-muted">{t('reorder.allocationReset')}</p>}
+                                {!reorderValid && <p role="alert" className="text-sm text-red-700">{t('reorder.invalidCart')}</p>}
+                            </section>
+                        ) : <CartItems items={items} updateQuantity={updateQuantity} />)}
                         {step === 1 && quote && (
                             <>
                                 <section className="rounded-2xl border border-store-ink/20 bg-white p-6">
@@ -597,9 +796,9 @@ export default function CartPage() {
                                     </div>
                                 </section>
                                 <CouponPicker
-                                    quoteId={quote.id}
                                     scope="PRODUCT"
-                                    appliedCode={quote.productCouponId ? productCode : ''}
+                                    quoteId={quote.id}
+                                    appliedCode={quote.productCouponCode ?? ''}
                                     applied={!!quote.productCouponId}
                                     busy={busy}
                                     onApply={(code) => applyCoupon('PRODUCT', code)}
@@ -665,6 +864,12 @@ export default function CartPage() {
                                                     {item.deliveryDate}
                                                 </p>
                                             </div>
+                                            <div className="flex items-center gap-2">
+                                            <button type="button" disabled={busy}
+                                                onClick={() => editPackage(item)}
+                                                className="inline-flex items-center gap-2 rounded-lg border border-store-ink/20 px-3 py-2 text-sm font-bold text-store-green hover:bg-store-cream">
+                                                <Pencil size={16} /> {t('form.editTitle')}
+                                            </button>
                                             <button
                                                 type="button"
                                                 disabled={busy}
@@ -674,6 +879,7 @@ export default function CartPage() {
                                             >
                                                 <Trash2 size={19} />
                                             </button>
+                                            </div>
                                         </div>
                                         <div className="mt-4 border-t border-store-ink/10 pt-3 text-sm">
                                             {item.items.map((line) => (
@@ -718,14 +924,17 @@ export default function CartPage() {
                                         {t('packageTotalsError')}
                                     </p>
                                 )}
-                                <PackageForm
+                                {(!allAllocated || editingPackageId) && <PackageForm
+                                    key={editingPackageId ?? 'new'}
                                     quote={quote}
-                                    packages={packages}
+                                    editing={!!editingPackageId}
+                                    onCancelEdit={cancelPackageEdit}
+                                    packages={packages.filter(item => item.id !== editingPackageId)}
                                     parcel={parcel}
                                     setParcel={setParcel}
                                     quantities={quantities}
                                     setQuantities={setQuantities}
-                                    allocated={allocated}
+                                    allocated={allocatedOutsideEdit}
                                     busy={busy}
                                     error={
                                         packageError === 'errors.duplicateAddress'
@@ -742,11 +951,11 @@ export default function CartPage() {
                                     createPackage={createPackage}
                                     onPickOnMap={() => setMapOpen(true)}
                                     revealErrors={reviewAttempt}
-                                />
+                                />}
                                 <CouponPicker
-                                    quoteId={quote.id}
                                     scope="SHIPPING"
-                                    appliedCode={quote.shippingCouponId ? shippingCode : ''}
+                                    quoteId={quote.id}
+                                    appliedCode={quote.shippingCouponCode ?? ''}
                                     applied={!!quote.shippingCouponId}
                                     busy={busy}
                                     onApply={(code) => applyCoupon('SHIPPING', code)}
@@ -838,8 +1047,8 @@ export default function CartPage() {
                             <button
                                 type="button"
                                 className={`${primary} mt-5 w-full`}
-                                disabled={!selectedItems.length || busy}
-                                onClick={() => void startQuote()}
+                                disabled={busy || restoring || (reorderQuoteId ? !reorderValid : Boolean(session) && !selectedItems.length)}
+                                onClick={() => void (reorderQuoteId ? saveReorderCart() : startQuote())}
                             >
                                 {busy
                                     ? t('processing')
@@ -865,7 +1074,7 @@ export default function CartPage() {
                                     type="button"
                                     className={`${primary} mt-5 w-full`}
                                     onClick={() => {
-                                        if (!allAllocated || duplicatePackages) {
+                                        if (editingPackageId || !allAllocated || duplicatePackages) {
                                             // Stay here and point at what is missing instead of a disabled button.
                                             setReviewAttempt((count) => count + 1);
                                             document
@@ -876,10 +1085,11 @@ export default function CartPage() {
                                         setReviewAttempt(0);
                                         void reviewQuote();
                                     }}
-                                    disabled={busy}
+                                    disabled={busy || !!editingPackageId}
                                 >
                                     {busy ? t('processing') : t('viewTotal')} <ArrowRight size={17} />
                                 </button>
+                                {editingPackageId && <p className="mb-0 mt-3 text-xs text-store-muted">{t('form.finishEditing')}</p>}
                                 {reviewAttempt > 0 && (!allAllocated || duplicatePackages) ? (
                                     <ul
                                         role="alert"
@@ -927,7 +1137,7 @@ export default function CartPage() {
                             </button>
                         )}
                     </aside>
-                </div>
+                </div>}
             </main>
             <Footer />
             {mapOpen && (
@@ -937,7 +1147,7 @@ export default function CartPage() {
                             <ArrowLeft size={17} /> {t('back')}
                         </button>
                         <h2 id="delivery-map-title" className="mb-0 mt-5 font-subheading text-3xl font-bold">{t('mapTitle')}</h2>
-                        <DistributionExplorer onAddressSelected={() => setMapOpen(false)} />
+                        <DistributionExplorer formOwner={owner} onAddressSelected={() => setMapOpen(false)} />
                     </div>
                 </div>
             )}

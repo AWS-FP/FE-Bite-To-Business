@@ -1,9 +1,12 @@
+/**
+ * Store khung chat trợ lý (chế độ chat): lịch sử hội thoại, gọi /api/ai/agent, áp surface A2UI trả về.
+ * Lưu ở sessionStorage để tải lại trang vẫn dựng lại được các khối giao diện cũ (last valid surface).
+ * Ngắn hạn: STATE_SNAPSHOT (kiểu hiển thị, từ khóa, sort) được gửi lại ở lượt sau qua `state`.
+ */
 import { create } from 'zustand';
+import { useAuthStore } from '@/store/admin/authStore';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { MessageProcessor, type ActionPayload } from '@a2ui/web_core/v0_9';
-import type { ReactComponentImplementation } from '@a2ui/react/v0_9';
-import { ALLOWED_ACTIONS, btbCatalog, BTB_CATALOG_ID } from '../catalog/btbCatalog';
-import type { A2uiProduct } from '../catalog/productTypes';
+import { applyA2ui } from './a2uiRuntime';
 import { AgentHttpError, runAgent, type AgentEvent, type AgentState } from '../client/agentClient';
 import { trackEvent } from '../telemetry/interactionTracker';
 
@@ -17,9 +20,8 @@ export type ChatEntry = {
     error?: boolean;
 };
 
-type ActionHandler = (action: ActionPayload, product: A2uiProduct | null) => void;
-
 type AssistantState = {
+    owner: string | null;
     threadId: string;
     entries: ChatEntry[];
     agentState: AgentState;
@@ -34,79 +36,17 @@ type AssistantState = {
 
 const newId = () => crypto.randomUUID();
 
-let actionHandler: ActionHandler | null = null;
-/** Khung chat đăng ký handler có navigate/cart; processor chỉ có một handler toàn cục. */
-export function setAssistantActionHandler(handler: ActionHandler | null) {
-    actionHandler = handler;
-}
-
-let processor: MessageProcessor<ReactComponentImplementation> | null = null;
-export function getProcessor() {
-    if (!processor) {
-        processor = new MessageProcessor<ReactComponentImplementation>([btbCatalog], (action) => {
-            if (!ALLOWED_ACTIONS.has(action.name)) return;
-            const product = findProduct(action.surfaceId, action.context?.productId);
-            trackEvent('a2ui_action', {
-                surfaceId: action.surfaceId,
-                component: action.sourceComponentId,
-                target:
-                    typeof action.context?.productId === 'string'
-                        ? action.context.productId
-                        : undefined,
-                value: { name: action.name },
-            });
-            actionHandler?.(action, product);
-        });
-    }
-    return processor;
-}
-
-/** Đưa message A2UI vào processor; message sai catalog/schema bị bỏ để không làm vỡ khung chat. */
-function applyA2ui(messages: unknown[]): string | undefined {
-    let surfaceId: string | undefined;
-    for (const message of messages) {
-        try {
-            const create = (message as { createSurface?: { surfaceId: string; catalogId: string } })
-                .createSurface;
-            if (create && create.catalogId !== BTB_CATALOG_ID) continue;
-            if (create && getProcessor().model.surfacesMap.has(create.surfaceId)) continue;
-            getProcessor().processMessages(message as never);
-            surfaceId = create?.surfaceId ?? surfaceId;
-        } catch (error) {
-            console.warn('A2UI message rejected', error);
-            trackEvent('a2ui_rejected', { value: { reason: String(error).slice(0, 200) } });
-        }
-    }
-    return surfaceId;
-}
-
-function findProduct(surfaceId: string, productId: unknown): A2uiProduct | null {
-    if (typeof productId !== 'string') return null;
-    for (const entry of useAssistantStore.getState().entries) {
-        if (entry.surfaceId !== surfaceId) continue;
-        for (const message of entry.a2ui ?? []) {
-            const update = (
-                message as { updateDataModel?: { value?: { products?: A2uiProduct[] } } }
-            ).updateDataModel;
-            const found = update?.value?.products?.find(
-                (product) => product.productId === productId,
-            );
-            if (found) return found;
-        }
-    }
-    return null;
-}
-
 export const useAssistantStore = create<AssistantState>()(
     persist(
         (set, get) => ({
+            owner: null,
             threadId: newId(),
             entries: [],
             agentState: {},
             busy: false,
             open: false,
             setOpen: (open) => set({ open }),
-            reset: () => set({ threadId: newId(), entries: [], agentState: {} }),
+            reset: () => set({ threadId: newId(), entries: [], agentState: {}, busy: false }),
             note: (text) =>
                 set((state) => ({
                     entries: [...state.entries, { id: newId(), role: 'system', text }],
@@ -114,6 +54,7 @@ export const useAssistantStore = create<AssistantState>()(
             send: async (text, locale) => {
                 const content = text.trim();
                 if (!content || get().busy) return;
+                const threadId = get().threadId;
                 const userEntry: ChatEntry = { id: newId(), role: 'user', text: content };
                 set((state) => ({ entries: [...state.entries, userEntry], busy: true }));
                 trackEvent('assistant_prompt', { value: { length: content.length } });
@@ -131,6 +72,7 @@ export const useAssistantStore = create<AssistantState>()(
                 let firstSurfaceMs: number | null = null;
                 const push = (patch: Partial<ChatEntry>) =>
                     set((state) => {
+                        if (state.threadId !== threadId) return state;
                         const exists = state.entries.some((entry) => entry.id === reply.id);
                         const next = { ...reply, ...patch };
                         Object.assign(reply, patch);
@@ -143,6 +85,7 @@ export const useAssistantStore = create<AssistantState>()(
                         };
                     });
                 const onEvent = (event: AgentEvent) => {
+                    if (get().threadId !== threadId) return;
                     if (event.type === 'TEXT_MESSAGE_CONTENT') {
                         push({ text: (reply.text ?? '') + event.delta });
                     } else if (
@@ -171,7 +114,7 @@ export const useAssistantStore = create<AssistantState>()(
                 try {
                     await runAgent(
                         {
-                            threadId: get().threadId,
+                            threadId,
                             runId: newId(),
                             messages: history,
                             state: { ...get().agentState, locale },
@@ -190,7 +133,7 @@ export const useAssistantStore = create<AssistantState>()(
                                   : 'Trợ lý hiện chưa thể phản hồi. Bạn vẫn có thể tìm sản phẩm ở trang danh mục.',
                     });
                 } finally {
-                    set({ busy: false });
+                    if (get().threadId === threadId) set({ busy: false });
                 }
             },
         }),
@@ -198,6 +141,7 @@ export const useAssistantStore = create<AssistantState>()(
             name: 'btb.assistant',
             storage: createJSONStorage(() => sessionStorage),
             partialize: (state) => ({
+                owner: state.owner,
                 threadId: state.threadId,
                 entries: state.entries.slice(-30),
                 agentState: state.agentState,
@@ -210,6 +154,19 @@ export const useAssistantStore = create<AssistantState>()(
     ),
 );
 
+function syncChatOwner(auth: ReturnType<typeof useAuthStore.getState>) {
+    if (auth.restoring) return;
+    const owner = auth.session?.user.id ?? null;
+    const chat = useAssistantStore.getState();
+    if (owner !== chat.owner || (!owner && chat.entries.length > 0)) {
+        useAssistantStore.setState({ owner, threadId: newId(), entries: [], agentState: {}, busy: false, open: false });
+    }
+}
+
+syncChatOwner(useAuthStore.getState());
+useAuthStore.subscribe(syncChatOwner);
+
+/** Loại component trong message updateComponents, ghi vào sự kiện a2ui_render (đếm số lần hiển thị). */
 function componentTypes(messages: unknown[]): string[] {
     for (const message of messages) {
         const update = (message as { updateComponents?: { components?: { component?: string }[] } })

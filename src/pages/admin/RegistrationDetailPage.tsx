@@ -211,10 +211,16 @@ export default function RegistrationDetailPage() {
                     {/* Hồ sơ chờ duyệt */}
                     {registration?.status === 'PENDING' && (
                         <>
-                            <span className="mr-auto flex items-center gap-[5px] text-[11px] leading-[16.5px]">
-                                <AdminIcon name="once" />
-                                {t('detail.onceOnly')}
-                            </span>
+                            {registration.approvalLocked ? (
+                                <span className="mr-auto max-w-[460px] text-[11px] leading-[16.5px] text-[#c8102e]">
+                                    {t('detail.approvalLocked')}
+                                </span>
+                            ) : (
+                                <span className="mr-auto flex items-center gap-[5px] text-[11px] leading-[16.5px]">
+                                    <AdminIcon name="once" />
+                                    {t('detail.onceOnly')}
+                                </span>
+                            )}
                             <AdminButton
                                 tone="subtleDanger"
                                 icon="reject"
@@ -227,7 +233,7 @@ export default function RegistrationDetailPage() {
                                 tone="primary"
                                 icon="send"
                                 onClick={() => handleOpenReview('APPROVE')}
-                                disabled={isProcessing}
+                                disabled={isProcessing || registration.approvalLocked}
                             >
                                 {t('actions.approve')}
                             </AdminButton>

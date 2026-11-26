@@ -30,6 +30,8 @@ import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 import type { Promotion, PromotionWrite } from '@/types/e-commerce/executiveAdmin';
 import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
 import PromotionProductManager from '@/components/e-commerce/PromotionProductManager';
+import { promotionDisplayStatus } from '@/utils/e-commerce/promotionLifecycle';
+import { PROMOTION_BANNER_ASPECT, PROMOTION_BANNER_SIZE } from '@/constants/customer/promotionBanner';
 import PromotionImageCropper from '@/components/e-commerce/PromotionImageCropper';
 
 function localValue(iso: string) {
@@ -84,6 +86,7 @@ export default function EcommercePromotionsPage() {
         [failed, setFailed] = useState(false),
         [cropUrl, setCropUrl] = useState(''),
         [cropFilename, setCropFilename] = useState('');
+    const pageRef = useRef<HTMLDivElement>(null);
     const imageInput = useRef<HTMLInputElement>(null);
     useEffect(() => {
         const timeout = window.setTimeout(() => setDebouncedSearch(search.trim()), 300);
@@ -96,6 +99,7 @@ export default function EcommercePromotionsPage() {
     const list = useQuery({
         queryKey: ['ecom', 'promotions', status, page, debouncedSearch],
         queryFn: () => executiveApi.promotions(status || undefined, page, 20, debouncedSearch),
+        refetchInterval: 60_000,
     });
     function reset() {
         setDraftOpen(false);
@@ -120,6 +124,12 @@ export default function EcommercePromotionsPage() {
         setImageUrl(p.imageUrl ?? '');
         setPromotionType(p.promotionType ?? 'STANDARD');
         setDraftOpen(true);
+        pageRef.current?.scrollIntoView({
+            behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                ? 'instant'
+                : 'smooth',
+            block: 'start',
+        });
     }
     const uploadImage = useMutation({
         mutationFn: (file: File) => executiveApi.uploadPromotionImage(file),
@@ -297,7 +307,7 @@ export default function EcommercePromotionsPage() {
         });
     }
     return (
-        <div className="space-y-6">
+        <div ref={pageRef} className="space-y-6 scroll-mt-6">
             <ExecutiveHeading
                 number="05"
                 eyebrow="MARKETING / CAMPAIGNS"
@@ -441,6 +451,9 @@ export default function EcommercePromotionsPage() {
                                     onChange={(e) => setImageUrl(e.target.value)}
                                 />
                             </label>
+                            <p className="mb-0 mt-2 text-xs text-store-muted">
+                                {tr('Kích thước banner trang chủ khuyến nghị', 'Recommended homepage banner size')}: {PROMOTION_BANNER_SIZE} (16:9).
+                            </p>
                             <div className="mt-3 flex flex-wrap items-center gap-3">
                                 <input
                                     ref={imageInput}
@@ -568,7 +581,8 @@ export default function EcommercePromotionsPage() {
                                             alt=""
                                             src={p.imageUrl}
                                             loading="lazy"
-                                            className="h-44 w-full object-cover"
+                                            className="w-full bg-store-dark object-contain"
+                                            style={{ aspectRatio: PROMOTION_BANNER_ASPECT }}
                                         />
                                     ) : (
                                         <ImageIcon size={35} className="text-[#8ea896]" />
@@ -577,7 +591,7 @@ export default function EcommercePromotionsPage() {
                                 <div className="p-5">
                                     <div className="flex flex-wrap items-center justify-between gap-2">
                                         <div className="flex items-center gap-2">
-                                            <ExecutiveBadge status={p.status} />
+                                            <ExecutiveBadge status={promotionDisplayStatus(p)} />
                                             <span className="rounded-full bg-[#e7f1e9] px-2 py-1 text-[10px] font-bold text-[#165b3d]">
                                                 {p.promotionType === 'FLASH_SALE'
                                                     ? 'FLASH SALE'

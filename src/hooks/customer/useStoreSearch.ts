@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent, MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ROUTES } from '@/router/routes';
 import { getCatalogSearchPath } from '@/constants/catalogNavigation';
 import { SUGGESTION_DELAY_MS } from '@/constants/catalogSearch';
 import { cleanSearchText, suggestionPath } from '@/utils/customer/catalogSearch';
@@ -9,6 +10,7 @@ import { canSuggest } from '@/validations/catalogSearch';
 import { getCatalogSuggestions } from '@/services/customer/catalogReadService';
 import useSearchHistory from '@/hooks/useSearchHistory';
 import { useCatalogQuery } from './useCatalogQuery';
+import { aiPagePath } from '@/a2ui/runtime/useA2uiActions';
 
 export function useStoreSearch() {
     const [open, setOpen] = useState(false);
@@ -16,7 +18,11 @@ export function useStoreSearch() {
     const inputRef = useRef<HTMLInputElement>(null);
     const menuRef = useRef<HTMLElement>(null);
     const navigate = useNavigate();
-    const [keyword, setKeyword] = useState('');
+    const location = useLocation();
+    const catalogKeyword = location.pathname === ROUTES.CATALOG
+        ? new URLSearchParams(location.search).get('q') ?? ''
+        : '';
+    const [keyword, setKeyword] = useState(catalogKeyword);
     const [searchMode, setSearchMode] = useState<'products' | 'ai'>('products');
     const [showAINotice, setShowAINotice] = useState(false);
     const { historyEntries, recordSearch, deleteSearch, clearHistory, deleting, deleteError } =
@@ -24,6 +30,17 @@ export function useStoreSearch() {
     const historyRef = useRef<HTMLElement>(null);
     const dragRef = useRef<{ startX: number; initialScroll: number; moved: boolean } | null>(null);
     const suppressHistoryClick = useRef(false);
+
+    // Synchronize only on navigation, before rendering the new catalog results.
+    const navigationKey = JSON.stringify([location.key, location.pathname, location.search]);
+    const [previousNavigationKey, setPreviousNavigationKey] = useState(navigationKey);
+    if (navigationKey !== previousNavigationKey) {
+        setPreviousNavigationKey(navigationKey);
+        if (location.pathname === ROUTES.CATALOG && searchMode === 'products') {
+            setKeyword(catalogKeyword);
+            setOpen(false);
+        }
+    }
 
     function startDrag(event: React.PointerEvent<HTMLElement>) {
         if (event.pointerType !== 'mouse' || event.button !== 0) return;
@@ -90,11 +107,14 @@ export function useStoreSearch() {
         if (!searchText) return;
 
         if (searchMode === 'ai') {
-            setShowAINotice(true);
+            // Chế độ AI: AI ghép cả trang theo yêu cầu thay trang kết quả mặc định.
+            setOpen(false);
+            navigate(aiPagePath(searchText));
             return;
         }
 
         setOpen(false);
+        setKeyword(searchText);
         // Navigation must never wait for the search-history network request.
         navigate(path ?? getCatalogSearchPath(searchText));
         void recordSearch(searchText);
@@ -184,7 +204,8 @@ export function useStoreSearch() {
 
     return {
         open,
-        suggestionLoading: open && searchMode === 'products' && canSuggest(term) && (!enabled || isFetching),
+        suggestionLoading:
+            open && searchMode === 'products' && canSuggest(term) && (!enabled || isFetching),
         suggestionError: enabled && isError,
         showSuggestionMenu: open && searchMode === 'products' && canSuggest(term),
         showRecentSearches: open && searchMode === 'products' && !term && historyEntries.length > 0,

@@ -2,21 +2,17 @@ import { useTranslation } from 'react-i18next';
 import {
     ArrowLeft,
     Bell,
-    Check,
     CheckCheck,
     Clock3,
     FileText,
     Inbox,
     Settings2,
-    ShieldCheck,
     Sparkles,
-    Trash2,
     Truck,
     X,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { INITIAL_NOTIFICATIONS } from '../../constants/customer/homeData';
 import { useAuthStore } from '@/store/admin/authStore';
 import {
     getCustomerNotifications,
@@ -152,9 +148,7 @@ export default function NotificationSystem({
     const [localIsOpen, setLocalIsOpen] = useState(false);
     const isOpen = controlledIsOpen ?? localIsOpen;
 
-    const [notifications, setNotifications] = useState<NotificationItemData[]>(
-        isCustomer ? [] : INITIAL_NOTIFICATIONS,
-    );
+    const [notifications, setNotifications] = useState<NotificationItemData[]>([]);
     const [loadError, setLoadError] = useState(false);
 
     const [filter, setFilter] = useState<Filter>('all');
@@ -204,7 +198,7 @@ export default function NotificationSystem({
         return () => {
             active = false;
         };
-    }, [isCustomer, isOpen, english, refreshNotifications]);
+    }, [customerId, isCustomer, isOpen, english, refreshNotifications]);
 
     const unreadCount = isCustomer
         ? (serverUnreadCount ?? notifications.filter((item) => item.unread).length)
@@ -334,7 +328,7 @@ export default function NotificationSystem({
                                         </span>
                                     )}
 
-                                    <button
+                                    {isCustomer && <button
                                         type="button"
                                         aria-label={
                                             view === 'list'
@@ -351,7 +345,7 @@ export default function NotificationSystem({
                                         ) : (
                                             <ArrowLeft size={17} />
                                         )}
-                                    </button>
+                                    </button>}
                                 </div>
                             </div>
                         </div>
@@ -419,7 +413,7 @@ export default function NotificationSystem({
                                                 {ui('notifEmpty')}
                                             </p>
                                             <p className="m-0 mt-1 text-xs text-store-muted">
-                                                {loadError
+                                                {!isCustomer ? '' : loadError
                                                     ? ui('notifLoadError')
                                                     : ui('notifNoMatches')}
                                             </p>
@@ -483,17 +477,6 @@ export default function NotificationSystem({
                                         {ui('notifSystem')}
                                     </span>
 
-                                    {!isCustomer && (
-                                        <button
-                                            type="button"
-                                            onClick={() => setNotifications([])}
-                                            disabled={notifications.length === 0}
-                                            className="inline-flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-[11px] font-bold text-danger hover:text-danger disabled:opacity-40"
-                                        >
-                                            <Trash2 size={13} />
-                                            Clear all
-                                        </button>
-                                    )}
                                 </div>
                             </>
                         ) : (
@@ -620,35 +603,6 @@ export default function NotificationSystem({
                             <p className="m-0 text-sm leading-7 text-store-muted">
                                 {selected.description}
                             </p>
-
-                            {selected.isSystemUpdatePopup && selected.popupHighlights?.length ? (
-                                <div className="rounded-2xl bg-surface-green p-4">
-                                    <div className="mb-3 flex items-center gap-2 text-xs font-bold text-store-ink">
-                                        <ShieldCheck size={17} />
-                                        Release highlights · {selected.popupVersion ?? 'Update'}
-                                    </div>
-
-                                    <div className="space-y-3">
-                                        {selected.popupHighlights.map((highlight) => (
-                                            <div
-                                                key={highlight.title}
-                                                className="flex items-start gap-2 text-xs leading-6"
-                                            >
-                                                <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-store-green text-white">
-                                                    <Check size={12} />
-                                                </span>
-
-                                                <p className="m-0 text-store-ink">
-                                                    <strong className="text-store-ink">
-                                                        {highlight.title}
-                                                    </strong>{' '}
-                                                    {highlight.detail}
-                                                </p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            ) : null}
 
                             {selected.actionUrl && (
                                 <Link

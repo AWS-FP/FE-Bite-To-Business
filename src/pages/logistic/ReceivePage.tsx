@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ImageOff, Package } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import LogisticsPageShell, { ListStatus } from '@/components/logistic/LogisticsPageShell';
+import Pagination from '@/components/common/Pagination';
 import ProductCreateWizard from '@/components/logistic/ProductCreateWizard';
 import {
     useLogisticsActions,
@@ -14,7 +15,7 @@ export default function ReceivePage() {
     const { i18n } = useTranslation();
     const [search, setSearch] = useState('');
     const [keyword, setKeyword] = useState('');
-    const data = useLogisticsList<Stock>('/api/logistics/inventory', keyword, true);
+    const data = useLogisticsList<Stock>('/api/logistics/inventory', keyword);
     const action = useLogisticsActions(data.refresh);
     const [productId, setProductId] = useState('');
     const [quantity, setQuantity] = useState('');
@@ -53,7 +54,7 @@ export default function ReceivePage() {
     }, [search]);
     async function save(event: FormEvent) {
         event.preventDefault();
-        if (!productId || !Number.isInteger(Number(quantity)) || Number(quantity) <= 0) return;
+        if (!product || data.loading || search.trim() !== keyword || !Number.isInteger(Number(quantity)) || Number(quantity) <= 0) return;
         movementId.current ??= crypto.randomUUID();
         const saved = await action.submit(`/api/logistics/inventory/${productId}/receipts`, {
             movementId: movementId.current,
@@ -78,11 +79,12 @@ export default function ReceivePage() {
                 onCreated={(created) => {
                     setCreatingProduct(false);
                     setSearch(created.sku);
+                    data.setPage(0);
                     setKeyword(created.sku);
                     setProductId(created.id);
                     setCreatedSku(created.sku);
                     changed();
-                    void data.refresh();
+                    if (keyword === created.sku) void data.refresh();
                 }}
             />
         );
@@ -94,6 +96,7 @@ export default function ReceivePage() {
             description={tr("Ghi nhận số lượng sản phẩm nhận vào kho.")}
         >
             <div className="grid grid-cols-[minmax(0,1.2fr)_minmax(300px,1fr)] items-start gap-6">
+                <div>
                 <form
                     onSubmit={save}
                     className="space-y-4 rounded-xl border-2 border-black bg-white p-6"
@@ -117,6 +120,7 @@ export default function ReceivePage() {
                             value={search}
                             maxLength={200}
                             onChange={(e) => {
+                                data.setPage(0);
                                 setSearch(e.target.value);
                                 setProductId('');
                                 setCreatedSku('');
@@ -199,6 +203,9 @@ export default function ReceivePage() {
                         {action.busy ? tr("Đang lưu...") : tr("Nhập hàng")}
                     </button>
                 </form>
+                <Pagination page={data.page} totalPages={data.totalPages} loading={data.loading}
+                    onPageChange={page => { setProductId(''); changed(); data.setPage(page); }} />
+                </div>
                 <section className="flex flex-col gap-5 rounded-xl border-2 border-black bg-white p-6">
                     <div className="flex items-center gap-3">
                         <span className="grid size-10 place-items-center rounded-lg bg-store-cream text-store-green">

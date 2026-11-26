@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, ChevronLeft, ChevronRight, Filter, Package, Search, Tag, X } from 'lucide-react';
 import { executiveUi } from '@/constants/e-commerce/executiveUi';
 import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
+import { useDebouncedSearch } from '@/hooks/e-commerce/useDebouncedSearch';
 import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 import type { Promotion, PromotionPriceUpdate, PromotionProductChoice, PromotionProductFilter } from '@/types/e-commerce/executiveAdmin';
 import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
@@ -31,6 +32,8 @@ export default function PromotionProductManager({
     const qc = useQueryClient();
     const flash = campaign.promotionType === 'FLASH_SALE';
     const [search, setSearch] = useState('');
+    const settledSearch = useDebouncedSearch(search.trim());
+    const searchIsSettled = search.trim() === settledSearch;
     const [brandId, setBrandId] = useState('');
     const [categoryId, setCategoryId] = useState('');
     const [inStockOnly, setInStockOnly] = useState(false);
@@ -49,21 +52,26 @@ export default function PromotionProductManager({
 
     const filter = useMemo<PromotionProductFilter>(
         () => ({
-            q: search.trim(),
+            q: settledSearch,
             brandId: brandId || null,
             categoryId: categoryId || null,
             inStockOnly,
             discountOnly,
         }),
-        [search, brandId, categoryId, inStockOnly, discountOnly],
+        [settledSearch, brandId, categoryId, inStockOnly, discountOnly],
     );
+    const latestFilter = useRef(filter);
+    useEffect(() => {
+        latestFilter.current = filter;
+    }, [filter]);
     const assigned = useQuery({
         queryKey: ['ecom', 'promotion-product-ids', campaign.id],
         queryFn: () => executiveApi.promotionProductIds(campaign.id),
     });
     const products = useQuery({
         queryKey: ['ecom', 'promotion-product-options', campaign.id, filter, page],
-        queryFn: () => executiveApi.promotionProductOptions(campaign.id, filter, page, PAGE_SIZE),
+        queryFn: ({ signal }) => executiveApi.promotionProductOptions(campaign.id, filter, page, PAGE_SIZE, signal),
+        enabled: searchIsSettled,
     });
     const brands = useQuery({ queryKey: ['ecom', 'brands'], queryFn: () => getCatalogBrands() });
     const categories = useQuery({
@@ -189,8 +197,11 @@ export default function PromotionProductManager({
             ),
     });
     const bulkSelect = useMutation({
-        mutationFn: () => executiveApi.promotionMatchingProductIds(campaign.id, filter),
-        onSuccess: (ids) => {
+        mutationFn: (submitted: PromotionProductFilter) =>
+            executiveApi.promotionMatchingProductIds(campaign.id, submitted),
+        onSuccess: (ids, submitted) => {
+            // Ignore an in-flight bulk response after filters have changed.
+            if (JSON.stringify(submitted) !== JSON.stringify(latestFilter.current)) return;
             const next = Array.from(new Set([...selected, ...ids]));
             if (next.length > (flash ? 8 : MAX_ASSIGNED)) {
                 setFeedback(
@@ -269,6 +280,7 @@ export default function PromotionProductManager({
         setFeedback('');
     }
     async function applyBulk() {
+        if (!searchIsSettled || products.isFetching || !products.isSuccess) return;
         setBulkFeedback('');
         const amount = numeric(bulkAmount);
         if (
@@ -290,6 +302,7 @@ export default function PromotionProductManager({
         try {
             if (bulkScope === 'MATCHING') {
                 const matches = await executiveApi.promotionMatchingProductIds(campaign.id, filter);
+                if (JSON.stringify(filter) !== JSON.stringify(latestFilter.current)) return;
                 const matching = new Set(matches);
                 ids = selected.filter((id) => matching.has(id));
             }
@@ -474,7 +487,7 @@ export default function PromotionProductManager({
                         </label>
                     ) : (
                         <p className="mt-1 font-bold text-[#176a46]">
-                            {tr('Giá sale', 'Sale price')}: {money(item.salePrice)}
+                            {tr('Giá sale đã lưu', 'Stored sale price')}: {money(item.salePrice)}
                         </p>
                     )}
                     <p className="mt-1 text-[#597668]">
@@ -502,14 +515,14 @@ export default function PromotionProductManager({
                 role="dialog"
                 aria-modal="true"
                 aria-label={tr('Sản phẩm áp dụng', 'Campaign products')}
-                className="flex max-h-[93dvh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-[#faf8ed] shadow-2xl"
+                className="flex h-[min(94dvh,900px)] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-[#faf8ed] shadow-2xl"
             >
-                <header className="flex shrink-0 items-start justify-between gap-3 border-b border-[#d9e4d8] bg-white px-5 py-4">
+                <header className="flex shrink-0 items-center justify-between gap-3 border-b border-[#d9e4d8] bg-white px-4 py-2.5 sm:px-5">
                     <div>
-                        <h2 className="text-lg font-bold text-[#123b2b]">
+                        <h2 className="text-base font-bold leading-5 text-[#123b2b]">
                             {tr('Sản phẩm áp dụng', 'Campaign products')}
                         </h2>
-                        <p className="mt-1 text-sm text-[#597668]">
+                        <p className="mt-0.5 text-xs text-[#597668]">
                             {tr(campaign.nameVi, campaign.nameEn)} ·{' '}
                             {flash ? 'FLASH SALE' : 'STANDARD'}
                         </p>
@@ -518,12 +531,20 @@ export default function PromotionProductManager({
                         type="button"
                         aria-label={tr('Đóng', 'Close')}
                         onClick={closeSafely}
-                        className="rounded-lg p-2 text-[#173f30] hover:bg-[#edf4e9]"
+                        className="rounded-lg p-1.5 text-[#173f30] hover:bg-[#edf4e9] focus-visible:outline-2 focus-visible:outline-[#15543b]"
                     >
                         <X size={20} />
                     </button>
                 </header>
-                <div className="shrink-0 border-b border-[#d9e4d8] px-5 py-3">
+                {campaign.expired && (
+                    <p role="status" className="shrink-0 border-b border-amber-200 bg-amber-50 px-4 py-1.5 text-xs text-amber-900 sm:px-5">
+                        {tr(
+                            'Chiến dịch đã hết hạn. Giá sale bên dưới là giá lưu ở sản phẩm, không còn có hiệu lực chỉ vì chiến dịch này.',
+                            'This campaign has expired. The stored product sale prices below are not active merely because of this campaign.',
+                        )}
+                    </p>
+                )}
+                <div className="shrink-0 border-b border-[#d9e4d8] px-4 py-2 sm:px-5">
                     <div className="flex flex-wrap items-center gap-2">
                         <label className="relative flex min-w-[210px] flex-1 items-center gap-2 rounded-xl border border-[#b4ccbb] bg-white px-3">
                             <Search size={17} className="shrink-0 text-[#486c58]" />
@@ -539,7 +560,7 @@ export default function PromotionProductManager({
                                     'Tìm theo tên hoặc SKU...',
                                     'Search by name or SKU...',
                                 )}
-                                className="h-10 w-full min-w-0 border-0 bg-transparent text-sm outline-none focus:border-0 focus:outline-none"
+                                className="h-9 w-full min-w-0 !border-0 bg-transparent text-sm !outline-none !shadow-none focus:!border-0 focus:!outline-none focus:!shadow-none"
                                 style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
                             />
                         </label>
@@ -548,7 +569,7 @@ export default function PromotionProductManager({
                             {flash ? ' / 8' : ''}
                         </span>
                     </div>
-                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <div className="mt-1.5 flex flex-wrap items-center gap-2">
                         <Filter size={16} className="text-[#486c58]" />
                         <select
                             aria-label={tr('Lọc thương hiệu', 'Filter brand')}
@@ -583,7 +604,7 @@ export default function PromotionProductManager({
                                 </option>
                             ))}
                         </select>
-                        <label className="flex h-11 items-center gap-2 whitespace-nowrap rounded-xl border border-[#d3dfd5] bg-white px-3 text-xs font-medium text-[#173f30]">
+                        <label className="flex h-9 items-center gap-2 whitespace-nowrap rounded-xl border border-[#d3dfd5] bg-white px-3 text-xs font-medium text-[#173f30]">
                             <input
                                 type="checkbox"
                                 checked={inStockOnly}
@@ -594,7 +615,7 @@ export default function PromotionProductManager({
                             />
                             {tr('Đủ tồn kho', 'In stock')}
                         </label>
-                        <label className="flex h-11 items-center gap-2 whitespace-nowrap rounded-xl border border-[#d3dfd5] bg-white px-3 text-xs font-medium text-[#173f30]">
+                        <label className="flex h-9 items-center gap-2 whitespace-nowrap rounded-xl border border-[#d3dfd5] bg-white px-3 text-xs font-medium text-[#173f30]">
                             <input
                                 type="checkbox"
                                 checked={discountOnly}
@@ -606,13 +627,13 @@ export default function PromotionProductManager({
                             {tr('Đã có giá sale', 'Has sale price')}
                         </label>
                     </div>
-                    <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex flex-wrap rounded-xl bg-white p-1 text-xs">
+                    <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
                             <button
                                 type="button"
                                 aria-pressed={tab === 'browse'}
                                 onClick={() => setTab('browse')}
-                                className={`min-w-[155px] rounded-lg px-5 py-2.5 text-center font-bold sm:min-w-[205px] ${tab === 'browse' ? 'bg-[#15543b] text-white' : 'text-[#15543b] hover:bg-[#edf4e9]'}`}
+                                className={`min-w-[145px] rounded-lg border border-[#b4ccbb] px-4 py-2 text-center font-bold sm:min-w-[185px] ${tab === 'browse' ? 'border-[#15543b] bg-[#15543b] text-white' : 'bg-white text-[#15543b] hover:bg-[#edf4e9]'}`}
                             >
                                 {tr('Danh sách sản phẩm', 'Browse products')}
                             </button>
@@ -620,7 +641,7 @@ export default function PromotionProductManager({
                                 type="button"
                                 aria-pressed={tab === 'selected'}
                                 onClick={() => setTab('selected')}
-                                className={`min-w-[155px] rounded-lg px-5 py-2.5 text-center font-bold sm:min-w-[205px] ${tab === 'selected' ? 'bg-[#15543b] text-white' : 'text-[#15543b] hover:bg-[#edf4e9]'}`}
+                                className={`min-w-[145px] rounded-lg border border-[#b4ccbb] px-4 py-2 text-center font-bold sm:min-w-[185px] ${tab === 'selected' ? 'border-[#15543b] bg-[#15543b] text-white' : 'bg-white text-[#15543b] hover:bg-[#edf4e9]'}`}
                             >
                                 {tr('Sản phẩm đã chọn', 'Selected products')} ({selected.length})
                             </button>
@@ -629,9 +650,10 @@ export default function PromotionProductManager({
                             <button
                                 type="button"
                                 disabled={
-                                    bulkSelect.isPending || assigned.isLoading || save.isPending
+                                    bulkSelect.isPending || assigned.isLoading || save.isPending ||
+                                    !searchIsSettled || products.isFetching || !products.isSuccess
                                 }
-                                onClick={() => bulkSelect.mutate()}
+                                onClick={() => bulkSelect.mutate(filter)}
                                 className={executiveUi.secondary}
                             >
                                 {bulkSelect.isPending
@@ -654,10 +676,10 @@ export default function PromotionProductManager({
                         </p>
                     )}
                 </div>
-                <div className="min-h-0 flex-1 overflow-y-auto px-5 py-3">
+                <div className="min-h-0 flex-1 overflow-y-auto px-4 py-2 sm:px-5">
                     {tab === 'browse' ? (
                         <>
-                            {products.isFetching && (
+                            {(!searchIsSettled || products.isFetching) && (
                                 <p
                                     role="status"
                                     className="py-2 text-center text-xs text-[#597668]"
@@ -665,18 +687,19 @@ export default function PromotionProductManager({
                                     {tr('Đang tải...', 'Loading...')}
                                 </p>
                             )}
-                            {products.isError && (
+                            {searchIsSettled && products.isError && (
                                 <p role="alert" className="rounded-lg bg-red-50 p-4 text-red-700">
                                     {tr('Không tải được sản phẩm.', 'Unable to load products.')}
                                 </p>
                             )}
-                            {products.data?.items.length === 0 && (
+                            {searchIsSettled && !products.isFetching && products.data?.items.length === 0 && (
                                 <p className="py-8 text-center text-sm text-[#597668]">
                                     {tr('Không tìm thấy sản phẩm.', 'No matching products.')}
                                 </p>
                             )}
                             <div className="space-y-2">
-                                {products.data?.items.map((item) => productRow(item, false))}
+                                {searchIsSettled && !products.isFetching &&
+                                    products.data?.items.map((item) => productRow(item, false))}
                             </div>
                         </>
                     ) : (
@@ -755,7 +778,7 @@ export default function PromotionProductManager({
                         </>
                     )}
                 </div>
-                <div className="shrink-0 border-t border-[#d9e4d8] bg-[#eef3e9] px-5 py-3">
+                <div className="shrink-0 border-t border-[#d9e4d8] bg-[#eef3e9] px-4 py-2 sm:px-5">
                     <div className="flex flex-wrap items-center gap-2 text-xs text-[#173f30]">
                         <Tag size={16} />
                         <strong>{tr('Giảm giá hàng loạt', 'Bulk discount')}</strong>
@@ -793,7 +816,8 @@ export default function PromotionProductManager({
                         <button
                             type="button"
                             disabled={
-                                !selected.length || selectedDetails.isFetching || save.isPending
+                                !selected.length || selectedDetails.isFetching || save.isPending ||
+                                !searchIsSettled || products.isFetching || !products.isSuccess
                             }
                             onClick={() => void applyBulk()}
                             className={executiveUi.secondary}
@@ -813,7 +837,7 @@ export default function PromotionProductManager({
                         </p>
                     )}
                 </div>
-                <footer className="shrink-0 border-t border-[#d9e4d8] bg-white px-5 py-3">
+                <footer className="shrink-0 border-t border-[#d9e4d8] bg-white px-4 py-2 sm:px-5">
                     {invalidPrice && (
                         <p role="alert" className="mb-2 text-xs text-red-700">
                             {tr(

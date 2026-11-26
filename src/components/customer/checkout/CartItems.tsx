@@ -1,9 +1,10 @@
-import { ImageIcon, Minus, Plus, ShoppingBasket, Trash2 } from 'lucide-react';
+import { ImageIcon, ShoppingBasket, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
 import { ROUTES } from '@/router/routes';
 import { cartRules, useCartStore, type CartItem } from '@/store/customer/cartStore';
+import CartQuantityControl from './CartQuantityControl';
 
 const productPath = (id: string) =>
     ROUTES.PRODUCT_DETAIL.replace(':productId', encodeURIComponent(id));
@@ -13,7 +14,7 @@ interface CartItemsProps {
     updateQuantity: (id: string, delta: number) => void;
 }
 
-export default function CartItems({ items, updateQuantity }: CartItemsProps) {
+export default function CartItems({ items }: CartItemsProps) {
     const { t, i18n } = useTranslation('quote');
     const english = i18n.resolvedLanguage === 'en';
     const setQuantity = useCartStore((state) => state.setQuantity);
@@ -89,46 +90,11 @@ export default function CartItems({ items, updateQuantity }: CartItemsProps) {
                                 );
                             })()}
                         </div>
-                        <div className="flex items-center rounded-lg border border-store-ink/25">
-                            {/* At the MOQ "-" is disabled; the trash button at the end removes the line. */}
-                            <button
-                                type="button"
-                                aria-label={t('decrease', {
-                                    name: (english ? item.nameEn : item.nameVi) || item.name,
-                                })}
-                                disabled={item.quantity <= cartRules(item).min}
-                                title={
-                                    item.quantity <= cartRules(item).min
-                                        ? t('atMinimum', { min: cartRules(item).min })
-                                        : undefined
-                                }
-                                className="grid size-9 place-items-center border-0 bg-transparent hover:bg-store-cream disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
-                                onClick={() => updateQuantity(item.id, -1)}
-                            >
-                                <Minus size={16} />
-                            </button>
-                            <span className="min-w-8 text-center font-bold">{item.quantity}</span>
-                            <button
-                                type="button"
-                                aria-label={t('increase', {
-                                    name: (english ? item.nameEn : item.nameVi) || item.name,
-                                })}
-                                disabled={(() => {
-                                    const { step, cap } = cartRules(item);
-                                    return cap != null && item.quantity + step > cap + 1e-9;
-                                })()}
-                                title={(() => {
-                                    const { step, max, cap } = cartRules(item);
-                                    return cap != null && item.quantity + step > cap + 1e-9
-                                        ? t('atStockLimit', { stock: max })
-                                        : undefined;
-                                })()}
-                                className="grid size-9 place-items-center border-0 bg-transparent hover:bg-store-cream disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
-                                onClick={() => updateQuantity(item.id, 1)}
-                            >
-                                <Plus size={16} />
-                            </button>
-                        </div>
+                        {/* At the MOQ "-" is disabled; the trash button at the end removes the line. */}
+                        <CartQuantityControl
+                            item={item}
+                            label={(english ? item.nameEn : item.nameVi) || item.name}
+                        />
                         <strong className="min-w-28 text-right">
                             {formatCurrencyVnd(item.unitPrice * item.quantity)}
                         </strong>

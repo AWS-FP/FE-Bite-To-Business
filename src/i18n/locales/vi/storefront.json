@@ -186,6 +186,7 @@
         "branch": "Trụ sở {{name}}",
         "errors": {
             "reverse": "Không tìm được địa chỉ từ vị trí này. Bạn có thể tự nhập địa chỉ.",
+            "unreachable": "Vui lòng chọn vị trí hợp lệ (không nằm trên nóc nhà hoặc giữa sông, gần đường xe chạy).",
             "route": "Không tính được quãng đường. Hãy kéo điểm hoặc chọn lại vị trí.",
             "search": "Không tìm được địa chỉ. Vui lòng thử lại.",
             "estimate": "Không tính được quãng đường. Vui lòng chọn lại địa chỉ.",

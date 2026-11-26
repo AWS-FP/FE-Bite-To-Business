@@ -88,7 +88,11 @@
         "addressFromDistribution": "Uses the exact location chosen on the Distribution page. Editing the address will locate it again.",
         "creating": "Creating package...",
         "pickOnMap": "Pick on map",
-        "defaultPackageName": "Default delivery package"
+        "defaultPackageName": "Default delivery package",
+        "editTitle": "Edit package",
+        "saveEdit": "Save package",
+        "cancelEdit": "Cancel editing",
+        "finishEditing": "Save or cancel your package changes before continuing."
     },
     "review": {
         "title": "Review before checkout",
@@ -118,22 +122,58 @@
         "shippingUnavailable": "Could not calculate the delivery fee. Please try again later.",
         "vatMissing": "Some products do not have a VAT rate configured yet, so the order cannot be placed. Please contact Bite to Business.",
         "stockUnavailable": "Some products no longer have enough stock. Go back to the cart to adjust quantities.",
+        "stockShortItem": "{{name}}: ordered {{requested}} {{unit}}, only {{available}} {{unit}} left",
+        "stockOutItem": "{{name}}: out of stock (ordered {{requested}} {{unit}})",
         "revisionConflict": "The quote has just changed. Review the total and try again.",
         "quoteIncomplete": "The quote is incomplete. Check the contact details and allocate every product to a package."
     },
     "notices": {
         "couponsUpdated": "Discounts updated.",
         "couponsRemoved": "All coupons removed from the quote.",
-        "packageAdded": "Delivery package added."
+        "packageAdded": "Delivery package added.",
+        "packageUpdated": "Delivery package updated."
     },
     "lineVat": "VAT {{rate}}%: {{amount}}",
     "lineVatMissing": "VAT rate not set",
     "vatIncomplete": "VAT missing for some products",
     "totalBeforeShipping": "Subtotal",
     "couponPicker": {
+        "listTitle": "Your coupon codes",
+        "details": {
+            "discount": "Discount",
+            "cap": "Maximum discount",
+            "minimum": "Minimum order",
+            "campaignLimit": "Campaign limit",
+            "userLimit": "Your limit",
+            "used": "Redeemed",
+            "reserved": "Reserved",
+            "remaining": "Remaining uses",
+            "validity": "Validity",
+            "scope": "Applies to"
+        },
+        "historyError": "Could not load your saved codes.",
+        "inspect": "Check terms",
+        "lookupError": "Could not look up this code. Check the code or try again.",
+        "unlimited": "Unlimited",
+        "terms": "Discount {{discount}} · Cap {{cap}} · Minimum order {{min}}",
+        "usage": "Campaign limit: {{total}} · Your limit: {{limit}} · Redeemed {{used}} · Reserved {{reserved}} · Remaining {{left}}",
+        "dates": "Valid from {{start}} to {{end}}",
+        "all": "All products qualify.",
+        "products": "Eligible products: {{names}}",
+        "reasons": {
+            "VALID": "Eligible.",
+            "WRONG_SCOPE": "This code applies to a different discount type.",
+            "INACTIVE": "Disabled.",
+            "NOT_STARTED": "Not yet active.",
+            "EXPIRED": "Expired.",
+            "GLOBAL_LIMIT": "Campaign usage limit reached.",
+            "USER_LIMIT": "You have no available uses.",
+            "MINIMUM": "Minimum order value not reached.",
+            "PRODUCT_SCOPE": "No qualifying products in this quote."
+        },
         "productTitle": "Product coupon",
         "shippingTitle": "Shipping coupon",
-        "selectOrEnter": "Select or enter",
+        "selectOrEnter": "Enter a code",
         "appliedUnknown": "Applied",
         "inputLabel": "Coupon code",
         "inputPlaceholder": "Enter 8-character code",
@@ -157,6 +197,24 @@
         "choose": "Use",
         "inUse": "In use",
         "remove": "Remove current code",
-        "close": "Close"
-    }
+        "close": "Close",
+        "privateNotice": "Enter the exact code you received. Coupon codes are not listed publicly.",
+        "savedCodes": "Your reusable codes"
+    },
+    "reorder": {
+        "title": "Reorder",
+        "summary": "Your previous delivery details were reused. Prices, stock and delivery dates were rechecked.",
+        "loading": "Checking your reorder...",
+        "cartTitle": "Items in this reorder",
+        "cartHint": "Change quantities here. Enter 0 to remove an item. Your regular cart is unchanged.",
+        "allocationReset": "Packages containing changed items will need to be allocated again. Unaffected packages are kept.",
+        "invalidCart": "Each product needs at least its minimum order quantity (or 0 to remove it), and keep at least one product.",
+        "closedTitle": "This quote has already been ordered.",
+        "closedHint": "It can no longer be edited or paid again. Open your orders to pay, or go back to the cart to place a new order.",
+        "viewOrders": "View orders",
+        "backToCart": "Back to cart"
+    },
+    "quantityInput": "Quantity of {{name}}",
+    "quantityOverStock": "Only {{stock}} in stock, not enough for {{quantity}}. Set to {{stock}}.",
+    "quantityBelowMinimum": "The minimum quantity is {{min}}. Set to {{min}}."
 }

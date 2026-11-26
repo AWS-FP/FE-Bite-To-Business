@@ -1,90 +1,35 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+/**
+ * Khung chat "Trợ lý mua hàng" nổi trên storefront. AI chỉ dành cho Customer đã đăng nhập: Guest bấm nút sẽ được
+ * đưa tới trang đăng nhập rồi quay lại trang đang xem. Hiển thị tin nhắn và render surface A2UI
+ * của từng lượt bằng A2uiSurface; action trên surface được xử lý bởi useA2uiActions (RootLayout).
+ * Có ô tích bật/tắt dùng thói quen duyệt web để cá nhân hóa.
+ */
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ROUTES } from '@/router/routes';
 import { Loader2, RotateCcw, Send, Sparkles, X } from 'lucide-react';
 import { A2uiSurface } from '@a2ui/react/v0_9';
-import { ROUTES } from '@/router/routes';
 import { useAuthStore } from '@/store/admin/authStore';
-import { useCartStore } from '@/store/customer/cartStore';
-import {
-    getProcessor,
-    setAssistantActionHandler,
-    useAssistantStore,
-    type ChatEntry,
-} from '@/a2ui/runtime/assistantStore';
+import { useAssistantStore, type ChatEntry } from '@/a2ui/runtime/assistantStore';
+import { getSurface } from '@/a2ui/runtime/a2uiRuntime';
 import {
     personalizationEnabled,
     setPersonalizationEnabled,
+    subscribePersonalization,
 } from '@/a2ui/telemetry/interactionTracker';
 
-const PAGES: Record<string, string> = {
-    catalog: ROUTES.CATALOG,
-    cart: ROUTES.QUOTES,
-    orders: ROUTES.ORDERS,
-    favorites: ROUTES.FAVORITES,
-    profile: ROUTES.PROFILE,
-    brands: ROUTES.BRANDS,
-};
-
-/** Trợ lý mua hàng: chat + giao diện A2UI do AI sinh. Chỉ Guest và Customer thấy. */
+/** Trợ lý mua hàng: chat + giao diện A2UI do AI sinh. Nhân viên/Admin không thấy; Guest thấy nút mời đăng nhập. */
 export default function AssistantBubble() {
     const role = useAuthStore((state) => state.session?.user.role);
+    const navigate = useNavigate();
+    const location = useLocation();
     const { i18n } = useTranslation();
     const locale = i18n.resolvedLanguage?.startsWith('en') ? 'en' : 'vi';
-    const navigate = useNavigate();
-    const { entries, busy, open, setOpen, send, note, reset } = useAssistantStore();
+    const { entries, busy, open, setOpen, send, reset } = useAssistantStore();
     const [text, setText] = useState('');
-    const [personalize, setPersonalize] = useState(personalizationEnabled);
+    const personalize = useSyncExternalStore(subscribePersonalization, personalizationEnabled);
     const listRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        setAssistantActionHandler((action, product) => {
-            const context = action.context ?? {};
-            switch (action.name) {
-                case 'view_product':
-                    if (typeof context.productId === 'string')
-                        navigate(`/products/${context.productId}`);
-                    break;
-                case 'add_to_cart': {
-                    // Giá/tồn lấy từ data model BE vừa gửi; giỏ hàng kiểm tra lại khi tạo báo giá.
-                    if (!product || product.listPrice == null) {
-                        note('Chưa thêm được: sản phẩm chưa có giá.');
-                        break;
-                    }
-                    const price =
-                        product.saleActive && product.salePrice != null
-                            ? product.salePrice
-                            : product.listPrice;
-                    useCartStore.getState().addItem(
-                        {
-                            id: product.productId,
-                            name: product.name,
-                            spec: product.spec ?? product.unitCode,
-                            unitPrice: price,
-                            imageUrl: product.imageUrl ?? undefined,
-                            minOrderQuantity: product.minOrderQuantity,
-                            quantityStep: product.quantityStep,
-                            maxQuantity: product.availableQuantity ?? null,
-                        },
-                        Number(context.quantity) || product.minOrderQuantity,
-                    );
-                    note(`Đã thêm ${product.name} vào giỏ. Bạn chỉnh số lượng trong giỏ hàng.`);
-                    break;
-                }
-                case 'refine_search':
-                    if (typeof context.q === 'string') void send(context.q, locale);
-                    break;
-                case 'send_prompt':
-                    if (typeof context.text === 'string') void send(context.text, locale);
-                    break;
-                case 'open_page':
-                    if (typeof context.page === 'string' && PAGES[context.page])
-                        navigate(PAGES[context.page]);
-                    break;
-            }
-        });
-        return () => setAssistantActionHandler(null);
-    }, [navigate, note, send, locale]);
 
     useEffect(() => {
         listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
@@ -100,11 +45,22 @@ export default function AssistantBubble() {
         void send(value, locale);
     }
 
-    if (!open) {
+    // Guest có thể còn trạng thái open từ phiên trước (sessionStorage): luôn hiện nút mời đăng nhập.
+    if (!open || role !== 'CUSTOMER') {
         return (
             <button
                 type="button"
-                onClick={() => setOpen(true)}
+                onClick={() =>
+                    role === 'CUSTOMER'
+                        ? setOpen(true)
+                        : // Guest: AI cần biết đúng khách (ý định, thói quen) nên phải đăng nhập trước.
+                          navigate(ROUTES.LOGIN, {
+                              state: {
+                                  from: { pathname: location.pathname, search: location.search },
+                              },
+                          })
+                }
+                title={role === 'CUSTOMER' ? undefined : 'Đăng nhập để dùng trợ lý AI'}
                 className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full bg-store-green px-4 py-3 text-sm font-bold text-white shadow-lg hover:bg-store-dark"
             >
                 <Sparkles size={18} aria-hidden="true" /> Trợ lý mua hàng
@@ -121,9 +77,6 @@ export default function AssistantBubble() {
                 <div>
                     <p className="flex items-center gap-2 text-sm font-bold">
                         <Sparkles size={16} aria-hidden="true" /> Trợ lý mua hàng
-                    </p>
-                    <p className="text-[11px] text-white/70">
-                        Giao diện do AI tạo · giá và tồn kho lấy từ hệ thống
                     </p>
                 </div>
                 <div className="flex items-center gap-1">
@@ -191,7 +144,7 @@ export default function AssistantBubble() {
                         onChange={(event) => setText(event.target.value)}
                         maxLength={1000}
                         placeholder="Hỏi về sản phẩm, giá sỉ, tồn kho…"
-                        className="min-w-0 flex-1 rounded border border-store-line px-3 py-2 text-sm outline-none focus:border-store-green"
+                        className="min-w-0 flex-1 rounded border border-store-line bg-white px-3 py-2 text-sm text-store-ink outline-none focus:border-store-green"
                     />
                     <button
                         type="submit"
@@ -206,18 +159,18 @@ export default function AssistantBubble() {
                     <input
                         type="checkbox"
                         checked={personalize}
-                        onChange={(event) => {
-                            setPersonalize(event.target.checked);
-                            setPersonalizationEnabled(event.target.checked);
-                        }}
+                        onChange={(event) => setPersonalizationEnabled(event.target.checked)}
                     />
-                    Cho phép dùng thói quen duyệt web để cá nhân hóa giao diện
+                    {locale === 'en'
+                        ? 'Use my customer profile, searches and browsing activity for personalized suggestions'
+                        : 'Dùng hồ sơ, lịch sử tìm kiếm và duyệt web của tôi để cá nhân hóa gợi ý'}
                 </label>
             </form>
         </section>
     );
 }
 
+/** Một mục hội thoại: tin nhắn người dùng, ghi chú hệ thống, hoặc câu trả lời kèm surface A2UI. */
 function Entry({ entry }: { entry: ChatEntry }) {
     if (entry.role === 'user') {
         return (
@@ -229,9 +182,7 @@ function Entry({ entry }: { entry: ChatEntry }) {
     if (entry.role === 'system') {
         return <p className="text-center text-[11px] text-store-muted">{entry.text}</p>;
     }
-    const surface = entry.surfaceId
-        ? getProcessor().model.surfacesMap.get(entry.surfaceId)
-        : undefined;
+    const surface = getSurface(entry.surfaceId);
     return (
         <div className="space-y-2">
             {entry.text && (
@@ -242,7 +193,7 @@ function Entry({ entry }: { entry: ChatEntry }) {
                 </p>
             )}
             {surface && (
-                <div className="a2ui-surface rounded-lg bg-white p-2 shadow-sm">
+                <div className="a2ui-surface rounded-lg bg-white p-2 text-store-ink shadow-sm [--a2ui-color-on-background:var(--color-store-ink)] [--a2ui-color-on-surface:var(--color-store-ink)] [--a2ui-text-caption-color:var(--color-store-ink)] [--a2ui-text-color-text:var(--color-store-ink)]">
                     <A2uiSurface surface={surface} />
                 </div>
             )}

@@ -1,8 +1,6 @@
-import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { MessageCircle, Star } from 'lucide-react';
+import { MessageCircle, Star, Trash2 } from 'lucide-react';
 import { executiveUi } from '@/constants/e-commerce/executiveUi';
-import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
+import { useExecutiveReviews } from '@/hooks/e-commerce/useExecutiveReviews';
 import {
     ExecutiveBadge,
     ExecutiveFeedback,
@@ -16,51 +14,12 @@ import {
     ExecutivePanel,
     LoadingRows,
 } from '@/components/e-commerce/ExecutiveUI';
-import { executiveApi } from '@/services/e-commerce/executiveAdminService';
-import { useAuthStore } from '@/store/admin/authStore';
-import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
 
 export default function EcommerceReviewsPage() {
-    const tr = useExecutiveText(),
-        qc = useQueryClient();
-    const ownUserId = useAuthStore((state) => state.session?.user?.id);
-    const [status, setStatus] = useState(''),
-        [stars, setStars] = useState(''),
-        [page, setPage] = useState(0),
-        [feedback, setFeedback] = useState('');
-    const list = useQuery({
-        queryKey: ['ecom', 'reviews', status, stars, page],
-        queryFn: () =>
-            executiveApi.reviews(status || undefined, stars ? Number(stars) : undefined, page, 20),
-    });
-    const mutate = useMutation({
-        mutationFn: ({
-            id,
-            action,
-            reason,
-        }: {
-            id: string;
-            action: 'HIDE' | 'RESTORE';
-            reason?: string;
-        }) => executiveApi.moderateReview(id, action, reason),
-        onSuccess: () => {
-            setFeedback(tr('Cập nhật đánh giá thành công.', 'Review moderation saved.'));
-            void qc.invalidateQueries({ queryKey: ['ecom', 'reviews'] });
-        },
-        onError: (error) =>
-            setFeedback(
-                executiveErrorMessage(
-                    error,
-                    tr('Không thể xử lý đánh giá.', 'Cannot moderate this review.'),
-                ),
-            ),
-    });
-    function hide(id: string) {
-        const reason = window.prompt(
-            tr('Nhập lý do ẩn đánh giá (bắt buộc):', 'Enter a reason for hiding the review:'),
-        );
-        if (reason?.trim()) mutate.mutate({ id, action: 'HIDE', reason: reason.trim() });
-    }
+    const {
+        tr, ownUserId, status, stars, page, setPage, feedback, failed, list, busy,
+        changeStatus, changeStars, hide, restore, remove,
+    } = useExecutiveReviews();
     return (
         <div className="space-y-6">
             <ExecutiveHeading
@@ -74,7 +33,7 @@ export default function EcommerceReviewsPage() {
             />
             <ExecutiveFeedback
                 message={feedback}
-                error={feedback.startsWith('Không') || feedback.startsWith('Cannot')}
+                error={failed}
             />
             <ExecutivePanel
                 title={tr('Đánh giá khách hàng', 'Customer reviews')}
@@ -83,10 +42,7 @@ export default function EcommerceReviewsPage() {
                 <div className="grid gap-3 p-5 sm:max-w-[590px] sm:grid-cols-2">
                     <ExecutiveSelect
                         value={status}
-                        onValueChange={(value) => {
-                            setStatus(value);
-                            setPage(0);
-                        }}
+                        onValueChange={changeStatus}
                         ariaLabel={tr('Trạng thái', 'Status')}
                     >
                         <option value="">{tr('Tất cả đánh giá', 'All reviews')}</option>
@@ -95,10 +51,7 @@ export default function EcommerceReviewsPage() {
                     </ExecutiveSelect>
                     <ExecutiveSelect
                         value={stars}
-                        onValueChange={(next) => {
-                            setStars(next);
-                            setPage(0);
-                        }}
+                        onValueChange={changeStars}
                         ariaLabel={tr('Lọc theo số sao', 'Filter by stars')}
                     >
                         <option value="">{tr('Tất cả mức sao', 'All ratings')}</option>
@@ -159,11 +112,11 @@ export default function EcommerceReviewsPage() {
                                         </p>
                                     )}
                                 </div>
-                                <div className="flex items-start justify-end">
+                                <div className="flex flex-wrap items-start justify-end gap-2">
                                     {!r.deletedAt ? (
                                         <button
                                             type="button"
-                                            disabled={mutate.isPending}
+                                            disabled={busy}
                                             className={executiveUi.secondary}
                                             onClick={() => hide(r.id)}
                                         >
@@ -172,22 +125,30 @@ export default function EcommerceReviewsPage() {
                                     ) : r.deletedBy === ownUserId ? (
                                         <button
                                             type="button"
-                                            disabled={mutate.isPending}
+                                            disabled={busy}
                                             className={executiveUi.secondary}
-                                            onClick={() =>
-                                                mutate.mutate({ id: r.id, action: 'RESTORE' })
-                                            }
+                                            onClick={() => restore(r.id)}
                                         >
                                             {tr('Hiện lại', 'Restore')}
                                         </button>
                                     ) : (
-                                        <span className="text-xs text-[#738577]">
+                                        <span className="self-center text-xs text-[#738577]">
                                             {tr(
                                                 'Đã ẩn bởi nhân viên khác',
                                                 'Hidden by another moderator',
                                             )}
                                         </span>
                                     )}
+                                    <button
+                                        type="button"
+                                        disabled={busy}
+                                        onClick={() => remove(r.id)}
+                                        aria-label={tr('Xóa vĩnh viễn đánh giá', 'Permanently delete review')}
+                                        className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700 transition hover:border-rose-400 hover:bg-rose-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        <Trash2 size={15} aria-hidden="true" />
+                                        {tr('Xóa đánh giá', 'Delete review')}
+                                    </button>
                                 </div>
                             </article>
                         ))}

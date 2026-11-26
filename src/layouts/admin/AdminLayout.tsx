@@ -6,6 +6,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/router/routes';
 import { useAuthStore } from '@/store/admin/authStore';
 import { useRegistrationStats } from '@/hooks/admin/useRegistrations';
+import { useOpenPaymentReviewCount } from '@/hooks/admin/usePaymentReviews';
 import { logout } from '@/services/admin/authService';
 import AdminHeader from './AdminHeader';
 import AdminSidebar from './AdminSidebar';
@@ -45,6 +46,7 @@ function AdminWorkspace() {
     const user = useAuthStore((state) => state.session?.user ?? null);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const statsQuery = useRegistrationStats();
+    const paymentReviewCount = useOpenPaymentReviewCount();
     const queryClient = useQueryClient();
     const loggingOut = useRef(false);
     let sectionNumber = '01';
@@ -86,6 +88,8 @@ function AdminWorkspace() {
                 registrationsPath={ROUTES.ADMIN_REGISTRATIONS}
                 staffPath={ROUTES.ADMIN_STAFF}
                 returnsPath={ROUTES.ADMIN_PACKAGE_RETURNS}
+                paymentReviewsPath={ROUTES.ADMIN_PAYMENT_REVIEWS}
+                openPaymentReviews={paymentReviewCount.data}
                 systemPath={ROUTES.ADMIN_SYSTEM}
                 isCollapsed={isCollapsed}
                 onToggleCollapse={() => setIsCollapsed(!isCollapsed)}

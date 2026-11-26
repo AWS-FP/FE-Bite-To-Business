@@ -1,7 +1,7 @@
 import axios, { type InternalAxiosRequestConfig } from 'axios';
 import { env } from '@/lib/env';
 import type { AuthResponse } from '@/types/admin/auth';
-import { useAuthStore } from '@/store/admin/authStore';
+import { hasSessionHint, useAuthStore } from '@/store/admin/authStore';
 import type { ApiResponse } from '@/types/api';
 
 const clientConfig = {
@@ -133,6 +133,11 @@ let restoring: Promise<void> | null = null;
 export function restoreSession() {
     restoring ??= (async () => {
         const version = useAuthStore.getState().sessionVersion;
+        // Never signed in on this browser (guest, crawler): there is no refresh cookie to use.
+        if (!hasSessionHint()) {
+            useAuthStore.getState().finishRestoring();
+            return;
+        }
         try {
             const response = await requestRefresh();
             const session = response.data.data;
@@ -143,8 +148,16 @@ export function restoreSession() {
             ) {
                 useAuthStore.getState().setSession(session);
             }
-        } catch {
-            // No cookie, expired, or offline: stay signed out.
+        } catch (error: unknown) {
+            // No cookie, expired, or offline: stay signed out. A rejected refresh also drops the
+            // sign-in marker so the next visit does not try again; offline keeps it for a later retry.
+            const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+            if (
+                (status === 400 || status === 401 || status === 403) &&
+                useAuthStore.getState().sessionVersion === version
+            ) {
+                useAuthStore.getState().clearSession();
+            }
         } finally {
             useAuthStore.getState().finishRestoring();
         }

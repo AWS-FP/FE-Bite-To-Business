@@ -1,0 +1,252 @@
+.finance-report {
+    font-family: var(--font-body);
+    display: grid;
+    gap: 20px;
+    min-width: 0;
+    color: var(--color-store-ink);
+}
+.finance-info {
+    margin-top: -12px;
+    font-size: 12px;
+}
+.finance-info summary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    padding: 4px 0;
+    color: var(--color-store-muted);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+.finance-info > div {
+    display: grid;
+    gap: 8px;
+    max-width: 900px;
+    margin-top: 8px;
+    border-left: 2px solid var(--color-store-sage);
+    padding: 8px 14px;
+    line-height: 1.7;
+}
+.finance-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 18px 24px 0;
+}
+.finance-presets button {
+    border: 1px solid var(--color-store-line);
+    border-radius: 3px;
+    padding: 8px 12px;
+    color: var(--color-store-ink);
+    background: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.finance-presets button:hover,
+.finance-presets button:focus-visible {
+    border-color: var(--color-store-green);
+    background: var(--color-store-cream);
+}
+.finance-report .system-panel-heading label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.finance-report select,
+.finance-report input {
+    min-height: 42px;
+    max-width: 100%;
+    border: 1px solid var(--color-store-line);
+    border-radius: 3px;
+    padding: 9px 12px;
+    background: white;
+    color: var(--color-store-ink);
+    font-size: 13px;
+}
+.finance-report input:focus-visible,
+.finance-report select:focus-visible {
+    outline: 2px solid var(--color-store-green);
+    outline-offset: 2px;
+}
+.finance-report [aria-invalid='true'] {
+    border-color: var(--color-danger-strong);
+}
+.finance-field-error {
+    color: var(--color-danger-strong);
+    font-size: 12px;
+    font-weight: 400;
+}
+.finance-period {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-store-muted);
+}
+.finance-customer-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+.finance-customer-label button,
+.finance-customer-link {
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--color-store-green);
+    font: inherit;
+    text-align: left;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+.finance-report .finance-metric {
+    min-height: 145px;
+    border-top: 3px solid var(--color-store-green);
+}
+.finance-report .finance-metric > strong {
+    font-family: var(--font-price);
+    font-size: clamp(21px, 1.8vw, 30px);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.4;
+    letter-spacing: -0.5px;
+    padding-top: 20px;
+}
+.finance-report .finance-metric-net {
+    background: var(--color-store-cream);
+}
+.finance-counts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    padding: 18px 24px;
+    border: 1px solid var(--color-store-line);
+    background: white;
+}
+.finance-counts > div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+.finance-counts dt {
+    color: var(--color-store-muted);
+    font-size: 12px;
+}
+.finance-counts dd {
+    font-size: 19px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+.finance-chart {
+    height: 340px;
+    min-width: 0;
+    padding: 24px 16px 16px;
+}
+.finance-chart .recharts-legend-wrapper {
+    font-size: 12px;
+}
+.finance-report .recharts-default-tooltip {
+    border-radius: 3px;
+    font-size: 12px;
+}
+.finance-report .system-log-table {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 12px;
+}
+.finance-report .system-log-table th {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--color-store-line);
+    background: var(--color-store-cream);
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.finance-report .system-log-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--color-store-line);
+    overflow-wrap: anywhere;
+    max-width: 240px;
+    font-variant-numeric: tabular-nums;
+}
+.finance-report .system-log-table tbody tr:hover {
+    background: var(--color-surface-soft);
+}
+.finance-report .system-log-table td:nth-last-child(2) {
+    white-space: nowrap;
+}
+.finance-status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 3px;
+    background: var(--color-surface-soft);
+    color: var(--color-store-muted);
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.finance-status[data-status='SUCCESS'],
+.finance-status[data-status='REFUNDED'],
+.finance-status[data-status='RESTORED'] {
+    color: var(--color-success);
+    background: var(--color-surface-green);
+}
+.finance-status[data-status='REVIEW'],
+.finance-status[data-status='PENDING'],
+.finance-status[data-status='REQUESTED'],
+.finance-status[data-status='PROCESSING'] {
+    color: var(--color-warning);
+    background: var(--color-warning-soft);
+}
+.finance-status[data-status='FAILED'],
+.finance-status[data-status='REJECTED'] {
+    color: var(--color-danger-strong);
+    background: var(--color-danger-soft);
+}
+@media (max-width: 1050px) {
+    .finance-report .system-metric-grid,
+    .finance-counts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 600px) {
+    .finance-report {
+        font-family: var(--font-body);
+        gap: 16px;
+    }
+    .finance-report .system-metric-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .finance-chart {
+        height: 300px;
+        padding: 20px 0 10px;
+    }
+    .finance-presets {
+        padding: 16px 16px 0;
+    }
+    .finance-report .system-panel-heading,
+    .finance-report .system-panel-footer {
+        padding: 16px;
+    }
+    .finance-report .system-panel-heading .system-button-row {
+        width: 100%;
+    }
+}
+
+.finance-chart text,
+.finance-chart .recharts-default-tooltip,
+.finance-chart .recharts-default-legend {
+    font-family: var(--font-body);
+}
+.finance-chart .recharts-cartesian-axis-tick text {
+    fill: var(--color-store-muted);
+}

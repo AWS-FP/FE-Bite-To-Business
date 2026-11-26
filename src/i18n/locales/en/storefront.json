@@ -186,6 +186,7 @@
         "branch": "{{name}} branch",
         "errors": {
             "reverse": "Could not find an address for this location. You can enter it manually.",
+            "unreachable": "Please choose a valid location (not on a rooftop or in a river, close to a road).",
             "route": "Could not calculate the route. Drag the pin or select another location.",
             "search": "Could not search for addresses. Please try again.",
             "estimate": "Could not calculate the route. Please select the address again.",
