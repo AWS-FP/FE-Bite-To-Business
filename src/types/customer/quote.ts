@@ -122,3 +122,25 @@ export interface CreatedOrder {
     totalAmount: number;
     reservationExpiresAt: string | null;
 }
+
+export interface SavedCoupon {
+    code: string;
+    scope: CouponScope;
+    nameVi: string | null;
+    nameEn: string | null;
+    discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
+    discountValue: number;
+    maxDiscountAmount: number | null;
+    minOrderAmount: number;
+    usageLimit: number | null;
+    usageLimitPerUser: number | null;
+    used: number;
+    reserved: number;
+    remaining: number | null;
+    startsAt: string;
+    endsAt: string;
+    productScope: 'ALL' | 'SELECTED';
+    products: { id: string; nameVi: string; nameEn: string }[];
+    valid: boolean;
+    reason: string | null;
+}

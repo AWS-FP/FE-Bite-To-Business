@@ -44,6 +44,7 @@ interface CartStoreState {
     removePurchased: (ids: string[]) => void
 }
 
+const guestKey = 'bitetobusiness.guest-cart'
 const round = (value: number) => Number(value.toFixed(3))
 
 export function cartRules(item: Pick<CartItem, 'minOrderQuantity' | 'quantityStep' | 'maxQuantity'>) {
@@ -136,8 +137,19 @@ export const useCartStore = create<CartStoreState>()(persist((set) => ({
     selectAll: (selected) => set((state) => ({ items: state.items.map((item) => ({ ...item, selected })) })),
     removePurchased: (ids) => set((state) => ({ items: state.items.filter((item) => !ids.includes(item.id)) })),
 }), {
-    name: 'bitetobusiness.guest-cart',
-    storage: createJSONStorage(() => localStorage),
+    name: guestKey,
+    storage: createJSONStorage(() => {
+        try {
+            return localStorage
+        } catch {
+            const carts = new Map<string, string>()
+            return {
+                getItem: (key: string) => carts.get(key) ?? null,
+                setItem: (key: string, value: string) => { carts.set(key, value) },
+                removeItem: (key: string) => { carts.delete(key) },
+            }
+        }
+    }),
     partialize: (state) => ({ items: state.items }),
     // Re-apply MOQ/step/stock to a saved cart, e.g. a line saved at 100 when only 65 can be sold.
     merge: (persisted, current) => {
@@ -148,3 +160,22 @@ export const useCartStore = create<CartStoreState>()(persist((set) => ({
         return { ...current, items }
     },
 }))
+
+/** Each account has its own browser cart. An overlapping guest line carries its exact quantity. */
+export function switchCartOwner(userId: string | null, mergeGuest = false) {
+    const key = userId ? `bitetobusiness.cart.${userId}` : guestKey
+    const previous = useCartStore.persist.getOptions().name
+    if (previous === key) return
+    // Another tab may already have consumed the persisted guest cart.
+    if (previous === guestKey && mergeGuest) void useCartStore.persist.rehydrate()
+    const guest = previous === guestKey && mergeGuest ? useCartStore.getState().items : []
+    useCartStore.persist.setOptions({ name: key })
+    // createJSONStorage uses synchronous localStorage here.
+    void useCartStore.persist.rehydrate()
+    if (guest.length) {
+        const merged = new Map(useCartStore.getState().items.map(item => [item.id, item]))
+        for (const item of guest) merged.set(item.id, item)
+        useCartStore.setState({ items: [...merged.values()] })
+        useCartStore.persist.getOptions().storage?.removeItem(guestKey)
+    }
+}

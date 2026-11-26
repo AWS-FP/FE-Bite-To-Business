@@ -20,7 +20,7 @@ export default function CouponProductPicker({ selectedIds, onChange, disabled = 
     const [term, setTerm] = useState('');
     const [page, setPage] = useState(0);
     const products = useQuery({
-        queryKey: ['ecom', 'coupon-product-picker', term, page],
+        queryKey: ['ecom', 'products', 'coupon-picker', term, page],
         queryFn: ({ signal }) => executiveApi.products({ q: term || undefined, status: 'PUBLISHED', page, size: PAGE_SIZE }, signal),
         staleTime: 60_000,
     });

@@ -24,6 +24,7 @@ import {
     updateExecutiveVat,
 } from '@/services/e-commerce/executiveReadService';
 import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
+import { invalidatePublicCatalog } from '@/hooks/customer/useCatalogQuery';
 import { useExecutiveProductCatalog } from '@/hooks/e-commerce/useExecutiveProductCatalog';
 
 function ProductDrawer({
@@ -100,6 +101,7 @@ function ProductDrawer({
         mutationFn: (status: string) => executiveApi.setProductStatus(product.id, status),
         onSuccess: (_, status) => {
             setLocalStatus(status as AdminProduct['status']);
+            void invalidatePublicCatalog();
             setFeedback(tr('Đã cập nhật trạng thái sản phẩm.', 'Publication status updated.'));
             setFailed(false);
             void qc.invalidateQueries({ queryKey: ['ecom', 'products'] });

@@ -7,6 +7,10 @@ const publicCatalog = new QueryClient({
     defaultOptions: { queries: { staleTime: CATALOG_STALE_MS } },
 });
 
+export function invalidatePublicCatalog() {
+    return publicCatalog.invalidateQueries();
+}
+
 export function useCatalogQuery<T>(options: UseQueryOptions<T>) {
     return useQuery(options, publicCatalog);
 }

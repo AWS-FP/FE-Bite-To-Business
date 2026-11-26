@@ -4,6 +4,7 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getRoleHome, ROUTES } from '@/router/routes';
+import { useCartStore } from '@/store/customer/cartStore';
 import useAuth from '@/hooks/admin/useAuth';
 import { getAuthError, type AuthError } from '@/utils/admin/authError';
 import { loginSchema } from '@/validations/admin/authSchema';
@@ -75,7 +76,27 @@ export default function LoginForm() {
                         ? previousPage + previousSearch
                         : previousPage;
             }
-            navigate(destination, { replace: true });
+            const checkoutLines = location.state?.checkoutLines;
+            const checkout = previousPage === ROUTES.QUOTES && Array.isArray(checkoutLines);
+            if (checkout && session.user.role === 'CUSTOMER' && checkoutLines.length > 0) {
+                const selected = new Set(
+                    checkoutLines.map((line: { productId: string }) => line.productId),
+                );
+                useCartStore.setState((state) => ({
+                    items: state.items.map((item) => ({
+                        ...item,
+                        selected: selected.has(item.id),
+                    })),
+                }));
+            } else if (checkout && session.user.role !== 'CUSTOMER') {
+                destination = getRoleHome(session.user.role);
+            }
+            navigate(destination, {
+                replace: true,
+                ...(checkout && session.user.role === 'CUSTOMER' && checkoutLines.length > 0
+                    ? { state: { checkoutLines } }
+                    : {}),
+            });
         } catch (error) {
             setServerError(getAuthError(error));
         } finally {
