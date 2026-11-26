@@ -1,6 +1,6 @@
 import { http, publicHttp } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
-import type { SystemMonitoring } from '@/types/admin/system';
+import type { ApiDiagnostics, SystemMonitoring } from '@/types/admin/system';
 import { backendHealthSchema } from '@/validations/admin/systemSchema';
 import type { BackendHealth } from '@/types/admin/system';
 
@@ -10,6 +10,18 @@ export async function getSystemMonitoring(hours: number, signal?: AbortSignal) {
         signal,
         timeout: 20_000,
     });
+    return response.data.data;
+}
+
+export async function getApiDiagnostics(hours: number, signal?: AbortSignal) {
+    const response = await http.get<ApiResponse<ApiDiagnostics>>(
+        '/api/admin/system/monitoring/api-diagnostics',
+        {
+            params: { hours },
+            signal,
+            timeout: 20_000,
+        },
+    );
     return response.data.data;
 }
 

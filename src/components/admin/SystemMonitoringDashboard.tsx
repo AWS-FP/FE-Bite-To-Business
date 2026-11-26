@@ -3,9 +3,17 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { RefreshCw } from 'lucide-react';
 import {
-    Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis,
+    Bar,
+    CartesianGrid,
+    ComposedChart,
+    Line,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
 } from 'recharts';
 import AdminButton from './AdminButton';
+import ApiDiagnosticsPanel from './ApiDiagnosticsPanel';
 import { getSystemMonitoring } from '@/services/admin/systemService';
 import { useAuthStore } from '@/store/admin/authStore';
 import type { MonitoringPoint, SystemMonitoring } from '@/types/admin/system';
@@ -22,6 +30,21 @@ const cloudMetrics = [
     'jserrors',
 ];
 const aiMetrics = ['aiRequests', 'aiFailed', 'inputTokens', 'outputTokens'];
+const diagnosticsMetrics = [
+    'requests',
+    'clientErrors',
+    'errors',
+    'alb4xx',
+    'alb5xx',
+    'latency',
+    'pageLoad',
+    'lcp',
+    'jserrors',
+    'cpu',
+    'memory',
+];
+const gaugeMetrics = ['cpu', 'memory', 'latency', 'pageLoad', 'lcp'];
+const sparseErrorMetrics = ['errors', 'clientErrors', 'alb4xx', 'alb5xx'];
 
 export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?: Mode }) {
     const { t, i18n } = useTranslation('admin');
@@ -48,7 +71,12 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
         }).format(new Date(time));
     const data = query.data;
     const from = data ? Date.parse(data.from) : 0;
-    const keys = mode === 'overview' ? [...cloudMetrics, 'aiRequests', 'aiFailed'] : aiMetrics;
+    const keys =
+        mode === 'logs'
+            ? diagnosticsMetrics
+            : mode === 'overview'
+              ? [...cloudMetrics, 'aiRequests', 'aiFailed']
+              : aiMetrics;
     const logs =
         data?.recentAiLogs.filter(
             (row) =>
@@ -62,10 +90,11 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                 <div>
                     <h2>
                         {t(
-                            `system.monitoring.${mode === 'logs' ? 'logsTitle' : mode === 'ai' ? 'aiTitle' : 'title'}`,
+                            mode === 'logs'
+                                ? 'system.diagnostics.production'
+                                : `system.monitoring.${mode === 'ai' ? 'aiTitle' : 'title'}`,
                         )}
                     </h2>
-                    <p>{t('system.monitoring.description')}</p>
                 </div>
                 <div className="system-button-row">
                     <label className="monitoring-range">
@@ -95,6 +124,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                 </div>
             )}
             {query.isPending && <p role="status">{t('system.loading')}</p>}
+            {mode === 'logs' && !data && <ApiDiagnosticsPanel hours={hours} />}
             {data && (
                 <>
                     <p className="system-muted">
@@ -106,73 +136,72 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                     {query.isError && (
                         <p className="system-muted">{t('system.monitoring.stale')}</p>
                     )}
-                    {data.cloudStatus !== 'AVAILABLE' && mode === 'overview' && (
+                    {data.cloudStatus !== 'AVAILABLE' && mode !== 'ai' && (
                         <div className="system-notice system-notice-warning">
                             {t(
                                 `system.monitoring.${data.cloudStatus === 'UNAVAILABLE' ? 'cloudUnavailable' : 'cloudPartial'}`,
                             )}
                         </div>
                     )}
-                    {mode !== 'logs' && (
-                        <>
-                            <div className="system-metric-grid">
-                                {keys.map((id) => {
-                                    const points = metricPoints(data, id);
-                                    const current = points.filter(
-                                        (point) => Date.parse(point.time) >= from,
-                                    );
-                                    const previous = points.filter(
-                                        (point) => Date.parse(point.time) < from,
-                                    );
-                                    const gauge = ['cpu', 'memory', 'latency'].includes(id);
-                                    const value = gauge ? current.at(-1)?.value : total(current);
-                                    const old = total(previous);
-                                    const change =
-                                        !gauge &&
-                                        value !== undefined &&
-                                        old !== undefined &&
-                                        old > 0
-                                            ? ((value - old) / old) * 100
-                                            : null;
-                                    return (
-                                        <article className="system-metric-card" key={id}>
-                                            <div className="system-metric-label">
-                                                {t(`system.monitoring.metrics.${id}`)}
-                                            </div>
-                                            <strong>
-                                                {value === undefined
-                                                    ? '—'
-                                                    : number.format(
-                                                          id === 'latency' ? value * 1000 : value,
-                                                      )}
-                                                <small>
-                                                    {id === 'latency' ? ' ms' : gauge ? ' %' : ''}
-                                                </small>
-                                            </strong>
-                                            <p>
-                                                {gauge
-                                                    ? t('system.monitoring.latestBucket')
-                                                    : change === null
-                                                      ? t('system.monitoring.noComparison')
-                                                      : t('system.monitoring.change', {
-                                                            value: `${change > 0 ? '+' : ''}${number.format(change)}`,
-                                                        })}
-                                            </p>
-                                        </article>
-                                    );
-                                })}
-                            </div>
-                            <p className="system-muted">{t('system.monitoring.definitions')}</p>
-                            <div className="monitoring-chart-grid">
-                                {(mode === 'ai'
-                                    ? aiMetrics
-                                    : ['pageviews', 'requests', 'aiRequests', 'aiFailed']
-                                ).map((id) => (
-                                    <MetricChart key={id} id={id} data={data} date={date} />
-                                ))}
-                            </div>
-                        </>
-                    )}
+                    <div className="system-metric-grid">
+                        {keys.map((id) => {
+                            const points = metricPoints(data, id);
+                            const current = points.filter(
+                                (point) => Date.parse(point.time) >= from,
+                            );
+                            const previous = points.filter(
+                                (point) => Date.parse(point.time) < from,
+                            );
+                            const gauge = gaugeMetrics.includes(id);
+                            const value = gauge ? current.at(-1)?.value : total(current);
+                            const old = total(previous);
+                            const change =
+                                !gauge && value !== undefined && old !== undefined && old > 0
+                                    ? ((value - old) / old) * 100
+                                    : null;
+                            return (
+                                <article className="system-metric-card" key={id}>
+                                    <div className="system-metric-label">
+                                        {t(`system.monitoring.metrics.${id}`)}
+                                    </div>
+                                    <strong>
+                                        {value === undefined
+                                            ? '—'
+                                            : number.format(
+                                                  id === 'latency' ? value * 1000 : value,
+                                              )}
+                                        <small>
+                                            {gauge && value !== undefined
+                                                ? id === 'cpu' || id === 'memory'
+                                                    ? ' %'
+                                                    : ' ms'
+                                                : ''}
+                                        </small>
+                                    </strong>
+                                    <p>
+                                        {gauge
+                                            ? t('system.monitoring.latestBucket')
+                                            : change === null
+                                              ? t('system.monitoring.noComparison')
+                                              : t('system.monitoring.change', {
+                                                    value: `${change > 0 ? '+' : ''}${number.format(change)}`,
+                                                })}
+                                    </p>
+                                </article>
+                            );
+                        })}
+                    </div>
+                    {mode === 'logs' && <ApiDiagnosticsPanel hours={hours} />}
+                    <div className="monitoring-chart-grid">
+                        {(mode === 'ai'
+                            ? aiMetrics
+                            : mode === 'logs'
+                              ? ['requests', 'errors', 'alb5xx', 'latency', 'pageLoad', 'lcp']
+                              : ['pageviews', 'requests', 'aiRequests', 'aiFailed']
+                        ).map((id) => (
+                            <MetricChart key={id} id={id} data={data} date={date} />
+                        ))}
+                    </div>
                     <section className="system-panel">
                         <header className="system-panel-heading">
                             <div>
@@ -249,8 +278,20 @@ function total(points: MonitoringPoint[]) {
 }
 
 function metricPoints(data: SystemMonitoring, id: string): MonitoringPoint[] {
-    if (!aiMetrics.includes(id))
-        return data.metrics.find((metric) => metric.id === id)?.points ?? [];
+    if (!aiMetrics.includes(id)) {
+        const metric = data.metrics.find((series) => series.id === id);
+        if (!metric) return [];
+        if (!sparseErrorMetrics.includes(id) || data.cloudStatus !== 'AVAILABLE')
+            return metric.points;
+        // ALB only publishes error counts when nonzero. Fill gaps with zero only in known traffic buckets.
+        const counts = new Map(metric.points.map((point) => [point.time, point.value]));
+        for (const point of data.metrics.find((series) => series.id === 'requests')?.points ?? []) {
+            if (point.value > 0 && !counts.has(point.time)) counts.set(point.time, 0);
+        }
+        return Array.from(counts, ([time, value]) => ({ time, value })).sort(
+            (a, b) => Date.parse(a.time) - Date.parse(b.time),
+        );
+    }
     const field = {
         aiRequests: 'requests',
         aiFailed: 'failed',
@@ -291,9 +332,10 @@ function MetricChart({
             value: values.get(timestamp) ?? null,
         });
     }
-    const gauge = ['cpu', 'memory', 'latency'].includes(id);
+    const gauge = gaugeMetrics.includes(id);
     const unit = data.metrics.find((metric) => metric.id === id)?.unit;
-    const suffix = unit === 'percent' ? '%' : unit === 'seconds' ? 's' : '';
+    const suffix =
+        unit === 'percent' ? '%' : unit === 'seconds' ? ' s' : unit === 'milliseconds' ? ' ms' : '';
     const number = new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 2 });
     return (
         <section className="system-panel">
@@ -308,33 +350,59 @@ function MetricChart({
                 <>
                     <div className="h-64 min-w-0 px-2 pt-4">
                         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                            <ComposedChart data={buckets} accessibilityLayer margin={{ top: 8, right: 16, bottom: 8, left: 8 }}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#d1dcd5" />
+                            <ComposedChart
+                                data={buckets}
+                                accessibilityLayer
+                                margin={{ top: 8, right: 16, bottom: 8, left: 8 }}
+                            >
+                                <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    vertical={false}
+                                    stroke="var(--color-store-line)"
+                                />
                                 <XAxis
                                     dataKey="timestamp"
                                     type="number"
                                     domain={[from, to]}
-                                    tickFormatter={(value) => date(new Date(Number(value)).toISOString())}
+                                    tickFormatter={(value) =>
+                                        date(new Date(Number(value)).toISOString())
+                                    }
                                     minTickGap={60}
-                                    tick={{ fontSize: 11, fill: '#526579' }}
+                                    tick={{ fontSize: 11, fill: 'var(--color-store-muted)' }}
                                 />
                                 <YAxis
                                     width={60}
-                                    tickFormatter={(value) => `${number.format(Number(value))}${suffix}`}
+                                    tickFormatter={(value) =>
+                                        `${number.format(Number(value))}${suffix}`
+                                    }
                                     allowDecimals={gauge}
-                                    tick={{ fontSize: 11, fill: '#526579' }}
+                                    tick={{ fontSize: 11, fill: 'var(--color-store-muted)' }}
                                 />
                                 <Tooltip
-                                    labelFormatter={(value) => date(new Date(Number(value)).toISOString())}
+                                    labelFormatter={(value) =>
+                                        date(new Date(Number(value)).toISOString())
+                                    }
                                     formatter={(value) => [
                                         `${number.format(Number(value))}${suffix}`,
                                         t(`system.monitoring.metrics.${id}`),
                                     ]}
                                 />
                                 {gauge ? (
-                                    <Line dataKey="value" stroke="#123b2e" strokeWidth={2} dot={false} connectNulls={false} isAnimationActive={false} />
+                                    <Line
+                                        dataKey="value"
+                                        stroke="var(--color-store-green)"
+                                        strokeWidth={2}
+                                        dot={false}
+                                        connectNulls={false}
+                                        isAnimationActive={false}
+                                    />
                                 ) : (
-                                    <Bar dataKey="value" fill="#123b2e" maxBarSize={24} isAnimationActive={false} />
+                                    <Bar
+                                        dataKey="value"
+                                        fill="var(--color-store-green)"
+                                        maxBarSize={24}
+                                        isAnimationActive={false}
+                                    />
                                 )}
                             </ComposedChart>
                         </ResponsiveContainer>
@@ -357,9 +425,7 @@ function MetricChart({
                                     <tr key={point.time}>
                                         <td>{date(point.time)}</td>
                                         <td>
-                                            {point.value == null
-                                                ? '—'
-                                                : number.format(point.value)}
+                                            {point.value == null ? '—' : number.format(point.value)}
                                         </td>
                                     </tr>
                                 ))}
