@@ -146,3 +146,47 @@ export function ProductTile({
         </article>
     );
 }
+
+export function ProductPresentation({
+    product,
+    context,
+    featured,
+    showTiers,
+    showAdd,
+}: {
+    product: A2uiProduct;
+    context: ComponentContext;
+    featured: boolean;
+    showTiers: boolean;
+    showAdd: boolean;
+}) {
+    return (
+        <article className="@container min-w-0 overflow-hidden rounded-xl border border-store-line bg-white text-black">
+            <div className={featured ? 'grid @xl:grid-cols-2' : 'flex items-start gap-3 p-3'}>
+                <button
+                    type="button"
+                    onClick={() => viewProduct(context, product)}
+                    aria-label={product.name}
+                    className={featured
+                        ? 'aspect-[4/3] w-full overflow-hidden bg-store-cream'
+                        : 'size-20 shrink-0 overflow-hidden rounded-lg bg-store-cream'}
+                >
+                    {product.imageUrl && <img src={product.imageUrl} alt="" loading="lazy" className="size-full object-contain" />}
+                </button>
+                <div className={`min-w-0 flex-1 space-y-2 ${featured ? 'p-5' : ''}`}>
+                    <button type="button" onClick={() => viewProduct(context, product)} className={`block border-0 bg-transparent p-0 text-left font-bold text-black hover:underline ${featured ? 'text-xl' : 'text-sm'}`}>
+                        {product.name}
+                    </button>
+                    {product.spec && <p className="text-sm text-store-muted">{product.spec}</p>}
+                    <Price product={product} />
+                    <div className="flex flex-wrap items-center gap-3">
+                        <Stock product={product} />
+                        <span className="text-xs text-store-muted">MOQ: {product.minOrderQuantity} {unitLabel(product.unitCode)}</span>
+                    </div>
+                    {showTiers && <Tiers product={product} />}
+                    {showAdd && <AddButton context={context} product={product} />}
+                </div>
+            </div>
+        </article>
+    );
+}
