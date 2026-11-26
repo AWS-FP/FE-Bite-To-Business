@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { acceptPackageReturn, getPackageReturns, rejectPackageReturn } from '@/services/admin/packageReturnService';
+import { acceptPackageReturn, confirmPackageReturnRefund, getPackageReturns, rejectPackageReturn } from '@/services/admin/packageReturnService';
 import type { PackageReturnStatus } from '@/types/admin/packageReturn';
 
 /** Danh sách yêu cầu trả hàng cho Admin, chọn một yêu cầu để xem form và chấp nhận / từ chối. */
@@ -36,11 +36,25 @@ export function usePackageReturns() {
         },
     });
 
+    const confirmRefund = useMutation({
+        mutationFn: (id: string) => confirmPackageReturnRefund(id),
+        onSuccess: () => {
+            setFeedback({ message: 'Đã ghi nhận hoàn tiền và cập nhật báo cáo doanh thu.', error: false });
+            setSelectedId(null);
+            void queryClient.invalidateQueries({ queryKey: ['admin', 'package-returns'] });
+            void queryClient.invalidateQueries({ queryKey: ['admin', 'finance'] });
+        },
+        onError: () => {
+            setFeedback({ message: 'Không ghi nhận được khoản hoàn. Hãy kiểm tra trạng thái yêu cầu và thử lại.', error: true });
+            void queryClient.invalidateQueries({ queryKey: ['admin', 'package-returns'] });
+        },
+    });
+
     function changeStatus(next: PackageReturnStatus | '') {
         setStatus(next);
         setPage(0);
         setSelectedId(null);
     }
 
-    return { status, changeStatus, page, setPage, list, selected, setSelectedId, decide, feedback };
+    return { status, changeStatus, page, setPage, list, selected, setSelectedId, decide, confirmRefund, feedback };
 }

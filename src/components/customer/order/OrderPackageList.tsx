@@ -59,6 +59,13 @@ export default function OrderPackageList({ packages, returns: r }: Props) {
                                 }}
                             >
                                 <p className="m-0 text-xs text-store-muted">Chỉ trả được trong 24 giờ sau khi giao. Tiền hàng sẽ được hoàn vào tài khoản dưới đây sau khi Admin chấp nhận.</p>
+                                {pack.packageAmount != null && pack.returnFee != null && pack.refundAmount != null ? (
+                                    <div className="rounded border border-store-ink/20 bg-white p-3 text-sm">
+                                        <p className="my-1">Tiền hàng của kiện: {Number(pack.packageAmount).toLocaleString('vi-VN')}đ</p>
+                                        <p className="my-1">Phí trả hàng (2%): {Number(pack.returnFee).toLocaleString('vi-VN')}đ</p>
+                                        <p className="my-1 font-bold">Tiền dự kiến hoàn: {Number(pack.refundAmount).toLocaleString('vi-VN')}đ</p>
+                                    </div>
+                                ) : <p className="text-red-700">Không thể tính tiền hoàn cho kiện này. Vui lòng liên hệ hỗ trợ.</p>}
                                 <label className="block">
                                     <span className="font-semibold">Lý do trả hàng <span className="text-red-600">*</span></span>
                                     <textarea className={inputClass} rows={3} maxLength={1000} value={r.form.reason} onChange={(e) => r.updateField('reason', e.target.value)} />
@@ -79,7 +86,7 @@ export default function OrderPackageList({ packages, returns: r }: Props) {
                                 {r.error && <p role="alert" className="m-0 text-red-700">{r.error}</p>}
                                 <div className="flex gap-2">
                                     <button type="button" disabled={r.submitting} onClick={r.close} className="flex-1 rounded border border-store-ink bg-white px-4 py-2 font-semibold">Quay lại</button>
-                                    <button type="submit" disabled={!r.formValid || r.submitting} className="flex-1 rounded bg-store-green px-4 py-2 font-semibold text-white disabled:opacity-50">
+                                    <button type="submit" disabled={!r.formValid || r.submitting || pack.refundAmount == null} className="flex-1 rounded bg-store-green px-4 py-2 font-semibold text-white disabled:opacity-50">
                                         {r.submitting ? 'Đang gửi...' : 'Gửi yêu cầu trả hàng'}
                                     </button>
                                 </div>

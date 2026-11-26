@@ -10,6 +10,25 @@ export interface MonitoringPoint {
     value: number;
 }
 
+export interface ApiDiagnosticRow {
+    method: string;
+    route: string;
+    httpStatus: number | null;
+    source: 'ALB' | 'BACKEND' | null;
+    requests: number;
+    averageMs: number | null;
+    p95Ms: number | null;
+    lastSeen: string;
+}
+
+export interface ApiDiagnostics {
+    from: string;
+    to: string;
+    status: 'AVAILABLE' | 'LOADING' | 'UNCONFIGURED' | 'UNAVAILABLE';
+    errors: ApiDiagnosticRow[];
+    slowest: ApiDiagnosticRow[];
+}
+
 export interface SystemMonitoring {
     from: string;
     to: string;
