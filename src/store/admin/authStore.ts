@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { switchCartOwner } from '@/store/customer/cartStore';
 import type { AuthResponse } from '@/types/admin/auth';
 
 interface AuthState {
@@ -60,6 +61,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
     // Tính năng login sẽ gọi hàm này sau khi nhận AuthResponse từ BE.
     setSession: (session) => {
+        switchCartOwner(session.user.id, session.user.role === 'CUSTOMER');
         setSessionHint(true);
         set({
             session: withoutRefreshToken(session),
@@ -79,6 +81,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     },
 
     clearSession: () => {
+        switchCartOwner(null);
         setSessionHint(false);
         set({ session: null, sessionVersion: get().sessionVersion + 1 });
     },

@@ -2,18 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import type { PointerEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { Check, Move, RotateCcw, X, ZoomIn } from 'lucide-react';
+import { PROMOTION_BANNER_ASPECT, PROMOTION_BANNER_HEIGHT, PROMOTION_BANNER_SIZE, PROMOTION_BANNER_WIDTH } from '@/constants/customer/promotionBanner';
 import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 
 type Dimension = { width: number; height: number };
 type Point = { x: number; y: number };
-type Ratio = { key: string; width: number; height: number; vi: string; en: string };
-
-const RATIOS: Ratio[] = [
-    { key: '16:9', width: 16, height: 9, vi: 'Banner 16:9', en: 'Banner 16:9' },
-    { key: '3:1', width: 3, height: 1, vi: 'Banner rộng 3:1', en: 'Wide banner 3:1' },
-    { key: '1:1', width: 1, height: 1, vi: 'Ảnh vuông 1:1', en: 'Square 1:1' },
-    { key: '4:5', width: 4, height: 5, vi: 'Poster dọc 4:5', en: 'Portrait poster 4:5' },
-];
 const STAGE_HEIGHT = 370;
 const MAX_BYTES = 5 * 1024 * 1024;
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
@@ -36,7 +29,6 @@ export default function PromotionImageCropper({
     const dragRef = useRef<{ pointerId: number; start: Point; offset: Point } | null>(null);
     const [stageWidth, setStageWidth] = useState(720);
     const [natural, setNatural] = useState<Dimension | null>(null);
-    const [ratio, setRatio] = useState(RATIOS[0]);
     const [zoom, setZoom] = useState(1);
     const [offset, setOffset] = useState<Point>({ x: 0, y: 0 });
     const [dragging, setDragging] = useState(false);
@@ -74,7 +66,7 @@ export default function PromotionImageCropper({
         return () => { active = false; imageRef.current = null; };
     }, [src, imageLoadError]);
 
-    const aspect = ratio.width / ratio.height;
+    const aspect = PROMOTION_BANNER_ASPECT;
     const cropWidth = Math.max(80, Math.min(stageWidth - 32, (STAGE_HEIGHT - 48) * aspect));
     const cropHeight = cropWidth / aspect;
     const baseScale = natural ? Math.max(cropWidth / natural.width, cropHeight / natural.height) : 1;
@@ -95,13 +87,6 @@ export default function PromotionImageCropper({
         stage.addEventListener('wheel', wheel, { passive: false });
         return () => stage.removeEventListener('wheel', wheel);
     }, []);
-
-    function chooseRatio(next: Ratio) {
-        setRatio(next);
-        setOffset({ x: 0, y: 0 });
-        setZoom(1);
-        setError('');
-    }
 
     function beginDrag(event: PointerEvent<HTMLDivElement>) {
         if (!natural || (event.pointerType === 'mouse' && event.button !== 0)) return;
@@ -138,8 +123,8 @@ export default function PromotionImageCropper({
         setBusy(true);
         setError('');
         try {
-            const outputWidth = ratio.key === '3:1' ? 1800 : ratio.key === '4:5' ? 960 : ratio.key === '1:1' ? 1200 : 1600;
-            const outputHeight = Math.round(outputWidth / aspect);
+            const outputWidth = PROMOTION_BANNER_WIDTH;
+            const outputHeight = PROMOTION_BANNER_HEIGHT;
             const canvas = document.createElement('canvas');
             canvas.width = outputWidth;
             canvas.height = outputHeight;
@@ -171,18 +156,14 @@ export default function PromotionImageCropper({
                 <div className="flex items-start justify-between border-b border-[#dbe6d9] px-5 py-4 sm:px-7">
                     <div>
                         <h2 className="text-xl font-bold text-[#14392b]">{tr('Chỉnh sửa vùng ảnh', 'Edit image crop')}</h2>
-                        <p className="mt-1 text-sm text-[#607465]">{tr('Kéo ảnh, phóng to và chọn khung trước khi tải lên.', 'Drag and zoom to choose exactly what gets uploaded.')}</p>
+                        <p className="mt-1 text-sm text-[#607465]">{tr('Kéo và phóng to ảnh trong khung cố định trước khi tải lên.', 'Drag and zoom within the fixed frame before uploading.')}</p>
                     </div>
                     <button type="button" onClick={onCancel} disabled={busy} aria-label={tr('Đóng', 'Close')} className="rounded-lg p-2 text-[#14392b] hover:bg-[#e8efe6]"><X size={20} /></button>
                 </div>
                 <div className="px-4 pt-4 sm:px-7">
-                    <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label={tr('Tỷ lệ khung ảnh', 'Crop aspect ratio')}>
-                        {RATIOS.map((item) => (
-                            <button key={item.key} type="button" onClick={() => chooseRatio(item)} aria-pressed={ratio.key === item.key}
-                                className={`rounded-lg border px-3 py-2 text-xs font-bold transition ${ratio.key === item.key ? 'border-[#24593d] bg-[#24593d] text-white' : 'border-[#bfd0bf] bg-white text-[#24593d] hover:border-[#24593d]'}`}>
-                                {tr(item.vi, item.en)}
-                            </button>
-                        ))}
+                    <div className="mb-3 rounded-xl border border-[#dbe6d9] bg-white px-4 py-3 text-sm text-[#24593d]">
+                        <p className="m-0 font-bold">{tr('Kích thước thiết kế banner', 'Banner design size')}: {PROMOTION_BANNER_SIZE} (16:9)</p>
+                        <p className="mb-0 mt-1 text-xs text-[#607465]">{tr('Khung này khớp với banner trang chủ. Chừa khoảng trống phía dưới cho tiêu đề chiến dịch.', 'This frame matches the homepage banner. Leave room at the bottom for the campaign title.')}</p>
                     </div>
                     <div ref={stageRef} role="img" aria-label={tr('Kéo ảnh trong khung sáng để chọn vùng cắt', 'Drag photo inside the crop guide to choose the area')} tabIndex={0}
                         onPointerDown={beginDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}

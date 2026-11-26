@@ -8,40 +8,58 @@ export interface Stock { productId: string; sku: string; name: string; unit: str
 export interface ProductRequest { id: string; productName: string; customerNote: string | null; status: string; createdAt: string }
 interface Page<T> { content: T[]; totalPages: number }
 
-export function useLogisticsList<T>(path: string, keyword = '', loadAll = false) {
+export function useLogisticsList<T>(path: string, keyword = '') {
     const { tr } = useLogisticsText();
     const [items, setItems] = useState<T[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-    const latestRequest = useRef(0);
+    const requests = useRef<{ id: number; controller: AbortController | null }>({
+        id: 0,
+        controller: null,
+    });
     const refresh = useCallback(async () => {
-        const requestId = ++latestRequest.current;
+        const state = requests.current;
+        const requestId = ++state.id;
+        state.controller?.abort();
+        const controller = new AbortController();
+        state.controller = controller;
         setLoading(true);
         setError('');
         try {
-            const result = await http.get<ApiResponse<Page<T>>>(path, { params: { size: loadAll ? 100 : 10, page: loadAll ? 0 : page, ...(keyword ? { keyword } : {}) } });
-            if (requestId !== latestRequest.current) return;
-            const allItems = [...result.data.data.content];
-            if (loadAll) {
-                for (let nextPage = 1; nextPage < result.data.data.totalPages; nextPage++) {
-                    const next = await http.get<ApiResponse<Page<T>>>(path, { params: { size: 100, page: nextPage, ...(keyword ? { keyword } : {}) } });
-                    if (requestId !== latestRequest.current) return;
-                    allItems.push(...next.data.data.content);
-                }
-            }
-            setItems(allItems);
+            const result = await http.get<ApiResponse<Page<T>>>(path, {
+                params: { size: 10, page, ...(keyword ? { keyword } : {}) },
+                signal: controller.signal,
+            });
+            if (requestId !== state.id) return;
+            setItems(result.data.data.content);
             setTotalPages(result.data.data.totalPages);
         } catch {
-            if (requestId !== latestRequest.current) return;
+            if (requestId !== state.id) return;
             setItems([]);
             setError('Không tải được dữ liệu. Vui lòng thử lại.');
         } finally {
-            if (requestId === latestRequest.current) setLoading(false);
+            if (requestId === state.id) {
+                state.controller = null;
+                setLoading(false);
+            }
         }
-    }, [path, page, keyword, loadAll]);
-    useEffect(() => { void refresh(); }, [refresh]);
+    }, [path, page, keyword]);
+    useEffect(() => {
+        const state = requests.current;
+        let cancelled = false;
+        // Start after the effect setup; skip obsolete setups (including Strict Mode replay).
+        queueMicrotask(() => {
+            if (!cancelled) void refresh();
+        });
+        return () => {
+            cancelled = true;
+            state.id++;
+            state.controller?.abort();
+            state.controller = null;
+        };
+    }, [refresh]);
     return { items, loading, error: error ? tr(error) : '', refresh, page, setPage, totalPages };
 }
 

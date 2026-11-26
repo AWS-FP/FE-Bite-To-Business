@@ -58,6 +58,8 @@ export type PricingWrite = {
 };
 
 export type Coupon = {
+    nameVi?: string | null;
+    nameEn?: string | null;
     id: string;
     code: string;
     discountType: string;

@@ -1,6 +1,6 @@
 import { http } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
-import type { CreatedOrder, CustomerQuotePage, Quote, QuoteAvailability, QuotePackage, QuotePackageAmount } from '@/types/customer/quote';
+import type { SavedCoupon, CreatedOrder, CustomerQuotePage, Quote, QuoteAvailability, QuotePackage, QuotePackageAmount } from '@/types/customer/quote';
 
 export async function getQuotePackageTotals(id: string, signal?: AbortSignal) {
     const response = await http.get<ApiResponse<Record<string, QuotePackageAmount>>>(
@@ -141,8 +141,15 @@ export async function updateQuotePackage(
     return data.data;
 }
 
+export async function inspectQuoteCoupon(quoteId: string, code: string) {
+    const { data } = await http.post<ApiResponse<SavedCoupon>>(
+        `/api/customer/quotes/${encodeURIComponent(quoteId)}/coupons/inspect`, { code },
+    );
+    return data.data;
+}
+
 export async function getReusableCoupons(quoteId: string, signal?: AbortSignal) {
-    const { data } = await http.get<ApiResponse<{ code: string; scope: 'PRODUCT' | 'SHIPPING' }[]>>(
+    const { data } = await http.get<ApiResponse<SavedCoupon[]>>(
         `/api/customer/quotes/${encodeURIComponent(quoteId)}/coupons/reusable`, { signal },
     );
     return data.data;

@@ -34,6 +34,8 @@ export default function EcommerceCouponsPage() {
         [open, setOpen] = useState(false),
         [editId, setEditId] = useState<string | null>(null),
         [code, setCode] = useState(''),
+        [nameVi, setNameVi] = useState(''),
+        [nameEn, setNameEn] = useState(''),
         [discountType, setDiscountType] = useState('PERCENTAGE'),
         [discountValue, setDiscountValue] = useState(''),
         [minimum, setMinimum] = useState('0'),
@@ -56,6 +58,8 @@ export default function EcommerceCouponsPage() {
         setOpen(false);
         setEditId(null);
         setCode('');
+        setNameVi('');
+        setNameEn('');
         setDiscountType('PERCENTAGE');
         setDiscountValue('');
         setMinimum('0');
@@ -110,6 +114,8 @@ export default function EcommerceCouponsPage() {
             .then((c) => {
                 setEditId(c.id);
                 setCode(c.code);
+                setNameVi(c.nameVi ?? '');
+                setNameEn(c.nameEn ?? '');
                 setDiscountType(c.discountType);
                 setDiscountValue(String(c.discountValue));
                 setMinimum(String(c.minOrderAmount));
@@ -182,6 +188,8 @@ export default function EcommerceCouponsPage() {
             return;
         }
         const payload: CouponWrite = {
+            nameVi: nameVi.trim(),
+            nameEn: nameEn.trim(),
             code,
             discountType,
             discountValue: Number(discountValue),
@@ -233,6 +241,12 @@ export default function EcommerceCouponsPage() {
                     }
                 >
                     <form onSubmit={submit} className="grid gap-4 p-5 sm:grid-cols-2">
+                        <label className="text-xs font-bold">{tr('Tên coupon tiếng Việt', 'Vietnamese coupon name')}
+                            <input className={executiveUi.input} value={nameVi} maxLength={160} onChange={e => setNameVi(e.target.value)} />
+                        </label>
+                        <label className="text-xs font-bold">{tr('Tên coupon tiếng Anh', 'English coupon name')}
+                            <input className={executiveUi.input} value={nameEn} maxLength={160} onChange={e => setNameEn(e.target.value)} />
+                        </label>
                         <label className="text-xs font-bold">
                             {tr('Mã coupon (8 ký tự)', 'Coupon code (8 characters)')}
                             <input

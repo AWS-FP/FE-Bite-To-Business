@@ -2,7 +2,7 @@ import axios from 'axios';
 import { ArrowLeft, ArrowRight, Package, Pencil, Tag, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { getCustomerProfile } from '@/services/customer/profileService';
 import Footer from '@/layouts/Footer';
 import Header from '@/layouts/Header';
@@ -24,7 +24,6 @@ import {
     getQuote,
     getQuotePackages,
     getQuotePackageTotals,
-    getReusableCoupons,
     replaceQuoteCart,
     updateQuotePackage,
     placeOrderFromQuote,
@@ -108,6 +107,8 @@ export default function CartPage() {
             ? t(value)
             : value;
     const navigate = useNavigate();
+    const location = useLocation();
+    const restoring = useAuthStore((state) => state.restoring);
     const session = useAuthStore((state) => state.session);
     const items = useCartStore((state) => state.items);
     const updateQuantity = useCartStore((state) => state.updateQuantity);
@@ -178,15 +179,19 @@ export default function CartPage() {
     // Back from the distribution map (?step=delivery): reopen the quote at the delivery step.
     const resumeDelivery = searchParams.get('step') === 'delivery';
     const resumed = useRef(false);
+    const checkoutLines = location.state?.checkoutLines as { productId: string; quantity: number }[] | undefined;
     useEffect(() => {
-        if (!resumeDelivery || resumed.current || reorderQuoteId) return;
+        if (restoring || resumed.current || reorderQuoteId || (!resumeDelivery && !Array.isArray(checkoutLines))) return;
         resumed.current = true;
-        setSearchParams({}, { replace: true });
-        if (session?.user.role === 'CUSTOMER' && selectedItems.length > 0) {
-            void Promise.resolve().then(() => startQuote(2));
+        setSearchParams({}, { replace: true, state: null });
+        if (session?.user.role === 'CUSTOMER') {
+            const lines = Array.isArray(checkoutLines)
+                ? checkoutLines
+                : selectedItems.map(item => ({ productId: item.id, quantity: item.quantity }));
+            if (lines.length) void startQuote(resumeDelivery ? 2 : 1, lines);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps -- run once when arriving with ?step=delivery
-    }, [resumeDelivery]);
+    }, [resumeDelivery, restoring, checkoutLines, session, reorderQuoteId]);
 
     // First package: prefill it with the delivery details given at registration, so the
     // customer only enters quantities. Skipped once they clear it or after any package exists.
@@ -419,12 +424,16 @@ export default function CartPage() {
         return Math.max(0, allocated(itemId) - Number(own));
     }
 
-    async function startQuote(targetStep = 1) {
-        if (selectedItems.length === 0) return;
+    async function startQuote(targetStep = 1, lines = selectedItems.map(item => ({ productId: item.id, quantity: item.quantity }))) {
+        if (restoring) return;
         if (!session) {
-            navigate(ROUTES.LOGIN, { state: { from: { pathname: ROUTES.QUOTES } } });
+            navigate(ROUTES.LOGIN, { state: {
+                from: { pathname: ROUTES.QUOTES },
+                checkoutLines: lines,
+            } });
             return;
         }
+        if (lines.length === 0) return;
         if (session.user.role !== 'CUSTOMER') {
             setMessage('errors.customer');
             return;
@@ -432,9 +441,7 @@ export default function CartPage() {
         setBusy(true);
         setMessage('');
         try {
-            let draft = await createQuoteFromCart(
-                selectedItems.map((item) => ({ productId: item.id, quantity: item.quantity })),
-            );
+            let draft = await createQuoteFromCart(lines);
             if (!draft.contactName) {
                 draft = await saveQuoteContact(draft.id, {
                     name: `${session.user.firstName} ${session.user.lastName}`.trim(),
@@ -448,7 +455,7 @@ export default function CartPage() {
             setStep(targetStep);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
-            setMessage(errorMessage(error, t('errors.fallback')));
+            await checkoutFailed(error);
         } finally {
             setBusy(false);
         }
@@ -586,18 +593,6 @@ export default function CartPage() {
     );
     const quoteId = quote?.id;
     const revision = quote?.revision;
-    const [reusableCoupons, setReusableCoupons] = useState<{ quoteId: string; revision: number; codes: { code: string; scope: CouponScope }[] } | null>(null);
-    useEffect(() => {
-        if (!quoteId || revision == null) return;
-        const controller = new AbortController();
-        void getReusableCoupons(quoteId, controller.signal)
-            .then(codes => { if (!controller.signal.aborted) setReusableCoupons({ quoteId, revision, codes }); })
-            .catch(() => { if (!controller.signal.aborted) setReusableCoupons(null); });
-        return () => controller.abort();
-    }, [quoteId, revision]);
-    const savedCodes = (scope: CouponScope) =>
-        reusableCoupons?.quoteId === quoteId && reusableCoupons?.revision === revision
-            ? reusableCoupons?.codes.filter(item => item.scope === scope).map(item => item.code) ?? [] : [];
     useEffect(() => {
         if (!allAllocated || !quoteId || revision == null || quote?.vatAmount == null) return;
         const controller = new AbortController();
@@ -802,7 +797,7 @@ export default function CartPage() {
                                 </section>
                                 <CouponPicker
                                     scope="PRODUCT"
-                                    reusableCodes={savedCodes('PRODUCT')}
+                                    quoteId={quote.id}
                                     appliedCode={quote.productCouponCode ?? ''}
                                     applied={!!quote.productCouponId}
                                     busy={busy}
@@ -959,7 +954,7 @@ export default function CartPage() {
                                 />}
                                 <CouponPicker
                                     scope="SHIPPING"
-                                    reusableCodes={savedCodes('SHIPPING')}
+                                    quoteId={quote.id}
                                     appliedCode={quote.shippingCouponCode ?? ''}
                                     applied={!!quote.shippingCouponId}
                                     busy={busy}
@@ -1052,7 +1047,7 @@ export default function CartPage() {
                             <button
                                 type="button"
                                 className={`${primary} mt-5 w-full`}
-                                disabled={busy || (reorderQuoteId ? !reorderValid : !selectedItems.length)}
+                                disabled={busy || restoring || (reorderQuoteId ? !reorderValid : Boolean(session) && !selectedItems.length)}
                                 onClick={() => void (reorderQuoteId ? saveReorderCart() : startQuote())}
                             >
                                 {busy

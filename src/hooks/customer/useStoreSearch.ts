@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent, MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ROUTES } from '@/router/routes';
 import { getCatalogSearchPath } from '@/constants/catalogNavigation';
 import { SUGGESTION_DELAY_MS } from '@/constants/catalogSearch';
 import { cleanSearchText, suggestionPath } from '@/utils/customer/catalogSearch';
@@ -17,7 +18,11 @@ export function useStoreSearch() {
     const inputRef = useRef<HTMLInputElement>(null);
     const menuRef = useRef<HTMLElement>(null);
     const navigate = useNavigate();
-    const [keyword, setKeyword] = useState('');
+    const location = useLocation();
+    const catalogKeyword = location.pathname === ROUTES.CATALOG
+        ? new URLSearchParams(location.search).get('q') ?? ''
+        : '';
+    const [keyword, setKeyword] = useState(catalogKeyword);
     const [searchMode, setSearchMode] = useState<'products' | 'ai'>('products');
     const [showAINotice, setShowAINotice] = useState(false);
     const { historyEntries, recordSearch, deleteSearch, clearHistory, deleting, deleteError } =
@@ -25,6 +30,17 @@ export function useStoreSearch() {
     const historyRef = useRef<HTMLElement>(null);
     const dragRef = useRef<{ startX: number; initialScroll: number; moved: boolean } | null>(null);
     const suppressHistoryClick = useRef(false);
+
+    // Synchronize only on navigation, before rendering the new catalog results.
+    const navigationKey = JSON.stringify([location.key, location.pathname, location.search]);
+    const [previousNavigationKey, setPreviousNavigationKey] = useState(navigationKey);
+    if (navigationKey !== previousNavigationKey) {
+        setPreviousNavigationKey(navigationKey);
+        if (location.pathname === ROUTES.CATALOG && searchMode === 'products') {
+            setKeyword(catalogKeyword);
+            setOpen(false);
+        }
+    }
 
     function startDrag(event: React.PointerEvent<HTMLElement>) {
         if (event.pointerType !== 'mouse' || event.button !== 0) return;
@@ -98,6 +114,7 @@ export function useStoreSearch() {
         }
 
         setOpen(false);
+        setKeyword(searchText);
         // Navigation must never wait for the search-history network request.
         navigate(path ?? getCatalogSearchPath(searchText));
         void recordSearch(searchText);

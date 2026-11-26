@@ -104,7 +104,7 @@ export default function StoreAccountActions() {
     return (
         <div ref={dropdownRef} className="relative flex flex-1 items-center gap-2.5">
             {/* Guest Actions */}
-            {!isLoggedIn && <GuestHeaderActions t={t} />}
+            {!isLoggedIn && <GuestHeaderActions t={t} totalItemsCount={totalItemsCount} />}
 
             {isLoggedIn && (
                 <>
