@@ -4,7 +4,7 @@
  * của từng lượt bằng A2uiSurface; action trên surface được xử lý bởi useA2uiActions (RootLayout).
  * Có ô tích bật/tắt dùng thói quen duyệt web để cá nhân hóa.
  */
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/router/routes';
@@ -16,6 +16,7 @@ import { getSurface } from '@/a2ui/runtime/a2uiRuntime';
 import {
     personalizationEnabled,
     setPersonalizationEnabled,
+    subscribePersonalization,
 } from '@/a2ui/telemetry/interactionTracker';
 
 /** Trợ lý mua hàng: chat + giao diện A2UI do AI sinh. Nhân viên/Admin không thấy; Guest thấy nút mời đăng nhập. */
@@ -27,7 +28,7 @@ export default function AssistantBubble() {
     const locale = i18n.resolvedLanguage?.startsWith('en') ? 'en' : 'vi';
     const { entries, busy, open, setOpen, send, reset } = useAssistantStore();
     const [text, setText] = useState('');
-    const [personalize, setPersonalize] = useState(personalizationEnabled);
+    const personalize = useSyncExternalStore(subscribePersonalization, personalizationEnabled);
     const listRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -76,9 +77,6 @@ export default function AssistantBubble() {
                 <div>
                     <p className="flex items-center gap-2 text-sm font-bold">
                         <Sparkles size={16} aria-hidden="true" /> Trợ lý mua hàng
-                    </p>
-                    <p className="text-[11px] text-white/70">
-                        Giao diện do AI tạo · giá và tồn kho lấy từ hệ thống
                     </p>
                 </div>
                 <div className="flex items-center gap-1">
@@ -146,7 +144,7 @@ export default function AssistantBubble() {
                         onChange={(event) => setText(event.target.value)}
                         maxLength={1000}
                         placeholder="Hỏi về sản phẩm, giá sỉ, tồn kho…"
-                        className="min-w-0 flex-1 rounded border border-store-line px-3 py-2 text-sm outline-none focus:border-store-green"
+                        className="min-w-0 flex-1 rounded border border-store-line bg-white px-3 py-2 text-sm text-store-ink outline-none focus:border-store-green"
                     />
                     <button
                         type="submit"
@@ -161,12 +159,11 @@ export default function AssistantBubble() {
                     <input
                         type="checkbox"
                         checked={personalize}
-                        onChange={(event) => {
-                            setPersonalize(event.target.checked);
-                            setPersonalizationEnabled(event.target.checked);
-                        }}
+                        onChange={(event) => setPersonalizationEnabled(event.target.checked)}
                     />
-                    Cho phép dùng thói quen duyệt web để cá nhân hóa giao diện
+                    {locale === 'en'
+                        ? 'Use my customer profile, searches and browsing activity for personalized suggestions'
+                        : 'Dùng hồ sơ, lịch sử tìm kiếm và duyệt web của tôi để cá nhân hóa gợi ý'}
                 </label>
             </form>
         </section>
@@ -196,7 +193,7 @@ function Entry({ entry }: { entry: ChatEntry }) {
                 </p>
             )}
             {surface && (
-                <div className="a2ui-surface rounded-lg bg-white p-2 shadow-sm">
+                <div className="a2ui-surface rounded-lg bg-white p-2 text-store-ink shadow-sm [--a2ui-color-on-background:var(--color-store-ink)] [--a2ui-color-on-surface:var(--color-store-ink)] [--a2ui-text-caption-color:var(--color-store-ink)] [--a2ui-text-color-text:var(--color-store-ink)]">
                     <A2uiSurface surface={surface} />
                 </div>
             )}

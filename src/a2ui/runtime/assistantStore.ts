@@ -4,6 +4,7 @@
  * Ngắn hạn: STATE_SNAPSHOT (kiểu hiển thị, từ khóa, sort) được gửi lại ở lượt sau qua `state`.
  */
 import { create } from 'zustand';
+import { useAuthStore } from '@/store/admin/authStore';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { applyA2ui } from './a2uiRuntime';
 import { AgentHttpError, runAgent, type AgentEvent, type AgentState } from '../client/agentClient';
@@ -20,6 +21,7 @@ export type ChatEntry = {
 };
 
 type AssistantState = {
+    owner: string | null;
     threadId: string;
     entries: ChatEntry[];
     agentState: AgentState;
@@ -37,13 +39,14 @@ const newId = () => crypto.randomUUID();
 export const useAssistantStore = create<AssistantState>()(
     persist(
         (set, get) => ({
+            owner: null,
             threadId: newId(),
             entries: [],
             agentState: {},
             busy: false,
             open: false,
             setOpen: (open) => set({ open }),
-            reset: () => set({ threadId: newId(), entries: [], agentState: {} }),
+            reset: () => set({ threadId: newId(), entries: [], agentState: {}, busy: false }),
             note: (text) =>
                 set((state) => ({
                     entries: [...state.entries, { id: newId(), role: 'system', text }],
@@ -51,6 +54,7 @@ export const useAssistantStore = create<AssistantState>()(
             send: async (text, locale) => {
                 const content = text.trim();
                 if (!content || get().busy) return;
+                const threadId = get().threadId;
                 const userEntry: ChatEntry = { id: newId(), role: 'user', text: content };
                 set((state) => ({ entries: [...state.entries, userEntry], busy: true }));
                 trackEvent('assistant_prompt', { value: { length: content.length } });
@@ -68,6 +72,7 @@ export const useAssistantStore = create<AssistantState>()(
                 let firstSurfaceMs: number | null = null;
                 const push = (patch: Partial<ChatEntry>) =>
                     set((state) => {
+                        if (state.threadId !== threadId) return state;
                         const exists = state.entries.some((entry) => entry.id === reply.id);
                         const next = { ...reply, ...patch };
                         Object.assign(reply, patch);
@@ -80,6 +85,7 @@ export const useAssistantStore = create<AssistantState>()(
                         };
                     });
                 const onEvent = (event: AgentEvent) => {
+                    if (get().threadId !== threadId) return;
                     if (event.type === 'TEXT_MESSAGE_CONTENT') {
                         push({ text: (reply.text ?? '') + event.delta });
                     } else if (
@@ -108,7 +114,7 @@ export const useAssistantStore = create<AssistantState>()(
                 try {
                     await runAgent(
                         {
-                            threadId: get().threadId,
+                            threadId,
                             runId: newId(),
                             messages: history,
                             state: { ...get().agentState, locale },
@@ -127,7 +133,7 @@ export const useAssistantStore = create<AssistantState>()(
                                   : 'Trợ lý hiện chưa thể phản hồi. Bạn vẫn có thể tìm sản phẩm ở trang danh mục.',
                     });
                 } finally {
-                    set({ busy: false });
+                    if (get().threadId === threadId) set({ busy: false });
                 }
             },
         }),
@@ -135,6 +141,7 @@ export const useAssistantStore = create<AssistantState>()(
             name: 'btb.assistant',
             storage: createJSONStorage(() => sessionStorage),
             partialize: (state) => ({
+                owner: state.owner,
                 threadId: state.threadId,
                 entries: state.entries.slice(-30),
                 agentState: state.agentState,
@@ -146,6 +153,18 @@ export const useAssistantStore = create<AssistantState>()(
         },
     ),
 );
+
+function syncChatOwner(auth: ReturnType<typeof useAuthStore.getState>) {
+    if (auth.restoring) return;
+    const owner = auth.session?.user.id ?? null;
+    const chat = useAssistantStore.getState();
+    if (owner !== chat.owner || (!owner && chat.entries.length > 0)) {
+        useAssistantStore.setState({ owner, threadId: newId(), entries: [], agentState: {}, busy: false, open: false });
+    }
+}
+
+syncChatOwner(useAuthStore.getState());
+useAuthStore.subscribe(syncChatOwner);
 
 /** Loại component trong message updateComponents, ghi vào sự kiện a2ui_render (đếm số lần hiển thị). */
 function componentTypes(messages: unknown[]): string[] {

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { CommonSchemas } from '@a2ui/web_core/v0_9';
 import { createComponentImplementation } from '@a2ui/react/v0_9';
-import { CalendarClock, ChevronRight, Layers, Sparkles, Users } from 'lucide-react';
+import { CalendarClock, ChevronRight, Layers, Users } from 'lucide-react';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
 import { AddButton, ProductTile } from './productParts';
 import {
@@ -35,9 +35,6 @@ export const PageHeaderApi = {
 };
 export const PageHeader = createComponentImplementation(PageHeaderApi, ({ props }) => (
     <header className="space-y-2 border-b border-store-line pb-5">
-        <p className="inline-flex items-center gap-1 rounded-full bg-store-mint/60 px-3 py-1 text-xs font-bold text-store-green">
-            <Sparkles size={12} aria-hidden="true" /> Trang do AI dựng theo yêu cầu của bạn
-        </p>
         <h1 className="font-heading text-3xl text-store-green sm:text-4xl">{props.title}</h1>
         {props.subtitle && (
             <p className="max-w-3xl text-sm text-store-muted sm:text-base">{props.subtitle}</p>

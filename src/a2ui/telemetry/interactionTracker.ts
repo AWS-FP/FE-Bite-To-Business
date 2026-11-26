@@ -48,6 +48,18 @@ export function personalizationEnabled() {
     return storage()?.getItem(OPT_OUT_KEY) !== 'off';
 }
 
+export function subscribePersonalization(notify: () => void) {
+    const onStorage = (event: StorageEvent) => {
+        if (event.key === OPT_OUT_KEY || event.key === null) notify();
+    };
+    window.addEventListener('btb-personalization-change', notify);
+    window.addEventListener('storage', onStorage);
+    return () => {
+        window.removeEventListener('btb-personalization-change', notify);
+        window.removeEventListener('storage', onStorage);
+    };
+}
+
 export function setPersonalizationEnabled(enabled: boolean) {
     try {
         if (enabled) storage()?.removeItem(OPT_OUT_KEY);
@@ -56,6 +68,7 @@ export function setPersonalizationEnabled(enabled: boolean) {
         /* storage bị chặn: coi như vẫn bật, BE vẫn có quyền xóa dữ liệu */
     }
     if (!enabled) queue = [];
+    window.dispatchEvent(new Event('btb-personalization-change'));
 }
 
 export function trackEvent(

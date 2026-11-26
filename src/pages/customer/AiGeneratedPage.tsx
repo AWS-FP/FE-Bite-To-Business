@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { A2uiSurface } from '@a2ui/react/v0_9';
@@ -7,11 +7,12 @@ import StorefrontLayout from '@/layouts/StorefrontLayout';
 import { getCatalogSearchPath } from '@/constants/catalogNavigation';
 import { AgentHttpError, runAgent, type AgentEvent } from '@/a2ui/client/agentClient';
 import { applyA2ui, getSurface, getSurfaceTree } from '@/a2ui/runtime/a2uiRuntime';
-import { trackEvent } from '@/a2ui/telemetry/interactionTracker';
+import { personalizationEnabled, subscribePersonalization, trackEvent } from '@/a2ui/telemetry/interactionTracker';
+import { useAuthStore } from '@/store/admin/authStore';
 import WidgetTree from '@/a2ui/devtools/WidgetTree';
 
 const DEFAULT_PROMPT = 'Gợi ý trang mua sắm phù hợp với tôi';
-const CACHE_PREFIX = 'btb.aiPage:';
+const CACHE_PREFIX = 'btb.aiPage:catalog5:';
 const CACHE_MS = 30 * 60 * 1000;
 
 type View = { status: 'loading' | 'ready' | 'error'; surfaceId?: string; error?: string };
@@ -46,13 +47,17 @@ export default function AiGeneratedPage() {
     const { i18n } = useTranslation();
     const locale = i18n.resolvedLanguage?.startsWith('en') ? 'en' : 'vi';
     const [version, setVersion] = useState(0);
+    const owner = useAuthStore((state) => state.session?.user.id);
+    const personalized = useSyncExternalStore(subscribePersonalization, personalizationEnabled);
+    const cacheKey = JSON.stringify([owner, personalized, locale, prompt]);
     const defaultPath = query ? getCatalogSearchPath(query) : '/';
 
     return (
         <StorefrontLayout rootClassName="min-h-screen bg-store-cream text-store-ink">
             {/* key: đổi yêu cầu, ngôn ngữ hoặc bấm Dựng lại thì dựng một trang mới từ đầu. */}
             <GeneratedSurface
-                key={`${locale}:${prompt}:${version}`}
+                key={`${cacheKey}:${version}`}
+                cacheKey={cacheKey}
                 prompt={prompt}
                 locale={locale}
                 useCache={version === 0}
@@ -66,6 +71,7 @@ export default function AiGeneratedPage() {
 function GeneratedSurface({
     prompt,
     locale,
+    cacheKey,
     useCache,
     defaultPath,
     onRegenerate,
@@ -73,10 +79,11 @@ function GeneratedSurface({
     prompt: string;
     locale: 'vi' | 'en';
     useCache: boolean;
+    cacheKey: string;
     defaultPath: string;
     onRegenerate: () => void;
 }) {
-    const cacheKey = `${locale}:${prompt}`;
+
     const [view, setView] = useState<View>(() => {
         const cached = useCache ? readCache(cacheKey) : null;
         const surfaceId = cached ? applyA2ui(cached) : undefined;
@@ -149,10 +156,10 @@ function GeneratedSurface({
         <div className="mx-auto max-w-[1280px] space-y-6 px-4 py-6 sm:px-6">
             <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
                 <Link
-                    to={defaultPath}
+                    to="/"
                     className="inline-flex items-center gap-1 font-semibold underline underline-offset-4"
                 >
-                    <ArrowLeft size={16} aria-hidden="true" /> Về trang mặc định
+                    <ArrowLeft size={16} aria-hidden="true" /> {locale === 'en' ? 'Back to home' : 'Về trang chủ'}
                 </Link>
                 <div className="flex gap-2">
                     <button
@@ -200,7 +207,7 @@ function GeneratedSurface({
             )}
 
             {surface && (
-                <div className="a2ui-page">
+                <div className="a2ui-page text-store-ink [--a2ui-color-on-background:var(--color-store-ink)] [--a2ui-color-on-surface:var(--color-store-ink)] [--a2ui-text-caption-color:var(--color-store-ink)] [--a2ui-text-color-text:var(--color-store-ink)]">
                     <A2uiSurface surface={surface} />
                 </div>
             )}
