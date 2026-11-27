@@ -26,6 +26,7 @@ import {
 } from './pageComponents';
 import { CartSummary, ReorderList } from './personalComponents';
 import { ProductFacts } from './factsComponents';
+import { NutritionTable } from './nutritionComponents';
 import { LayoutGrid, ProductList, ProductSpotlight } from './compositionComponents';
 
 /** Phải trùng catalogId trong Generate-UI-BE/src/main/resources/ai/catalog.json. */
@@ -57,6 +58,7 @@ export const btbCatalog = new Catalog(BTB_CATALOG_ID, 'v0.9', [
     ReorderList,
     CartSummary,
     ProductFacts,
+    NutritionTable,
     LayoutGrid,
     ProductList,
     ProductSpotlight,

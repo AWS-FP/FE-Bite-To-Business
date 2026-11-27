@@ -1,6 +1,6 @@
 import { http, publicHttp } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
-import type { ApiDiagnostics, SystemMonitoring } from '@/types/admin/system';
+import type { ApiDiagnostics, ApplicationLogs, SystemMonitoring } from '@/types/admin/system';
 import { backendHealthSchema } from '@/validations/admin/systemSchema';
 import type { BackendHealth } from '@/types/admin/system';
 
@@ -34,4 +34,11 @@ export async function getBackendHealth(signal?: AbortSignal): Promise<BackendHea
         roundTripMs: Math.round(performance.now() - startedAt),
         checkedAt: new Date().toISOString(),
     };
+}
+
+export async function getApplicationLogs(hours: number, signal?: AbortSignal) {
+    const response = await http.get<ApiResponse<ApplicationLogs>>('/api/admin/system/monitoring/logs', {
+        params: { hours }, signal, timeout: 20_000,
+    });
+    return response.data.data;
 }
