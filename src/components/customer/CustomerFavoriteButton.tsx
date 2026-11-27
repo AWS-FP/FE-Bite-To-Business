@@ -1,11 +1,15 @@
 import { Heart } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useFavoriteToggle } from '@/hooks/customer/useFavoriteToggle';
+import { useStorefrontPurchaseAccess } from '@/hooks/customer/useStorefrontPurchaseAccess';
 
 /** Customer favorite action for public product tiles; logged-out visitors go to login. */
 export default function CustomerFavoriteButton({ productId }: { productId: string }) {
     const { t } = useTranslation('storefront');
+    const purchaseAllowed = useStorefrontPurchaseAccess();
     const { favorite, pending, toggle } = useFavoriteToggle(productId);
+
+    if (!purchaseAllowed) return null;
 
     return (
         <button

@@ -188,7 +188,9 @@ export default function CustomerProductInfo({
         {
             key: 'origin',
             icon: Leaf,
-            text: originText,
+            text: product.unitCode === 'COMBO'
+                ? translatedText(details?.originContentEn, details?.originContentVi) || originText
+                : originText,
             facts: [],
         },
     ];

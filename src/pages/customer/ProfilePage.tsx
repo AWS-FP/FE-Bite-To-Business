@@ -1,3 +1,4 @@
+import Skeleton from '@/components/common/Skeleton';
 import { useState } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -45,10 +46,8 @@ function ProfileContent() {
                 {query.data && <ProfileAccountCard key={query.data.user.id} profile={query.data} />}
             </div>
             {query.isPending && (
-                <p role="status" className="rounded-2xl border border-store-line bg-white p-6">
-                    {t('loading')}
-                </p>
-            )}
+<div aria-busy="true" className="grid grid-cols-[250px_minmax(0,1fr)] items-start gap-5"><div className="space-y-3 rounded-2xl border border-store-line bg-white p-4">{Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-10 w-full"/>)}</div><div className="rounded-2xl border border-store-line bg-white p-6"><Skeleton className="mb-6 h-7 w-1/3"/><div className="grid gap-4 sm:grid-cols-2">{Array.from({ length: 8 }, (_, i) => <div key={i} className="space-y-2"><Skeleton className="h-3 w-24"/><Skeleton className="h-11 w-full"/></div>)}</div></div></div>
+)}
             {query.isError && (
                 <div
                     role="alert"

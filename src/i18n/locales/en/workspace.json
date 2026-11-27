@@ -17,6 +17,7 @@
     },
     "navigation": {
         "products": "Products",
+        "combos": "Product combos",
         "promotions": "Promotions",
         "coupons": "Coupons",
         "inventory": "Inventory",

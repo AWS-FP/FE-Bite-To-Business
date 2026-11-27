@@ -1,3 +1,4 @@
+import TableSkeleton from '@/components/common/TableSkeleton';
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -179,10 +180,8 @@ export default function StaffPage() {
                     </AdminButton>
                 </div>
                 {staffQuery.isPending && (
-                    <div role="status" className="staff-list-message">
-                        {t('staff.loading')}
-                    </div>
-                )}
+<TableSkeleton columns={6} image tableClass="staff-table" className="staff-table-scroll" />
+)}
                 {staffQuery.isError && (
                     <div className="staff-list-message">
                         <StaffError

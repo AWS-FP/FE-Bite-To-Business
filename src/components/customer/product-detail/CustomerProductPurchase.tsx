@@ -3,7 +3,12 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
 import { useCartStore } from '@/store/customer/cartStore';
-import type { CustomerProductDetail, CustomerProductPricing, ProductPriceTier } from '@/types/customer/productDetail';
+import { useStorefrontPurchaseAccess } from '@/hooks/customer/useStorefrontPurchaseAccess';
+import type {
+    CustomerProductDetail,
+    CustomerProductPricing,
+    ProductPriceTier,
+} from '@/types/customer/productDetail';
 
 type Props = {
     product: CustomerProductDetail;
@@ -16,6 +21,7 @@ type Props = {
 export default function CustomerProductPurchase({ product, pricing, name, spec }: Props) {
     const { t } = useTranslation('storefront');
     const tr = (key: string) => t(`productDetail.${key}`);
+    const purchaseAllowed = useStorefrontPurchaseAccess();
     const addItem = useCartStore((state) => state.addItem);
     const [quantity, setQuantity] = useState(() =>
         Math.max(1, Number(pricing?.minOrderQuantity ?? product.minOrderQuantity) || 1),
@@ -49,7 +55,7 @@ export default function CustomerProductPurchase({ product, pricing, name, spec }
         salePrice != null && listPrice != null ? Math.round((1 - salePrice / listPrice) * 100) : 0;
     const stockOk = pricing?.inventoryAvailable === true && availableQuantity >= min;
     const canAdd =
-        priceAvailable && unitPrice != null && stockOk && selectedQuantity <= availableQuantity;
+        purchaseAllowed && priceAvailable && unitPrice != null && stockOk && selectedQuantity <= availableQuantity;
 
     const setValidQuantity = (requested: number) => {
         setAdded(false);
@@ -225,7 +231,7 @@ export default function CustomerProductPurchase({ product, pricing, name, spec }
                     className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border-0 bg-store-yellow px-3 py-2 text-sm font-extrabold text-[#153b2a] transition-colors hover:bg-[#ffdf68] disabled:cursor-not-allowed disabled:bg-[#d5e0d6] disabled:text-[#718778]"
                 >
                     <ShoppingCart size={17} />
-                    {added ? tr('added') : canAdd ? tr('addToOrder') : tr('unavailableToOrder')}
+                    {!purchaseAllowed ? t('customerUI.comboPreviewOnly') : added ? tr('added') : canAdd ? tr('addToOrder') : tr('unavailableToOrder')}
                 </button>
                 {added && (
                     <p

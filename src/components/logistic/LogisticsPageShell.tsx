@@ -1,3 +1,4 @@
+import ListSkeleton from '@/components/common/ListSkeleton';
 import type { ReactNode } from 'react';
 import { useLogisticsText } from '@/hooks/logistic/useLogisticsText';
 export function LogisticsPageHeader({ number, label, title, description, children }: { number: string; label: string; title: string; description?: string; children?: ReactNode }) {
@@ -19,7 +20,7 @@ export default function LogisticsPageShell({ number, label, title, description, 
 }
 export function ListStatus({ loading, error, empty }: { loading: boolean; error: string; empty: boolean }) {
     const { tr } = useLogisticsText();
-    if (loading) return <p role="status">{tr('Đang tải dữ liệu...')}</p>;
+    if (loading) return <ListSkeleton count={3} lines={2} />;
     if (error) return <p role="alert" className="text-red-700">{error}</p>;
     if (empty) return <p className="text-store-muted">{tr('Chưa có dữ liệu.')}</p>;
     return null;

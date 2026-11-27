@@ -1,3 +1,5 @@
+import Skeleton from '@/components/common/Skeleton';
+import { ExecutiveTableSkeleton, ExecutiveQuoteSummarySkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { useQuery } from '@tanstack/react-query';
 import {
     BarChart3,
@@ -13,7 +15,6 @@ import {
     ExecutiveHeading,
     ExecutivePanel,
     ExecutiveStat,
-    LoadingRows,
 } from '@/components/e-commerce/ExecutiveUI';
 import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 import { formatVnd } from '@/services/e-commerce/executiveReadService';
@@ -84,27 +85,27 @@ export default function EcommerceDashboardPage() {
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <ExecutiveStat
                     title={tr('Sản phẩm đã đăng', 'Published products')}
-                    value={m?.publishedProducts ?? (metrics.isLoading ? '…' : '—')}
+                    value={metrics.isLoading ? <Skeleton className="h-[43.5px] w-24" /> : m?.publishedProducts ?? '—'}
                     icon={<Package size={20} />}
                     detail={tr('Đang bán trên gian hàng', 'Visible to customers')}
                 />
                 <ExecutiveStat
                     title={tr('Báo giá chờ duyệt', 'Pending quotes')}
-                    value={m?.pendingQuotes ?? (metrics.isLoading ? '…' : '—')}
+                    value={metrics.isLoading ? <Skeleton className="h-[43.5px] w-24" /> : m?.pendingQuotes ?? '—'}
                     icon={<ClipboardCheck size={20} />}
                     tone="yellow"
                     detail={tr('Cần xử lý', 'Awaiting review')}
                 />
                 <ExecutiveStat
                     title={tr('Đơn hoàn thành trong tháng', 'Completed orders this month')}
-                    value={m?.completedOrders ?? (metrics.isLoading ? '…' : '—')}
+                    value={metrics.isLoading ? <Skeleton className="h-[43.5px] w-24" /> : m?.completedOrders ?? '—'}
                     icon={<ShoppingBag size={20} />}
                     tone="blue"
                     detail={tr('Chỉ tính đơn COMPLETED', 'Completed orders only')}
                 />
                 <ExecutiveStat
                     title={tr('Doanh thu hoàn thành', 'Completed order revenue')}
-                    value={m ? formatVnd(m.revenue) : '—'}
+                    value={metrics.isLoading ? <Skeleton className="h-[43.5px] w-32" /> : m ? formatVnd(m.revenue) : '—'}
                     icon={<TrendingUp size={20} />}
                     tone="coral"
                     detail={tr('Tháng hiện tại', 'Current month')}
@@ -116,7 +117,7 @@ export default function EcommerceDashboardPage() {
                         {tr('Sản phẩm nháp', 'Draft products')}
                     </span>
                     <strong className="mt-3 block text-2xl font-black">
-                        {m?.draftProducts ?? '—'}
+                        {metrics.isLoading ? <Skeleton className="h-8 w-24" /> : m?.draftProducts ?? '—'}
                     </strong>
                 </div>
                 <div className="rounded-2xl border border-[#dce9dc] bg-white p-5">
@@ -124,7 +125,7 @@ export default function EcommerceDashboardPage() {
                         {tr('Khuyến mãi đang chạy', 'Active promotions')}
                     </span>
                     <strong className="mt-3 block text-2xl font-black">
-                        {m?.activePromotions ?? '—'}
+                        {metrics.isLoading ? <Skeleton className="h-8 w-24" /> : m?.activePromotions ?? '—'}
                     </strong>
                 </div>
                 <div className="rounded-2xl border border-[#dce9dc] bg-white p-5">
@@ -133,7 +134,7 @@ export default function EcommerceDashboardPage() {
                         {tr('Đơn có sử dụng coupon', 'Coupon orders')}
                     </span>
                     <strong className="mt-3 block text-2xl font-black">
-                        {m?.couponOrders ?? '—'}
+                        {metrics.isLoading ? <Skeleton className="h-8 w-24" /> : m?.couponOrders ?? '—'}
                     </strong>
                 </div>
             </div>
@@ -146,7 +147,7 @@ export default function EcommerceDashboardPage() {
                     )}
                 >
                     {products.isLoading ? (
-                        <LoadingRows />
+                        <ExecutiveTableSkeleton cells={["product", "text", "text", "badge"]} count={8} tableClass="w-full min-w-[540px] text-left text-sm" cellClass="border-t border-[#edf1e9] px-5 py-3" />
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full min-w-[540px] text-left text-sm">
@@ -204,7 +205,7 @@ export default function EcommerceDashboardPage() {
                     caption={tr('Phiên bản và tổng giá trị thực tế', 'Live revision and value')}
                 >
                     {quotes.isLoading ? (
-                        <LoadingRows />
+                        <ExecutiveQuoteSummarySkeleton />
                     ) : (
                         <div className="divide-y divide-[#edf1e9]">
                             {quotes.data?.items.map((q) => (

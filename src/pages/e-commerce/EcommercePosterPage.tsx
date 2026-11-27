@@ -1,3 +1,4 @@
+import Skeleton from '@/components/common/Skeleton';
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CheckCircle2, ImagePlus, Pencil, UploadCloud } from 'lucide-react';
@@ -235,9 +236,7 @@ export default function EcommercePosterPage() {
                                 ))}
                         </ExecutiveSelect>
                         {promos.isPending && (
-                            <p className="text-xs text-[#667d6b]">
-                                {tr('Đang tải danh sách chiến dịch...', 'Loading campaigns...')}
-                            </p>
+                            <Skeleton className="h-3 w-2/3" />
                         )}
                         {promos.isError && (
                             <ExecutiveError

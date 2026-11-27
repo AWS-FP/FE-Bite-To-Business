@@ -1,3 +1,4 @@
+import Skeleton from '@/components/common/Skeleton';
 import { useEffect, useState } from 'react';
 import { RotateCw, RotateCcw } from 'lucide-react';
 import { isAxiosError } from 'axios';
@@ -187,10 +188,8 @@ export default function OrderStatusPage() {
             <div className="mx-auto max-w-[1150px]">
                 <PageNav back={{ label: 'Về lịch sử đơn hàng', to: ROUTES.ORDERS }} />
                 {loading && (
-                    <p className="py-10" role="status">
-                        Đang tải đơn hàng...
-                    </p>
-                )}
+<div aria-busy="true" className="my-6 space-y-5"><div className="flex justify-between"><div className="flex-1 space-y-2"><Skeleton className="h-10 w-2/3"/><Skeleton className="h-3 w-1/3"/></div><Skeleton className="h-8 w-28"/></div><div className="rounded-xl border bg-white p-6 space-y-4">{Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-8 w-full"/>)}</div></div>
+)}
                 {error && (
                     <p className="my-8 rounded-xl border bg-white p-6 text-sm" role="alert">
                         Không tìm thấy đơn hàng hoặc bạn không có quyền xem đơn này.

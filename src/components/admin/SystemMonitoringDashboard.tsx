@@ -1,3 +1,4 @@
+import Skeleton from '@/components/common/Skeleton';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -124,7 +125,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                     {t('system.monitoring.error')}
                 </div>
             )}
-            {query.isPending && <p role="status">{t('system.loading')}</p>}
+            {query.isPending && <div aria-busy="true" className="system-metric-grid">{keys.map(id => <article key={id} className="system-metric-card"><Skeleton className="h-4 w-2/3"/><Skeleton className="mt-4 h-8 w-1/2"/><Skeleton className="mt-3 h-3 w-3/4"/></article>)}</div>}
             {mode === 'logs' && !data && <ApiDiagnosticsPanel hours={hours} />}
             {data && (
                 <>

@@ -63,9 +63,13 @@ export default function ProductsSection() {
                     </Link>
                 </div>
                 {loadingProducts ? (
-                    <p role="status" className="mt-5 text-sm">
-                        {t('homePage.productsLoading')}
-                    </p>
+                    <div className="mt-5">
+                        <ProductCarousel
+                            products={[]}
+                            label={t('homePage.flashDealsTitle')}
+                            loading
+                        />
+                    </div>
                 ) : productError ? (
                     <p role="alert" className="mt-5 text-sm text-danger">
                         {t('homePage.productsError')}
@@ -101,7 +105,19 @@ export default function ProductsSection() {
                         <ArrowRight size={16} />
                     </Link>
                 </div>
-                {standardProducts.length ? (
+                {loadingProducts ? (
+                    <div className="mt-5">
+                        <ProductCarousel
+                            products={[]}
+                            label={t('homePage.standardSupplyTitle')}
+                            loading
+                        />
+                    </div>
+                ) : productError ? (
+                    <p role="alert" className="mt-5 text-sm text-danger">
+                        {t('homePage.productsError')}
+                    </p>
+                ) : standardProducts.length ? (
                     <div className="mt-5">
                         <ProductCarousel
                             products={standardProducts}
@@ -140,7 +156,13 @@ export default function ProductsSection() {
                                 <ArrowRight size={16} />
                             </Link>
                         </div>
-                        {group.products.length ? (
+                        {loadingProducts ? (
+                            <ProductCarousel products={[]} label={group.title} loading />
+                        ) : productError ? (
+                            <p role="alert" className="mt-3 text-sm text-danger">
+                                {t('homePage.productsError')}
+                            </p>
+                        ) : group.products.length ? (
                             <ProductCarousel products={group.products} label={group.title} />
                         ) : !loadingProducts && !productError ? (
                             <p className="mt-3 flex items-center gap-2 rounded-xl bg-white/70 p-4 text-sm text-store-muted">
