@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { ClipboardList, LayoutDashboard, LogOut, Megaphone, Menu, MessageSquare, Package, TicketPercent, Undo2 } from 'lucide-react';
+import { Boxes, ClipboardList, LayoutDashboard, LogOut, Megaphone, Menu, MessageSquare, Package, TicketPercent, Undo2 } from 'lucide-react';
 import { ROUTES } from '@/router/routes';
 import { logout } from '@/services/admin/authService';
 import { useAuthStore } from '@/store/admin/authStore';
@@ -27,6 +27,7 @@ function EcommerceWorkspace() {
     const navigation = [
         { path: ROUTES.ECOMMERCE_DASHBOARD, label: tr('Tổng quan', 'Overview'), icon: <LayoutDashboard size={18} /> },
         { path: ROUTES.ECOMMERCE_PRODUCTS, label: tr('Sản phẩm & giá', 'Products & pricing'), icon: <Package size={18} /> },
+        { path: ROUTES.ECOMMERCE_COMBOS, label: tr('Combo sản phẩm', 'Product combos'), icon: <Boxes size={18} /> },
         { path: ROUTES.ECOMMERCE_QUOTES, label: tr('Báo giá B2B', 'B2B quotes'), icon: <ClipboardList size={18} /> },
         { path: ROUTES.ECOMMERCE_COUPONS, label: tr('Mã giảm giá', 'Coupons'), icon: <TicketPercent size={18} /> },
         { path: ROUTES.ECOMMERCE_PROMOTIONS, label: tr('Khuyến mãi', 'Promotions'), icon: <Megaphone size={18} /> },
@@ -53,7 +54,7 @@ function EcommerceWorkspace() {
             {mobileOpen && <button type="button" className="lg-sidebar-backdrop" aria-label={tr('Đóng menu', 'Close menu')} onClick={() => setMobileOpen(false)} />}
             <WorkspaceSidebar
                 sidebarId="ecommerce-sidebar"
-                homePath={ROUTES.ECOMMERCE_DASHBOARD}
+                homePath={ROUTES.HOME}
                 className={`lg-shared-sidebar ${mobileOpen ? 'lg-shared-sidebar--open' : ''}`}
                 workspaceLabel={tr('KHÔNG GIAN LÀM VIỆC', 'WORKSPACE')}
                 isCollapsed={collapsed}

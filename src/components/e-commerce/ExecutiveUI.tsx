@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { AlertCircle, ArrowRight, Inbox, LockKeyhole, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { executiveUi } from '@/constants/e-commerce/executiveUi';
+import Skeleton from '@/components/common/Skeleton';
 import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 
 export function ExecutiveHeading({ number, eyebrow, title, description, action }: {
@@ -68,4 +69,6 @@ export function ExecutiveShortcut({ to, label, icon }: { to: string; label: stri
     </Link>;
 }
 
-export function LoadingRows() { const txt = useExecutiveText(); return <p role="status" className="px-6 py-12 text-center text-sm text-[#6b7972]">{txt('Đang tải dữ liệu...','Loading data...')}</p>; }
+export function LoadingRows() {
+    return <div aria-busy="true" className="divide-y divide-[#edf0ea] px-5">{Array.from({length:5},(_,i)=><div key={i} className="flex items-center gap-4 py-4"><Skeleton className="size-12 shrink-0 rounded-lg"/><div className="min-w-0 flex-1 space-y-2"><Skeleton className="h-4 w-2/3"/><Skeleton className="h-3 w-1/3"/></div><Skeleton className="hidden h-7 w-24 sm:block"/><Skeleton className="h-9 w-20"/></div>)}</div>;
+}

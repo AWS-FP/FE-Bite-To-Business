@@ -66,6 +66,7 @@ import { ROUTES } from './routes';
 import EcommerceDashboardPage from '@/pages/e-commerce/EcommerceDashboardPage';
 import EcommerceQuotesPage from '@/pages/e-commerce/EcommerceQuotesPage';
 import EcommerceProductsPage from '@/pages/e-commerce/EcommerceProductsPage';
+import EcommerceCombosPage from '@/pages/e-commerce/EcommerceCombosPage';
 import EcommercePromotionsPage from '@/pages/e-commerce/EcommercePromotionsPage';
 import EcommerceCouponsPage from '@/pages/e-commerce/EcommerceCouponsPage';
 import EcommerceReviewsPage from '@/pages/e-commerce/EcommerceReviewsPage';
@@ -104,7 +105,7 @@ export const router = createBrowserRouter([
 
             // ==========================================
             // 2. PUBLIC CUSTOMER PAGES
-            // Guests/Customers may browse; E-commerce staff stay in their workspace.
+            // Guests, customers and staff may browse; checkout is guest/customer-only.
             // ==========================================
             {
                 element: <StorefrontRoleGuard />,
@@ -281,6 +282,7 @@ export const router = createBrowserRouter([
                             },
                             { path: ROUTES.ECOMMERCE_QUOTES, Component: EcommerceQuotesPage },
                             { path: ROUTES.ECOMMERCE_PRODUCTS, Component: EcommerceProductsPage },
+                            { path: ROUTES.ECOMMERCE_COMBOS, Component: EcommerceCombosPage },
                             {
                                 path: ROUTES.ECOMMERCE_PROMOTIONS,
                                 Component: EcommercePromotionsPage,

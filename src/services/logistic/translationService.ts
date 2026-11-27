@@ -11,11 +11,12 @@ export async function suggestTranslation(
     source: TranslationLanguage,
     field: TranslationField,
     signal?: AbortSignal,
+    timeout?: number,
 ): Promise<string> {
     const response = await http.post<{ data: TranslateResponse }>(
         '/api/ai/translate',
         { text, source, field },
-        { signal },
+        { signal, ...(timeout === undefined ? {} : { timeout }) },
     );
     return response.data.data.translation;
 }

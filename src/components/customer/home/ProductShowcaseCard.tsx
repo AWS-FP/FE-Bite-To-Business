@@ -4,14 +4,17 @@ import { Link } from 'react-router-dom';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
 import type { HomeProductCardItem } from '@/types/customer/homeData';
 import { useFavoriteToggle } from '@/hooks/customer/useFavoriteToggle';
+import Skeleton from '@/components/common/Skeleton';
 import { useProductCardPurchase } from '@/hooks/customer/useProductCardPurchase';
 
 /** Only the customer API supplies product, price and promotion values. */
 export default function ProductShowcaseCard({
     product,
+    comboSummary,
 }: {
     product: HomeProductCardItem;
     section?: 'flash' | 'standard';
+    comboSummary?: { ingredients: string; savings: string };
 }) {
     const { t, i18n } = useTranslation('storefront');
     const english = i18n.resolvedLanguage?.startsWith('en');
@@ -24,8 +27,13 @@ export default function ProductShowcaseCard({
     // Presentation-only fallback: unrated products still show five empty stars.
     const reviewCount = product.reviewCount ?? 0;
     const rating = reviewCount > 0 ? (product.rating ?? 0) : 0;
-    const { favorite, pending: savingFavorite, toggle: toggleFavorite } = useFavoriteToggle(product.id);
     const {
+        favorite,
+        pending: savingFavorite,
+        toggle: toggleFavorite,
+    } = useFavoriteToggle(product.id);
+    const {
+        purchaseAllowed,
         quantity,
         setQuantity,
         minQuantity,
@@ -70,7 +78,7 @@ export default function ProductShowcaseCard({
                 <button
                     type="button"
                     onClick={toggleFavorite}
-                    disabled={savingFavorite}
+                    disabled={!purchaseAllowed || savingFavorite}
                     aria-label={t(
                         favorite ? 'customerUI.removeFavorite' : 'customerUI.addFavorite',
                     )}
@@ -117,6 +125,12 @@ export default function ProductShowcaseCard({
                     </span>
                 </div>
 
+                {comboSummary && (
+                    <div className="mt-2 h-10 min-w-0 text-xs leading-5 text-store-muted">
+                        <p className="m-0 truncate" title={comboSummary.ingredients}>{comboSummary.ingredients}</p>
+                        <p className="m-0 truncate font-semibold text-store-green" title={comboSummary.savings}>{comboSummary.savings || '\u00a0'}</p>
+                    </div>
+                )}
                 <div className="mt-auto pt-2.5">
                     <div className="flex min-h-[16px] items-center gap-2">
                         {validSale && (
@@ -130,10 +144,7 @@ export default function ProductShowcaseCard({
                             className={`font-price text-[20px] font-black leading-6 tabular-nums ${validSale ? 'text-[#d73a30]' : 'text-store-green'}`}
                         >
                             {product.priceLoading ? (
-                                <span
-                                    className="inline-block h-5 w-24 animate-pulse rounded bg-store-line/60 align-middle"
-                                    aria-hidden="true"
-                                />
+                                <Skeleton className="h-6 w-24" />
                             ) : unitPrice == null ? (
                                 t('customerUI.priceUnavailable')
                             ) : (
@@ -161,7 +172,7 @@ export default function ProductShowcaseCard({
                             <button
                                 type="button"
                                 onClick={() => setQuantity(Math.max(minQuantity, quantity - step))}
-                                disabled={quantity <= minQuantity || !inStock}
+                                disabled={!purchaseAllowed || quantity <= minQuantity || !inStock}
                                 aria-label={t('homePage.decreaseQuantity')}
                                 className="grid h-7 w-6 cursor-pointer place-items-center rounded-md border-0 bg-transparent text-store-ink hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-40"
                             >
@@ -174,7 +185,7 @@ export default function ProductShowcaseCard({
                                 type="button"
                                 onClick={() => setQuantity(quantity + step)}
                                 disabled={
-                                    !inStock || (available != null && quantity + step > available)
+                                    !purchaseAllowed || !inStock || (available != null && quantity + step > available)
                                 }
                                 aria-label={t('homePage.increaseQuantity')}
                                 className="grid h-7 w-6 cursor-pointer place-items-center rounded-md border-0 bg-transparent text-store-ink hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-40"
@@ -186,19 +197,23 @@ export default function ProductShowcaseCard({
                             type="button"
                             onClick={handleAddToOrder}
                             disabled={
-                                !inStock ||
+                                !purchaseAllowed || !inStock ||
                                 unitPrice == null ||
                                 (available != null && quantity > available)
                             }
                             className="h-9 min-w-0 flex-1 cursor-pointer rounded-lg border-0 bg-store-green px-2 text-[11px] font-bold text-white transition hover:bg-store-dark disabled:cursor-not-allowed disabled:bg-[#91a59d]"
                         >
-                            {product.priceLoading
-                                ? t('customerUI.checkingStock')
-                                : unitPrice == null
-                                ? t('customerUI.priceUnavailable')
-                                : inStock
-                                  ? t('homePage.addToOrder', 'Add to Order')
-                                  : t('customerUI.outOfStock')}
+                            {!purchaseAllowed ? (
+                                t('customerUI.comboPreviewOnly')
+                            ) : product.priceLoading ? (
+                                <Skeleton className="mx-auto h-3 w-16" />
+                            ) : unitPrice == null ? (
+                                t('customerUI.priceUnavailable')
+                            ) : inStock ? (
+                                t('homePage.addToOrder', 'Add to Order')
+                            ) : (
+                                t('customerUI.outOfStock')
+                            )}
                         </button>
                     </div>
                 </div>
