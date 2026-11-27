@@ -56,7 +56,7 @@ export async function runAgent(
     const response = await fetch(`${env.apiBaseUrl}/api/ai/agent`, {
         method: 'POST',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
+        headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream, application/json' },
         body: JSON.stringify({
             ...input,
             state: Object.keys(state).length ? clean(state) : undefined,

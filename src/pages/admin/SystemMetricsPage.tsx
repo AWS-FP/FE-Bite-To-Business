@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
     Activity,
@@ -8,13 +8,10 @@ import {
     Clock3,
     Cpu,
     Download,
-    FileBarChart2,
     FileText,
     Info,
     RefreshCw,
     Server,
-    ShieldCheck,
-    SlidersHorizontal,
     Users,
     Wallet,
     WifiOff,
@@ -22,12 +19,9 @@ import {
 import AdminButton from '@/components/admin/AdminButton';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import SystemMonitoringDashboard from '@/components/admin/SystemMonitoringDashboard';
-import SystemSettingsForm from '@/components/admin/SystemSettingsForm';
-import FinanceReport from '@/components/admin/FinanceReport';
 import { useSystemMetrics } from '@/hooks/admin/useSystemMetrics';
 import { useRegistrationStats } from '@/hooks/admin/useRegistrations';
 import { useStaff } from '@/hooks/admin/useStaff';
-import { useAuthStore } from '@/store/admin/authStore';
 import { exportRegistrationMetrics } from '@/utils/admin/systemMetrics';
 import { getAuthError } from '@/utils/admin/authError';
 import { ROUTES } from '@/router/routes';
@@ -35,18 +29,19 @@ import type { RegistrationStats } from '@/types/admin/registration';
 import './SystemMetricsPage.css';
 
 export default function SystemMetricsPage() {
-    const { t, i18n } = useTranslation('admin');
     const [searchParams] = useSearchParams();
+    const requestedTab = searchParams.get('tab') || 'overview';
+    if (requestedTab === 'reports' || requestedTab === 'revenue') {
+        return <Navigate to={ROUTES.ADMIN_REVENUE} replace />;
+    }
+    return <SystemMetricsContent tab={['ai', 'logs'].includes(requestedTab) ? requestedTab : 'overview'} />;
+}
+
+function SystemMetricsContent({ tab }: { tab: string }) {
+    const { t, i18n } = useTranslation('admin');
     const health = useSystemMetrics();
     const registrations = useRegistrationStats();
     const staff = useStaff({ page: 0, size: 1 });
-    const session = useAuthStore((state) => state.session);
-    const sessionVersion = useAuthStore((state) => state.sessionVersion);
-    const requestedTab = searchParams.get('tab') || 'overview';
-    const currentTab = requestedTab === 'reports' ? 'revenue' : requestedTab;
-    const tab = ['overview', 'revenue', 'ai', 'settings', 'logs'].includes(currentTab)
-        ? currentTab
-        : 'overview';
     const refreshing = health.isFetching || registrations.isFetching || staff.isFetching;
     const number = new Intl.NumberFormat(i18n.resolvedLanguage === 'en' ? 'en-GB' : 'vi-VN');
 
@@ -80,40 +75,18 @@ export default function SystemMetricsPage() {
     return (
         <div className="system-page">
             <AdminPageHeader
-                sectionNumber="03"
                 eyebrow={t('system.eyebrow')}
                 title={t('system.title')}
-                description={t('system.description')}
-            >
-                <div className="flex items-center gap-3 rounded-[3px] border border-black bg-store-cream px-4 py-3">
-                    <ShieldCheck size={20} strokeWidth={1.5} aria-hidden="true" />
-                    <div>
-                        <strong className="block text-[12px] leading-[18px] font-semibold">
-                            {t('system.adminOnly')}
-                        </strong>
-                        <span className="block pt-1 text-[11px] leading-[16.5px] text-store-muted">
-                            {t('system.timezone')}
-                        </span>
-                    </div>
-                </div>
-            </AdminPageHeader>
+            />
 
             <nav className="system-tabs" aria-label={t('system.tabsLabel')}>
                 <Link to="?tab=overview" aria-current={tab === 'overview' ? 'page' : undefined}>
                     <Activity size={17} />
                     {t('system.tabs.overview')}
                 </Link>
-                <Link to="?tab=revenue" aria-current={tab === 'revenue' ? 'page' : undefined}>
-                    <FileBarChart2 size={17} />
-                    {t('system.tabs.revenue')}
-                </Link>
                 <Link to="?tab=ai" aria-current={tab === 'ai' ? 'page' : undefined}>
                     <Cpu size={17} />
                     {t('system.tabs.ai')}
-                </Link>
-                <Link to="?tab=settings" aria-current={tab === 'settings' ? 'page' : undefined}>
-                    <SlidersHorizontal size={17} />
-                    {t('system.tabs.settings')}
                 </Link>
                 <Link to="?tab=logs" aria-current={tab === 'logs' ? 'page' : undefined}>
                     <FileText size={17} />
@@ -320,14 +293,7 @@ export default function SystemMetricsPage() {
                     </p>
                 </>
             )}
-            {tab === 'revenue' && <FinanceReport />}
             {tab === 'ai' && <SystemMonitoringDashboard mode="ai" />}
-            {tab === 'settings' && (
-                <SystemSettingsForm
-                    key={`${session?.user.id}:${sessionVersion}`}
-                    storageKey={`bitetobusiness.admin.systemDraft.${session?.user.id}`}
-                />
-            )}
             {tab === 'logs' && <SystemMonitoringDashboard mode="logs" />}
         </div>
     );

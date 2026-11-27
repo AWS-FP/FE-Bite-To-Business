@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useSearchParams } from 'react-router-dom';
 import AdminIcon from '@/components/admin/AdminIcon';
@@ -83,10 +83,8 @@ export default function RegistrationsPage() {
     return (
         <>
             <AdminPageHeader
-                sectionNumber="01"
                 eyebrow={t('list.stamp')}
                 title={t('navigation.registrations')}
-                description={t('list.description')}
             >
                 <AdminButton
                     icon="refresh"

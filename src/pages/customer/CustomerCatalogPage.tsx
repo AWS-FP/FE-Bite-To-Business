@@ -84,7 +84,7 @@ export default function CustomerCatalogPage() {
                                                 className={`flex min-w-0 flex-1 items-center gap-2.5 rounded-xl border-0 px-2.5 py-3 text-left text-sm font-semibold transition-colors ${
                                                     selectedParent
                                                         ? 'bg-surface-green text-store-green'
-                                                        : 'text-store-ink hover:bg-surface-soft'
+                                                        : 'bg-transparent text-store-ink hover:bg-surface-soft'
                                                 }`}
                                             >
                                                 <CategoryIcon
@@ -105,7 +105,7 @@ export default function CustomerCatalogPage() {
                                                         name: title(parent),
                                                     })}
                                                     aria-expanded={open}
-                                                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-store-line text-store-green transition hover:bg-surface-green"
+                                                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-store-line bg-transparent text-store-green transition hover:bg-surface-green"
                                                 >
                                                     <ChevronDown
                                                         size={17}

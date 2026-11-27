@@ -80,10 +80,8 @@ export default function StaffPage() {
     return (
         <div className="staff-page">
             <AdminPageHeader
-                sectionNumber="02"
                 eyebrow={t('staff.eyebrow')}
                 title={t('navigation.staff')}
-                description={t('staff.description')}
             >
                 <AdminButton
                     tone="primary"

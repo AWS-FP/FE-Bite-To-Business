@@ -265,15 +265,15 @@ export const PromotionListApi = {
     }),
 };
 export const PromotionList = createComponentImplementation(PromotionListApi, ({ props }) => {
-    const promotions = listOf<A2uiPromotion>(props.items).slice(0, props.maxItems ?? 3);
+    const promotions = listOf<A2uiPromotion>(props.items);
     if (!promotions.length) return null;
     const date = (value?: string) => (value ? new Date(value).toLocaleDateString('vi-VN') : null);
     return (
-        <ul className="space-y-2">
+        <ul className="flex snap-x gap-4 overflow-x-auto pb-3 [scrollbar-width:thin]">
             {promotions.map((promotion) => (
                 <li
                     key={promotion.id}
-                    className="rounded-lg border border-store-line bg-store-cream/50 p-3"
+                    className="min-w-[min(85%,320px)] snap-start rounded-xl border border-store-green/20 bg-white p-5 shadow-sm"
                 >
                     <p className="text-sm font-bold">{promotion.name}</p>
                     {promotion.content && (

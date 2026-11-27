@@ -39,6 +39,7 @@ export const ROUTES = {
     ADMIN_PACKAGE_RETURNS: '/admin/package-returns',
     ADMIN_PAYMENT_REVIEWS: '/admin/payment-reviews',
     ADMIN_SYSTEM: '/admin/system',
+    ADMIN_REVENUE: '/admin/revenue',
 
     ECOMMERCE: '/e-commerce',
     ECOMMERCE_DASHBOARD: '/e-commerce/dashboard',
@@ -72,6 +73,16 @@ const roleHome: Record<UserRole, string> = {
 
 export function getRoleHome(role: UserRole) {
     return roleHome[role] ?? ROUTES.HOME;
+}
+
+const adminSections = [
+    ROUTES.ADMIN_REGISTRATIONS, ROUTES.ADMIN_STAFF, ROUTES.ADMIN_PACKAGE_RETURNS,
+    ROUTES.ADMIN_PAYMENT_REVIEWS, ROUTES.ADMIN_SYSTEM, ROUTES.ADMIN_REVENUE,
+];
+
+export function getAdminSectionNumber(pathname: string) {
+    const index = adminSections.findIndex(path => pathname === path || pathname.startsWith(path + '/'));
+    return String(Math.max(index, 0) + 1).padStart(2, '0');
 }
 
 export function getWorkspaceHome(role: UserRole) {

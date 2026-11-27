@@ -85,7 +85,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
         ) ?? [];
 
     return (
-        <section className="system-monitoring" aria-label={t('system.monitoring.title')}>
+        <section className="grid min-w-0 gap-5" aria-label={t('system.monitoring.title')}>
             <div className="system-section-toolbar">
                 <div>
                     <h2>
@@ -97,9 +97,10 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                     </h2>
                 </div>
                 <div className="system-button-row">
-                    <label className="monitoring-range">
+                    <label className="flex items-center gap-2 text-xs">
                         {t('system.monitoring.range')}
                         <select
+                            className="rounded-[3px] border border-solid border-black bg-white p-2.5"
                             value={hours}
                             onChange={(event) => setHours(Number(event.target.value))}
                         >
@@ -143,7 +144,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                             )}
                         </div>
                     )}
-                    <div className="system-metric-grid">
+                    <div className="grid grid-cols-1 gap-4 min-[701px]:grid-cols-2 min-[1201px]:grid-cols-4">
                         {keys.map((id) => {
                             const points = metricPoints(data, id);
                             const current = points.filter(
@@ -192,7 +193,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                         })}
                     </div>
                     {mode === 'logs' && <ApiDiagnosticsPanel hours={hours} />}
-                    <div className="monitoring-chart-grid">
+                    <div className="grid grid-cols-1 gap-5 min-[701px]:grid-cols-2">
                         {(mode === 'ai'
                             ? aiMetrics
                             : mode === 'logs'
@@ -208,9 +209,10 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                                 <h2>{t('system.monitoring.logsTitle')}</h2>
                                 <p>{t('system.monitoring.logsHint')}</p>
                             </div>
-                            <label className="monitoring-range">
+                            <label className="flex items-center gap-2 text-xs">
                                 {t('system.monitoring.status')}
                                 <select
+                                    className="rounded-[3px] border border-solid border-black bg-white p-2.5"
                                     value={status}
                                     onChange={(event) => setStatus(event.target.value)}
                                 >
@@ -221,7 +223,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                             </label>
                         </header>
                         <div className="system-table-scroll">
-                            <table className="system-log-table monitoring-log-table">
+                            <table className="system-log-table [&_td]:border-t [&_td]:[border-top-style:solid] [&_td]:border-store-line [&_td]:px-6 [&_td]:py-3.5 [&_td]:text-xs [&_td]:wrap-anywhere">
                                 <thead>
                                     <tr>
                                         {[
@@ -407,13 +409,13 @@ function MetricChart({
                             </ComposedChart>
                         </ResponsiveContainer>
                     </div>
-                    <div className="monitoring-chart-axis">
+                    <div className="flex justify-between px-6 pb-4 text-[11px] text-store-muted">
                         <span>{date(data.from)}</span>
                         <span>{date(data.to)}</span>
                     </div>
-                    <details className="monitoring-chart-data">
-                        <summary>{t('system.monitoring.viewData')}</summary>
-                        <table>
+                    <details className="border-t [border-top-style:solid] border-store-line px-6 py-3 text-xs">
+                        <summary className="cursor-pointer">{t('system.monitoring.viewData')}</summary>
+                        <table className="mt-3 w-full text-left">
                             <thead>
                                 <tr>
                                     <th>{t('system.monitoring.time')}</th>
