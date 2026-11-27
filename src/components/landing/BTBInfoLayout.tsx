@@ -3,7 +3,8 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import LandingHeader from '@/components/landing/LandingHeader';
 import Footer from '@/layouts/Footer';
-import { ROUTES } from '@/router/routes';
+import { getRoleHome, ROUTES } from '@/router/routes';
+import { useAuthStore } from '@/store/admin/authStore';
 import LandingPersonalization from '@/components/landing/LandingPersonalization';
 import EditorialPhoto from './EditorialPhoto';
 import '@/components/landing/landing.css';
@@ -33,6 +34,10 @@ const visuals = {
 export default function BTBInfoLayout({ title, eyebrow, description, children, variant }: Props) {
     const { t } = useTranslation('storefront');
     const visual = visuals[variant];
+    const session = useAuthStore((state) => state.session);
+    const restoring = useAuthStore((state) => state.restoring);
+    const guest = !session && !restoring;
+    const staff = Boolean(session && session.user.role !== 'CUSTOMER');
 
     return (
         <div className="flex min-h-dvh flex-col bg-store-cream text-store-ink">
@@ -57,10 +62,10 @@ export default function BTBInfoLayout({ title, eyebrow, description, children, v
                                 </p>
                                 <div className="mt-9 flex flex-wrap gap-3.5">
                                     <Link
-                                        to={ROUTES.REGISTER}
+                                        to={guest ? ROUTES.REGISTER : session && staff ? getRoleHome(session.user.role) : ROUTES.CATALOG}
                                         className="group inline-flex min-h-12 items-center gap-4 rounded-full bg-store-yellow px-6 py-3 text-[13px] font-extrabold text-store-ink shadow-[0_6px_0_rgba(0,0,0,.15)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_10px_0_rgba(0,0,0,.13)]"
                                     >
-                                        {t('introPages.start')}
+                                        {t(guest ? 'introPages.start' : staff ? 'introPages.personal.workspace' : 'landing.live.browseCatalog')}
                                         <span aria-hidden="true" className="text-lg transition-transform group-hover:translate-x-1">↗</span>
                                     </Link>
                                     <Link

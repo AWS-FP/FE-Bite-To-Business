@@ -8,6 +8,7 @@ export default function LandingPersonalization() {
     const { t } = useTranslation('storefront');
     const { audience, setAudience } = useLandingAudience();
     const session = useAuthStore((s) => s.session);
+    const restoring = useAuthStore((s) => s.restoring);
     const customer = session?.user.role === 'CUSTOMER';
     const options = [
         { id: 'business' as const, label: t('introPages.personal.business'), sub: t('introPages.personal.businessSub') },
@@ -47,29 +48,29 @@ export default function LandingPersonalization() {
                             </button>
                         ))}
                     </div>
-                    <div className="flex items-center justify-between gap-3.5 pt-[17px] [&>span]:text-xs [&>span]:leading-[1.5] [&>span]:text-store-green [&_a]:inline-flex [&_a]:shrink-0 [&_a]:items-center [&_a]:gap-[7px] [&_a]:rounded-lg [&_a]:bg-store-green [&_a]:px-3 [&_a]:py-2.5 [&_a]:text-xs [&_a]:font-bold [&_a]:text-store-cream [&_a]:no-underline [&_img]:h-[15px] [&_img]:w-[15px] [&_img]:brightness-0 [&_img]:invert">
+                    {!restoring && <div className="flex items-center justify-between gap-3.5 pt-[17px] [&>span]:text-xs [&>span]:leading-[1.5] [&>span]:text-store-green [&_a]:inline-flex [&_a]:shrink-0 [&_a]:items-center [&_a]:gap-[7px] [&_a]:rounded-lg [&_a]:bg-store-green [&_a]:px-3 [&_a]:py-2.5 [&_a]:text-xs [&_a]:font-bold [&_a]:text-store-cream [&_a]:no-underline [&_img]:h-[15px] [&_img]:w-[15px] [&_img]:brightness-0 [&_img]:invert">
                         <span>
                             {customer
                                 ? t('introPages.personal.customer')
-                                : t('introPages.personal.guest')}
+                                : session ? t('landing.live.signedIn') : t('introPages.personal.guest')}
                         </span>
                         <Link
                             to={
                                 customer
                                     ? '/profile'
                                     : session
-                                      ? getRoleHome(session.user.role)
-                                      : '/register'
+                                        ? getRoleHome(session.user.role)
+                                        : '/register'
                             }
                         >
                             {customer
                                 ? t('introPages.personal.profile')
                                 : session
-                                  ? t('introPages.personal.workspace')
-                                  : t('introPages.personal.register')}
+                                    ? t('introPages.personal.workspace')
+                                    : t('introPages.personal.register')}
                             <img src="/icons/arrow-up-right.svg" alt="" aria-hidden="true" />
                         </Link>
-                    </div>
+                    </div>}
                 </div>
             </div>
         </section>
