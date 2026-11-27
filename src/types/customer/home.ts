@@ -71,6 +71,7 @@ export interface HomeCombo {
     salePrice: number | null;
     availableQuantity: number;
     items: HomeComboItem[];
+    separateListPrice?: number | null;
     minOrderQuantity: number;
     quantityStep: number;
     vatRate: number | null;

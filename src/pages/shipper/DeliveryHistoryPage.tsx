@@ -1,3 +1,4 @@
+import ListSkeleton from '@/components/common/ListSkeleton';
 import { CheckCircle2, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Pagination from '@/components/common/Pagination';
@@ -55,7 +56,7 @@ export default function DeliveryHistoryPage() {
                     </div>
                 </div>
                 {loading && !data && (
-                    <p role="status" className="text-sm text-store-muted">{vi ? 'Đang tải lịch sử...' : 'Loading history...'}</p>
+                    <ListSkeleton lines={5} rowClassName="flex items-start justify-between gap-3 rounded-xl border border-store-ink/15 p-4" className="space-y-4" />
                 )}
                 {!loading && !error && parcels.length === 0 && (
                     <p className="mb-0 text-sm text-store-muted">{vi ? 'Bạn chưa giao xong package nào.' : 'You have not delivered any package yet.'}</p>

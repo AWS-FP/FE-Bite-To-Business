@@ -1,3 +1,4 @@
+import TableSkeleton from '@/components/common/TableSkeleton';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -46,7 +47,7 @@ export default function RegistrationDuplicates() {
                 </h2>
             </div>
 
-            {query.isPending && <p className="px-6 py-6 text-[13px]">{t('duplicates.loading')}</p>}
+            {query.isPending && <TableSkeleton columns={6} tableClass="w-full min-w-[760px] border-collapse text-left text-[13px]" className="mt-4 overflow-x-auto border-t border-black" headerClass="bg-store-cream px-4 py-3" />}
             {query.isError && (
                 <p role="alert" className="px-6 py-6 text-[13px] text-red-700">
                     {t('duplicates.error')}

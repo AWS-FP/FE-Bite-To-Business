@@ -1,3 +1,4 @@
+import { ExecutiveTableSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Save, TicketPercent } from 'lucide-react';
@@ -14,7 +15,6 @@ import {
     ExecutiveError,
     ExecutiveHeading,
     ExecutivePanel,
-    LoadingRows,
 } from '@/components/e-commerce/ExecutiveUI';
 import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 import type { CouponWrite } from '@/types/e-commerce/executiveAdmin';
@@ -439,7 +439,7 @@ export default function EcommerceCouponsPage() {
                 caption={list.data ? `${list.data.total} coupon` : ''}
             >
                 {list.isLoading ? (
-                    <LoadingRows />
+                    <ExecutiveTableSkeleton cells={["text", "text", "text", "double", "text", "badge", "actions"]} count={5} tableClass="w-full min-w-[940px] text-left text-sm" cellClass={executiveUi.td} />
                 ) : list.isError ? (
                     <div className="p-5">
                         <ExecutiveError

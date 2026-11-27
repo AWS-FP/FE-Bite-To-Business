@@ -1,3 +1,4 @@
+import Skeleton from '@/components/common/Skeleton';
 import { useLogisticsText } from '@/hooks/logistic/useLogisticsText';
 import { Boxes, RefreshCw, Search } from 'lucide-react';
 import { useState } from 'react';
@@ -65,10 +66,11 @@ export default function InventoryPage() {
                         <button type="submit" className="flex items-center gap-2 rounded border border-black bg-store-yellow px-3 py-2 text-sm font-semibold"><Search size={16} aria-hidden="true" /> {tr("Tìm")}</button>
                     </form>
                 </div>
-                {(data.loading || data.error || data.items.length === 0) && (
+                {data.loading && <div aria-busy="true" className="overflow-x-auto"><table className="w-full min-w-[1650px] border-collapse text-center text-sm"><thead className="bg-store-cream"><tr>{Array.from({length:8},(_,i)=><th key={i} className="px-4 py-4"><Skeleton className="mx-auto h-3 w-20"/></th>)}</tr></thead><tbody>{Array.from({length:5},(_,i)=><tr key={i} className="border-t border-store-line/70">{Array.from({length:8},(_,j)=><td key={j} className="px-4 py-4"><Skeleton className={j===0?"h-12 w-48":"mx-auto h-5 w-20"}/></td>)}</tr>)}</tbody></table></div>}
+                {!data.loading && (data.error || data.items.length === 0) && (
                     <div className="px-6 py-8"><ListStatus loading={data.loading} error={data.error} empty={data.items.length === 0} /></div>
                 )}
-                {!data.error && data.items.length > 0 && (
+                {!data.loading && !data.error && data.items.length > 0 && (
                     <div className="overflow-x-auto">
                         <table className="w-full min-w-[1650px] border-collapse text-center text-sm">
                             <thead className="whitespace-nowrap bg-store-cream text-[11px] font-bold uppercase tracking-[0.06em] text-store-green">

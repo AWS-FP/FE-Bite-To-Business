@@ -43,6 +43,7 @@ export default function StoreAccountActions() {
     const isVietnamese = i18n.language.startsWith('vi');
 
     const isLoggedIn = Boolean(user);
+    const customer = user?.role === 'CUSTOMER';
 
     const totalItemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -108,8 +109,8 @@ export default function StoreAccountActions() {
 
             {isLoggedIn && (
                 <>
-                    {/* Cart button opens a preview; navigating starts from the preview actions. */}
-                    <button
+                    {/* Staff can browse without using the customer cart. */}
+                    {customer && <button
                         type="button"
                         onClick={() =>
                             setOpenDropdown((previous) => (previous === 'cart' ? null : 'cart'))
@@ -137,7 +138,7 @@ export default function StoreAccountActions() {
                                 {formatCurrencyVnd(subtotalAmount)}
                             </span>
                         </div>
-                    </button>
+                    </button>}
 
                     {/* Notification Bell */}
                     <NotificationSystem
@@ -176,7 +177,7 @@ export default function StoreAccountActions() {
             )}
 
             {/* Preview of products currently in cart (not completed orders). */}
-            {isLoggedIn && cartIsOpen && (
+            {customer && cartIsOpen && (
                 <div
                     id="customer-cart-preview"
                     role="dialog"

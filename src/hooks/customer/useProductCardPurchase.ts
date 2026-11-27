@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import type { HomeProductCardItem } from '@/types/customer/homeData';
 import { useCartStore } from '@/store/customer/cartStore';
+import { useStorefrontPurchaseAccess } from './useStorefrontPurchaseAccess';
 
 /**
  * Giá, giảm giá, số lượng và thêm vào giỏ cho một thẻ sản phẩm.
  * Chỉ dùng giá từ API; giá khuyến mãi chỉ hợp lệ khi thấp hơn giá niêm yết.
  */
 export function useProductCardPurchase(product: HomeProductCardItem, name: string) {
+    const purchaseAllowed = useStorefrontPurchaseAccess();
     const addItemToCart = useCartStore((state) => state.addItem);
     const [requestedQuantity, setQuantity] = useState(product.minOrderQuantity ?? 1);
 
@@ -14,7 +16,10 @@ export function useProductCardPurchase(product: HomeProductCardItem, name: strin
     const quantity = Math.max(minQuantity, requestedQuantity);
     const step = product.quantityStep ?? 1;
     const available = product.availableQuantity;
-    const inStock = available == null || available > 0;
+    const inStock =
+        product.unit === 'COMBO'
+            ? available != null && available >= minQuantity
+            : available == null || available > 0;
     const validSale =
         product.salePrice != null &&
         product.salePrice >= 0 &&
@@ -28,7 +33,7 @@ export function useProductCardPurchase(product: HomeProductCardItem, name: strin
     const totalPrice = unitPrice == null ? null : unitPrice * quantity;
 
     function handleAddToOrder() {
-        if (!inStock || unitPrice == null || (available != null && quantity > available)) return;
+        if (!purchaseAllowed || !inStock || unitPrice == null || (available != null && quantity > available)) return;
         addItemToCart(
             {
                 id: product.id,
@@ -45,6 +50,7 @@ export function useProductCardPurchase(product: HomeProductCardItem, name: strin
     }
 
     return {
+        purchaseAllowed,
         quantity,
         setQuantity,
         minQuantity,

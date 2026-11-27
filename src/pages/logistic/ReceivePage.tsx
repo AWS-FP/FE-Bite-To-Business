@@ -1,3 +1,4 @@
+import Skeleton from '@/components/common/Skeleton';
 import { useLogisticsText } from '@/hooks/logistic/useLogisticsText';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ImageOff, Package } from 'lucide-react';
@@ -131,12 +132,12 @@ export default function ReceivePage() {
                         />
                     </label>
                     <ListStatus
-                        loading={data.loading}
-                        error={data.error}
-                        empty={data.items.length === 0}
+                        loading={false}
+                        error={data.loading ? '' : data.error}
+                        empty={!data.loading && data.items.length === 0}
                     />
                     <label className="block font-bold">
-                        {tr("Sản phẩm") + ' '}<select
+                        {tr("Sản phẩm") + ' '}{data.loading ? <Skeleton className="mt-2 h-[50px] w-full" /> : <select
                             required
                             disabled={data.loading || search.trim() !== keyword}
                             value={productId}
@@ -152,7 +153,7 @@ export default function ReceivePage() {
                                     {item.name} · {item.sku}
                                 </option>
                             ))}
-                        </select>
+                        </select>}
                     </label>
                     <label className="block font-bold">
                         {tr("Số lượng") + ' '}{unit && (

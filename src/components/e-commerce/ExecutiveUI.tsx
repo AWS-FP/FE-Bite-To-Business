@@ -32,7 +32,7 @@ export function ExecutivePanel({ title, caption, action, children }: {
 }
 
 export function ExecutiveStat({ title, value, icon, detail, tone = 'green' }: {
-    title: string; value: string | number; icon: ReactNode; detail?: string; tone?: 'green' | 'yellow' | 'blue' | 'coral';
+    title: string; value: ReactNode; icon: ReactNode; detail?: string; tone?: 'green' | 'yellow' | 'blue' | 'coral';
 }) {
     const bg = { green: 'bg-[#e7f4e8]', yellow: 'bg-[#fff3bf]', blue: 'bg-[#e7f2f8]', coral: 'bg-[#fff0e7]' }[tone];
     return <div className={`${executiveUi.card} p-5`}>
@@ -67,5 +67,3 @@ export function ExecutiveShortcut({ to, label, icon }: { to: string; label: stri
         <span className="flex items-center gap-3">{icon}{label}</span><ArrowRight size={17} className="transition group-hover:translate-x-1"/>
     </Link>;
 }
-
-export function LoadingRows() { const txt = useExecutiveText(); return <p role="status" className="px-6 py-12 text-center text-sm text-[#6b7972]">{txt('Đang tải dữ liệu...','Loading data...')}</p>; }
