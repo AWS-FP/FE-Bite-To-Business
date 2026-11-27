@@ -6,7 +6,7 @@ import {
     Bar,
     CartesianGrid,
     ComposedChart,
-    Line,
+    Area,
     ResponsiveContainer,
     Tooltip,
     XAxis,
@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import AdminButton from './AdminButton';
 import ApiDiagnosticsPanel from './ApiDiagnosticsPanel';
+import SystemLogPanel from './SystemLogPanel';
 import { getSystemMonitoring } from '@/services/admin/systemService';
 import { useAuthStore } from '@/store/admin/authStore';
 import type { MonitoringPoint, SystemMonitoring } from '@/types/admin/system';
@@ -48,7 +49,7 @@ const sparseErrorMetrics = ['errors', 'clientErrors', 'alb4xx', 'alb5xx'];
 
 export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?: Mode }) {
     const { t, i18n } = useTranslation('admin');
-    const [hours, setHours] = useState(24);
+    const [hours, setHours] = useState(6);
     const [status, setStatus] = useState('all');
     const session = useAuthStore((state) => state.session);
     const sessionVersion = useAuthStore((state) => state.sessionVersion);
@@ -104,9 +105,10 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                             value={hours}
                             onChange={(event) => setHours(Number(event.target.value))}
                         >
+                            <option value={1}>{t('system.monitoring.hour')}</option>
+                            <option value={6}>{t('system.monitoring.sixHours')}</option>
                             <option value={24}>{t('system.monitoring.day')}</option>
                             <option value={168}>{t('system.monitoring.week')}</option>
-                            <option value={720}>{t('system.monitoring.month')}</option>
                         </select>
                     </label>
                     <AdminButton
@@ -125,7 +127,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                 </div>
             )}
             {query.isPending && <p role="status">{t('system.loading')}</p>}
-            {mode === 'logs' && !data && <ApiDiagnosticsPanel hours={hours} />}
+            {mode === 'logs' && !data && <><ApiDiagnosticsPanel hours={hours} /><SystemLogPanel hours={hours} /></>}
             {data && (
                 <>
                     <p className="system-muted">
@@ -192,7 +194,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                             );
                         })}
                     </div>
-                    {mode === 'logs' && <ApiDiagnosticsPanel hours={hours} />}
+                    {mode === 'logs' && <><ApiDiagnosticsPanel hours={hours} /><SystemLogPanel hours={hours} /></>}
                     <div className="grid grid-cols-1 gap-5 min-[701px]:grid-cols-2">
                         {(mode === 'ai'
                             ? aiMetrics
@@ -231,7 +233,8 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                                             'model',
                                             'status',
                                             'duration',
-                                            'tokens',
+                                            'input',
+                                            'output',
                                             'code',
                                         ].map((key) => (
                                             <th key={key}>{t(`system.monitoring.${key}`)}</th>
@@ -240,7 +243,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                                 </thead>
                                 <tbody>
                                     {logs.map((row, index) => (
-                                        <tr key={`${row.time}-${index}`}>
+                                        <tr key={row.id ?? `${row.time}-${index}`}>
                                             <td>{date(row.time)}</td>
                                             <td>{row.model}</td>
                                             <td>{row.status}</td>
@@ -250,19 +253,15 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                                                     : `${number.format(row.durationMs)} ms`}
                                             </td>
                                             <td>
-                                                {row.inputTokens === null ||
-                                                row.outputTokens === null
-                                                    ? '—'
-                                                    : number.format(
-                                                          row.inputTokens + row.outputTokens,
-                                                      )}
+                                                {row.inputTokens === null ? '—' : number.format(row.inputTokens)}
                                             </td>
+                                            <td>{row.outputTokens === null ? '—' : number.format(row.outputTokens)}</td>
                                             <td>{row.errorCode ?? '—'}</td>
                                         </tr>
                                     ))}
                                     {logs.length === 0 && (
                                         <tr>
-                                            <td colSpan={6}>{t('system.monitoring.emptyLogs')}</td>
+                                            <td colSpan={7}>{t('system.monitoring.emptyLogs')}</td>
                                         </tr>
                                     )}
                                 </tbody>
@@ -340,7 +339,7 @@ function MetricChart({
         unit === 'percent' ? '%' : unit === 'seconds' ? ' s' : unit === 'milliseconds' ? ' ms' : '';
     const number = new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 2 });
     return (
-        <section className="system-panel">
+        <section className="system-panel overflow-hidden rounded-xl border border-store-line bg-white shadow-sm">
             <header className="system-panel-heading">
                 <h2>{t(`system.monitoring.metrics.${id}`)}</h2>
             </header>
@@ -350,17 +349,17 @@ function MetricChart({
                 </div>
             ) : (
                 <>
-                    <div className="h-64 min-w-0 px-2 pt-4">
+                    <div className="h-72 min-w-0 px-4 pt-5">
                         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                             <ComposedChart
                                 data={buckets}
                                 accessibilityLayer
-                                margin={{ top: 8, right: 16, bottom: 8, left: 8 }}
+                                margin={{ top: 12, right: 16, bottom: 8, left: 4 }}
                             >
                                 <CartesianGrid
-                                    strokeDasharray="3 3"
+                                    strokeDasharray="3 5"
                                     vertical={false}
-                                    stroke="var(--color-store-line)"
+                                    stroke="#e4e9e6"
                                 />
                                 <XAxis
                                     dataKey="timestamp"
@@ -369,18 +368,22 @@ function MetricChart({
                                     tickFormatter={(value) =>
                                         date(new Date(Number(value)).toISOString())
                                     }
-                                    minTickGap={60}
+                                    minTickGap={75}
+                                    axisLine={false}
+                                    tickLine={false}
                                     tick={{ fontSize: 11, fill: 'var(--color-store-muted)' }}
                                 />
                                 <YAxis
-                                    width={60}
+                                    width={75}
                                     tickFormatter={(value) =>
                                         `${number.format(Number(value))}${suffix}`
                                     }
                                     allowDecimals={gauge}
+                                    axisLine={false}
+                                    tickLine={false}
                                     tick={{ fontSize: 11, fill: 'var(--color-store-muted)' }}
                                 />
-                                <Tooltip
+                                <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid #d8e2dc", boxShadow: "0 8px 25px rgba(10, 40, 29, .12)" }}
                                     labelFormatter={(value) =>
                                         date(new Date(Number(value)).toISOString())
                                     }
@@ -390,7 +393,9 @@ function MetricChart({
                                     ]}
                                 />
                                 {gauge ? (
-                                    <Line
+                                    <Area
+                                        type="monotone"
+                                        fill="rgba(18, 59, 46, 0.10)"
                                         dataKey="value"
                                         stroke="var(--color-store-green)"
                                         strokeWidth={2}
@@ -402,7 +407,8 @@ function MetricChart({
                                     <Bar
                                         dataKey="value"
                                         fill="var(--color-store-green)"
-                                        maxBarSize={24}
+                                        maxBarSize={18}
+                                        radius={[4, 4, 0, 0]}
                                         isAnimationActive={false}
                                     />
                                 )}

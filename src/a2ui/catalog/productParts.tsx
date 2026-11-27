@@ -3,7 +3,8 @@
  * Tách riêng file để React Fast Refresh hoạt động (file chỉ export component).
  */
 import type { ComponentContext } from '@a2ui/web_core/v0_9';
-import { CheckCircle2, PackageX, Plus } from 'lucide-react';
+import { CheckCircle2, PackageX, Plus, Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
 import {
     addToCart,
@@ -13,6 +14,49 @@ import {
     viewProduct,
     type A2uiProduct,
 } from './productTypes';
+
+export function Rating({ product }: { product: A2uiProduct }) {
+    const { i18n } = useTranslation();
+    const en = i18n.resolvedLanguage?.startsWith('en');
+    const count = product.reviewCount;
+    const rating =
+        count != null && count > 0 && product.averageRating != null
+            ? Math.max(0, Math.min(5, product.averageRating))
+            : null;
+    const label =
+        count == null
+            ? en
+                ? 'Review data unavailable'
+                : 'Chưa có dữ liệu đánh giá'
+            : count === 0
+              ? en
+                  ? 'No reviews yet'
+                  : 'Chưa có đánh giá'
+              : `${rating?.toFixed(1) ?? '—'}/5 · ${count.toLocaleString(en ? 'en-GB' : 'vi-VN')} ${en ? 'reviews' : 'đánh giá'}`;
+    return (
+        <div
+            className="flex flex-wrap items-center gap-1.5 text-[11px] text-store-muted"
+            aria-label={label}
+        >
+            <span className="inline-flex gap-0.5" aria-hidden="true">
+                {[0, 1, 2, 3, 4].map((index) => (
+                    <span key={index} className="relative inline-block size-3">
+                        <Star size={12} className="text-stone-300" />
+                        <span
+                            className="absolute inset-y-0 left-0 overflow-hidden"
+                            style={{
+                                width: `${Math.max(0, Math.min(1, (rating ?? 0) - index)) * 100}%`,
+                            }}
+                        >
+                            <Star size={12} className="fill-amber-400 text-amber-500" />
+                        </span>
+                    </span>
+                ))}
+            </span>
+            <span>{label}</span>
+        </div>
+    );
+}
 
 /** Giá theo đơn vị bán; có sale thì hiện giá gạch. Chưa có giá thì báo rõ, không hiện 0đ. */
 export function Price({ product }: { product: A2uiProduct }) {
@@ -135,6 +179,7 @@ export function ProductTile({
                     <span className="text-[11px] text-store-muted">{product.spec}</span>
                 )}
                 <Price product={product} />
+                <Rating product={product} />
                 <Stock product={product} />
                 {showTiers && <Tiers product={product} />}
                 {showAdd && (
@@ -167,21 +212,37 @@ export function ProductPresentation({
                     type="button"
                     onClick={() => viewProduct(context, product)}
                     aria-label={product.name}
-                    className={featured
-                        ? 'aspect-[4/3] w-full overflow-hidden bg-store-cream'
-                        : 'size-20 shrink-0 overflow-hidden rounded-lg bg-store-cream'}
+                    className={
+                        featured
+                            ? 'aspect-[4/3] w-full overflow-hidden bg-store-cream'
+                            : 'size-20 shrink-0 overflow-hidden rounded-lg bg-store-cream'
+                    }
                 >
-                    {product.imageUrl && <img src={product.imageUrl} alt="" loading="lazy" className="size-full object-contain" />}
+                    {product.imageUrl && (
+                        <img
+                            src={product.imageUrl}
+                            alt=""
+                            loading="lazy"
+                            className="size-full object-contain"
+                        />
+                    )}
                 </button>
                 <div className={`min-w-0 flex-1 space-y-2 ${featured ? 'p-5' : ''}`}>
-                    <button type="button" onClick={() => viewProduct(context, product)} className={`block border-0 bg-transparent p-0 text-left font-bold text-black hover:underline ${featured ? 'text-xl' : 'text-sm'}`}>
+                    <button
+                        type="button"
+                        onClick={() => viewProduct(context, product)}
+                        className={`block border-0 bg-transparent p-0 text-left font-bold text-black hover:underline ${featured ? 'text-xl' : 'text-sm'}`}
+                    >
                         {product.name}
                     </button>
                     {product.spec && <p className="text-sm text-store-muted">{product.spec}</p>}
                     <Price product={product} />
+                    <Rating product={product} />
                     <div className="flex flex-wrap items-center gap-3">
                         <Stock product={product} />
-                        <span className="text-xs text-store-muted">MOQ: {product.minOrderQuantity} {unitLabel(product.unitCode)}</span>
+                        <span className="text-xs text-store-muted">
+                            MOQ: {product.minOrderQuantity} {unitLabel(product.unitCode)}
+                        </span>
                     </div>
                     {showTiers && <Tiers product={product} />}
                     {showAdd && <AddButton context={context} product={product} />}

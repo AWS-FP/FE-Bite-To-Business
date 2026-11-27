@@ -1,0 +1,6 @@
+@media (min-width: 640px) {
+    .assistant-panel {
+        width: min(var(--assistant-width, 440px), calc(100vw - 2.5rem));
+        height: min(var(--assistant-height, 680px), calc(100dvh - 2.5rem));
+    }
+}

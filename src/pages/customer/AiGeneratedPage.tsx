@@ -7,11 +7,15 @@ import StorefrontLayout from '@/layouts/StorefrontLayout';
 import { getCatalogSearchPath } from '@/constants/catalogNavigation';
 import { AgentHttpError, runAgent, type AgentEvent } from '@/a2ui/client/agentClient';
 import { applyA2ui, getSurface } from '@/a2ui/runtime/a2uiRuntime';
-import { personalizationEnabled, subscribePersonalization, trackEvent } from '@/a2ui/telemetry/interactionTracker';
+import {
+    personalizationEnabled,
+    subscribePersonalization,
+    trackEvent,
+} from '@/a2ui/telemetry/interactionTracker';
 import { useAuthStore } from '@/store/admin/authStore';
 
 const DEFAULT_PROMPT = 'Gợi ý trang mua sắm phù hợp với tôi';
-const CACHE_PREFIX = 'btb.aiPage:catalog6:';
+const CACHE_PREFIX = 'btb.aiPage:catalog7:';
 const CACHE_MS = 30 * 60 * 1000;
 
 type View = { status: 'loading' | 'ready' | 'error'; surfaceId?: string; error?: string };
@@ -78,7 +82,6 @@ function GeneratedSurface({
     cacheKey: string;
     defaultPath: string;
 }) {
-
     const [view, setView] = useState<View>(() => {
         const cached = useCache ? readCache(cacheKey) : null;
         const surfaceId = cached ? applyA2ui(cached) : undefined;
@@ -151,21 +154,35 @@ function GeneratedSurface({
             <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
                 <Link
                     to="/"
-                    className="inline-flex items-center gap-1 font-semibold underline underline-offset-4"
+                    className="inline-flex items-center gap-1 font-semibold !text-store-green visited:!text-store-green hover:!text-store-ink underline underline-offset-4"
                 >
-                    <ArrowLeft size={16} aria-hidden="true" /> {locale === 'en' ? 'Back to home' : 'Về trang chủ'}
+                    <ArrowLeft size={16} aria-hidden="true" />{' '}
+                    {locale === 'en' ? 'Back to home' : 'Về trang chủ'}
                 </Link>
-
             </div>
 
             {view.status === 'loading' && (
-                <div className="space-y-6 animate-pulse" role="status" aria-label={locale === 'en' ? 'Preparing your page' : 'Đang chuẩn bị giao diện'}>
-                    <span className="sr-only">{locale === 'en' ? 'Preparing your page' : 'Đang chuẩn bị giao diện'}</span>
+                <div
+                    className="space-y-6 animate-pulse"
+                    role="status"
+                    aria-label={locale === 'en' ? 'Preparing your page' : 'Đang chuẩn bị giao diện'}
+                >
+                    <span className="sr-only">
+                        {locale === 'en' ? 'Preparing your page' : 'Đang chuẩn bị giao diện'}
+                    </span>
                     <div className="h-10 w-2/3 max-w-lg rounded-lg bg-stone-300/60" />
                     <div className="h-4 w-4/5 max-w-2xl rounded bg-stone-300/40" />
                     <div className="rounded-2xl border border-stone-200 bg-white/70 p-6 space-y-5">
                         <div className="h-7 w-40 rounded bg-stone-300/60" />
-                        {[0, 1, 2].map((row) => <div key={row} className="flex items-center gap-4"><div className="h-16 w-16 shrink-0 rounded-xl bg-stone-300/50" /><div className="flex-1 space-y-3"><div className="h-4 w-2/3 rounded bg-stone-300/50" /><div className="h-3 w-1/3 rounded bg-stone-300/40" /></div></div>)}
+                        {[0, 1, 2].map((row) => (
+                            <div key={row} className="flex items-center gap-4">
+                                <div className="h-16 w-16 shrink-0 rounded-xl bg-stone-300/50" />
+                                <div className="flex-1 space-y-3">
+                                    <div className="h-4 w-2/3 rounded bg-stone-300/50" />
+                                    <div className="h-3 w-1/3 rounded bg-stone-300/40" />
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             )}
@@ -188,7 +205,6 @@ function GeneratedSurface({
                     <A2uiSurface surface={surface} />
                 </div>
             )}
-
         </div>
     );
 }

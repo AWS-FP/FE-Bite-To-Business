@@ -44,6 +44,14 @@ export async function requestPasswordReset(email: string): Promise<void> {
     await publicHttp.post('/api/auth/forgot-password', { email });
 }
 
+export async function resendActivationOtp(email: string) {
+    const response = await publicHttp.post<ApiResponse<{ retryAfterSeconds: number }>>(
+        '/api/auth/resend-otp',
+        { email },
+    );
+    return response.data.data;
+}
+
 export async function verifyPasswordResetOtp(
     request: VerifyOtpRequest,
 ): Promise<OtpVerificationResponse> {
