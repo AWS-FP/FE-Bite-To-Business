@@ -51,7 +51,7 @@ export default function AssistantBubble() {
     useEffect(() => {
         if (!pendingPage) return;
         useAssistantStore.setState({ pendingPage: null, open: false });
-        navigate(aiPagePath(pendingPage));
+        navigate(aiPagePath(pendingPage.prompt, pendingPage.subject, pendingPage.view));
     }, [pendingPage, navigate]);
 
     function resize(width: number, height: number) {

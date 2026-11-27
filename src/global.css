@@ -32,6 +32,27 @@
     --a2ui-color-on-input: var(--color-store-ink);
 }
 
+.a2ui-page-header {
+    position: static;
+}
+.a2ui-page {
+    --a2ui-column-gap: 2rem;
+    --a2ui-row-gap: 1.25rem;
+}
+.a2ui-surface {
+    --a2ui-column-gap: 1rem;
+    --a2ui-row-gap: 0.75rem;
+}
+.a2ui-page h1,
+.a2ui-page h2,
+.a2ui-page h3 {
+    overflow-wrap: anywhere;
+}
+.a2ui-surface button,
+.a2ui-page button {
+    line-height: 1.5;
+}
+
 html,
 body,
 * {

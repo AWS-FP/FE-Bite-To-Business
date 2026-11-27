@@ -15,6 +15,7 @@ import {
 import AdminButton from './AdminButton';
 import ApiDiagnosticsPanel from './ApiDiagnosticsPanel';
 import SystemLogPanel from './SystemLogPanel';
+import FrontendLogPanel from './FrontendLogPanel';
 import { getSystemMonitoring } from '@/services/admin/systemService';
 import { useAuthStore } from '@/store/admin/authStore';
 import type { MonitoringPoint, SystemMonitoring } from '@/types/admin/system';
@@ -127,7 +128,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                 </div>
             )}
             {query.isPending && <p role="status">{t('system.loading')}</p>}
-            {mode === 'logs' && !data && <><ApiDiagnosticsPanel hours={hours} /><SystemLogPanel hours={hours} /></>}
+            {mode === 'logs' && !data && <><ApiDiagnosticsPanel hours={hours} /><SystemLogPanel hours={hours} /><FrontendLogPanel key={hours} hours={hours} /></>}
             {data && (
                 <>
                     <p className="system-muted">
@@ -194,7 +195,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                             );
                         })}
                     </div>
-                    {mode === 'logs' && <><ApiDiagnosticsPanel hours={hours} /><SystemLogPanel hours={hours} /></>}
+                    {mode === 'logs' && <><ApiDiagnosticsPanel hours={hours} /><SystemLogPanel hours={hours} /><FrontendLogPanel key={hours} hours={hours} /></>}
                     <div className="grid grid-cols-1 gap-5 min-[701px]:grid-cols-2">
                         {(mode === 'ai'
                             ? aiMetrics
@@ -244,9 +245,9 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                                 <tbody>
                                     {logs.map((row, index) => (
                                         <tr key={row.id ?? `${row.time}-${index}`}>
-                                            <td>{date(row.time)}</td>
-                                            <td>{row.model}</td>
-                                            <td>{row.status}</td>
+                                            <td>{new Date(row.time).toLocaleString(i18n.language, { timeZone: 'Asia/Ho_Chi_Minh' })}</td>
+                                            <td>{row.model}<span className="mt-1 block font-mono text-[10px] text-store-muted" title={row.id}>{row.id}</span></td>
+                                            <td><span className={`rounded-full px-2 py-1 font-semibold ${row.status === 'FAILED' ? 'bg-red-50 text-red-700' : row.status === 'SUCCEEDED' ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-800'}`}>{row.status}</span></td>
                                             <td>
                                                 {row.durationMs === null
                                                     ? '—'

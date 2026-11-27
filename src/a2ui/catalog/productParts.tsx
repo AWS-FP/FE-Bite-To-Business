@@ -60,14 +60,22 @@ export function Rating({ product }: { product: A2uiProduct }) {
 
 /** Giá theo đơn vị bán; có sale thì hiện giá gạch. Chưa có giá thì báo rõ, không hiện 0đ. */
 export function Price({ product }: { product: A2uiProduct }) {
+    const { i18n } = useTranslation();
+    const en = i18n.resolvedLanguage?.startsWith('en');
     const price = unitPrice(product);
     if (!product.priceAvailable || price == null) {
-        return <span className="text-xs text-store-muted">Chưa cập nhật giá</span>;
+        return (
+            <span className="text-xs text-store-muted">
+                {en ? 'Price unavailable' : 'Chưa cập nhật giá'}
+            </span>
+        );
     }
     return (
         <span className="flex flex-wrap items-baseline gap-1">
             <strong className="text-sm text-store-green">{formatCurrencyVnd(price)}</strong>
-            <span className="text-xs text-store-muted">/{unitLabel(product.unitCode)}</span>
+            <span className="text-xs text-store-muted">
+                /{unitLabel(product.unitCode, en ? 'en' : 'vi')}
+            </span>
             {product.saleActive && product.listPrice != null && product.listPrice > price && (
                 <s className="text-xs text-store-muted">{formatCurrencyVnd(product.listPrice)}</s>
             )}
@@ -77,24 +85,32 @@ export function Price({ product }: { product: A2uiProduct }) {
 
 /** Nhãn còn hàng/hết hàng/chưa rõ tồn, tính từ availableQuantity backend gửi. */
 export function Stock({ product }: { product: A2uiProduct }) {
+    const { i18n } = useTranslation();
+    const en = i18n.resolvedLanguage?.startsWith('en');
     if (product.availableQuantity == null) {
-        return <span className="text-xs text-store-muted">Chưa rõ tồn kho</span>;
+        return (
+            <span className="text-xs text-store-muted">
+                {en ? 'Stock unavailable' : 'Chưa rõ tồn kho'}
+            </span>
+        );
     }
     return inStock(product) ? (
         <span className="inline-flex items-center gap-1 text-xs font-semibold text-green-700">
-            <CheckCircle2 size={12} aria-hidden="true" /> Còn hàng
+            <CheckCircle2 size={12} aria-hidden="true" /> {en ? 'In stock' : 'Còn hàng'}
         </span>
     ) : (
         <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-700">
-            <PackageX size={12} aria-hidden="true" /> Hết hàng
+            <PackageX size={12} aria-hidden="true" /> {en ? 'Out of stock' : 'Hết hàng'}
         </span>
     );
 }
 
 /** Bảng giá theo bậc số lượng (priceTiers); không có bậc thì không hiện gì. */
 export function Tiers({ product }: { product: A2uiProduct }) {
+    const { i18n } = useTranslation();
+    const en = i18n.resolvedLanguage?.startsWith('en');
     if (!product.priceTiers?.length) return null;
-    const unit = unitLabel(product.unitCode);
+    const unit = unitLabel(product.unitCode, en ? 'en' : 'vi');
     return (
         <table className="mt-1 w-full text-xs">
             <tbody>
@@ -102,7 +118,7 @@ export function Tiers({ product }: { product: A2uiProduct }) {
                     <tr key={tier.minQuantity} className="border-t border-store-line/70">
                         <td className="py-1 text-store-muted">
                             {tier.maxQuantity == null
-                                ? `Từ ${tier.minQuantity} ${unit}`
+                                ? `${en ? 'From' : 'Từ'} ${tier.minQuantity} ${unit}`
                                 : `${tier.minQuantity}–${tier.maxQuantity} ${unit}`}
                         </td>
                         <td className="py-1 text-right font-semibold">
@@ -124,14 +140,16 @@ export function AddButton({
     product: A2uiProduct;
 }) {
     const disabled = !inStock(product) || !product.priceAvailable;
+    const { i18n } = useTranslation();
+    const en = i18n.resolvedLanguage?.startsWith('en');
     return (
         <button
             type="button"
             disabled={disabled}
             onClick={() => addToCart(context, product)}
-            className="inline-flex items-center gap-1 rounded bg-store-green px-2 py-1 text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border-0 bg-store-green px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-store-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-store-green disabled:cursor-not-allowed disabled:opacity-40"
         >
-            <Plus size={12} aria-hidden="true" /> Thêm vào giỏ
+            <Plus size={14} aria-hidden="true" /> {en ? 'Add to cart' : 'Thêm vào giỏ'}
         </button>
     );
 }
@@ -151,27 +169,27 @@ export function ProductTile({
     showAdd: boolean;
 }) {
     return (
-        <article className="flex min-w-0 flex-col overflow-hidden rounded border border-store-line bg-white">
+        <article className="flex min-w-0 flex-col overflow-hidden rounded-2xl border border-store-line bg-white shadow-sm transition-shadow hover:shadow-md">
             <button
                 type="button"
                 onClick={() => viewProduct(context, product)}
-                className={`block w-full bg-store-cream ${compact ? 'h-16' : 'h-28'}`}
+                className={`block w-full border-0 bg-[#fafaf6] p-3 ${compact ? 'h-24' : 'h-44'}`}
                 aria-label={product.name}
             >
                 {product.imageUrl ? (
                     <img
                         src={product.imageUrl}
                         alt=""
-                        className="size-full object-cover"
+                        className="size-full object-contain"
                         loading="lazy"
                     />
                 ) : null}
             </button>
-            <div className="flex flex-1 flex-col gap-1 p-2">
+            <div className="flex flex-1 flex-col gap-2.5 p-4">
                 <button
                     type="button"
                     onClick={() => viewProduct(context, product)}
-                    className="line-clamp-2 border-0 bg-transparent p-0 text-left text-xs font-semibold text-black hover:underline"
+                    className="line-clamp-2 min-h-10 border-0 bg-transparent p-0 text-left text-sm font-semibold leading-5 text-store-ink hover:underline"
                 >
                     {product.name}
                 </button>
@@ -183,7 +201,7 @@ export function ProductTile({
                 <Stock product={product} />
                 {showTiers && <Tiers product={product} />}
                 {showAdd && (
-                    <div className="mt-auto pt-1">
+                    <div className="mt-auto pt-3">
                         <AddButton context={context} product={product} />
                     </div>
                 )}

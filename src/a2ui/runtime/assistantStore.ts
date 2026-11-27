@@ -9,6 +9,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { applyA2ui } from './a2uiRuntime';
 import { AgentHttpError, runAgent, type AgentEvent, type AgentState } from '../client/agentClient';
 import { trackEvent } from '../telemetry/interactionTracker';
+import { safeAssistantText } from './assistantText';
 
 export type ChatEntry = {
     id: string;
@@ -27,7 +28,7 @@ type AssistantState = {
     agentState: AgentState;
     busy: boolean;
     open: boolean;
-    pendingPage: string | null;
+    pendingPage: { prompt: string; subject?: string; view?: 'table' } | null;
     setOpen: (open: boolean) => void;
     send: (text: string, locale: 'vi' | 'en') => Promise<void>;
     /** Ghi chú cục bộ (vd. đã thêm vào giỏ) — không gửi cho model như lời trợ lý. */
@@ -79,6 +80,7 @@ export const useAssistantStore = create<AssistantState>()(
                 const reply: ChatEntry = { id: newId(), role: 'assistant' };
                 const started = performance.now();
                 let firstSurfaceMs: number | null = null;
+                let rawResponseText = '';
                 const push = (patch: Partial<ChatEntry>) =>
                     set((state) => {
                         if (state.threadId !== threadId) return state;
@@ -96,12 +98,26 @@ export const useAssistantStore = create<AssistantState>()(
                 const onEvent = (event: AgentEvent) => {
                     if (get().threadId !== threadId) return;
                     if (event.type === 'CUSTOM' && event.name === 'open_ai_page') {
-                        const value = event.value as { prompt?: unknown };
+                        const value = event.value as {
+                            prompt?: unknown;
+                            subject?: unknown;
+                            view?: unknown;
+                        };
                         if (typeof value?.prompt === 'string' && value.prompt.trim()) {
-                            set({ pendingPage: value.prompt });
+                            set({
+                                pendingPage: {
+                                    prompt: value.prompt,
+                                    subject:
+                                        typeof value.subject === 'string'
+                                            ? value.subject
+                                            : undefined,
+                                    view: value.view === 'table' ? 'table' : undefined,
+                                },
+                            });
                         }
                     } else if (event.type === 'TEXT_MESSAGE_CONTENT') {
-                        push({ text: (reply.text ?? '') + event.delta });
+                        rawResponseText += event.delta;
+                        push({ text: safeAssistantText(rawResponseText, locale) });
                     } else if (
                         event.type === 'CUSTOM' &&
                         event.name === 'a2ui' &&
@@ -173,7 +189,17 @@ export const useAssistantStore = create<AssistantState>()(
             }),
             // Dựng lại các surface hợp lệ gần nhất từ message đã lưu.
             onRehydrateStorage: () => (state) => {
-                state?.entries.forEach((entry) => entry.a2ui && applyA2ui(entry.a2ui));
+                state?.entries.forEach((entry) => {
+                    if (entry.role === 'assistant' && entry.text) {
+                        const safe = safeAssistantText(entry.text, state.agentState.locale);
+                        if (safe !== entry.text) {
+                            entry.text = safe;
+                            entry.a2ui = undefined;
+                            entry.surfaceId = undefined;
+                        }
+                    }
+                    if (entry.a2ui) applyA2ui(entry.a2ui);
+                });
             },
         },
     ),
