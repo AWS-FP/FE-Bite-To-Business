@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from 'react';
 export default function LandingCarousel() {
     const { t } = useTranslation('storefront');
     const isLoggedIn = useAuthStore((state) => Boolean(state.session?.user));
+    const restoring = useAuthStore((state) => state.restoring);
+    const guest = !isLoggedIn && !restoring;
     const [slide, setSlide] = useState(0);
     const [progress, setProgress] = useState(0);
     const [playing, setPlaying] = useState(true);
@@ -30,7 +32,6 @@ export default function LandingCarousel() {
     return (
         <div className="mb-8 text-left">
             <div className="relative h-[650px] w-full overflow-hidden sm:h-[570px] lg:h-[500px] rounded-[var(--radius-lg)] border border-solid border-store-line bg-store-dark shadow-sm" id="heroCarouselViewport">
-                <span className="pointer-events-none absolute top-9 right-5 z-[25] rounded-full bg-black/45 px-3 py-1 text-[10px] font-semibold tracking-wide text-white/85 backdrop-blur-sm">{t('landing.carousel.illustration')}</span>
                 <div className="absolute top-4 right-5 left-5 z-20 grid grid-cols-5 gap-2">
                     <div
                         className="h-[5px] cursor-pointer overflow-hidden rounded-full bg-store-cream/35"
@@ -408,8 +409,8 @@ export default function LandingCarousel() {
                                     justifyContent: 'center',
                                 }}
                             >
-                                <a href={isLoggedIn ? "#categories" : "#onboarding-cta"} className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-solid border-store-line px-6 py-3 font-body text-[15px] font-bold no-underline shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm bg-store-yellow text-store-ink">
-                                    {t(isLoggedIn ? 'introPages.hero.catalog' : 'landing.carousel.openAccount')}{' '}
+                                <a href={guest ? "#onboarding-cta" : "#categories"} className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-solid border-store-line px-6 py-3 font-body text-[15px] font-bold no-underline shadow-sm transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-sm bg-store-yellow text-store-ink">
+                                    {t(guest ? 'landing.carousel.openAccount' : 'introPages.hero.catalog')}{' '}
                                     <img
                                         className="h-4 w-4 shrink-0 object-contain"
                                         src="/icons/arrow-right.svg"
@@ -452,21 +453,6 @@ export default function LandingCarousel() {
                             src={playing ? '/icons/pause.svg' : '/icons/play.svg'}
                             alt=""
                             aria-hidden="true"
-                        />
-                    </button>
-                    <button
-                        type="button"
-                        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-2 border-solid border-store-ink bg-store-cream text-[15px] text-store-ink shadow-sm transition-colors hover:bg-store-coral hover:text-white"
-                        id="btnMuteCarousel"
-                        disabled
-                        title={t('landing.carousel.muted')}
-                        aria-label={t('landing.carousel.muted')}
-                    >
-                        <img
-                            src="/icons/volume-off.svg"
-                            alt=""
-                            aria-hidden="true"
-                            className="h-4 w-4 shrink-0 object-contain"
                         />
                     </button>
                 </div>

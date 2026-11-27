@@ -22,6 +22,8 @@
         "coupons": "Coupons",
         "inventory": "Inventory",
         "productRequests": "Product requests",
+        "quotes": "B2B quotes",
+        "cancellationRequests": "Cancellation requests",
         "trips": "Delivery trips"
     }
 }

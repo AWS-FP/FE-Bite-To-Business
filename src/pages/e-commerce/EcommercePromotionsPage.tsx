@@ -1,3 +1,5 @@
+import ExecutiveTranslatedField from '@/components/e-commerce/ExecutiveTranslatedField';
+import { useExecutiveConfirmation } from '@/hooks/e-commerce/useExecutiveConfirmation';
 import { ExecutiveCampaignSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -65,6 +67,8 @@ async function preparePromotionImage(file: File): Promise<File> {
 }
 
 export default function EcommercePromotionsPage() {
+    const confirm = useExecutiveConfirmation();
+    const [translationSession, setTranslationSession] = useState(0);
     const tr = useExecutiveText(),
         qc = useQueryClient();
     const [status, setStatus] = useState(''),
@@ -114,6 +118,7 @@ export default function EcommercePromotionsPage() {
         setPromotionType('STANDARD');
     }
     function edit(p: Promotion) {
+        setTranslationSession(value => value + 1);
         setEditId(p.id);
         setVi(p.nameVi);
         setEn(p.nameEn);
@@ -344,13 +349,12 @@ export default function EcommercePromotionsPage() {
                     )}
                 >
                     <form onSubmit={submit} className="grid gap-4 p-5 md:grid-cols-2">
-                        <label className="text-xs font-bold md:col-span-2">
-                            {tr('Loại chiến dịch', 'Campaign type')}
-                            <select
-                                className={`${executiveUi.input} mt-2`}
+                        <div className="md:col-span-2">
+                            <ExecutiveSelect
+                                label={tr('Loại chiến dịch', 'Campaign type')}
                                 value={promotionType}
-                                onChange={(e) =>
-                                    setPromotionType(e.target.value as 'STANDARD' | 'FLASH_SALE')
+                                onValueChange={(value) =>
+                                    setPromotionType(value as 'STANDARD' | 'FLASH_SALE')
                                 }
                             >
                                 <option value="STANDARD">
@@ -365,7 +369,7 @@ export default function EcommercePromotionsPage() {
                                         'Flash Sale (max 72 hours)',
                                     )}
                                 </option>
-                            </select>
+                            </ExecutiveSelect>
                             <span className="mt-2 block text-[11px] font-normal text-[#6b7972]">
                                 {promotionType === 'FLASH_SALE'
                                     ? tr(
@@ -377,45 +381,11 @@ export default function EcommercePromotionsPage() {
                                           'Long-term promotions do not appear in Flash Sale.',
                                       )}
                             </span>
-                        </label>
-                        <label className="text-xs font-bold">
-                            {tr('Tên tiếng Việt', 'Vietnamese title')}
-                            <input
-                                className={`${executiveUi.input} mt-2`}
-                                maxLength={200}
-                                required
-                                value={vi}
-                                onChange={(e) => setVi(e.target.value)}
-                            />
-                        </label>
-                        <label className="text-xs font-bold">
-                            {tr('Tên tiếng Anh', 'English title')}
-                            <input
-                                className={`${executiveUi.input} mt-2`}
-                                maxLength={200}
-                                required
-                                value={en}
-                                onChange={(e) => setEn(e.target.value)}
-                            />
-                        </label>
-                        <label className="text-xs font-bold">
-                            {tr('Nội dung tiếng Việt', 'Vietnamese description')}
-                            <textarea
-                                rows={3}
-                                className={`${executiveUi.input} mt-2 !h-auto py-3`}
-                                value={contentVi}
-                                onChange={(e) => setContentVi(e.target.value)}
-                            />
-                        </label>
-                        <label className="text-xs font-bold">
-                            {tr('Nội dung tiếng Anh', 'English description')}
-                            <textarea
-                                rows={3}
-                                className={`${executiveUi.input} mt-2 !h-auto py-3`}
-                                value={contentEn}
-                                onChange={(e) => setContentEn(e.target.value)}
-                            />
-                        </label>
+                        </div>
+                        <ExecutiveTranslatedField label={tr('Tên tiếng Việt', 'Vietnamese title')} value={vi} source={en} sourceLanguage="en" field="NAME" limit={200} session={`${editId ?? 'new'}:${translationSession}`} onChange={setVi} disabled={save.isPending} required />
+                        <ExecutiveTranslatedField label={tr('Tên tiếng Anh', 'English title')} value={en} source={vi} sourceLanguage="vi" field="NAME" limit={200} session={`${editId ?? 'new'}:${translationSession}`} onChange={setEn} disabled={save.isPending} required />
+                        <ExecutiveTranslatedField label={tr('Nội dung tiếng Việt', 'Vietnamese description')} value={contentVi} source={contentEn} sourceLanguage="en" field="DESCRIPTION" limit={2000} session={`${editId ?? 'new'}:${translationSession}`} onChange={setContentVi} disabled={save.isPending} multiline />
+                        <ExecutiveTranslatedField label={tr('Nội dung tiếng Anh', 'English description')} value={contentEn} source={contentVi} sourceLanguage="vi" field="DESCRIPTION" limit={2000} session={`${editId ?? 'new'}:${translationSession}`} onChange={setContentEn} disabled={save.isPending} multiline />
                         <label className="text-xs font-bold">
                             {tr('Bắt đầu', 'Starts')}
                             <input
@@ -666,15 +636,10 @@ export default function EcommercePromotionsPage() {
                                                         p.status === 'PUBLISHED'
                                                             ? 'disable'
                                                             : 'publish';
-                                                    if (
-                                                        window.confirm(
-                                                            tr(
+                                                    void confirm(tr(
                                                                 'Xác nhận thay đổi trạng thái chiến dịch?',
                                                                 'Change campaign status?',
-                                                            ),
-                                                        )
-                                                    )
-                                                        action.mutate({ id: p.id, type });
+                                                            ), () => action.mutateAsync({ id: p.id, type }));
                                                 }}
                                             >
                                                 {p.status === 'PUBLISHED'
@@ -687,18 +652,13 @@ export default function EcommercePromotionsPage() {
                                                 className={executiveUi.secondary}
                                                 disabled={action.isPending}
                                                 onClick={() => {
-                                                    if (
-                                                        window.confirm(
-                                                            tr(
+                                                    void confirm(tr(
                                                                 'Lưu trữ chiến dịch này?',
                                                                 'Archive this campaign?',
-                                                            ),
-                                                        )
-                                                    )
-                                                        action.mutate({
+                                                            ), () => action.mutateAsync({
                                                             id: p.id,
                                                             type: 'archive',
-                                                        });
+                                                        }), { danger: true });
                                                 }}
                                             >
                                                 {tr('Lưu trữ', 'Archive')}
@@ -713,16 +673,10 @@ export default function EcommercePromotionsPage() {
                                                     }
                                                     className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-rose-300 bg-white px-4 py-2 text-xs font-bold text-rose-700 hover:bg-rose-50 disabled:opacity-50"
                                                     onClick={() => {
-                                                        if (
-                                                            window.confirm(
-                                                                tr(
+                                                        void confirm(tr(
                                                                     `Bạn có chắc muốn xóa chiến dịch "${p.nameVi}"? Hành động này không thể hoàn tác. Liên kết sản phẩm sẽ được gỡ, giá sale không đổi.`,
                                                                     `Are you sure you want to delete "${p.nameEn}"? This cannot be undone. Product links will be removed; sale prices stay unchanged.`,
-                                                                ),
-                                                            )
-                                                        ) {
-                                                            removeCampaign.mutate(p.id);
-                                                        }
+                                                                ), () => removeCampaign.mutateAsync(p.id), { danger: true });
                                                     }}
                                                 >
                                                     <Trash2 size={15} />

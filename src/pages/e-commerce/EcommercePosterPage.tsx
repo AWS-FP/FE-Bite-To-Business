@@ -1,3 +1,4 @@
+import { useExecutiveConfirmation } from '@/hooks/e-commerce/useExecutiveConfirmation';
 import Skeleton from '@/components/common/Skeleton';
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -57,6 +58,7 @@ async function loadCampaigns(): Promise<Promotion[]> {
 }
 
 export default function EcommercePosterPage() {
+    const confirm = useExecutiveConfirmation();
     const tr = useExecutiveText();
     const qc = useQueryClient();
     const [promotionId, setPromotionId] = useState('');
@@ -297,15 +299,10 @@ export default function EcommercePosterPage() {
                         <button
                             type="button"
                             onClick={() => {
-                                if (
-                                    window.confirm(
-                                        tr(
+                                void confirm(tr(
                                             'Tải ảnh đã cắt và cập nhật chiến dịch?',
                                             'Upload cropped image and update campaign?',
-                                        ),
-                                    )
-                                )
-                                    upload.mutate();
+                                        ), () => upload.mutateAsync());
                             }}
                             disabled={!file || !promotion || upload.isPending || promos.isPending}
                             className={`${executiveUi.button} w-full`}

@@ -26,7 +26,7 @@ type Decision =
 
 const money = (value: number | null) => (value == null ? '—' : `${Number(value).toLocaleString('vi-VN')}đ`);
 
-export default function EcommerceRefundsPage() {
+export default function LogisticsCancellationsPage() {
     const tr = useExecutiveText(),
         qc = useQueryClient();
     const [status, setStatus] = useState('REQUESTED'),

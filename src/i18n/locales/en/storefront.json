@@ -892,6 +892,10 @@
         "bestSellingEmpty": "No best sellers yet from orders completed in the last 30 days.",
         "deepDiscountEmpty": "Discounted products will appear here when new offers go live.",
         "topRatedEmpty": "Top-rated products will appear here as customers share their reviews.",
+        "promotionPage": {
+            "title": "Promotion",
+            "unavailable": "This promotion is unavailable or has ended."
+        },
         "groupEmpty": "No qualifying products yet. This will update when new data is available.",
         "flashComingSoon": "Offers are being prepared",
         "flashEmptyHint": "Products will appear here when a real flash sale goes live.",
@@ -1286,6 +1290,35 @@
         },
         "toast": {
             "added": "Added \"{{item}}\" to the sample quote. Not saved to the server."
+        },
+        "live": {
+            "brandsTitle": "Brands available at BTB",
+            "brandsLoading": "Loading brands…",
+            "brandsEmpty": "No brands with published products are currently available.",
+            "pauseBrands": "Pause",
+            "resumeBrands": "Resume",
+            "catalogDescription": "Discover products currently offered at BTB. Images, prices and stock information come from our live catalog.",
+            "catalogTitle": "Products in our catalog",
+            "categoriesError": "Could not load product categories.",
+            "viewMode": "Product display mode",
+            "pricingLoading": "Loading prices…",
+            "pricingError": "Some price or stock information could not be loaded.",
+            "stockUnknown": "Stock information unavailable",
+            "available": "{{count}} {{unit}} available",
+            "details": "View details",
+            "exploreMore": "Explore the full catalog or request a product you need.",
+            "browseCatalog": "Explore products",
+            "myOrders": "My orders",
+            "shoppingStep1": "Choose ingredients",
+            "shoppingStep1Text": "Find products, pack sizes and prices that suit your purchasing needs.",
+            "shoppingStep2": "Prepare your purchase",
+            "shoppingStep2Text": "Choose quantities and organize delivery addresses.",
+            "shoppingStep3": "Track your orders",
+            "shoppingStep3Text": "View order progress and delivery information in your account.",
+            "signedIn": "You are signed in.",
+            "solutionTitle": "From our catalog to your kitchen",
+            "solutionDescription": "Choose real products, view current prices and prepare your purchase with one food supplier.",
+            "volumeTiers": "Quantity price tiers (before offers)"
         }
     },
     "searchHistory": {

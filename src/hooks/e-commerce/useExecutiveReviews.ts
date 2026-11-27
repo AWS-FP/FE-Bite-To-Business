@@ -1,3 +1,4 @@
+import { useExecutiveConfirmation } from '@/hooks/e-commerce/useExecutiveConfirmation';
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { executiveApi } from '@/services/e-commerce/executiveAdminService';
@@ -14,6 +15,7 @@ type ModerationInput = {
 /** All review moderation state and destructive operations stay outside the UI component. */
 export function useExecutiveReviews() {
     const tr = useExecutiveText();
+    const confirm = useExecutiveConfirmation();
     const qc = useQueryClient();
     const ownUserId = useAuthStore((state) => state.session?.user?.id);
     const [status, setStatus] = useState('');
@@ -76,25 +78,23 @@ export function useExecutiveReviews() {
 
     function hide(id: string) {
         if (busy) return;
-        const reason = window.prompt(
-            tr('Nhập lý do ẩn đánh giá (bắt buộc):', 'Enter a reason for hiding the review:'),
-        );
-        if (reason?.trim()) moderation.mutate({ id, action: 'HIDE', reason: reason.trim() });
+        void confirm(tr('Ẩn đánh giá khỏi khách hàng?', 'Hide this review from customers?'),
+            reason => moderation.mutateAsync({ id, action: 'HIDE', reason }),
+            { title: tr('Ẩn đánh giá', 'Hide review'), reasonLabel: tr('Lý do ẩn (bắt buộc)', 'Reason (required)') });
     }
 
     function restore(id: string) {
-        if (!busy) moderation.mutate({ id, action: 'RESTORE' });
+        if (busy) return;
+        void confirm(tr('Hiển thị lại đánh giá này?', 'Make this review visible again?'),
+            () => moderation.mutateAsync({ id, action: 'RESTORE' }));
     }
 
     function remove(id: string) {
         if (busy) return;
-        const confirmed = window.confirm(
-            tr(
-                'Xóa vĩnh viễn đánh giá này? Không thể khôi phục sau khi xóa. Nếu chỉ muốn ẩn khỏi khách hàng, hãy chọn “Ẩn đánh giá”.',
-                'Permanently delete this review? This cannot be undone. Use "Hide review" to remove it from public view temporarily.',
-            ),
-        );
-        if (confirmed) deletion.mutate(id);
+        void confirm(tr(
+            'Xóa vĩnh viễn đánh giá này? Không thể khôi phục sau khi xóa. Nếu chỉ muốn ẩn khỏi khách hàng, hãy chọn “Ẩn đánh giá”.',
+            'Permanently delete this review? This cannot be undone. Use "Hide review" to remove it from public view temporarily.',
+        ), () => deletion.mutateAsync(id), { danger: true, title: tr('Xóa đánh giá', 'Delete review') });
     }
 
     return {

@@ -1,7 +1,8 @@
+import { useExecutiveConfirmation } from '@/hooks/e-commerce/useExecutiveConfirmation';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import PromotionImageCropper from '@/components/e-commerce/PromotionImageCropper';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Boxes, ImagePlus, Plus, Save, Languages } from 'lucide-react';
+import { Boxes, ImagePlus, Plus, Save } from 'lucide-react';
 import { executiveUi } from '@/constants/e-commerce/executiveUi';
 import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 import {
@@ -23,11 +24,10 @@ import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
 import type { ComboStatus, ComboWrite, ExecutiveCombo } from '@/types/e-commerce/executiveCombo';
 import { ExecutiveComboSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/router/routes';
 import type { TranslationField } from '@/types/logistic/translation';
-import { suggestTranslation } from '@/services/logistic/translationService';
+import ExecutiveTranslationSuggestion from '@/components/e-commerce/ExecutiveTranslationSuggestion';
 import { invalidatePublicCatalog } from '@/hooks/customer/useCatalogQuery';
 
 const emptyForm = {
@@ -54,92 +54,12 @@ const emptyForm = {
     originContentVi: '',
     originContentEn: '',
 };
-function ComboTranslation({
-    source,
-    field,
-    disabled,
-    onAccept,
-}: {
-    source: string;
-    field: TranslationField;
-    disabled: boolean;
-    onAccept: (text: string) => void;
-}) {
-    const tr = useExecutiveText();
-    const text = source.trim();
-    const limit = field === 'NAME' ? 200 : 2000;
-    const translation = useMutation({
-        mutationFn: (value: string) => suggestTranslation(value, 'vi', field, undefined, 55_000),
-    });
-    const failure = axios.isAxiosError(translation.error) ? translation.error : null;
-    const errorStatus = failure?.response?.status;
-    const errorText = failure?.code === 'ECONNABORTED' || failure?.code === 'ETIMEDOUT'
-        ? tr('Dịch thuật quá thời gian chờ. Vui lòng thử lại.', 'Translation timed out. Please retry.')
-        : errorStatus === 401 || errorStatus === 403
-          ? tr('Phiên đăng nhập hoặc quyền dịch thuật không hợp lệ.', 'Translation session or permissions are invalid.')
-          : errorStatus === 429
-            ? tr('Đã vượt giới hạn yêu cầu dịch. Vui lòng thử lại sau.', 'Translation request limit reached. Retry later.')
-            : errorStatus === 503
-              ? tr('Dịch vụ dịch thuật tạm thời không khả dụng.', 'Translation service is temporarily unavailable.')
-              : tr('Chưa lấy được gợi ý dịch. Vui lòng thử lại hoặc nhập thủ công.', 'Unable to get a translation. Retry or enter it manually.');
-    const current = translation.variables === text;
-    const suggestion = current ? translation.data?.trim() : undefined;
-    return (
-        <div className="mt-2 space-y-2">
-            <button
-                type="button"
-                className={executiveUi.secondary}
-                disabled={disabled || translation.isPending || !text || text.length > 2000}
-                onClick={() => translation.mutate(text)}
-            >
-                <Languages size={15} aria-hidden="true" />
-                {translation.isPending
-                    ? tr('Đang dịch…', 'Translating…')
-                    : tr('Gợi ý dịch sang Anh', 'Suggest English translation')}
-            </button>
-            {text.length > 2000 && (
-                <p className="m-0 text-xs text-store-muted">
-                    {tr(
-                        'Dịch tự động hỗ trợ tối đa 2.000 ký tự. Có thể nhập bản dịch thủ công.',
-                        'Translation supports up to 2,000 characters. You can enter the translation manually.',
-                    )}
-                </p>
-            )}
-            {current && translation.isError && (
-                <p role="alert" className="m-0 text-xs text-red-700">
-                    {errorText}
-                </p>
-            )}
-            {suggestion && (
-                <div className="space-y-2 rounded-xl border border-store-green/20 bg-[#f0f5f1] p-3 text-sm">
-                    <p className="m-0 whitespace-pre-wrap break-words font-normal">{suggestion}</p>
-                    {suggestion.length > limit ? (
-                        <p className="m-0 text-xs text-red-700">
-                            {tr(
-                                'Bản dịch quá dài, vui lòng rút gọn thủ công.',
-                                'Translation is too long. Please shorten it manually.',
-                            )}
-                        </p>
-                    ) : (
-                        <button
-                            type="button"
-                            disabled={disabled}
-                            className={executiveUi.secondary}
-                            onClick={() => {
-                                onAccept(suggestion);
-                                translation.reset();
-                            }}
-                        >
-                            {tr('Dùng gợi ý', 'Use suggestion')}
-                        </button>
-                    )}
-                </div>
-            )}
-        </div>
-    );
+function ComboTranslation({ source, field, disabled, onAccept }: { source: string; field: TranslationField; disabled: boolean; onAccept: (text: string) => void }) {
+    return <ExecutiveTranslationSuggestion key={JSON.stringify([source, field])} source={source} language="vi" field={field} limit={field === 'NAME' ? 200 : 2000} disabled={disabled} onAccept={onAccept} />;
 }
 
 export default function EcommerceCombosPage() {
+    const confirm = useExecutiveConfirmation();
     const tr = useExecutiveText(),
         qc = useQueryClient();
     const [page, setPage] = useState(0);
@@ -413,17 +333,12 @@ export default function EcommerceCombosPage() {
     }
     function changeStatus(combo: ExecutiveCombo, next: ComboStatus) {
         if (open) return;
-        if (
-            window.confirm(
-                next === 'PUBLISHED'
+        void confirm(next === 'PUBLISHED'
                     ? tr(
                           'Hiển thị combo trên catalog và trang chủ?',
                           'Publish this combo to catalog and homepage?',
                       )
-                    : tr('Xác nhận thay đổi trạng thái?', 'Confirm status change?'),
-            )
-        )
-            status.mutate({ id: combo.id, status: next });
+                    : tr('Xác nhận thay đổi trạng thái?', 'Confirm status change?'), () => status.mutateAsync({ id: combo.id, status: next }), { danger: next === 'ARCHIVED' });
     }
     const statusLabel = (value: ComboStatus) =>
         value === 'PUBLISHED'

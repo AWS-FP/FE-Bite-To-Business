@@ -11,6 +11,7 @@ export const ROUTES = {
     CATALOG: '/products',
     AI_PAGE: '/ai',
     CUSTOMER_COLLECTION: '/collections/:kind',
+    CUSTOMER_PROMOTION: '/promotions/:promotionId',
     PRODUCT_DETAIL: '/products/:productId',
 
     BRANDS: '/brands',
@@ -43,7 +44,6 @@ export const ROUTES = {
 
     ECOMMERCE: '/e-commerce',
     ECOMMERCE_DASHBOARD: '/e-commerce/dashboard',
-    ECOMMERCE_QUOTES: '/e-commerce/quotes',
     ECOMMERCE_POSTER: '/e-commerce/poster',
     ECOMMERCE_PRODUCTS: '/e-commerce/products',
     ECOMMERCE_COMBOS: '/e-commerce/combos',
@@ -51,10 +51,11 @@ export const ROUTES = {
     ECOMMERCE_COUPONS: '/e-commerce/coupons',
     ECOMMERCE_REQUESTS: '/e-commerce/product-requests',
     ECOMMERCE_REVIEWS: '/e-commerce/reviews',
-    ECOMMERCE_REFUNDS: '/e-commerce/cancellations',
 
     LOGISTICS: '/logistics',
     LOGISTICS_INVENTORY: '/logistics/inventory',
+    LOGISTICS_QUOTES: '/logistics/quotes',
+    LOGISTICS_CANCELLATIONS: '/logistics/cancellations',
     LOGISTICS_RECEIVE: '/logistics/receive',
     LOGISTICS_PRODUCT_REQUESTS: '/logistics/product-requests',
 
@@ -100,6 +101,7 @@ export function getWorkspaceHome(role: UserRole) {
 
 // Encode từng ID để ký tự /, ?, # không làm sai URL khi điều hướng.
 export const routePaths = {
+    promotionDetail: (promotionId: string) => `/promotions/${encodeURIComponent(promotionId)}`,
     productDetail: (productId: string) => `/products/${encodeURIComponent(productId)}`,
     quoteDetail: (quoteId: string) => `/quotes/${encodeURIComponent(quoteId)}`,
     orderDetail: (orderId: string) => `/orders/${encodeURIComponent(orderId)}`,

@@ -1,18 +1,16 @@
 import { useTranslation } from 'react-i18next';
 /* Generated from the supplied HTML layout. Edit this section independently. */
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ROUTES } from '@/router/routes';
 
-export default function LandingBusinessSolution({
-    showToast,
-}: {
-    showToast: (key: string) => void;
-}) {
+export default function LandingBusinessSolution() {
     const { t } = useTranslation('storefront');
     const [openAccordion, setOpenAccordion] = useState(0);
     return (
         <section className="py-[72px]">
             <div className="mx-auto max-w-[1240px] px-6">
-                <div className="rounded-[var(--radius-lg)] border-[3px] border-solid border-store-yellow bg-store-ink px-12 py-14 text-store-cream shadow-[10px_10px_0_var(--color-store-dark)]">
+                <div className="rounded-[var(--radius-lg)] border-[3px] border-solid border-store-yellow bg-store-ink px-5 py-10 sm:px-12 sm:py-14 text-store-cream shadow-[10px_10px_0_var(--color-store-dark)]">
                     <div className="mx-auto mb-10 max-w-[680px] text-center [&_h2]:mb-4 [&_h2]:font-subheading [&_h2]:text-[clamp(28px,3.2vw,40px)] [&_h2]:font-bold [&_h2]:text-store-cream">
                         <h2>
                             {t('landing.solution.titleStart')}{' '}
@@ -40,102 +38,19 @@ export default function LandingBusinessSolution({
                             </span>
                         </a>
                     </div>
-                    <div className="grid grid-cols-2 items-center gap-9">
-                        <div className="rounded-[var(--radius-md)] border-[3px] border-solid border-store-ink bg-store-cream p-[22px] text-store-ink shadow-[6px_6px_0_var(--color-store-coral)]">
-                            <div className="mb-3.5 flex items-center justify-between border-b-2 border-solid border-store-ink pb-3">
-                                <div>
-                                    <div
-                                        style={{
-                                            fontSize: '11px',
-                                            fontWeight: '700',
-                                            color: 'var(--forest)',
-                                        }}
-                                    >
-                                        {t('landing.solution.draft')}
+                    <div className="grid grid-cols-1 items-center gap-9 lg:grid-cols-2">
+                        <div className="rounded-2xl bg-store-cream p-6 text-store-ink shadow-sm">
+                            <h3 className="font-subheading text-xl font-bold text-store-green">{t('landing.live.solutionTitle')}</h3>
+                            <p className="mt-3 text-sm leading-relaxed text-store-muted">{t('landing.live.solutionDescription')}</p>
+                            <div className="mt-5 grid gap-3">
+                                {['quickTitle', 'stockTitle', 'routeTitle', 'pricingTitle'].map((key) => (
+                                    <div key={key} className="flex items-center gap-3 rounded-lg bg-white px-4 py-3 text-sm font-semibold text-store-green">
+                                        <img src="/icons/check.svg" alt="" className="size-5 shrink-0 object-contain" />
+                                        {t(`landing.solution.${key}`)}
                                     </div>
-                                    <strong
-                                        style={{
-                                            fontFamily: 'var(--font-subheading)',
-                                            fontSize: '18px',
-                                        }}
-                                    >
-                                        {t('landing.solution.quoteTitle')}
-                                    </strong>
-                                </div>
-                                <span
-                                    style={{
-                                        background: 'var(--yellow-tint)',
-                                        color: 'var(--color-warning)',
-                                        fontSize: '11px',
-                                        fontWeight: '700',
-                                        padding: '4px 10px',
-                                        borderRadius: '99px',
-                                    }}
-                                >
-                                    {t('landing.solution.revision')}
-                                </span>
+                                ))}
                             </div>
-                            <div className="mb-2.5 flex items-center justify-between rounded-[var(--radius-sm)] border-2 border-solid border-store-ink bg-store-cream px-3.5 py-2.5 text-[13px] shadow-[3px_3px_0_var(--color-store-ink)]">
-                                <div>
-                                    <strong>{t('landing.solution.salmon')}</strong>
-                                    <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
-                                        {t('landing.solution.salmonNote')}
-                                    </div>
-                                </div>
-                                <div style={{ textAlign: 'right' }}>
-                                    <strong style={{ color: 'var(--forest)' }}>
-                                        {t('landing.solution.salmonPrice')}
-                                    </strong>
-                                    <div style={{ fontSize: '11px', color: 'var(--coral)' }}>
-                                        {t('landing.solution.salmonSavings')}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="mb-2.5 flex items-center justify-between rounded-[var(--radius-sm)] border-2 border-solid border-store-ink bg-store-cream px-3.5 py-2.5 text-[13px] shadow-[3px_3px_0_var(--color-store-ink)]">
-                                <div>
-                                    <strong>{t('landing.solution.springRolls')}</strong>
-                                    <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
-                                        {t('landing.solution.springRollNote')}
-                                    </div>
-                                </div>
-                                <div style={{ textAlign: 'right' }}>
-                                    <strong style={{ color: 'var(--forest)' }}>
-                                        {t('landing.solution.springRollPrice')}
-                                    </strong>
-                                    <div style={{ fontSize: '11px', color: 'var(--green-ok)' }}>
-                                        {t('landing.solution.stock')}
-                                    </div>
-                                </div>
-                            </div>
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    marginTop: '14px',
-                                    paddingTop: '12px',
-                                    borderTop: 'var(--border-subtle)',
-                                }}
-                            >
-                                <span style={{ fontSize: '12.5px', fontWeight: '600' }}>
-                                    {t('landing.solution.coupon')}{' '}
-                                    <code>MDFOOD10</code>{' '}
-                                    (-10%)
-                                </span>
-                                <button
-                                    type="button"
-                                    className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
-                                    id="btnMockupConfirmOrder"
-                                    style={{ padding: '8px 18px', fontSize: '13px' }}
-                                    onClick={() =>
-                                        showToast(
-                                            'landing.solution.confirmToast',
-                                        )
-                                    }
-                                >
-                                    {t('landing.solution.confirm')}
-                                </button>
-                            </div>
+                            <Link to={ROUTES.CATALOG} className="mt-6 inline-flex rounded-full bg-store-yellow px-5 py-3 text-sm font-bold text-store-ink hover:bg-store-yellow/80">{t('landing.live.browseCatalog')}</Link>
                         </div>
                         <div className="flex flex-col gap-3" id="featureAccordionList">
                             <div

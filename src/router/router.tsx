@@ -25,6 +25,7 @@ import BrandDetailPage from '@/pages/BrandDetailPage';
 import ProfilePage from '@/pages/customer/ProfilePage';
 import CustomerCatalogPage from '@/pages/customer/CustomerCatalogPage';
 import CustomerCollectionPage from '@/pages/customer/CustomerCollectionPage';
+import CustomerPromotionPage from '@/pages/customer/CustomerPromotionPage';
 import CustomerProductDetailPage from '@/pages/customer/CustomerProductDetailPage';
 import CustomerFavoritesPage from '@/pages/customer/CustomerFavoritesPage';
 import CartPage from '@/pages/CartPage';
@@ -65,13 +66,13 @@ import ProtectedRoute from './ProtectedRoute';
 import StorefrontRoleGuard from './StorefrontRoleGuard';
 import { ROUTES } from './routes';
 import EcommerceDashboardPage from '@/pages/e-commerce/EcommerceDashboardPage';
-import EcommerceQuotesPage from '@/pages/e-commerce/EcommerceQuotesPage';
+import LogisticsQuotesPage from '@/pages/logistic/LogisticsQuotesPage';
 import EcommerceProductsPage from '@/pages/e-commerce/EcommerceProductsPage';
 import EcommerceCombosPage from '@/pages/e-commerce/EcommerceCombosPage';
 import EcommercePromotionsPage from '@/pages/e-commerce/EcommercePromotionsPage';
 import EcommerceCouponsPage from '@/pages/e-commerce/EcommerceCouponsPage';
 import EcommerceReviewsPage from '@/pages/e-commerce/EcommerceReviewsPage';
-import EcommerceRefundsPage from '@/pages/e-commerce/EcommerceRefundsPage';
+import LogisticsCancellationsPage from '@/pages/logistic/LogisticsCancellationsPage';
 
 export const router = createBrowserRouter([
     {
@@ -146,6 +147,10 @@ export const router = createBrowserRouter([
                     {
                         path: ROUTES.CUSTOMER_COLLECTION,
                         Component: CustomerCollectionPage,
+                    },
+                    {
+                        path: ROUTES.CUSTOMER_PROMOTION,
+                        Component: CustomerPromotionPage,
                     },
                     {
                         path: ROUTES.PRODUCT_DETAIL,
@@ -285,7 +290,7 @@ export const router = createBrowserRouter([
                                 path: ROUTES.ECOMMERCE_DASHBOARD,
                                 Component: EcommerceDashboardPage,
                             },
-                            { path: ROUTES.ECOMMERCE_QUOTES, Component: EcommerceQuotesPage },
+                            { path: 'quotes', element: <Navigate to={ROUTES.ECOMMERCE_DASHBOARD} replace /> },
                             { path: ROUTES.ECOMMERCE_PRODUCTS, Component: EcommerceProductsPage },
                             { path: ROUTES.ECOMMERCE_COMBOS, Component: EcommerceCombosPage },
                             {
@@ -302,7 +307,7 @@ export const router = createBrowserRouter([
                                 element: <Navigate to={ROUTES.ECOMMERCE_DASHBOARD} replace />,
                             },
                             { path: ROUTES.ECOMMERCE_REVIEWS, Component: EcommerceReviewsPage },
-                            { path: ROUTES.ECOMMERCE_REFUNDS, Component: EcommerceRefundsPage },
+                            { path: 'cancellations', element: <Navigate to={ROUTES.ECOMMERCE_DASHBOARD} replace /> },
                         ],
                     },
                 ],
@@ -336,6 +341,8 @@ export const router = createBrowserRouter([
                                 path: ROUTES.LOGISTICS_PRODUCT_REQUESTS,
                                 Component: ProductRequestsPage,
                             },
+                            { path: ROUTES.LOGISTICS_QUOTES, Component: LogisticsQuotesPage },
+                            { path: ROUTES.LOGISTICS_CANCELLATIONS, Component: LogisticsCancellationsPage },
                         ],
                     },
                 ],
