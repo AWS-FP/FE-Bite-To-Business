@@ -84,7 +84,7 @@ export default function AssistantBubble() {
                         type="button"
                         onClick={reset}
                         title="Cuộc trò chuyện mới"
-                        className="rounded p-1.5 hover:bg-white/10"
+                        className="rounded border-0 bg-transparent p-1.5 text-white hover:bg-white/10"
                     >
                         <RotateCcw size={16} aria-hidden="true" />
                         <span className="sr-only">Cuộc trò chuyện mới</span>
@@ -92,7 +92,7 @@ export default function AssistantBubble() {
                     <button
                         type="button"
                         onClick={() => setOpen(false)}
-                        className="rounded p-1.5 hover:bg-white/10"
+                        className="rounded border-0 bg-transparent p-1.5 text-white hover:bg-white/10"
                     >
                         <X size={18} aria-hidden="true" />
                         <span className="sr-only">Đóng</span>
@@ -131,8 +131,7 @@ export default function AssistantBubble() {
                         className="inline-flex items-center gap-2 text-xs text-store-muted"
                         role="status"
                     >
-                        <Loader2 size={14} className="animate-spin" aria-hidden="true" /> AI đang
-                        tạo giao diện…
+                        <Loader2 size={14} className="animate-spin" aria-hidden="true" /> Đang tìm kiếm…
                     </p>
                 )}
             </div>

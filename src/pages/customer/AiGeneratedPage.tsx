@@ -2,17 +2,16 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { A2uiSurface } from '@a2ui/react/v0_9';
-import { ArrowLeft, Loader2, Network, RefreshCw, Sparkles } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
 import { getCatalogSearchPath } from '@/constants/catalogNavigation';
 import { AgentHttpError, runAgent, type AgentEvent } from '@/a2ui/client/agentClient';
-import { applyA2ui, getSurface, getSurfaceTree } from '@/a2ui/runtime/a2uiRuntime';
+import { applyA2ui, getSurface } from '@/a2ui/runtime/a2uiRuntime';
 import { personalizationEnabled, subscribePersonalization, trackEvent } from '@/a2ui/telemetry/interactionTracker';
 import { useAuthStore } from '@/store/admin/authStore';
-import WidgetTree from '@/a2ui/devtools/WidgetTree';
 
 const DEFAULT_PROMPT = 'Gợi ý trang mua sắm phù hợp với tôi';
-const CACHE_PREFIX = 'btb.aiPage:catalog5:';
+const CACHE_PREFIX = 'btb.aiPage:catalog6:';
 const CACHE_MS = 30 * 60 * 1000;
 
 type View = { status: 'loading' | 'ready' | 'error'; surfaceId?: string; error?: string };
@@ -46,7 +45,6 @@ export default function AiGeneratedPage() {
     const prompt = query || DEFAULT_PROMPT;
     const { i18n } = useTranslation();
     const locale = i18n.resolvedLanguage?.startsWith('en') ? 'en' : 'vi';
-    const [version, setVersion] = useState(0);
     const owner = useAuthStore((state) => state.session?.user.id);
     const personalized = useSyncExternalStore(subscribePersonalization, personalizationEnabled);
     const cacheKey = JSON.stringify([owner, personalized, locale, prompt]);
@@ -56,13 +54,12 @@ export default function AiGeneratedPage() {
         <StorefrontLayout rootClassName="min-h-screen bg-store-cream text-store-ink">
             {/* key: đổi yêu cầu, ngôn ngữ hoặc bấm Dựng lại thì dựng một trang mới từ đầu. */}
             <GeneratedSurface
-                key={`${cacheKey}:${version}`}
+                key={cacheKey}
                 cacheKey={cacheKey}
                 prompt={prompt}
                 locale={locale}
-                useCache={version === 0}
+                useCache={true}
                 defaultPath={defaultPath}
-                onRegenerate={() => setVersion((value) => value + 1)}
             />
         </StorefrontLayout>
     );
@@ -74,14 +71,12 @@ function GeneratedSurface({
     cacheKey,
     useCache,
     defaultPath,
-    onRegenerate,
 }: {
     prompt: string;
     locale: 'vi' | 'en';
     useCache: boolean;
     cacheKey: string;
     defaultPath: string;
-    onRegenerate: () => void;
 }) {
 
     const [view, setView] = useState<View>(() => {
@@ -89,7 +84,6 @@ function GeneratedSurface({
         const surfaceId = cached ? applyA2ui(cached) : undefined;
         return surfaceId ? { status: 'ready', surfaceId } : { status: 'loading' };
     });
-    const [showTree, setShowTree] = useState(false);
     const fromCache = view.status === 'ready' && useCache;
 
     useEffect(() => {
@@ -161,35 +155,18 @@ function GeneratedSurface({
                 >
                     <ArrowLeft size={16} aria-hidden="true" /> {locale === 'en' ? 'Back to home' : 'Về trang chủ'}
                 </Link>
-                <div className="flex gap-2">
-                    <button
-                        type="button"
-                        onClick={onRegenerate}
-                        disabled={view.status === 'loading'}
-                        className="inline-flex items-center gap-1 rounded border border-store-line bg-white px-3 py-1.5 font-semibold text-store-ink disabled:opacity-50"
-                    >
-                        <RefreshCw size={14} aria-hidden="true" /> Dựng lại
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setShowTree(true)}
-                        disabled={!surface}
-                        className="inline-flex items-center gap-1 rounded border border-store-line bg-white px-3 py-1.5 font-semibold text-store-ink disabled:opacity-50"
-                    >
-                        <Network size={14} aria-hidden="true" /> Cây widget
-                    </button>
-                </div>
+
             </div>
 
             {view.status === 'loading' && (
-                <div className="space-y-4" role="status">
-                    <p className="inline-flex items-center gap-2 text-sm text-store-muted">
-                        <Loader2 size={16} className="animate-spin" aria-hidden="true" />
-                        <Sparkles size={14} aria-hidden="true" /> AI đang ghép trang cho “{prompt}”…
-                    </p>
-                    {[0, 1, 2].map((row) => (
-                        <div key={row} className="h-40 animate-pulse rounded-xl bg-white/70" />
-                    ))}
+                <div className="space-y-6 animate-pulse" role="status" aria-label={locale === 'en' ? 'Preparing your page' : 'Đang chuẩn bị giao diện'}>
+                    <span className="sr-only">{locale === 'en' ? 'Preparing your page' : 'Đang chuẩn bị giao diện'}</span>
+                    <div className="h-10 w-2/3 max-w-lg rounded-lg bg-stone-300/60" />
+                    <div className="h-4 w-4/5 max-w-2xl rounded bg-stone-300/40" />
+                    <div className="rounded-2xl border border-stone-200 bg-white/70 p-6 space-y-5">
+                        <div className="h-7 w-40 rounded bg-stone-300/60" />
+                        {[0, 1, 2].map((row) => <div key={row} className="flex items-center gap-4"><div className="h-16 w-16 shrink-0 rounded-xl bg-stone-300/50" /><div className="flex-1 space-y-3"><div className="h-4 w-2/3 rounded bg-stone-300/50" /><div className="h-3 w-1/3 rounded bg-stone-300/40" /></div></div>)}
+                    </div>
                 </div>
             )}
 
@@ -211,12 +188,7 @@ function GeneratedSurface({
                     <A2uiSurface surface={surface} />
                 </div>
             )}
-            {showTree && (
-                <WidgetTree
-                    message={getSurfaceTree(view.surfaceId)}
-                    onClose={() => setShowTree(false)}
-                />
-            )}
+
         </div>
     );
 }
