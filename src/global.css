@@ -10,6 +10,28 @@
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 
+/* A2UI injects a light/dark default theme when its first surface mounts. */
+:root {
+    color-scheme: light;
+}
+
+.store-search-input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.a2ui-surface,
+.a2ui-page {
+    color-scheme: light;
+    font-family: var(--font-body);
+    --a2ui-color-primary: var(--color-store-green);
+    --a2ui-color-on-primary: #ffffff;
+    --a2ui-color-on-background: var(--color-store-ink);
+    --a2ui-color-on-surface: var(--color-store-ink);
+    --a2ui-color-input: #ffffff;
+    --a2ui-color-on-input: var(--color-store-ink);
+}
+
 html,
 body,
 * {
@@ -144,7 +166,14 @@ body::-webkit-scrollbar,
     summary,
     label[for],
     select,
-    input:is([type='button'], [type='submit'], [type='reset'], [type='checkbox'], [type='radio'], [type='file']),
+    input:is(
+        [type='button'],
+        [type='submit'],
+        [type='reset'],
+        [type='checkbox'],
+        [type='radio'],
+        [type='file']
+    ),
     a[href] {
         cursor: pointer;
     }
@@ -164,7 +193,9 @@ body::-webkit-scrollbar,
         transition: filter 150ms ease;
     }
 
-    :is(button, [role='button']):not(:disabled):not([aria-disabled='true']):not([class*='hover:']):hover {
+    :is(button, [role='button']):not(:disabled):not([aria-disabled='true']):not(
+            [class*='hover:']
+        ):hover {
         filter: brightness(0.93);
     }
 }

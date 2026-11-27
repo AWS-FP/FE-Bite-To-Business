@@ -1,13 +1,13 @@
 import { LoaderCircle } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/router/routes';
-import { verifyOtp } from '@/services/admin/authService';
+import { resendActivationOtp, verifyOtp } from '@/services/admin/authService';
 import { saveActivationSession } from '@/utils/admin/activationSession';
 import { getAuthError, type AuthError } from '@/utils/admin/authError';
-import { verifyOtpSchema } from '@/validations/admin/authSchema';
+import { gmailSchema, verifyOtpSchema } from '@/validations/admin/authSchema';
 import AuthField from './AuthField';
 import './ActivationForm.css';
 
@@ -29,11 +29,54 @@ export default function VerifyOtpForm({
     const emailRef = useRef<HTMLInputElement>(null);
     const otpRef = useRef<HTMLInputElement>(null);
     const submittingRef = useRef(false);
+    const [isResending, setIsResending] = useState(false);
+    const [resendMessage, setResendMessage] = useState('');
+    const [deadlines, setDeadlines] = useState<Record<string, number>>({});
+    const [now, setNow] = useState(Date.now);
+    const deadline = deadlines[email.trim().toLowerCase()] ?? 0;
+    const remaining = Math.max(0, Math.ceil((deadline - now) / 1000));
+    const countingDown = remaining > 0;
+    useEffect(() => {
+        if (!countingDown) return;
+        const timer = window.setInterval(() => setNow(Date.now()), 1000);
+        return () => window.clearInterval(timer);
+    }, [countingDown]);
+
+    async function handleResend() {
+        if (submittingRef.current || deadline > Date.now()) return;
+        const result = gmailSchema.safeParse(email);
+        setServerError(null);
+        setResendMessage('');
+        if (!result.success) {
+            setErrors({ email: result.error.issues[0].message });
+            emailRef.current?.focus();
+            return;
+        }
+        submittingRef.current = true;
+        setIsResending(true);
+        setErrors({});
+        try {
+            const { retryAfterSeconds } = await resendActivationOtp(result.data);
+            const receivedAt = Date.now();
+            setNow(receivedAt);
+            setDeadlines((current) => ({
+                ...current,
+                [result.data]: receivedAt + retryAfterSeconds * 1000,
+            }));
+            setResendMessage('verifyOtp.resendReceived');
+        } catch (error) {
+            setServerError(getAuthError(error));
+        } finally {
+            submittingRef.current = false;
+            setIsResending(false);
+        }
+    }
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         if (submittingRef.current) return;
         const result = verifyOtpSchema.safeParse({ email, otp });
+        setResendMessage('');
         setServerError(null);
         if (!result.success) {
             const fields = result.error.flatten().fieldErrors;
@@ -66,7 +109,7 @@ export default function VerifyOtpForm({
             className="activation-form"
             onSubmit={handleSubmit}
             noValidate
-            aria-busy={isSubmitting}
+            aria-busy={isSubmitting || isResending}
         >
             {location.state?.setupExpired && (
                 <div className="activation-notice" role="alert">
@@ -107,12 +150,14 @@ export default function VerifyOtpForm({
                         maxLength={254}
                         required
                         value={email}
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isResending}
                         placeholder={t('placeholders.email')}
                         aria-invalid={!!errors.email}
                         aria-describedby="otp-email-help"
                         onChange={(event) => {
                             setEmail(event.target.value);
+                            setResendMessage('');
+                            setNow(Date.now());
                             setErrors({ ...errors, email: undefined });
                             setServerError(null);
                         }}
@@ -147,7 +192,11 @@ export default function VerifyOtpForm({
                     }}
                 />
             </AuthField>
-            <button className="activation-button" type="submit" disabled={isSubmitting}>
+            <button
+                className="activation-button"
+                type="submit"
+                disabled={isSubmitting || isResending}
+            >
                 {isSubmitting && (
                     <LoaderCircle
                         size={18}
@@ -157,14 +206,28 @@ export default function VerifyOtpForm({
                 )}
                 {isSubmitting ? t('verifyOtp.submitting') : t('verifyOtp.submit')}
             </button>
-            <p className="m-0 font-subtext text-[12px] leading-[1.6] text-auth-muted">
-                {t('verifyOtp.resendHint')}
+            <p role="status" className="m-0 font-subtext text-[12px] leading-[1.6] text-auth-muted">
+                {t(resendMessage || 'verifyOtp.resendHint')}
             </p>
-            {showEmailField && (
-                <Link className="activation-link text-center" to={ROUTES.LOGIN}>
-                    {t('register.backToLogin')}
-                </Link>
-            )}
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+                {showEmailField && (
+                    <Link className="activation-link text-center" to={ROUTES.LOGIN}>
+                        {t('register.backToLogin')}
+                    </Link>
+                )}
+                <button
+                    type="button"
+                    onClick={handleResend}
+                    disabled={isSubmitting || isResending || countingDown}
+                    className="activation-link border-0 bg-transparent p-0 underline disabled:opacity-60"
+                >
+                    {isResending
+                        ? t('verifyOtp.resending')
+                        : countingDown
+                          ? t('verifyOtp.resendWait', { seconds: remaining })
+                          : t('verifyOtp.resend')}
+                </button>
+            </div>
         </form>
     );
 }

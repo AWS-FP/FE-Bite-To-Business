@@ -6,9 +6,10 @@ import { getCatalogSearchPath } from '../../../constants/catalogNavigation';
 import { useStoreSearch } from '@/hooks/customer/useStoreSearch';
 import { SEARCH_MAX_LENGTH } from '@/constants/catalogSearch';
 import SearchModeDropdown from './SearchModeDropdown';
+import ConfirmModal from '@/components/common/ConfirmModal';
 
 export default function StoreSearch() {
-    const { t } = useTranslation('storefront');
+    const { t, i18n } = useTranslation('storefront');
     const {
         keyword,
         changeKeyword,
@@ -22,6 +23,9 @@ export default function StoreSearch() {
         historyEntries,
         deleteSearch,
         confirmClear,
+        clearHistoryOpen,
+        setClearHistoryOpen,
+        confirmClearHistory,
         deleting,
         deleteError,
         handleSearch,
@@ -46,11 +50,15 @@ export default function StoreSearch() {
                 aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.label')}
                 onSubmit={handleSearch}
             >
-                <SearchModeDropdown value={searchMode} onChange={changeMode} onOpen={() => setOpen(false)} />
+                <SearchModeDropdown
+                    value={searchMode}
+                    onChange={changeMode}
+                    onOpen={() => setOpen(false)}
+                />
 
                 <input
                     ref={inputRef}
-                    className="h-9 min-w-0 flex-1 rounded-full !border-0 bg-transparent px-2.5 text-[12px] text-store-ink !outline-none !shadow-none focus:!border-0 focus:!outline-none focus:!shadow-none placeholder:text-store-muted"
+                    className="store-search-input h-9 min-w-0 flex-1 rounded-full !border-0 bg-transparent px-2.5 text-[12px] text-store-ink !outline-none !shadow-none focus:!border-0 focus:!outline-none focus:!shadow-none placeholder:text-store-muted"
                     type="search"
                     name="q"
                     aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.label')}
@@ -63,6 +71,23 @@ export default function StoreSearch() {
                     value={keyword}
                     onChange={(event) => changeKeyword(event.target.value)}
                 />
+                {keyword && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            changeKeyword('');
+                            inputRef.current?.focus();
+                        }}
+                        aria-label={
+                            i18n.resolvedLanguage?.startsWith('en')
+                                ? 'Clear search'
+                                : 'Xóa nội dung tìm kiếm'
+                        }
+                        className="mr-1 grid size-8 shrink-0 place-items-center rounded-full border-0 bg-transparent text-store-green hover:bg-store-green/10"
+                    >
+                        <X size={15} aria-hidden="true" />
+                    </button>
+                )}
 
                 <button
                     className="flex h-full shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-r-full border-0 border-l-2 border-solid border-store-ink bg-store-yellow px-3.5 text-[12px] font-extrabold text-store-ink transition-colors hover:bg-[#ffe97b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white disabled:cursor-wait disabled:opacity-70"
@@ -94,22 +119,37 @@ export default function StoreSearch() {
                                 <p className="m-0 text-[11px] font-extrabold uppercase tracking-wide text-store-muted">
                                     {t('search.history')}
                                 </p>
-                                <button type="button" disabled={deleting} onClick={confirmClear}
-                                    className="inline-flex cursor-pointer items-center gap-1 rounded-lg border-0 bg-transparent px-1.5 py-1 text-xs text-store-muted hover:text-danger disabled:opacity-40">
+                                <button
+                                    type="button"
+                                    disabled={deleting}
+                                    onClick={confirmClear}
+                                    className="inline-flex cursor-pointer items-center gap-1 rounded-lg border-0 bg-transparent px-1.5 py-1 text-xs text-store-muted hover:text-danger disabled:opacity-40"
+                                >
                                     <Trash2 size={13} /> {t('searchHistory.clearAll')}
                                 </button>
                             </div>
                             {historyEntries.slice(0, 7).map((entry) => (
-                                <div key={entry.id} className="flex items-center gap-2 rounded-xl hover:bg-store-cream">
-                                    <Link to={getCatalogSearchPath(entry.keyword)}
-                                        onClick={(event) => void handleHistoryClick(event, entry.keyword)}
-                                        className="flex min-w-0 flex-1 items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold text-store-ink no-underline focus-visible:outline-2 focus-visible:outline-store-green">
+                                <div
+                                    key={entry.id}
+                                    className="flex items-center gap-2 rounded-xl hover:bg-store-cream"
+                                >
+                                    <Link
+                                        to={getCatalogSearchPath(entry.keyword)}
+                                        onClick={(event) =>
+                                            void handleHistoryClick(event, entry.keyword)
+                                        }
+                                        className="flex min-w-0 flex-1 items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold text-store-ink no-underline focus-visible:outline-2 focus-visible:outline-store-green"
+                                    >
                                         <Clock3 size={15} className="shrink-0 text-store-muted" />
                                         <span className="truncate">{entry.keyword}</span>
                                     </Link>
-                                    <button type="button" onClick={() => void deleteSearch(entry.id)}
-                                        disabled={deleting} aria-label={`${t('searchHistory.remove')}: ${entry.keyword}`}
-                                        className="mr-2 flex size-7 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent text-store-muted hover:bg-red-50 hover:text-danger disabled:opacity-40">
+                                    <button
+                                        type="button"
+                                        onClick={() => void deleteSearch(entry.id)}
+                                        disabled={deleting}
+                                        aria-label={`${t('searchHistory.remove')}: ${entry.keyword}`}
+                                        className="mr-2 flex size-7 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent text-store-muted hover:bg-red-50 hover:text-danger disabled:opacity-40"
+                                    >
                                         <X size={14} />
                                     </button>
                                 </div>
@@ -128,20 +168,35 @@ export default function StoreSearch() {
                                 </p>
                             ) : suggestions.length ? (
                                 suggestions.map((item) => (
-                                    <Link key={item.key} to={item.path}
-                                        onClick={(event) => void handleHistoryClick(event, item.keyword, item.path)}
-                                        className="group flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 text-store-ink no-underline transition-colors hover:bg-store-cream focus-visible:bg-store-cream focus-visible:outline-2 focus-visible:outline-store-green">
+                                    <Link
+                                        key={item.key}
+                                        to={item.path}
+                                        onClick={(event) =>
+                                            void handleHistoryClick(event, item.keyword, item.path)
+                                        }
+                                        className="group flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 text-store-ink no-underline transition-colors hover:bg-store-cream focus-visible:bg-store-cream focus-visible:outline-2 focus-visible:outline-store-green"
+                                    >
                                         {item.kind === 'product' ? (
                                             item.imageUrl ? (
-                                                <img src={item.imageUrl} alt="" loading="lazy"
-                                                    className="size-12 shrink-0 rounded-lg border border-solid border-store-line bg-white object-contain p-1" />
+                                                <img
+                                                    src={item.imageUrl}
+                                                    alt=""
+                                                    loading="lazy"
+                                                    className="size-12 shrink-0 rounded-lg border border-solid border-store-line bg-white object-contain p-1"
+                                                />
                                             ) : (
-                                                <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-surface-green text-store-muted"><ImageIcon size={18} /></span>
+                                                <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-surface-green text-store-muted">
+                                                    <ImageIcon size={18} />
+                                                </span>
                                             )
                                         ) : (
-                                            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-green text-store-green"><Search size={17} /></span>
+                                            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-green text-store-green">
+                                                <Search size={17} />
+                                            </span>
                                         )}
-                                        <span className="min-w-0 flex-1 truncate text-[13px] font-semibold leading-5">{item.label}</span>
+                                        <span className="min-w-0 flex-1 truncate text-[13px] font-semibold leading-5">
+                                            {item.label}
+                                        </span>
                                         {item.kind !== 'product' && (
                                             <span className="shrink-0 rounded-full bg-surface-green px-2 py-1 text-[10px] font-semibold text-store-muted">
                                                 {t(`search.kinds.${item.kind}`)}
@@ -150,12 +205,18 @@ export default function StoreSearch() {
                                     </Link>
                                 ))
                             ) : (
-                                <p className="m-0 px-3 py-5 text-sm text-store-muted">{t('search.noSuggestions')}</p>
+                                <p className="m-0 px-3 py-5 text-sm text-store-muted">
+                                    {t('search.noSuggestions')}
+                                </p>
                             )}
-                            <Link to={getCatalogSearchPath(keyword.trim())}
+                            <Link
+                                to={getCatalogSearchPath(keyword.trim())}
                                 onClick={(event) => void handleHistoryClick(event, keyword.trim())}
-                                className="mt-2 flex items-center justify-between gap-2 rounded-xl border border-solid border-store-line bg-store-cream px-3 py-3 text-xs font-bold text-store-green no-underline hover:bg-surface-yellow focus-visible:outline-2 focus-visible:outline-store-green">
-                                <span className="min-w-0 truncate">{t('search.viewAll', { query: keyword.trim() })}</span>
+                                className="mt-2 flex items-center justify-between gap-2 rounded-xl border border-solid border-store-line bg-store-cream px-3 py-3 text-xs font-bold text-store-green no-underline hover:bg-surface-yellow focus-visible:outline-2 focus-visible:outline-store-green"
+                            >
+                                <span className="min-w-0 truncate">
+                                    {t('search.viewAll', { query: keyword.trim() })}
+                                </span>
                                 <ArrowRight size={15} />
                             </Link>
                         </>
@@ -174,6 +235,18 @@ export default function StoreSearch() {
                     {t('searchHistory.deleteError')}
                 </p>
             )}
+            <ConfirmModal
+                open={clearHistoryOpen}
+                title={t('searchHistory.clearAll')}
+                message={t('searchHistory.confirmClear')}
+                confirmLabel={t('searchHistory.clearAll')}
+                cancelLabel={i18n.resolvedLanguage?.startsWith('en') ? 'Cancel' : 'Hủy'}
+                busy={deleting}
+                error={deleteError ? t('searchHistory.deleteError') : undefined}
+                danger
+                onConfirm={() => void confirmClearHistory()}
+                onCancel={() => setClearHistoryOpen(false)}
+            />
         </div>
     );
 }

@@ -3,7 +3,7 @@ import { CommonSchemas } from '@a2ui/web_core/v0_9';
 import { createComponentImplementation } from '@a2ui/react/v0_9';
 import type { ComponentContext } from '@a2ui/web_core/v0_9';
 import { AlertCircle, CheckCircle2, Info, Search, Sparkles } from 'lucide-react';
-import { AddButton, Price, ProductTile, Stock, Tiers } from './productParts';
+import { AddButton, Price, ProductTile, Rating, Stock, Tiers } from './productParts';
 import {
     inStock,
     productList,
@@ -106,7 +106,8 @@ export const ProductTable = createComponentImplementation(ProductTableApi, ({ pr
         .map((product) => unitPrice(product))
         .filter((price): price is number => price != null);
     const lowest = prices.length ? Math.min(...prices) : null;
-    const comparablePrices = new Set(items.map((product) => product.unitCode + ':' + (product.spec ?? ''))).size === 1;
+    const comparablePrices =
+        new Set(items.map((product) => product.unitCode + ':' + (product.spec ?? ''))).size === 1;
     const highlighted = (product: A2uiProduct) =>
         props.highlight === 'lowestPrice'
             ? comparablePrices && lowest != null && unitPrice(product) === lowest
@@ -143,13 +144,16 @@ export const ProductTable = createComponentImplementation(ProductTableApi, ({ pr
                                             <span className="block size-10 rounded bg-store-cream" />
                                         ))}
                                     {column === 'name' && (
-                                        <button
-                                            type="button"
-                                            onClick={() => viewProduct(context, product)}
-                                            className="border-0 bg-transparent p-0 text-left font-semibold text-store-ink hover:underline"
-                                        >
-                                            {product.name}
-                                        </button>
+                                        <div className="space-y-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => viewProduct(context, product)}
+                                                className="border-0 bg-transparent p-0 text-left font-semibold text-store-ink hover:underline"
+                                            >
+                                                {product.name}
+                                            </button>
+                                            <Rating product={product} />
+                                        </div>
                                     )}
                                     {column === 'spec' && (product.spec ?? '—')}
                                     {column === 'origin' &&
@@ -173,14 +177,63 @@ export const ProductTable = createComponentImplementation(ProductTableApi, ({ pr
             {items.some((product) => product.facts) && (
                 <div className="mt-5 grid gap-4 md:grid-cols-2">
                     {items.map((product) => (
-                        <section key={product.productId} className="rounded-xl border border-store-line bg-store-cream/40 p-4 text-sm text-store-ink">
+                        <section
+                            key={product.productId}
+                            className="rounded-xl border border-store-line bg-store-cream/40 p-4 text-sm text-store-ink"
+                        >
                             <h4 className="font-bold">{product.name}</h4>
                             <dl className="mt-3 space-y-2">
-                                <div><dt className="font-semibold">Xuất xứ</dt><dd>{product.facts?.origin || product.origin || 'Chưa có thông tin'}</dd></div>
-                                <div><dt className="font-semibold">Thương hiệu</dt><dd>{product.facts?.brand || 'Chưa có thông tin'}</dd></div>
-                                <div><dt className="font-semibold">Bảo quản</dt><dd className="whitespace-pre-line">{product.facts?.storage || 'Chưa có thông tin'}</dd></div>
-                                <div><dt className="font-semibold">Thông tin sản phẩm</dt><dd className="whitespace-pre-line">{product.facts?.description || product.facts?.technical || 'Chưa có thông tin'}</dd></div>
-                                <div><dt className="font-semibold">Dinh dưỡng {product.facts?.nutritionBasis ? '(' + product.facts.nutritionBasis + ')' : ''}</dt><dd>{product.facts?.nutrition?.length ? <ul className="mt-1 space-y-1">{product.facts.nutrition.map((item, index) => <li key={index} className="flex justify-between gap-4"><span>{item.nutrient}</span><span>{item.amount}</span></li>)}</ul> : 'Chưa có thông tin dinh dưỡng'}</dd></div>
+                                <div>
+                                    <dt className="font-semibold">Xuất xứ</dt>
+                                    <dd>
+                                        {product.facts?.origin ||
+                                            product.origin ||
+                                            'Chưa có thông tin'}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt className="font-semibold">Thương hiệu</dt>
+                                    <dd>{product.facts?.brand || 'Chưa có thông tin'}</dd>
+                                </div>
+                                <div>
+                                    <dt className="font-semibold">Bảo quản</dt>
+                                    <dd className="whitespace-pre-line">
+                                        {product.facts?.storage || 'Chưa có thông tin'}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt className="font-semibold">Thông tin sản phẩm</dt>
+                                    <dd className="whitespace-pre-line">
+                                        {product.facts?.description ||
+                                            product.facts?.technical ||
+                                            'Chưa có thông tin'}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt className="font-semibold">
+                                        Dinh dưỡng{' '}
+                                        {product.facts?.nutritionBasis
+                                            ? '(' + product.facts.nutritionBasis + ')'
+                                            : ''}
+                                    </dt>
+                                    <dd>
+                                        {product.facts?.nutrition?.length ? (
+                                            <ul className="mt-1 space-y-1">
+                                                {product.facts.nutrition.map((item, index) => (
+                                                    <li
+                                                        key={index}
+                                                        className="flex justify-between gap-4"
+                                                    >
+                                                        <span>{item.nutrient}</span>
+                                                        <span>{item.amount}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            'Chưa có thông tin dinh dưỡng'
+                                        )}
+                                    </dd>
+                                </div>
                             </dl>
                         </section>
                     ))}

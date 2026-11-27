@@ -1309,6 +1309,35 @@
         },
         "toast": {
             "added": "Đã thêm \"{{item}}\" vào báo giá mẫu. Chưa lưu lên máy chủ."
+        },
+        "live": {
+            "brandsTitle": "Thương hiệu đang có sản phẩm tại BTB",
+            "brandsLoading": "Đang tải thương hiệu…",
+            "brandsEmpty": "Hiện chưa có thương hiệu nào có sản phẩm công khai.",
+            "pauseBrands": "Tạm dừng",
+            "resumeBrands": "Tiếp tục",
+            "catalogDescription": "Khám phá sản phẩm đang được kinh doanh tại BTB. Hình ảnh, giá và thông tin tồn kho được cập nhật từ danh mục thực tế.",
+            "catalogTitle": "Sản phẩm đang kinh doanh",
+            "categoriesError": "Chưa tải được danh mục sản phẩm.",
+            "viewMode": "Cách hiển thị sản phẩm",
+            "pricingLoading": "Đang tải giá…",
+            "pricingError": "Chưa tải được một số thông tin giá hoặc tồn kho.",
+            "stockUnknown": "Chưa có thông tin tồn kho",
+            "available": "Còn {{count}} {{unit}}",
+            "details": "Xem chi tiết",
+            "exploreMore": "Khám phá thêm sản phẩm trong danh mục hoặc gửi yêu cầu mặt hàng bạn cần.",
+            "browseCatalog": "Khám phá sản phẩm",
+            "myOrders": "Đơn hàng của tôi",
+            "shoppingStep1": "Chọn nguyên liệu",
+            "shoppingStep1Text": "Tìm sản phẩm, xem quy cách và giá theo nhu cầu mua hàng.",
+            "shoppingStep2": "Chuẩn bị đơn mua",
+            "shoppingStep2Text": "Chọn số lượng và sắp xếp các địa chỉ nhận hàng phù hợp.",
+            "shoppingStep3": "Theo dõi đơn hàng",
+            "shoppingStep3Text": "Xem tiến độ xử lý và thông tin giao nhận trong tài khoản.",
+            "signedIn": "Bạn đã đăng nhập.",
+            "solutionTitle": "Từ danh mục đến gian bếp",
+            "solutionDescription": "Chọn sản phẩm thật, xem giá hiện hành và chuẩn bị đơn mua tại một địa chỉ cung ứng.",
+            "volumeTiers": "Bậc giá theo số lượng (trước ưu đãi)"
         }
     }
 }

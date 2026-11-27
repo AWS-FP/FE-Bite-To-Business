@@ -27,6 +27,7 @@ type AssistantState = {
     agentState: AgentState;
     busy: boolean;
     open: boolean;
+    pendingPage: string | null;
     setOpen: (open: boolean) => void;
     send: (text: string, locale: 'vi' | 'en') => Promise<void>;
     /** Ghi chú cục bộ (vd. đã thêm vào giỏ) — không gửi cho model như lời trợ lý. */
@@ -45,8 +46,16 @@ export const useAssistantStore = create<AssistantState>()(
             agentState: {},
             busy: false,
             open: false,
+            pendingPage: null,
             setOpen: (open) => set({ open }),
-            reset: () => set({ threadId: newId(), entries: [], agentState: {}, busy: false }),
+            reset: () =>
+                set({
+                    threadId: newId(),
+                    entries: [],
+                    agentState: {},
+                    busy: false,
+                    pendingPage: null,
+                }),
             note: (text) =>
                 set((state) => ({
                     entries: [...state.entries, { id: newId(), role: 'system', text }],
@@ -86,7 +95,12 @@ export const useAssistantStore = create<AssistantState>()(
                     });
                 const onEvent = (event: AgentEvent) => {
                     if (get().threadId !== threadId) return;
-                    if (event.type === 'TEXT_MESSAGE_CONTENT') {
+                    if (event.type === 'CUSTOM' && event.name === 'open_ai_page') {
+                        const value = event.value as { prompt?: unknown };
+                        if (typeof value?.prompt === 'string' && value.prompt.trim()) {
+                            set({ pendingPage: value.prompt });
+                        }
+                    } else if (event.type === 'TEXT_MESSAGE_CONTENT') {
                         push({ text: (reply.text ?? '') + event.delta });
                     } else if (
                         event.type === 'CUSTOM' &&
@@ -127,7 +141,8 @@ export const useAssistantStore = create<AssistantState>()(
                         error: true,
                         text:
                             status === 429
-                                ? error instanceof AgentHttpError && error.code === 'AI_RATE_LIMIT_EXCEEDED'
+                                ? error instanceof AgentHttpError &&
+                                  error.code === 'AI_RATE_LIMIT_EXCEEDED'
                                     ? 'Bạn đã dùng hết 50 lượt hỏi AI trong một giờ. Vui lòng thử lại sau.'
                                     : 'Trợ lý đang nhận quá nhiều yêu cầu. Vui lòng thử lại sau ít phút.'
                                 : status === 401
@@ -169,7 +184,15 @@ function syncChatOwner(auth: ReturnType<typeof useAuthStore.getState>) {
     const owner = auth.session?.user.id ?? null;
     const chat = useAssistantStore.getState();
     if (owner !== chat.owner || (!owner && chat.entries.length > 0)) {
-        useAssistantStore.setState({ owner, threadId: newId(), entries: [], agentState: {}, busy: false, open: false });
+        useAssistantStore.setState({
+            owner,
+            threadId: newId(),
+            entries: [],
+            agentState: {},
+            busy: false,
+            open: false,
+            pendingPage: null,
+        });
     }
 }
 
