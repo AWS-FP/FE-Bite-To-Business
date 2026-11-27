@@ -11,9 +11,13 @@ import { useProductCardPurchase } from '@/hooks/customer/useProductCardPurchase'
 export default function ProductShowcaseCard({
     product,
     comboSummary,
+    knownFavorite,
+    onFavoriteRemoved,
 }: {
     product: HomeProductCardItem;
     section?: 'flash' | 'standard';
+    knownFavorite?: boolean;
+    onFavoriteRemoved?: (id: string) => void;
     comboSummary?: { ingredients: string; savings: string };
 }) {
     const { t, i18n } = useTranslation('storefront');
@@ -31,7 +35,7 @@ export default function ProductShowcaseCard({
         favorite,
         pending: savingFavorite,
         toggle: toggleFavorite,
-    } = useFavoriteToggle(product.id);
+    } = useFavoriteToggle(product.id, knownFavorite, onFavoriteRemoved);
     const {
         purchaseAllowed,
         quantity,

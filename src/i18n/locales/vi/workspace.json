@@ -22,6 +22,8 @@
         "coupons": "Mã giảm giá",
         "inventory": "Kho hàng",
         "productRequests": "Yêu cầu sản phẩm",
+        "quotes": "Báo giá B2B",
+        "cancellationRequests": "Yêu cầu hủy hàng",
         "trips": "Chuyến giao hàng"
     }
 }

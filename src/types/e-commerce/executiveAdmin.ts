@@ -58,8 +58,6 @@ export type PricingWrite = {
 };
 
 export type Coupon = {
-    nameVi?: string | null;
-    nameEn?: string | null;
     id: string;
     code: string;
     discountType: string;
@@ -182,6 +180,7 @@ export type Quote = {
 };
 
 export type ExecutiveReview = {
+    imageUrls: string[];
     id: string;
     productId: string;
     customerId: string;
@@ -200,9 +199,6 @@ export type DashboardMetrics = {
     publishedProducts: number;
     draftProducts: number;
     archivedProducts: number;
-    pendingQuotes: number;
-    approvedQuotes: number;
-    rejectedQuotes: number;
     activePromotions: number;
     completedOrders: number;
     revenue: number;

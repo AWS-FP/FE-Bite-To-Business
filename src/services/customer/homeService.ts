@@ -1,6 +1,6 @@
 import { publicHttp } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
-import type { HomeBanner, HomeCategory, HomeResponse, HomeCombo } from '@/types/customer/home';
+import type { HomeBanner, HomeCategory, HomeResponse, HomeCombo, HomePromotionProductsPage } from '@/types/customer/home';
 
 /** These routes are implemented inside BE features/customer/home, not ecommerce. */
 export async function getHomeProducts(signal?: AbortSignal): Promise<HomeResponse> {
@@ -33,6 +33,14 @@ export async function getHomeCombo(id: string, signal?: AbortSignal): Promise<Ho
     const { data } = await publicHttp.get<ApiResponse<HomeCombo>>(
         `/api/homepage/combos/${encodeURIComponent(id)}`,
         { signal },
+    );
+    return data.data;
+}
+
+export async function getHomePromotionProducts(id: string, page: number, size: number, signal?: AbortSignal) {
+    const { data } = await publicHttp.get<ApiResponse<HomePromotionProductsPage>>(
+        `/api/homepage/promotions/${encodeURIComponent(id)}/products`,
+        { params: { page, size }, signal },
     );
     return data.data;
 }
