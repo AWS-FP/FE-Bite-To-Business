@@ -1,4 +1,4 @@
-import { Activity, Banknote, RotateCcw } from 'lucide-react';
+import { Activity, Banknote, FileBarChart2, RotateCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import WorkspaceSidebar from '../WorkspaceSidebar';
 
@@ -9,6 +9,7 @@ interface AdminSidebarProps {
     paymentReviewsPath: string;
     openPaymentReviews?: number;
     systemPath: string;
+    revenuePath: string;
     pendingCount?: number;
     isCollapsed: boolean;
     onToggleCollapse: () => void;
@@ -21,6 +22,7 @@ export default function AdminSidebar({
     paymentReviewsPath,
     openPaymentReviews,
     systemPath,
+    revenuePath,
     pendingCount,
     isCollapsed,
     onToggleCollapse,
@@ -83,6 +85,11 @@ export default function AdminSidebar({
                             path: systemPath,
                             label: t('navigation.system'),
                             icon: <Activity size={18} aria-hidden="true" />,
+                        },
+                        {
+                            path: revenuePath,
+                            label: t('system.tabs.revenue'),
+                            icon: <FileBarChart2 size={18} aria-hidden="true" />,
                         },
                     ],
                 },

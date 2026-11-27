@@ -168,10 +168,8 @@ export default function PaymentReviewsPage() {
     return (
         <>
             <AdminPageHeader
-                sectionNumber="01"
                 eyebrow="PAYMENT REVIEWS"
                 title="Thanh toán cần xử lý"
-                description="Tiền khách đã chuyển vào tài khoản nhưng không tự khớp được đơn nào: đơn hết hạn, sai số tiền, sai nội dung hoặc trả trùng."
             >
                 <AdminButton icon="refresh" busy={r.list.isFetching} onClick={() => void r.list.refetch()}>Làm mới</AdminButton>
             </AdminPageHeader>

@@ -109,10 +109,8 @@ export default function PackageReturnsPage() {
     return (
         <>
             <AdminPageHeader
-                sectionNumber="01"
                 eyebrow="PACKAGE RETURNS"
                 title="Yêu cầu trả hàng"
-                description="Khách trả kiện đã giao trong vòng 24 giờ. Mở yêu cầu để xem form và xác nhận hoàn tiền."
             >
                 <AdminButton icon="refresh" busy={r.list.isFetching} onClick={() => void r.list.refetch()}>Làm mới</AdminButton>
             </AdminPageHeader>
