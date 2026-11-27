@@ -1,3 +1,4 @@
+import { useExecutiveConfirmation } from '@/hooks/e-commerce/useExecutiveConfirmation';
 import { ExecutiveTableSkeleton, ExecutivePricingSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -38,6 +39,7 @@ function ProductDrawer({
     brand: string;
     onClose: () => void;
 }) {
+    const confirm = useExecutiveConfirmation();
     const tr = useExecutiveText(),
         qc = useQueryClient();
     const pricing = useQuery({
@@ -136,16 +138,13 @@ function ProductDrawer({
             };
         });
     const selectStatus = (status: string) => {
-        if (
-            status !== localStatus &&
-            window.confirm(
+        if (status !== localStatus && !statusSave.isPending)
+            void confirm(
                 tr(
                     `Chuyển trạng thái ${product.sku} thành ${status}?`,
                     `Change ${product.sku} to ${status}?`,
                 ),
-            )
-        )
-            statusSave.mutate(status);
+             () => statusSave.mutateAsync(status), { danger: status === 'ARCHIVED' });
     };
     return (
         <div
@@ -550,8 +549,7 @@ function ProductDrawer({
                         className="rounded-2xl border border-[#dde8dc] bg-white p-5"
                         onSubmit={(e) => {
                             e.preventDefault();
-                            if (window.confirm(tr('Lưu thuế suất VAT mới?', 'Save new VAT rate?')))
-                                vatSave.mutate(Number(vatInput ?? vat.data?.vatRate));
+                            void confirm(tr('Lưu thuế suất VAT mới?', 'Save new VAT rate?'), () => vatSave.mutateAsync(Number(vatInput ?? vat.data?.vatRate)));
                         }}
                     >
                         <h3 className="mb-4 font-bold">{tr('Thuế VAT', 'VAT rate')}</h3>

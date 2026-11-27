@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Boxes, ClipboardList, LayoutDashboard, LogOut, Megaphone, Menu, MessageSquare, Package, TicketPercent, Undo2 } from 'lucide-react';
+import { Boxes, LayoutDashboard, LogOut, Megaphone, Menu, MessageSquare, Package, TicketPercent } from 'lucide-react';
 import { ROUTES } from '@/router/routes';
 import { logout } from '@/services/admin/authService';
 import { useAuthStore } from '@/store/admin/authStore';
@@ -12,6 +12,7 @@ import LogoutConfirmation from '@/components/common/LogoutConfirmation';
 import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 import EcommerceWorkspaceSearch from '@/components/e-commerce/EcommerceWorkspaceSearch';
 import '@/components/logistic/logistics.css';
+import ExecutiveConfirmationProvider from '@/components/e-commerce/ExecutiveConfirmationProvider';
 
 function EcommerceWorkspace() {
     const tr = useExecutiveText();
@@ -28,11 +29,9 @@ function EcommerceWorkspace() {
         { path: ROUTES.ECOMMERCE_DASHBOARD, label: tr('Tổng quan', 'Overview'), icon: <LayoutDashboard size={18} /> },
         { path: ROUTES.ECOMMERCE_PRODUCTS, label: tr('Sản phẩm & giá', 'Products & pricing'), icon: <Package size={18} /> },
         { path: ROUTES.ECOMMERCE_COMBOS, label: tr('Combo sản phẩm', 'Product combos'), icon: <Boxes size={18} /> },
-        { path: ROUTES.ECOMMERCE_QUOTES, label: tr('Báo giá B2B', 'B2B quotes'), icon: <ClipboardList size={18} /> },
         { path: ROUTES.ECOMMERCE_COUPONS, label: tr('Mã giảm giá', 'Coupons'), icon: <TicketPercent size={18} /> },
         { path: ROUTES.ECOMMERCE_PROMOTIONS, label: tr('Khuyến mãi', 'Promotions'), icon: <Megaphone size={18} /> },
         { path: ROUTES.ECOMMERCE_REVIEWS, label: tr('Đánh giá khách hàng', 'Customer reviews'), icon: <MessageSquare size={18} /> },
-        { path: ROUTES.ECOMMERCE_REFUNDS, label: tr('Yêu cầu hủy hàng', 'Cancellation requests'), icon: <Undo2 size={18} /> },
     ];
     const current = navigation.find((item) => location.pathname === item.path) ?? navigation[0];
     useEffect(() => { document.title = `${current.label} | Bite to Business`; }, [current.label]);
@@ -63,7 +62,7 @@ function EcommerceWorkspace() {
                 groups={[
                     { label: tr('ĐIỀU HÀNH KINH DOANH', 'COMMERCE OPERATIONS'), items: navigation.slice(0, 3) },
                     { label: tr('MARKETING & NỘI DUNG', 'MARKETING & CONTENT'), items: navigation.slice(3, 5) },
-                    { label: tr('KHÁCH HÀNG & YÊU CẦU', 'CUSTOMERS & REQUESTS'), items: navigation.slice(5) },
+                    { label: tr('KHÁCH HÀNG', 'CUSTOMERS'), items: navigation.slice(5) },
                 ]}
             />
             <div className="lg-main-wrapper">
@@ -91,5 +90,5 @@ export default function EcommerceLayout() {
     const [queryClient] = useState(() => new QueryClient({
         defaultOptions: { queries: { retry: 1, staleTime: 60_000, refetchOnWindowFocus: false }, mutations: { retry: false } },
     }));
-    return <QueryClientProvider client={queryClient}><EcommerceWorkspace /></QueryClientProvider>;
+    return <QueryClientProvider client={queryClient}><ExecutiveConfirmationProvider><EcommerceWorkspace /></ExecutiveConfirmationProvider></QueryClientProvider>;
 }

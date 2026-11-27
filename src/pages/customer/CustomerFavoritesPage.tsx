@@ -1,18 +1,18 @@
-import Skeleton from '@/components/common/Skeleton';
-import { ChevronLeft, ChevronRight, Heart, ImageOff, Trash2 } from 'lucide-react';
+import ProductCardSkeleton from '@/components/customer/home/ProductCardSkeleton';
+import ProductShowcaseCard from '@/components/customer/home/ProductShowcaseCard';
+import { toCardIncludingUnpriced } from '@/utils/customer/homeProductMapper';
+import { ChevronLeft, ChevronRight, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
-import { ROUTES, routePaths } from '@/router/routes';
-import { formatCurrencyVnd } from '@/constants/customer/homeData';
+import { ROUTES } from '@/router/routes';
 import { useMyFavorites } from '@/hooks/customer/useMyFavorites';
 import PageNav from '@/components/common/PageNav';
 
 export default function CustomerFavoritesPage() {
-    const { t, i18n } = useTranslation('storefront');
-    const english = i18n.resolvedLanguage?.startsWith('en') ?? false;
+    const { t } = useTranslation('storefront');
     const tr = (key: string) => t(`customerUI.favoritesPage.${key}`);
-    const { page, setPage, setLoading, result, loading, error, removing, remove, retry } = useMyFavorites();
+    const { page, setPage, setLoading, result, loading, error, onRemoved, retry } = useMyFavorites();
 
     return (
         <StorefrontLayout rootClassName="min-h-screen bg-store-cream text-store-ink">
@@ -28,8 +28,10 @@ export default function CustomerFavoritesPage() {
                     </div>
                 </div>
                 {loading && (
-<div aria-busy="true" className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{Array.from({ length: 8 }, (_, i) => <div key={i} className="border border-store-line bg-white"><Skeleton className="h-48 w-full rounded-none"/><div className="space-y-3 p-4"><Skeleton className="h-5 w-4/5"/><Skeleton className="h-4 w-1/2"/><Skeleton className="h-9 w-full"/></div></div>)}</div>
-)}
+                    <div aria-busy="true" className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {Array.from({ length: 12 }, (_, i) => <ProductCardSkeleton key={i} />)}
+                    </div>
+                )}
                 {error && (
                     <div
                         role="alert"
@@ -58,87 +60,13 @@ export default function CustomerFavoritesPage() {
                     <>
                         <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {result.content.map((product) => (
-                                <article
+                                <ProductShowcaseCard
                                     key={product.productId}
-                                    className="
-    isolate flex min-w-0 flex-col
-    overflow-hidden rounded-none
-    border border-store-line bg-white
-    shadow-[5px_7px_0_rgba(17,58,42,0.18)]
-    transition-shadow duration-300
-    hover:shadow-[7px_10px_0_rgba(17,58,42,0.25)]
-  "
-                                >
-                                    {/* Product image */}
-                                    <Link
-                                        to={routePaths.productDetail(product.productId)}
-                                        className="
-      relative flex h-48 shrink-0
-      items-center justify-center
-      overflow-hidden bg-[#f8f8f2] p-3
-    "
-                                    >
-                                        {product.imageUrl ? (
-                                            <img
-                                                loading="lazy"
-                                                src={product.imageUrl}
-                                                alt={english ? product.nameEn : product.nameVi}
-                                                className="
-          block h-full w-full max-h-full max-w-full
-          object-contain
-          transition-transform duration-300
-          hover:scale-105
-        "
-                                            />
-                                        ) : (
-                                            <ImageOff size={35} className="text-store-muted" />
-                                        )}
-                                    </Link>
-
-                                    {/* Product information */}
-                                    <div className="relative z-10 flex flex-1 flex-col gap-3 bg-white p-4">
-                                        <p className="m-0 truncate text-xs text-store-muted">
-                                            {product.sku}
-                                        </p>
-
-                                        <Link
-                                            to={routePaths.productDetail(product.productId)}
-                                            className="
-        line-clamp-2 min-h-10
-        text-sm font-bold leading-5
-        text-store-ink no-underline
-        hover:text-store-green
-      "
-                                        >
-                                            {english
-                                                ? product.nameEn || product.nameVi
-                                                : product.nameVi || product.nameEn}
-                                        </Link>
-
-                                        <p className="m-0 mt-auto text-lg font-extrabold text-store-green">
-                                            {product.listPrice == null
-                                                ? tr('priceUnavailable')
-                                                : formatCurrencyVnd(product.listPrice)}
-                                        </p>
-
-                                        <button
-                                            type="button"
-                                            disabled={removing === product.productId}
-                                            onClick={() => void remove(product.productId)}
-                                            className="
-        inline-flex items-center justify-center gap-2
-        border border-store-line bg-white
-        px-3 py-2 text-xs font-bold
-        text-store-green transition-colors
-        hover:bg-store-cream
-        disabled:opacity-50
-      "
-                                        >
-                                            <Trash2 size={15} />
-                                            {tr('remove')}
-                                        </button>
-                                    </div>
-                                </article>
+                                    product={toCardIncludingUnpriced(product)}
+                                    section="standard"
+                                    knownFavorite
+                                    onFavoriteRemoved={onRemoved}
+                                />
                             ))}
                         </div>
                         {result.totalPages > 1 && (

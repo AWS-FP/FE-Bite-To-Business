@@ -99,3 +99,11 @@ export interface HomeResponse {
     activePromotions: HomePromotion[];
     banners: HomeBanner[];
 }
+
+export interface HomePromotionProductsPage {
+    promotion: HomePromotion;
+    items: HomeProduct[];
+    page: number;
+    size: number;
+    hasNext: boolean;
+}

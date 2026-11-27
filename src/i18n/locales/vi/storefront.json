@@ -892,6 +892,10 @@
         "bestSellingEmpty": "Chưa có sản phẩm bán chạy từ các đơn hoàn tất trong 30 ngày gần nhất.",
         "deepDiscountEmpty": "Sản phẩm giảm giá sẽ xuất hiện khi có chương trình ưu đãi mới.",
         "topRatedEmpty": "Sản phẩm được đánh giá cao sẽ xuất hiện khi khách hàng chia sẻ nhận xét.",
+        "promotionPage": {
+            "title": "Chương trình khuyến mãi",
+            "unavailable": "Chương trình không tồn tại hoặc đã kết thúc."
+        },
         "groupEmpty": "Chưa có sản phẩm đủ điều kiện. Nội dung sẽ cập nhật khi có dữ liệu mới.",
         "flashComingSoon": "Ưu đãi đang được chuẩn bị",
         "flashEmptyHint": "Khi có Flash Sale thực được công bố, sản phẩm sẽ tự xuất hiện tại đây.",

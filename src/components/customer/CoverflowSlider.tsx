@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { PROMOTION_BANNER_ASPECT } from '@/constants/customer/promotionBanner';
 import { useHomeModelContext } from './home/HomeModel';
 import Skeleton from '@/components/common/Skeleton';
+import { routePaths } from '@/router/routes';
 
 /** All slides are published banner images returned by Customer Homepage API. */
 export default function CoverflowSlider() {
@@ -101,7 +102,7 @@ export default function CoverflowSlider() {
                                     slide.targetUrl?.startsWith('/') &&
                                     !slide.targetUrl.startsWith('//')
                                         ? slide.targetUrl
-                                        : null;
+                                        : routePaths.promotionDetail(slide.id);
                                 const content = (
                                     <>
                                         <img

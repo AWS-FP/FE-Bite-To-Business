@@ -1,3 +1,4 @@
+import { useExecutiveConfirmation } from '@/hooks/e-commerce/useExecutiveConfirmation';
 import Skeleton from '@/components/common/Skeleton';
 import { ExecutiveTableSkeleton, ExecutiveQuoteDetailSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { useState } from 'react';
@@ -21,7 +22,8 @@ import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 import { formatVnd } from '@/services/e-commerce/executiveReadService';
 import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
 
-export default function EcommerceQuotesPage() {
+export default function LogisticsQuotesPage() {
+    const confirm = useExecutiveConfirmation();
     const tr = useExecutiveText(),
         qc = useQueryClient();
     const [status, setStatus] = useState(''),
@@ -505,15 +507,10 @@ export default function EcommerceQuotesPage() {
                                                                 decision.isPending
                                                             }
                                                             onClick={() => {
-                                                                if (
-                                                                    window.confirm(
-                                                                        tr(
+                                                                void confirm(tr(
                                                                             'Duyệt báo giá này?',
                                                                             'Approve this quotation?',
-                                                                        ),
-                                                                    )
-                                                                )
-                                                                    decision.mutate('approve');
+                                                                        ), () => decision.mutateAsync('approve'));
                                                             }}
                                                         >
                                                             {tr(
@@ -530,16 +527,12 @@ export default function EcommerceQuotesPage() {
                                                 className="rounded-2xl border border-rose-200 bg-white p-5"
                                                 onSubmit={(e) => {
                                                     e.preventDefault();
-                                                    if (
-                                                        reason.trim() &&
-                                                        window.confirm(
+                                                    if (reason.trim()) void confirm(
                                                             tr(
                                                                 'Xác nhận từ chối báo giá?',
                                                                 'Reject this quotation?',
                                                             ),
-                                                        )
-                                                    )
-                                                        decision.mutate('reject');
+                                                         () => decision.mutateAsync('reject'), { danger: true });
                                                 }}
                                             >
                                                 <h3 className="font-bold text-rose-700">

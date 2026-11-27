@@ -892,6 +892,10 @@
         "bestSellingEmpty": "No best sellers yet from orders completed in the last 30 days.",
         "deepDiscountEmpty": "Discounted products will appear here when new offers go live.",
         "topRatedEmpty": "Top-rated products will appear here as customers share their reviews.",
+        "promotionPage": {
+            "title": "Promotion",
+            "unavailable": "This promotion is unavailable or has ended."
+        },
         "groupEmpty": "No qualifying products yet. This will update when new data is available.",
         "flashComingSoon": "Offers are being prepared",
         "flashEmptyHint": "Products will appear here when a real flash sale goes live.",
