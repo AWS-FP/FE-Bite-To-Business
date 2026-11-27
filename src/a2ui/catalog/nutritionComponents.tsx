@@ -21,23 +21,40 @@ export const NutritionTable = createComponentImplementation(
         const { i18n } = useTranslation();
         const en = i18n.resolvedLanguage?.startsWith('en');
         const products = productList(props.items).slice(0, props.maxItems ?? 6);
+        const notes = products.find((product) => product.facts?.notes)?.facts?.notes;
+        const evidence = notes ? (
+            <details className="rounded-xl bg-store-cream p-4 text-xs leading-6 text-store-muted">
+                <summary className="cursor-pointer font-semibold">
+                    {en
+                        ? 'Reference values — sources and limitations'
+                        : 'Số liệu tham khảo — nguồn và giới hạn'}
+                </summary>
+                <p className="mt-2">{notes}</p>
+            </details>
+        ) : null;
         const nutrients = [
             ...new Set(
-                products.flatMap(
-                    (product) => product.facts?.nutrition?.map((row) => row.nutrient) ?? [],
+                products.flatMap((product) =>
+                    product.facts?.nutritionVerified === true
+                        ? (product.facts.nutrition?.map((row) => row.nutrient) ?? [])
+                        : [],
                 ),
             ),
         ];
         if (!nutrients.length)
             return (
-                <p className="rounded-lg bg-store-cream p-4 text-sm text-store-muted">
-                    {en
-                        ? 'Nutrition values are not available in these product records.'
-                        : 'Các sản phẩm này chưa có số liệu dinh dưỡng trong hồ sơ.'}
-                </p>
+                <>
+                    <p className="rounded-lg bg-store-cream p-4 text-sm text-store-muted">
+                        {en
+                            ? 'Verified nutrition is not available for these products. Existing unverified values cannot confirm nutritional requirements.'
+                            : 'Các sản phẩm này chưa có số liệu dinh dưỡng đã đối chiếu nguồn. Dữ liệu chưa xác minh chưa đủ để xác nhận điều kiện dinh dưỡng.'}
+                    </p>
+                    {evidence}
+                </>
             );
         return (
             <div className="space-y-3">
+                {evidence}
                 <p className="text-xs leading-relaxed text-store-muted">
                     {en
                         ? 'Values use each product’s recorded basis. Compare quantities only when units and serving sizes match.'
@@ -84,9 +101,11 @@ export const NutritionTable = createComponentImplementation(
                                     </th>
                                     {products.map((product) => (
                                         <td key={product.productId} className="p-3">
-                                            {product.facts?.nutrition?.find(
-                                                (row) => row.nutrient === nutrient,
-                                            )?.amount ?? (en ? 'Not provided' : 'Chưa có dữ liệu')}
+                                            {(product.facts?.nutritionVerified === true
+                                                ? product.facts.nutrition
+                                                : []
+                                            )?.find((row) => row.nutrient === nutrient)?.amount ??
+                                                (en ? 'Not provided' : 'Chưa có dữ liệu')}
                                         </td>
                                     ))}
                                 </tr>

@@ -42,3 +42,7 @@ export async function getApplicationLogs(hours: number, signal?: AbortSignal) {
     });
     return response.data.data;
 }
+export async function getFrontendLogs(hours:number, cursor:{before?:number;token?:string}, signal?:AbortSignal) {
+    const response=await http.get<ApiResponse<{from:string;to:string;status:string;nextToken:string|null;entries:{time:string;type:string;page:string;browser:string;message:string;httpStatus:number|null;durationMs:number|null}[]}>>('/api/admin/system/monitoring/frontend-logs', {params:{hours,before:cursor.before,nextToken:cursor.token},signal,timeout:20_000});
+    return response.data.data;
+}

@@ -1,5 +1,6 @@
 import { env } from '@/lib/env';
 import { personalizationEnabled } from '../telemetry/interactionTracker';
+import type { StablePage } from '../runtime/stablePage';
 
 /** Trạng thái hiển thị BE trả qua STATE_SNAPSHOT; gửi lại ở lượt sau (khớp RunAgentInput.AgentState). */
 export type AgentState = {
@@ -46,6 +47,7 @@ export async function runAgent(
         state?: AgentState;
         /** chat: trả lời kèm khối nhỏ; page: AI ghép cả trang. */
         mode?: 'chat' | 'page';
+        stablePage?: StablePage;
     },
     onEvent: (event: AgentEvent) => void,
     signal?: AbortSignal,
@@ -56,7 +58,10 @@ export async function runAgent(
     const response = await fetch(`${env.apiBaseUrl}/api/ai/agent`, {
         method: 'POST',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream, application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'text/event-stream, application/json',
+        },
         body: JSON.stringify({
             ...input,
             state: Object.keys(state).length ? clean(state) : undefined,

@@ -16,7 +16,12 @@ const PAGES: Record<string, string> = {
     brands: ROUTES.BRANDS,
 };
 
-export const aiPagePath = (prompt: string) => `/ai?q=${encodeURIComponent(prompt.trim())}`;
+export const aiPagePath = (prompt: string, subject?: string, view?: 'table') => {
+    const params = new URLSearchParams({ q: prompt.trim() });
+    if (subject?.trim()) params.set('subject', subject.trim().slice(0, 100));
+    if (view) params.set('view', view);
+    return `/ai?${params}`;
+};
 
 /**
  * Nối action A2UI (đã qua allowlist) vào luồng thật của web: router, giỏ hàng, trợ lý.

@@ -44,6 +44,8 @@ export type A2uiProductFacts = {
     compliance?: string | null;
     nutritionBasis?: string | null;
     nutrition?: { nutrient: string; amount: string }[];
+    nutritionVerified?: boolean;
+    notes?: string | null;
 };
 
 export type A2uiCategory = {
@@ -106,7 +108,22 @@ const UNIT: Record<string, string> = {
     TUB: 'hũ',
     CASE: 'thùng',
 };
-export const unitLabel = (code: string) => UNIT[code] ?? code.toLowerCase();
+const UNIT_EN: Record<string, string> = {
+    KG: 'kg',
+    BOTTLE: 'bottle',
+    PIECE: 'piece',
+    PACK: 'pack',
+    TRAY: 'tray',
+    BOX: 'box',
+    BAG: 'bag',
+    CAN: 'can',
+    TIN: 'tin',
+    TUB: 'tub',
+    CASE: 'case',
+    COMBO: 'combo',
+};
+export const unitLabel = (code: string, locale = 'vi') =>
+    (locale === 'en' ? UNIT_EN[code] : UNIT[code]) ?? code.toLowerCase();
 /** Còn hàng để bán: tồn khả dụng > 0 (null = chưa rõ, coi như không thêm được). */
 export const inStock = (product: A2uiProduct) =>
     product.availableQuantity != null && product.availableQuantity > 0;

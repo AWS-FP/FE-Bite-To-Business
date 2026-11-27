@@ -31,22 +31,34 @@ export const PageHeaderApi = {
         ...common,
         title: CommonSchemas.DynamicString,
         subtitle: CommonSchemas.DynamicString.optional(),
+        variant: z.enum(['plain', 'hero', 'soft']).optional(),
+        eyebrow: CommonSchemas.DynamicString.optional(),
     }),
 };
 export const PageHeader = createComponentImplementation(PageHeaderApi, ({ props }) => (
-    <header className="space-y-2 border-b border-store-line pb-5">
-        <h1 className="font-heading text-3xl text-store-green sm:text-4xl">{props.title}</h1>
+    <header
+        className={`a2ui-page-header space-y-4 ${props.variant === 'hero' ? 'rounded-3xl bg-store-green p-7 text-white sm:p-9' : props.variant === 'soft' ? 'rounded-3xl border border-store-green/10 bg-store-mint/25 p-7 text-store-green' : 'border-b border-store-line pb-7 text-store-green'}`}
+    >
+        {props.eyebrow && (
+            <p className="m-0 text-xs font-bold uppercase tracking-[0.14em] opacity-70">
+                {props.eyebrow}
+            </p>
+        )}
+        <h1 className="m-0 max-w-5xl text-balance font-heading text-3xl font-bold leading-tight sm:text-4xl">
+            {props.title}
+        </h1>
         {props.subtitle && (
-            <p className="max-w-3xl text-sm text-store-muted sm:text-base">{props.subtitle}</p>
+            <p className="m-0 max-w-3xl text-sm leading-7 opacity-80 sm:text-base">
+                {props.subtitle}
+            </p>
         )}
     </header>
 ));
 
 const SECTION_STYLE = {
     plain: '',
-    card: 'rounded-xl border border-store-line bg-white p-4 sm:p-5',
-    highlight:
-        'rounded-xl border-2 border-store-green bg-white p-4 shadow-[0_6px_0_-2px_rgba(9,51,36,0.2)] sm:p-5',
+    card: 'rounded-2xl border border-store-line bg-white p-5 sm:p-7',
+    highlight: 'rounded-2xl border border-store-green/30 bg-white p-5 shadow-sm sm:p-7',
 } as const;
 
 export const SectionApi = {
@@ -60,8 +72,8 @@ export const SectionApi = {
     }),
 };
 export const Section = createComponentImplementation(SectionApi, ({ props, buildChild }) => (
-    <section className={`space-y-3 ${SECTION_STYLE[props.variant ?? 'plain']}`}>
-        <div>
+    <section className={`space-y-5 ${SECTION_STYLE[props.variant ?? 'plain']}`}>
+        <div className="space-y-2">
             <h2 className="font-subheading text-xl font-bold text-black">{props.title}</h2>
             {props.description && <p className="text-sm text-store-muted">{props.description}</p>}
         </div>
