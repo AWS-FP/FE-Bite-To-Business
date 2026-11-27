@@ -17,13 +17,13 @@ import {
     ArrowDownLeft,
     ArrowUpRight,
     Download,
-    Info,
     RefreshCw,
     Wallet,
     CircleHelp,
 } from 'lucide-react';
 import './FinanceReport.css';
 import AdminButton from './AdminButton';
+import AdminPageHeader from './AdminPageHeader';
 import type { FinanceFilters, FinancePage } from '@/types/admin/finance';
 import { useFinanceReports } from '@/hooks/admin/useFinanceReports';
 import { exportFinanceReport } from '@/utils/admin/finance';
@@ -123,10 +123,7 @@ export default function FinanceReport() {
 
     return (
         <section className="finance-report" aria-label={t('system.reports.title')}>
-            <div className="system-section-toolbar">
-                <div>
-                    <h2>{t('system.reports.title')}</h2>
-                </div>
+            <AdminPageHeader eyebrow={t('sidebar.systemManagement')} title={t('system.reports.title')}>
                 <AdminButton
                     busy={busy}
                     onClick={() => {
@@ -138,18 +135,7 @@ export default function FinanceReport() {
                     <RefreshCw size={16} />
                     {t('system.refresh')}
                 </AdminButton>
-            </div>
-            <details className="finance-info">
-                <summary>
-                    <Info size={15} aria-hidden="true" />
-                    {label('reportInfo')}
-                </summary>
-                <div>
-                    <p>{label('scope')}</p>
-                    <p>{label('dateHint')}</p>
-                    <p>{label('transactionHint')}</p>
-                </div>
-            </details>
+            </AdminPageHeader>
             <form noValidate className="system-panel finance-filters" onSubmit={apply}>
                 <div className="finance-presets" role="group" aria-label={label('quickRange')}>
                     <button type="button" onClick={() => selectRange(7)}>

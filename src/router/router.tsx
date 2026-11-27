@@ -53,6 +53,7 @@ import RegistrationsPage from '@/pages/admin/RegistrationsPage';
 import RegistrationDetailPage from '@/pages/admin/RegistrationDetailPage';
 import StaffPage from '@/pages/admin/StaffPage';
 import SystemMetricsPage from '@/pages/admin/SystemMetricsPage';
+import RevenueReportPage from '@/pages/admin/RevenueReportPage';
 
 // Layouts & Shared Components
 import AdminLayout from '@/layouts/admin/AdminLayout';
@@ -254,6 +255,10 @@ export const router = createBrowserRouter([
                             {
                                 path: ROUTES.ADMIN_SYSTEM,
                                 Component: SystemMetricsPage,
+                            },
+                            {
+                                path: ROUTES.ADMIN_REVENUE,
+                                Component: RevenueReportPage,
                             },
                         ],
                     },

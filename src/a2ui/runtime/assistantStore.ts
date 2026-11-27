@@ -127,10 +127,20 @@ export const useAssistantStore = create<AssistantState>()(
                         error: true,
                         text:
                             status === 429
-                                ? 'Bạn đã dùng hết lượt hỏi trợ lý trong giờ này. Vui lòng thử lại sau.'
-                                : status === 403
-                                  ? 'Trợ lý mua hàng chỉ dành cho khách hàng.'
-                                  : 'Trợ lý hiện chưa thể phản hồi. Bạn vẫn có thể tìm sản phẩm ở trang danh mục.',
+                                ? error instanceof AgentHttpError && error.code === 'AI_RATE_LIMIT_EXCEEDED'
+                                    ? 'Bạn đã dùng hết 50 lượt hỏi AI trong một giờ. Vui lòng thử lại sau.'
+                                    : 'Trợ lý đang nhận quá nhiều yêu cầu. Vui lòng thử lại sau ít phút.'
+                                : status === 401
+                                  ? 'Phiên đăng nhập có thể đã hết hạn. Bạn hãy đăng nhập lại rồi thử nhé.'
+                                  : status === 403
+                                    ? 'Trợ lý mua hàng chỉ dành cho khách hàng.'
+                                    : status === 400
+                                      ? 'Không thể xử lý nội dung hoặc trạng thái cuộc trò chuyện. Hãy tạo cuộc trò chuyện mới rồi thử lại.'
+                                      : status >= 500
+                                        ? `Máy chủ trợ lý đang gặp lỗi (${status}). Vui lòng thử lại sau.`
+                                        : status === 0
+                                          ? 'Không kết nối được đến trợ lý. Hãy kiểm tra kết nối hoặc máy chủ BE.'
+                                          : `Trợ lý chưa thể phản hồi (mã ${status}). Vui lòng thử lại.`,
                     });
                 } finally {
                     if (get().threadId === threadId) set({ busy: false });

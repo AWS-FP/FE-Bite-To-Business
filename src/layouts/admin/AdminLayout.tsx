@@ -3,14 +3,13 @@ import axios from 'axios';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { ROUTES } from '@/router/routes';
+import { getAdminSectionNumber, ROUTES } from '@/router/routes';
 import { useAuthStore } from '@/store/admin/authStore';
 import { useRegistrationStats } from '@/hooks/admin/useRegistrations';
 import { useOpenPaymentReviewCount } from '@/hooks/admin/usePaymentReviews';
 import { logout } from '@/services/admin/authService';
 import AdminHeader from './AdminHeader';
 import AdminSidebar from './AdminSidebar';
-import AdminIcon from '@/components/admin/AdminIcon';
 
 function shouldRetryAdminRequest(failureCount: number, error: unknown) {
     if (failureCount >= 1) return false;
@@ -49,13 +48,7 @@ function AdminWorkspace() {
     const paymentReviewCount = useOpenPaymentReviewCount();
     const queryClient = useQueryClient();
     const loggingOut = useRef(false);
-    let sectionNumber = '01';
-    if (location.pathname.startsWith(ROUTES.ADMIN_STAFF)) {
-        sectionNumber = '02';
-    }
-    if (location.pathname.startsWith(ROUTES.ADMIN_SYSTEM)) {
-        sectionNumber = '03';
-    }
+    const sectionNumber = getAdminSectionNumber(location.pathname);
 
     async function handleLogout() {
         if (loggingOut.current) return;
@@ -91,6 +84,7 @@ function AdminWorkspace() {
                 paymentReviewsPath={ROUTES.ADMIN_PAYMENT_REVIEWS}
                 openPaymentReviews={paymentReviewCount.data}
                 systemPath={ROUTES.ADMIN_SYSTEM}
+                revenuePath={ROUTES.ADMIN_REVENUE}
                 isCollapsed={isCollapsed}
                 onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
             />
@@ -109,10 +103,6 @@ function AdminWorkspace() {
                     <Outlet />
                     <footer className="mt-6 flex flex-wrap items-center justify-between gap-3 text-[11px] leading-[16.5px] text-store-muted">
                         <p>{t('footer.copyright', { year: new Date().getFullYear() })}</p>
-                        <p className="flex items-center gap-1.5">
-                            <AdminIcon name="lock" />
-                            {t('footer.adminOnly')}
-                        </p>
                     </footer>
                 </main>
             </div>
