@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 // Landing Header riêng
@@ -26,25 +26,6 @@ export default function LandingPage() {
 
     const [category, setCategory] = useState('all');
     const [view, setView] = useState<'grid' | 'table'>('grid');
-    const [toast, setToast] = useState<{ key: string; itemKey?: string } | null>(null);
-
-    useEffect(() => {
-        if (!toast) return;
-
-        const timeout = window.setTimeout(() => {
-            setToast(null);
-        }, 3600);
-
-        return () => window.clearTimeout(timeout);
-    }, [toast]);
-
-    const showToast = (key: string) => {
-        setToast({ key });
-    };
-
-    const onAddToQuote = (itemKey: string) => {
-        setToast({ key: 'landing.toast.added', itemKey });
-    };
 
     return (
         <div className="flex min-h-dvh flex-col bg-store-cream">
@@ -65,11 +46,9 @@ export default function LandingPage() {
                         view={view}
                         setCategory={setCategory}
                         setView={setView}
-                        onAddToQuote={onAddToQuote}
-                        showToast={showToast}
                     />
 
-                    <LandingBusinessSolution showToast={showToast} />
+                    <LandingBusinessSolution />
 
                     <LandingImpact />
 
@@ -77,16 +56,6 @@ export default function LandingPage() {
 
                     <LandingCTA />
                 </main>
-
-                {/* Thông báo */}
-                <div
-                    id="appToast"
-                    className={`toast-notification${toast ? ' show' : ''}`}
-                    role="status"
-                    aria-live="polite"
-                >
-                    {toast ? t(toast.key, { item: toast.itemKey ? t(toast.itemKey) : '' }) : ''}
-                </div>
             </div>
 
             {/* Footer global - nằm ngoài CSS Landing */}
