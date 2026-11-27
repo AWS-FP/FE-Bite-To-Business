@@ -1,3 +1,4 @@
+import Skeleton from '@/components/common/Skeleton';
 import { useEffect, useRef, useState } from 'react';
 import type { Map, Marker } from '@vietmap/vietmap-gl-js/dist/vietmap-gl';
 import { loadVietMap } from '@/services/shipper/vietmapService';
@@ -175,9 +176,7 @@ export default function DeliveryMap({
                     </div>
                 )}
                 {apiKey && status === 'loading' && (
-                    <div className="dl-map-message" role="status">
-                        <p>Đang tải bản đồ VietMap…</p>
-                    </div>
+                    <Skeleton className="absolute! inset-0 h-full w-full"/>
                 )}
                 {apiKey && status === 'error' && (
                     <div className="dl-map-message" role="alert">

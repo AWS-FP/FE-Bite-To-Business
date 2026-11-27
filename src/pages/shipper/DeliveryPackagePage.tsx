@@ -1,3 +1,4 @@
+import Skeleton from '@/components/common/Skeleton';
 import { useParams } from 'react-router-dom';
 import DeliveryMap from '@/components/shipper/DeliveryMap';
 import ConfirmModal from '@/components/common/ConfirmModal';
@@ -16,7 +17,7 @@ export default function DeliveryPackagePage() {
             <PageNav back={{ label: 'Quay lại', to: ROUTES.DELIVERY_TRIPS }} />
             <h1 className="font-subheading text-3xl font-bold">Chi tiết package</h1>
             {error && <p role="alert">{error}</p>}
-            {!parcel && !error && <p>Đang tải thông tin...</p>}
+            {!parcel && !error && <div aria-busy="true" className="grid grid-cols-[minmax(260px,1fr)_2fr] gap-6"><section className="space-y-5 rounded-2xl border border-store-ink/15 bg-white p-6">{Array.from({length:5},(_,i)=><div key={i} className="space-y-2"><Skeleton className="h-4 w-28"/><Skeleton className="h-4 w-4/5"/></div>)}<Skeleton className="h-10 w-36"/></section><section className="rounded-2xl border bg-white p-4"><Skeleton className="h-6 w-40"/><Skeleton className="mt-4 h-[420px] w-full"/></section></div>}
             {parcel && <div className="grid grid-cols-[minmax(260px,1fr)_2fr] gap-6">
                 <section className="space-y-5 rounded-2xl border border-store-ink/15 bg-white p-6">
                     <div><strong>Package</strong><p>{parcel.packageName}</p></div>

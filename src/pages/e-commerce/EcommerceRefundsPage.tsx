@@ -1,3 +1,4 @@
+import { ExecutiveArticleSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Undo2 } from 'lucide-react';
@@ -14,7 +15,6 @@ import {
     ExecutiveError,
     ExecutiveHeading,
     ExecutivePanel,
-    LoadingRows,
 } from '@/components/e-commerce/ExecutiveUI';
 import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
@@ -104,7 +104,7 @@ export default function EcommerceRefundsPage() {
                     </ExecutiveSelect>
                 </div>
                 {list.isLoading ? (
-                    <LoadingRows />
+                    <ExecutiveArticleSkeleton kind="refunds" />
                 ) : list.isError ? (
                     <div className="p-5">
                         <ExecutiveError

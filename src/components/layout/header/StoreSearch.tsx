@@ -1,3 +1,4 @@
+import ListSkeleton from '@/components/common/ListSkeleton';
 import { ArrowRight, Clock3, Image as ImageIcon, Search, Sparkles, Trash2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -160,13 +161,7 @@ export default function StoreSearch() {
                                 {t('search.suggestions')}
                             </p>
                             {suggestionLoading ? (
-                                <div
-                                    className="flex items-center gap-2 px-3 py-5 text-sm text-store-muted"
-                                    role="status"
-                                >
-                                    <span className="size-4 animate-spin rounded-full border-2 border-store-line border-t-store-green" />
-                                    {t('search.loadingSuggestions')}
-                                </div>
+                                <ListSkeleton count={3} image lines={2} action={false} rowClassName="flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5" />
                             ) : suggestionError ? (
                                 <p role="status" className="m-0 px-3 py-5 text-sm text-store-muted">
                                     {t('search.suggestionUnavailable')}

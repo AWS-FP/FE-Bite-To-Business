@@ -1,4 +1,5 @@
 import {
+    Boxes,
     ClipboardList,
     Megaphone,
     Package,
@@ -31,6 +32,7 @@ export const STAFF_WORKSPACES: Record<StaffRole, StaffWorkspace> = {
             },
             { path: ROUTES.ECOMMERCE_QUOTES, label: 'ecommerceQuotes', icon: ClipboardList },
             { path: ROUTES.ECOMMERCE_PRODUCTS, label: 'navigation.products', icon: Package },
+            { path: ROUTES.ECOMMERCE_COMBOS, label: 'navigation.combos', icon: Boxes },
             { path: ROUTES.ECOMMERCE_PROMOTIONS, label: 'navigation.promotions', icon: Megaphone },
             { path: ROUTES.ECOMMERCE_COUPONS, label: 'navigation.coupons', icon: TicketPercent },
         ],

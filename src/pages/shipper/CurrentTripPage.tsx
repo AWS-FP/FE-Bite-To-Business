@@ -1,3 +1,4 @@
+import ListSkeleton from '@/components/common/ListSkeleton';
 import { Package, RefreshCw, Truck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { routePaths } from '@/router/routes';
@@ -50,11 +51,7 @@ export default function CurrentTripPage() {
                     {notice}
                 </p>
             )}
-            {loading && (
-                <p role="status" className="text-sm text-store-muted">
-                    Đang tải đơn hàng...
-                </p>
-            )}
+
             <section className="rounded-2xl border border-store-ink/15 bg-white p-6">
                 <div className="mb-5 flex items-center gap-3">
                     <span className="grid size-11 place-items-center rounded-xl bg-store-cream text-store-green">
@@ -67,6 +64,7 @@ export default function CurrentTripPage() {
                         </p>
                     </div>
                 </div>
+                {loading && !mine && <ListSkeleton lines={4} className="space-y-4" rowClassName="flex items-start justify-between gap-3 rounded-xl border border-store-ink/15 p-4" />}
                 {!loading && mine?.content.length === 0 && (
                     <p className="mb-0 text-sm text-store-muted">Bạn chưa nhận package nào.</p>
                 )}
@@ -99,7 +97,8 @@ export default function CurrentTripPage() {
                                                 {parcel.recipientPhone || 'Chưa có số điện thoại'}
                                             </p>
                                             <p className="mb-0 mt-1 text-sm text-store-muted">
-                                                {parcel.deliveryDate}
+                                                {parcel.deliveryDate}
+
                                             </p>
                                             {parcel.note && (
                                                 <p className="mb-0 mt-1 text-sm text-store-muted">
@@ -145,6 +144,7 @@ export default function CurrentTripPage() {
                         </p>
                     </div>
                 </div>
+                {loading && !ready && <ListSkeleton lines={4} className="space-y-4" rowClassName="flex items-start justify-between gap-3 rounded-xl border border-store-ink/15 p-4" />}
                 {!loading && ready?.content.length === 0 && (
                     <p className="mb-0 text-sm text-store-muted">
                         Hiện chưa có package sẵn sàng giao.

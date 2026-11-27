@@ -1,3 +1,4 @@
+import ListSkeleton from '@/components/common/ListSkeleton';
 import { Link, useSearchParams } from 'react-router-dom';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
 import OrderStatusBadge from '@/components/customer/order/OrderStatusBadge';
@@ -68,7 +69,7 @@ function OrderList({ group, empty }: { group: CustomerOrderGroup; empty: string 
     return (
         <>
             {reordering.error && <p role="alert" className="mb-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">{reordering.error}</p>}
-            {loading && <p role="status">Đang tải đơn hàng...</p>}
+            {loading && <ListSkeleton className="grid gap-4" lines={3} rowClassName="flex justify-between gap-4 rounded-xl border-2 border-store-ink bg-white p-5 shadow-[4px_4px_0_#14132b]" />}
             {error && (
                 <p role="alert" className="text-danger">
                     Không tải được đơn hàng. Vui lòng thử lại.

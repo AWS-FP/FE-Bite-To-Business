@@ -1,8 +1,10 @@
+import ProductDetailSkeleton from '@/components/customer/product-detail/ProductDetailSkeleton';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { PackageX } from 'lucide-react';
 import StorefrontLayout from '@/layouts/StorefrontLayout';
+import ComboIngredients from '@/components/customer/product-detail/ComboIngredients';
 import CustomerProductInfo from '@/components/customer/product-detail/CustomerProductInfo';
 import CustomerProductPurchase from '@/components/customer/product-detail/CustomerProductPurchase';
 import CustomerProductReviews from '@/components/customer/product-detail/CustomerProductReviews';
@@ -103,11 +105,7 @@ function CustomerProductDetailContent({ productId }: { productId?: string }) {
             </div>
 
             <div className="mx-auto w-full max-w-[1440px] px-5">
-                {loading && productId && (
-                    <p role="status" className="py-24 text-center text-sm text-[#d1dfd2]">
-                        {tr('loading')}
-                    </p>
-                )}
+                {loading && productId && <ProductDetailSkeleton />}
                 {(!productId || (!loading && (!product || failed))) && (
                     <div className="mx-auto max-w-xl rounded-xl bg-white p-8 text-center text-[#17182d]">
                         <PackageX size={46} className="mx-auto text-slate-400" />
@@ -135,6 +133,9 @@ function CustomerProductDetailContent({ productId }: { productId?: string }) {
                                     packageSpec={spec}
                                     english={english}
                                 />
+                                {product.unitCode === 'COMBO' && (
+                                    <ComboIngredients productId={product.id} />
+                                )}
                             </div>
 
                             <aside className="min-w-0 xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:self-stretch">
