@@ -1,3 +1,4 @@
+import ListSkeleton from '@/components/common/ListSkeleton';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, ChevronLeft, ChevronRight, Filter, Package, Search, Tag, X } from 'lucide-react';
@@ -680,12 +681,7 @@ export default function PromotionProductManager({
                     {tab === 'browse' ? (
                         <>
                             {(!searchIsSettled || products.isFetching) && (
-                                <p
-                                    role="status"
-                                    className="py-2 text-center text-xs text-[#597668]"
-                                >
-                                    {tr('Đang tải...', 'Loading...')}
-                                </p>
+                                <ListSkeleton image count={5} lines={3} className="space-y-2" rowClassName="flex flex-wrap items-center gap-3 rounded-xl border border-[#e1e8df] bg-white p-3 sm:flex-nowrap" />
                             )}
                             {searchIsSettled && products.isError && (
                                 <p role="alert" className="rounded-lg bg-red-50 p-4 text-red-700">
@@ -704,16 +700,8 @@ export default function PromotionProductManager({
                         </>
                     ) : (
                         <>
-                            {selectedDetails.isFetching && (
-                                <p
-                                    role="status"
-                                    className="py-3 text-center text-xs text-[#597668]"
-                                >
-                                    {tr(
-                                        'Đang tải toàn bộ sản phẩm đã chọn...',
-                                        'Loading all selected products...',
-                                    )}
-                                </p>
+                            {selectedDetails.isFetching && visibleDetails.length === 0 && (
+                                <ListSkeleton image count={5} lines={3} className="space-y-2" rowClassName="flex flex-wrap items-center gap-3 rounded-xl border border-[#e1e8df] bg-white p-3 sm:flex-nowrap" />
                             )}
                             {selectedDetails.isError && (
                                 <p role="alert" className="rounded-lg bg-red-50 p-4 text-red-700">
@@ -764,7 +752,7 @@ export default function PromotionProductManager({
                                         )}
                                     </p>
                                 )}
-                            {filteredDetails.length === 0 && selected.length > 0 && (
+                            {!selectedDetails.isFetching && filteredDetails.length === 0 && selected.length > 0 && (
                                 <p className="py-6 text-center text-sm text-[#597668]">
                                     {tr(
                                         'Không có sản phẩm đã chọn khớp tìm kiếm.',

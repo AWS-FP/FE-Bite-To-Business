@@ -1,3 +1,4 @@
+import { ExecutiveTableSkeleton, ExecutivePricingSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ClipboardList, Package, RefreshCw, Search, X, Plus, Trash2, Save } from 'lucide-react';
@@ -14,7 +15,6 @@ import {
     ExecutiveError,
     ExecutiveHeading,
     ExecutivePanel,
-    LoadingRows,
 } from '@/components/e-commerce/ExecutiveUI';
 import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 import type { AdminProduct, PricingWrite } from '@/types/e-commerce/executiveAdmin';
@@ -273,7 +273,7 @@ function ProductDrawer({
                             )}
                         </div>
                         {pricing.isLoading ? (
-                            <LoadingRows />
+                            <ExecutivePricingSkeleton />
                         ) : pricing.isError ? (
                             <ExecutiveError
                                 message={tr(
@@ -556,7 +556,7 @@ function ProductDrawer({
                     >
                         <h3 className="mb-4 font-bold">{tr('Thuế VAT', 'VAT rate')}</h3>
                         {vat.isLoading ? (
-                            <LoadingRows />
+                            <ExecutivePricingSkeleton vat />
                         ) : (
                             <div className="flex flex-wrap items-end gap-3">
                                 <label className="flex-1 text-xs font-semibold">
@@ -690,7 +690,7 @@ export default function EcommerceProductsPage() {
                     </p>
                 )}
                 {products.isLoading ? (
-                    <LoadingRows />
+                    <ExecutiveTableSkeleton cells={["product", "text", "double", "double", "double", "text", "badge", "action"]} count={5} tableClass="w-full min-w-[1080px] border-collapse text-left text-sm" cellClass={executiveUi.td} />
                 ) : products.isError ? (
                     <div className="p-5">
                         <ExecutiveError

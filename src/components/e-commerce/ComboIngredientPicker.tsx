@@ -1,3 +1,4 @@
+import ListSkeleton from '@/components/common/ListSkeleton';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Package, Plus, Search, X } from 'lucide-react';
@@ -6,7 +7,7 @@ import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 import { executiveComboApi } from '@/services/e-commerce/executiveComboService';
 import type { ComboIngredient } from '@/types/e-commerce/executiveCombo';
 import { ExecutivePagination } from './ExecutiveControls';
-import { ExecutiveError, LoadingRows } from './ExecutiveUI';
+import { ExecutiveError } from './ExecutiveUI';
 
 export type SelectedIngredient = ComboIngredient & { quantity: string };
 export default function ComboIngredientPicker({
@@ -60,7 +61,7 @@ export default function ComboIngredientPicker({
                 </div>
                 <div className="mt-3 max-h-[420px] overflow-y-auto">
                     {query.isPending ? (
-                        <LoadingRows />
+                        <ListSkeleton image count={5} rowClassName="flex min-w-0 items-center gap-3 border-b border-[#edf0ea] py-3" />
                     ) : query.isError ? (
                         <ExecutiveError
                             message={tr('Không tải được sản phẩm.', 'Unable to load products.')}

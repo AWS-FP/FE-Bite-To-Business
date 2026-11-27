@@ -1,3 +1,4 @@
+import { ExecutiveArticleSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { MessageCircle, Star, Trash2 } from 'lucide-react';
 import { executiveUi } from '@/constants/e-commerce/executiveUi';
 import { useExecutiveReviews } from '@/hooks/e-commerce/useExecutiveReviews';
@@ -12,7 +13,6 @@ import {
     ExecutiveError,
     ExecutiveHeading,
     ExecutivePanel,
-    LoadingRows,
 } from '@/components/e-commerce/ExecutiveUI';
 
 export default function EcommerceReviewsPage() {
@@ -66,7 +66,7 @@ export default function EcommerceReviewsPage() {
                     </ExecutiveSelect>
                 </div>
                 {list.isLoading ? (
-                    <LoadingRows />
+                    <ExecutiveArticleSkeleton kind="reviews" />
                 ) : list.isError ? (
                     <div className="p-5">
                         <ExecutiveError

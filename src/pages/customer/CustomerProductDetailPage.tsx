@@ -1,4 +1,4 @@
-import Skeleton from '@/components/common/Skeleton';
+import ProductDetailSkeleton from '@/components/customer/product-detail/ProductDetailSkeleton';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
@@ -105,30 +105,7 @@ function CustomerProductDetailContent({ productId }: { productId?: string }) {
             </div>
 
             <div className="mx-auto w-full max-w-[1440px] px-5">
-                {loading && productId && (
-                    <div
-                        aria-busy="true"
-                        className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_330px]"
-                    >
-                        <div className="grid gap-5 rounded-xl bg-white p-5 sm:grid-cols-2">
-                            <Skeleton className="aspect-square w-full" />
-                            <div className="space-y-4">
-                                <Skeleton className="h-5 w-1/3" />
-                                <Skeleton className="h-8 w-full" />
-                                <Skeleton className="h-5 w-2/3" />
-                                {Array.from({ length: 6 }, (_, i) => (
-                                    <Skeleton key={i} className="h-4 w-full" />
-                                ))}
-                            </div>
-                        </div>
-                        <div className="space-y-4 rounded-xl bg-white p-4">
-                            <Skeleton className="h-12 w-full" />
-                            <Skeleton className="h-8 w-2/3" />
-                            <Skeleton className="h-24 w-full" />
-                            <Skeleton className="h-11 w-full" />
-                        </div>
-                    </div>
-                )}
+                {loading && productId && <ProductDetailSkeleton />}
                 {(!productId || (!loading && (!product || failed))) && (
                     <div className="mx-auto max-w-xl rounded-xl bg-white p-8 text-center text-[#17182d]">
                         <PackageX size={46} className="mx-auto text-slate-400" />

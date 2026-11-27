@@ -1,3 +1,4 @@
+import Skeleton from '@/components/common/Skeleton';
 import { useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -163,7 +164,7 @@ export default function SystemMetricsPage() {
                             </div>
                             <strong>
                                 {health.isPending
-                                    ? '—'
+                                    ? <Skeleton className="h-8 w-28"/>
                                     : health.isError
                                       ? t('system.status.unreachable')
                                       : t('system.status.responding')}
@@ -176,7 +177,7 @@ export default function SystemMetricsPage() {
                                 <Clock3 size={20} aria-hidden="true" />
                             </div>
                             <strong>
-                                {health.data && !health.isError ? (
+                                {health.isPending ? <Skeleton className="h-8 w-24"/> : health.data && !health.isError ? (
                                     <>
                                         {number.format(health.data.roundTripMs)}
                                         <small> ms</small>
@@ -193,7 +194,7 @@ export default function SystemMetricsPage() {
                                 <FileText size={20} aria-hidden="true" />
                             </div>
                             <strong>
-                                {registrations.data && !registrations.isError
+                                {registrations.isPending ? <Skeleton className="h-8 w-24"/> : registrations.data && !registrations.isError
                                     ? number.format(registrations.data.total)
                                     : '—'}
                             </strong>
@@ -205,7 +206,7 @@ export default function SystemMetricsPage() {
                                 <Users size={20} aria-hidden="true" />
                             </div>
                             <strong>
-                                {staff.data && !staff.isError
+                                {staff.isPending ? <Skeleton className="h-8 w-24"/> : staff.data && !staff.isError
                                     ? number.format(staff.data.totalElements)
                                     : '—'}
                             </strong>
@@ -338,10 +339,7 @@ function RegistrationChart({ stats, loading }: { stats?: RegistrationStats; load
     const number = new Intl.NumberFormat(i18n.resolvedLanguage === 'en' ? 'en-GB' : 'vi-VN');
     if (loading)
         return (
-            <div className="system-empty-state" role="status">
-                <RefreshCw className="animate-spin motion-reduce:animate-none" size={28} />
-                <p>{t('system.loading')}</p>
-            </div>
+            <div aria-busy="true" className="system-registration-chart"><div className="system-chart-total"><Skeleton className="mx-auto h-10 w-20"/><Skeleton className="mx-auto mt-2 h-4 w-24"/></div><div className="system-bar-list">{Array.from({length:3},(_,i)=><div key={i} className="system-bar-row"><Skeleton className="h-4 w-32"/><Skeleton className="mt-2 h-3 w-full"/></div>)}</div></div>
         );
     if (!stats)
         return (

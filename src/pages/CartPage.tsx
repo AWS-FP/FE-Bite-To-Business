@@ -1,3 +1,5 @@
+import ListSkeleton from '@/components/common/ListSkeleton';
+import Skeleton from '@/components/common/Skeleton';
 import axios from 'axios';
 import { ArrowLeft, ArrowRight, Package, Pencil, Tag, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
@@ -141,12 +143,25 @@ export default function CartPage() {
     const [shortages, setShortages] = useState<StockShortage[]>([]);
     const [packageError, setPackageError] = useState('');
     const [mapOpen, setMapOpen] = useState(false);
-    const [reorderLoading, setReorderLoading] = useState(!!reorderQuoteId);
+    const [reorderLoad, setReorderLoad] = useState({
+        quoteId: reorderQuoteId,
+        pending: Boolean(reorderQuoteId),
+    });
+    // Reset the reorder state on a quote change before rendering stale checkout data.
+    if (reorderLoad.quoteId !== reorderQuoteId) {
+        setReorderLoad({ quoteId: reorderQuoteId, pending: Boolean(reorderQuoteId) });
+        setQuote(null);
+        setPackages([]);
+        setReorderQuantities({});
+        setStep(0);
+        setMessage('');
+    }
+    const reorderLoading = Boolean(reorderQuoteId) &&
+        (reorderLoad.quoteId !== reorderQuoteId || reorderLoad.pending);
     // Reorder quote was created atomically by BE from a previous order. Recheck it before
     // opening the payment-confirmation screen; do not rebuild from the current cart.
     useEffect(() => {
         if (!reorderQuoteId) return;
-        setReorderLoading(true);
         let active = true;
         Promise.all([getQuote(reorderQuoteId), getQuotePackages(reorderQuoteId)])
             .then(async ([draft, savedPackages]) => {
@@ -169,7 +184,13 @@ export default function CartPage() {
             .catch((error: unknown) => {
                 if (active) setMessage(errorMessage(error, 'errors.fallback'));
             })
-            .finally(() => { if (active) setReorderLoading(false); });
+            .finally(() => {
+                if (active) {
+                    setReorderLoad((current) => current.quoteId === reorderQuoteId
+                        ? { ...current, pending: false }
+                        : current);
+                }
+            });
         return () => { active = false; };
     }, [reorderQuoteId]);
 
@@ -636,7 +657,7 @@ export default function CartPage() {
                 {reorderQuoteId && <div className="mb-5 mt-5 rounded-xl border border-store-green/25 bg-surface-green p-4 text-sm text-store-green" role="status">
                     <strong>{t('reorder.title')}</strong> — {t('reorder.summary')}
                 </div>}
-                {reorderLoading && <p role="status" className="my-5 text-store-muted">{t('reorder.loading')}</p>}
+                {reorderLoading && <div aria-busy="true" className="my-5 space-y-5"><div className="grid grid-cols-4 gap-3">{Array.from({length:4},(_,i)=><Skeleton key={i} className="h-14 w-full rounded-xl"/>)}</div><div className="grid grid-cols-[minmax(0,1fr)_340px] items-start gap-6"><div className="rounded-2xl border bg-white p-6"><Skeleton className="mb-4 h-6 w-40"/><ListSkeleton image lines={3}/></div><div className="space-y-4 rounded-2xl border bg-white p-6"><Skeleton className="h-6 w-40"/><Skeleton className="h-4 w-full"/><Skeleton className="h-4 w-full"/><Skeleton className="h-11 w-full"/></div></div></div>}
                 {quoteClosed && (
                     <div role="status" className="my-5 rounded-xl border border-black bg-white p-5">
                         <p className="m-0 font-semibold">{t('reorder.closedTitle')}</p>

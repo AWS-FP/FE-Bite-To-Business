@@ -13,7 +13,7 @@ import PageNav from '@/components/common/PageNav';
 export default function CustomerCatalogPage() {
     const { t, i18n } = useTranslation('storefront');
     const english = i18n.resolvedLanguage?.startsWith('en') ?? false;
-    const { categories, categoryError, pageData, loading, error, categoryId, query, page, size, selected, categoryLookup, setFilter } =
+    const { categories, categoryError, categoryLoading, pageData, loading, error, categoryId, query, page, size, selected, categoryLookup, setFilter } =
         useCatalogBrowser();
     const title = (item: HomeCategory) => (english ? item.nameEn : item.nameVi);
 
@@ -36,6 +36,7 @@ export default function CustomerCatalogPage() {
                     <CatalogCategorySidebar
                         categories={categories}
                         categoryError={categoryError}
+                        categoryLoading={categoryLoading}
                         categoryId={categoryId}
                         onCategorySelect={(id) => setFilter('category', id)}
                     />

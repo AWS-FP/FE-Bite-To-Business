@@ -1,3 +1,5 @@
+import TableSkeleton from '@/components/common/TableSkeleton';
+import Skeleton from '@/components/common/Skeleton';
 import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -265,7 +267,7 @@ export default function FinanceReport() {
                     {report.data && <> {label('stale')}</>}
                 </p>
             )}
-            {report.isPending && <p role="status">{t('system.loading')}</p>}
+
             <div className="system-metric-grid">
                 {cards.map(([name, value, Icon]) => (
                     <article
@@ -276,7 +278,7 @@ export default function FinanceReport() {
                             <span>{label(name)}</span>
                             <Icon size={20} aria-hidden="true" />
                         </div>
-                        <strong>{money(value)}</strong>
+                        <strong>{report.isPending ? <Skeleton className="h-8 w-32"/> : money(value)}</strong>
                     </article>
                 ))}
             </div>
@@ -435,7 +437,7 @@ export default function FinanceReport() {
                 </header>
 
                 {transactions.isError && <p role="alert">{label('loadError')}</p>}
-                {transactions.isPending && <p role="status">{t('system.loading')}</p>}
+                {transactions.isPending && <TableSkeleton columns={6} tableClass="system-log-table w-full" />}
                 {transactions.data && (
                     <div className="overflow-x-auto">
                         <table className="system-log-table w-full">
@@ -488,7 +490,7 @@ export default function FinanceReport() {
                     <h2>{label('customers')}</h2>
                 </header>
                 {customers.isError && <p role="alert">{label('loadError')}</p>}
-                {customers.isPending && <p role="status">{t('system.loading')}</p>}
+                {customers.isPending && <TableSkeleton columns={5} tableClass="system-log-table w-full" />}
                 {customers.data && (
                     <div className="overflow-x-auto">
                         <table className="system-log-table w-full">

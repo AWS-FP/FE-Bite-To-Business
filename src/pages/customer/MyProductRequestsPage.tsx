@@ -1,3 +1,4 @@
+import ListSkeleton from '@/components/common/ListSkeleton';
 import { CheckCircle2, ChevronLeft, ChevronRight, Clock3, ExternalLink, PackageSearch, Search, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -93,7 +94,7 @@ export default function MyProductRequestsPage() {
                         </p>
                     </div>
                 </div>
-                {loading && <p role="status" className="mt-7 text-sm">{text('Đang tải yêu cầu...', 'Loading requests...')}</p>}
+                {loading && <ListSkeleton className="mt-7 space-y-5" lines={4} rowClassName="flex justify-between gap-4 rounded-xl border bg-white p-5" />}
                 {error && (
                     <div role="alert" className="mt-7 rounded-lg border border-red-200 bg-white p-5 text-red-700">
                         {text('Không tải được danh sách yêu cầu.', 'Requests could not be loaded.')}

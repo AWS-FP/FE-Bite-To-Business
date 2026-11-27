@@ -1,3 +1,4 @@
+import Skeleton from '@/components/common/Skeleton';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -8,6 +9,7 @@ import CategoryIcon from '@/components/customer/CategoryIcon';
 type Props = {
     categories: HomeCategory[];
     categoryError: boolean;
+    categoryLoading?: boolean;
     categoryId?: string | null;
     comboActive?: boolean;
     onCategorySelect: (categoryId?: string) => void;
@@ -16,6 +18,7 @@ type Props = {
 export default function CatalogCategorySidebar({
     categories,
     categoryError,
+    categoryLoading = false,
     categoryId,
     comboActive = false,
     onCategorySelect,
@@ -59,6 +62,7 @@ export default function CatalogCategorySidebar({
                 className="max-h-[62vh] overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-store-green lg:min-h-0 lg:max-h-none lg:flex-1"
                 tabIndex={0}
             >
+                {categoryLoading && <div aria-busy="true" className="space-y-2">{Array.from({length:8},(_,i)=><div key={i} className="flex items-center gap-2 border-b border-store-line py-2"><Skeleton className="size-9 shrink-0"/><Skeleton className="h-4 flex-1"/><Skeleton className="size-9 shrink-0 rounded-full"/></div>)}</div>}
                 {categories.map((parent) => {
                     const selectedParent =
                         categoryId === parent.id ||

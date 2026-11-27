@@ -1,3 +1,4 @@
+import Skeleton from '@/components/common/Skeleton';
 import { useEffect, useRef, useState } from 'react';
 import type { PointerEvent } from 'react';
 import { createPortal } from 'react-dom';
@@ -197,7 +198,7 @@ export default function PromotionImageCropper({
                             <div className="absolute top-1/3 left-0 w-full border-t border-dashed border-white/45" />
                             <div className="absolute top-2/3 left-0 w-full border-t border-dashed border-white/45" />
                         </div>
-                        {!natural && <div className="absolute inset-0 flex items-center justify-center text-sm text-white">{tr('Đang tải ảnh...', 'Loading image...')}</div>}
+                        {!natural && <Skeleton className="absolute! inset-0 h-full w-full" />}
                     </div>
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-[#315f42]">
                         <Move size={17} />

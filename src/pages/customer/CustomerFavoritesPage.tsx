@@ -1,3 +1,4 @@
+import Skeleton from '@/components/common/Skeleton';
 import { ChevronLeft, ChevronRight, Heart, ImageOff, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -27,10 +28,8 @@ export default function CustomerFavoritesPage() {
                     </div>
                 </div>
                 {loading && (
-                    <p role="status" className="mt-7 text-sm">
-                        {tr('loading')}
-                    </p>
-                )}
+<div aria-busy="true" className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{Array.from({ length: 8 }, (_, i) => <div key={i} className="border border-store-line bg-white"><Skeleton className="h-48 w-full rounded-none"/><div className="space-y-3 p-4"><Skeleton className="h-5 w-4/5"/><Skeleton className="h-4 w-1/2"/><Skeleton className="h-9 w-full"/></div></div>)}</div>
+)}
                 {error && (
                     <div
                         role="alert"

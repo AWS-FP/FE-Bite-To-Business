@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import { AlertCircle, ArrowRight, Inbox, LockKeyhole, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { executiveUi } from '@/constants/e-commerce/executiveUi';
-import Skeleton from '@/components/common/Skeleton';
 import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 
 export function ExecutiveHeading({ number, eyebrow, title, description, action }: {
@@ -33,7 +32,7 @@ export function ExecutivePanel({ title, caption, action, children }: {
 }
 
 export function ExecutiveStat({ title, value, icon, detail, tone = 'green' }: {
-    title: string; value: string | number; icon: ReactNode; detail?: string; tone?: 'green' | 'yellow' | 'blue' | 'coral';
+    title: string; value: ReactNode; icon: ReactNode; detail?: string; tone?: 'green' | 'yellow' | 'blue' | 'coral';
 }) {
     const bg = { green: 'bg-[#e7f4e8]', yellow: 'bg-[#fff3bf]', blue: 'bg-[#e7f2f8]', coral: 'bg-[#fff0e7]' }[tone];
     return <div className={`${executiveUi.card} p-5`}>
@@ -67,8 +66,4 @@ export function ExecutiveShortcut({ to, label, icon }: { to: string; label: stri
     return <Link to={to} className="group flex items-center justify-between gap-3 rounded-xl border border-[#dfebe1] bg-white px-4 py-4 text-sm font-semibold text-[#184b36] no-underline transition hover:-translate-y-0.5 hover:border-[#86bd91] hover:bg-[#f3faef]">
         <span className="flex items-center gap-3">{icon}{label}</span><ArrowRight size={17} className="transition group-hover:translate-x-1"/>
     </Link>;
-}
-
-export function LoadingRows() {
-    return <div aria-busy="true" className="divide-y divide-[#edf0ea] px-5">{Array.from({length:5},(_,i)=><div key={i} className="flex items-center gap-4 py-4"><Skeleton className="size-12 shrink-0 rounded-lg"/><div className="min-w-0 flex-1 space-y-2"><Skeleton className="h-4 w-2/3"/><Skeleton className="h-3 w-1/3"/></div><Skeleton className="hidden h-7 w-24 sm:block"/><Skeleton className="h-9 w-20"/></div>)}</div>;
 }

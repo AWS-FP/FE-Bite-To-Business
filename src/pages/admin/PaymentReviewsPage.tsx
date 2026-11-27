@@ -1,3 +1,4 @@
+import ListSkeleton from '@/components/common/ListSkeleton';
 import { useEffect, useState } from 'react';
 import AdminButton from '@/components/admin/AdminButton';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
@@ -189,7 +190,7 @@ export default function PaymentReviewsPage() {
                             <option value="RESOLVED">Đã xử lý</option>
                         </select>
                     </div>
-                    {r.list.isLoading && <p className="px-6 py-10 text-sm" role="status">Đang tải...</p>}
+                    {r.list.isLoading && <ListSkeleton className="mt-4 border-t border-black/10" rowClassName="flex items-start justify-between gap-3 border-b border-black/10 px-6 py-4" />}
                     {r.list.isError && <p className="px-6 py-10 text-sm text-red-700" role="alert">Không tải được danh sách khoản tiền.</p>}
                     {r.list.data && r.list.data.content.length === 0 && (
                         <p className="px-6 py-10 text-sm text-store-muted">{r.resolved ? 'Chưa có khoản nào được xử lý.' : 'Không có khoản tiền nào cần xử lý.'}</p>

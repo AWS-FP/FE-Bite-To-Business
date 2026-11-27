@@ -1,3 +1,4 @@
+import { ExecutiveCampaignSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -24,7 +25,6 @@ import {
     ExecutiveError,
     ExecutiveHeading,
     ExecutivePanel,
-    LoadingRows,
 } from '@/components/e-commerce/ExecutiveUI';
 import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 import type { Promotion, PromotionWrite } from '@/types/e-commerce/executiveAdmin';
@@ -547,7 +547,7 @@ export default function EcommercePromotionsPage() {
                     </div>
                 </div>
                 {list.isLoading ? (
-                    <LoadingRows />
+                    <ExecutiveCampaignSkeleton />
                 ) : list.isError ? (
                     <div className="p-5">
                         <ExecutiveError

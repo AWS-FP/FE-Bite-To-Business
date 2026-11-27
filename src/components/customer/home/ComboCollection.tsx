@@ -39,6 +39,7 @@ export default function ComboCollection() {
             <CatalogCategorySidebar
                 categories={categories.data ?? []}
                 categoryError={categories.isError}
+                categoryLoading={categories.isPending}
                 comboActive
                 onCategorySelect={(id) => navigate(id ? `${ROUTES.CATALOG}?category=${encodeURIComponent(id)}` : ROUTES.CATALOG)}
             />

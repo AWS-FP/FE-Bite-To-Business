@@ -1,3 +1,5 @@
+import Skeleton from '@/components/common/Skeleton';
+import { ExecutiveTableSkeleton, ExecutiveQuoteDetailSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ClipboardList, Search, X } from 'lucide-react';
@@ -14,7 +16,6 @@ import {
     ExecutiveError,
     ExecutiveHeading,
     ExecutivePanel,
-    LoadingRows,
 } from '@/components/e-commerce/ExecutiveUI';
 import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 import { formatVnd } from '@/services/e-commerce/executiveReadService';
@@ -131,7 +132,7 @@ export default function EcommerceQuotesPage() {
                     </div>
                 </div>
                 {list.isLoading ? (
-                    <LoadingRows />
+                    <ExecutiveTableSkeleton cells={["text", "double", "text", "text", "text", "badge", "action"]} count={5} tableClass="w-full min-w-[930px] text-left text-sm" cellClass={executiveUi.td} />
                 ) : list.isError ? (
                     <div className="p-5">
                         <ExecutiveError
@@ -252,7 +253,7 @@ export default function EcommerceQuotesPage() {
                                 <ExecutiveFeedback message={feedback} error />
                             )}
                             {detail.isLoading ? (
-                                <LoadingRows />
+                                <ExecutiveQuoteDetailSkeleton />
                             ) : detail.isError ? (
                                 <ExecutiveError
                                     message={tr(
@@ -390,9 +391,7 @@ export default function EcommerceQuotesPage() {
                                                           )}
                                                 </p>
                                             ) : readiness.isLoading ? (
-                                                <p className="text-sm">
-                                                    {tr('Đang kiểm tra...', 'Checking...')}
-                                                </p>
+                                                <div aria-busy="true" className="space-y-2"><Skeleton className="h-5 w-2/3"/><Skeleton className="h-4 w-4/5"/></div>
                                             ) : readiness.isError ? (
                                                 <div className="space-y-2 rounded-xl border border-rose-100 bg-rose-50 p-3">
                                                     <p className="text-sm text-rose-700">
