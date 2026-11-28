@@ -571,7 +571,7 @@ export default function EcommercePromotionsPage() {
                                     <div className="flex flex-wrap items-center justify-between gap-2">
                                         <div className="flex items-center gap-2">
                                             <ExecutiveBadge status={promotionDisplayStatus(p)} />
-                                            <span className="rounded-full bg-[#e7f1e9] px-2 py-1 text-[10px] font-bold text-[#165b3d]">
+                                            <span className="rounded-[5px] border border-solid border-[#c8dfcd] bg-[#edf5ee] px-2 py-1 text-[10px] font-semibold text-[#165b3d]">
                                                 {p.promotionType === 'FLASH_SALE'
                                                     ? 'FLASH SALE'
                                                     : 'STANDARD'}

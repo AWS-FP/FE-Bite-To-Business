@@ -1,4 +1,5 @@
 import Skeleton from '@/components/common/Skeleton';
+import DashboardCatalogIllustration from '@/components/e-commerce/DashboardCatalogIllustration';
 import { ExecutiveTableSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
@@ -6,10 +7,8 @@ import { ROUTES } from '@/router/routes';
 import {
     ArrowRight,
     BarChart3,
-    FileText,
     Package,
     ShoppingBag,
-    Tag,
     TrendingUp,
 } from 'lucide-react';
 import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
@@ -131,48 +130,43 @@ export default function EcommerceDashboardPage() {
                         {
                             label: tr('Sản phẩm đã đăng', 'Published products'),
                             value: m?.publishedProducts,
-                            icon: Package,
+                            illustration: 'published' as const,
                             tone: 'bg-[#eef7ef] border-[#c5ddcc] text-[#20603c] shadow-[0_4px_0_0_rgba(32,96,60,0.12)]',
-                            chip: 'bg-[#d8eddd] text-[#1b6340]',
                             to: ROUTES.ECOMMERCE_PRODUCTS,
                         },
                         {
                             label: tr('Sản phẩm nháp', 'Draft products'),
                             value: m?.draftProducts,
-                            icon: FileText,
+                            illustration: 'draft' as const,
                             tone: 'bg-[#eef5fb] border-[#cbddeb] text-[#285e88] shadow-[0_4px_0_0_rgba(40,94,136,0.12)]',
-                            chip: 'bg-[#dcecf8] text-[#285e88]',
                             to: ROUTES.ECOMMERCE_PRODUCTS,
                         },
                         {
                             label: tr('Khuyến mãi đang chạy', 'Active promotions'),
                             value: m?.activePromotions,
-                            icon: Tag,
+                            illustration: 'promotion' as const,
                             tone: 'bg-[#fff9df] border-[#ecdba0] text-[#795b14] shadow-[0_4px_0_0_rgba(121,91,20,0.12)]',
-                            chip: 'bg-[#ffedab] text-[#795b14]',
                             to: ROUTES.ECOMMERCE_PROMOTIONS,
                         },
-                    ].map(({ label, value, icon: Icon, tone, chip, to }) => (
+                    ].map(({ label, value, illustration, tone, to }) => (
                         <Link
                             key={label}
                             to={to}
-                            className={`group flex min-h-[158px] flex-col justify-between rounded-[22px] border-2 border-solid p-5 text-store-ink no-underline transition hover:-translate-y-0.5 ${tone}`}
+                            className={`group relative flex min-h-[158px] min-w-0 flex-col justify-between overflow-hidden rounded-[22px] border-2 border-solid p-5 text-store-ink no-underline transition hover:-translate-y-0.5 ${tone}`}
                         >
-                            <div className="flex items-start justify-between gap-3">
-                                <span className={`grid size-11 shrink-0 place-items-center rounded-2xl ${chip}`}>
-                                    <Icon size={20} />
-                                </span>
+                            <DashboardCatalogIllustration kind={illustration} />
+                            <div className="relative flex items-start justify-between gap-3">
+                                <p className="m-0 min-w-0 break-words text-xs font-bold uppercase tracking-[0.16em] text-current/75">
+                                    {label}
+                                </p>
                                 <ArrowRight
                                     size={18}
                                     className="shrink-0 text-current transition-transform group-hover:translate-x-1"
                                     aria-hidden="true"
                                 />
                             </div>
-                            <div>
-                                <p className="m-0 text-xs font-bold uppercase tracking-[0.16em] text-current/75">
-                                    {label}
-                                </p>
-                                <strong className="mt-2 block font-price text-[38px] font-black leading-none tabular-nums text-current">
+                            <div className="relative mt-6 min-w-0 pr-[76px] sm:pr-[62px] xl:pr-[108px] 2xl:pr-[126px]">
+                                <strong className="block break-words font-price text-[38px] font-black leading-none tabular-nums text-current">
                                     {metrics.isLoading ? (
                                         <Skeleton className="h-10 w-16" />
                                     ) : (

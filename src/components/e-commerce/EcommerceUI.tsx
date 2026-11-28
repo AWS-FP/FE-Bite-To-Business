@@ -116,9 +116,8 @@ export function StatusPill({ status }: { status: string }) {
     };
     return (
         <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-extrabold whitespace-nowrap ${colors[status] ?? 'bg-slate-100 text-slate-600'}`}
+            className={`inline-flex w-fit items-center rounded-[5px] px-2.5 py-1 text-[10px] font-semibold whitespace-nowrap ${colors[status] ?? 'bg-slate-100 text-slate-600'}`}
         >
-            <span className="size-1.5 rounded-full bg-current" />
             {labels[status] ?? status}
         </span>
     );

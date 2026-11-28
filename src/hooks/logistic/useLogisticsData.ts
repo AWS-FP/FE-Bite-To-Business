@@ -1,14 +1,31 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
+import { useQuery } from '@tanstack/react-query';
 import { http } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
 import { useLogisticsText } from './useLogisticsText';
 
 export interface Stock { productId: string; sku: string; name: string; unit: string; imageUrl: string | null; onHand: number; reserved: number; available: number; productStatus: string; active: boolean }
-export interface ProductRequest { id: string; productName: string; customerNote: string | null; status: string; createdAt: string }
+export interface ProductRequest { id: string; productName: string; customerNote: string | null; status: string; createdAt: string; referenceUrl?: string | null }
 interface Page<T> { content: T[]; totalPages: number }
 
-export function useLogisticsList<T>(path: string, keyword = '') {
+export const productRequestListKey = ['logistics', 'product-requests'] as const;
+
+export function useProductRequests(page: number, keyword: string, status: string, enabled: boolean) {
+    return useQuery({
+        queryKey: [...productRequestListKey, page, keyword, status],
+        queryFn: async ({ signal }) => {
+            const result = await http.get<ApiResponse<Page<ProductRequest> & { totalElements: number }>>('/api/logistics/product-requests', {
+                params: { size: 10, page, ...(keyword ? { keyword } : {}), ...(status ? { status } : {}) },
+                signal,
+            });
+            return result.data.data;
+        },
+        enabled,
+    });
+}
+
+export function useLogisticsList<T>(path: string, keyword = '', status = '') {
     const { tr } = useLogisticsText();
     const [items, setItems] = useState<T[]>([]);
     const [loading, setLoading] = useState(true);
@@ -29,7 +46,7 @@ export function useLogisticsList<T>(path: string, keyword = '') {
         setError('');
         try {
             const result = await http.get<ApiResponse<Page<T>>>(path, {
-                params: { size: 10, page, ...(keyword ? { keyword } : {}) },
+                params: { size: 10, page, ...(keyword ? { keyword } : {}), ...(status ? { status } : {}) },
                 signal: controller.signal,
             });
             if (requestId !== state.id) return;
@@ -45,7 +62,7 @@ export function useLogisticsList<T>(path: string, keyword = '') {
                 setLoading(false);
             }
         }
-    }, [path, page, keyword]);
+    }, [path, page, keyword, status]);
     useEffect(() => {
         const state = requests.current;
         let cancelled = false;

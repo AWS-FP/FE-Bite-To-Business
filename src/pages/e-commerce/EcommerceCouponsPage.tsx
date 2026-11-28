@@ -8,6 +8,7 @@ import { Plus, Save, TicketPercent } from 'lucide-react';
 import { executiveUi } from '@/constants/e-commerce/executiveUi';
 import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 import {
+    ExecutiveBadge,
     ExecutiveFeedback,
     ExecutivePagination,
     ExecutiveSelect,
@@ -517,9 +518,10 @@ export default function EcommerceCouponsPage() {
                                             {c.usageLimit != null ? `/${c.usageLimit}` : ''}
                                         </td>
                                         <td className={executiveUi.td}>
-                                            <span className={`inline-flex rounded-full px-3 py-1 text-[11px] font-bold ${c.isActive ? 'bg-[#e4f3e5] text-[#216643]' : 'bg-[#f1eeee] text-[#6f6060]'}`}>
-                                                {c.isActive ? tr('Đã bật', 'Enabled') : tr('Đã tắt', 'Disabled')}
-                                            </span>
+                                            <ExecutiveBadge
+                                                status={c.isActive ? 'ACTIVE' : 'INACTIVE'}
+                                                label={c.isActive ? tr('Đã bật', 'Enabled') : tr('Đã tắt', 'Disabled')}
+                                            />
                                         </td>
                                         <td className={executiveUi.td}>
                                             <div className="flex gap-2">

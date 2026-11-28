@@ -314,15 +314,15 @@ export function ExecutivePagination({
         </div>
     );
 }
-export function ExecutiveBadge({ status }: { status: string }) {
+export function ExecutiveBadge({ status, label }: { status: string; label?: string }) {
     const safe = (status ?? '').toUpperCase();
     const warm = ['PENDING_APPROVAL', 'PENDING', 'DRAFT', 'REVIEWING'].includes(safe);
-    const good = ['PUBLISHED', 'APPROVED', 'VISIBLE', 'COMPLETED', 'ADDED'].includes(safe);
+    const good = ['PUBLISHED', 'APPROVED', 'VISIBLE', 'COMPLETED', 'ADDED', 'ACTIVE', 'ENABLED'].includes(safe);
     return (
         <span
-            className={`inline-flex rounded-full px-3 py-1 text-[11px] font-bold tracking-wide ${good ? 'bg-[#e4f3e5] text-[#216643]' : warm ? 'bg-[#fff2c5] text-[#8b6100]' : 'bg-[#f1eeee] text-[#6f6060]'}`}
+            className={`inline-flex w-fit max-w-full items-center rounded-[5px] border border-solid px-2.5 py-1 text-[11px] font-semibold tracking-wide ${good ? 'border-[#c8dfcd] bg-[#edf5ee] text-[#216643]' : warm ? 'border-[#eadbb4] bg-[#fbf4df] text-[#80591c]' : 'border-[#e2deda] bg-[#f4f2f0] text-[#6f6060]'}`}
         >
-            {safe.replace(/_/g, ' ')}
+            {label ?? safe.replace(/_/g, ' ')}
         </span>
     );
 }

@@ -8,6 +8,7 @@ import { Boxes, ImagePlus, Plus, Save } from 'lucide-react';
 import { executiveUi } from '@/constants/e-commerce/executiveUi';
 import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 import {
+    ExecutiveBadge,
     ExecutiveFeedback,
     ExecutivePagination,
     ExecutiveSelect,
@@ -747,9 +748,7 @@ export default function EcommerceCombosPage() {
                                     )}
                                 </div>
                                 <div className="flex flex-1 flex-col gap-2 p-4">
-                                    <span className="self-start rounded-full bg-[#e9f2e9] px-2 py-1 text-xs font-bold text-store-dark">
-                                        {statusLabel(combo.status)}
-                                    </span>
+                                    <ExecutiveBadge status={combo.status} label={statusLabel(combo.status)} />
                                     <h3
                                         className="line-clamp-2 min-h-12 break-words font-bold text-store-dark"
                                         title={tr(combo.nameVi, combo.nameEn)}
