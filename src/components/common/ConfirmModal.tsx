@@ -132,6 +132,7 @@ export default function ConfirmModal({
 
     return createPortal(
         <div
+            data-workspace-dialog={workspace ? true : undefined}
             className={`fixed inset-0 ${
                 workspace ? 'z-[600]' : 'z-[100]'
             } flex items-center justify-center bg-black/40 p-6`}

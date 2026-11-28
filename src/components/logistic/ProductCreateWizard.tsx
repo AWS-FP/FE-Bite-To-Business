@@ -1,6 +1,12 @@
 import { LogisticsPageHeader } from '@/components/logistic/LogisticsPageShell';
 import { useLogisticsText } from '@/hooks/logistic/useLogisticsText';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useBlocker, useBeforeUnload } from 'react-router-dom';
+import ConfirmModal from '@/components/common/ConfirmModal';
+import type { WarehouseProductDetail } from '@/types/logistic/warehouseProduct';
+import { warehouseProductValues, writeSellingSpec } from '@/utils/logistic/warehouseProductForm';
+import { invalidateChangedProduct } from '@/hooks/customer/useCatalogQuery';
 import {
     ArrowLeft,
     ArrowRight,
@@ -15,17 +21,17 @@ import type { TranslationField, TranslationLanguage } from '@/types/logistic/tra
 import { getHomeCategories } from '@/services/customer/homeService';
 import type { HomeCategory } from '@/types/customer/home';
 import { getCatalogBrands } from '@/services/customer/catalogReadService';
-import type { CatalogBrand } from '@/types/customer/catalog';
 import type { ProductRequest } from '@/hooks/logistic/useLogisticsData';
 import { http } from '@/services/axiosClient';
 import axios from 'axios';
 import PageNav from '@/components/common/PageNav';
+import PromotionImageCropper from '@/components/e-commerce/PromotionImageCropper';
+import LogisticsRemoveButton from './LogisticsRemoveButton';
 import BilingualNutritionEditor, { type NutritionRow } from './BilingualNutritionEditor';
 import { getCountries, getDistributors } from '@/services/logistic/productSourceService';
-import type { CountryOption, DistributorOption } from '@/types/logistic/productSource';
 
 const inputClass =
-    'mt-2 w-full rounded border border-black/40 bg-white px-3 py-3 text-sm font-normal text-black outline-none focus:border-black focus:ring-0';
+    'mt-2 w-full rounded border border-black/40 bg-white px-3 py-3 text-sm font-normal text-black outline-none focus:border-black focus:ring-0 read-only:bg-store-cream disabled:bg-store-cream';
 
 // Các cặp ô song ngữ: AI gợi ý bản dịch từ ô đã nhập sang ô còn lại.
 const BILINGUAL_FIELDS: [string, TranslationField][] = [
@@ -33,6 +39,7 @@ const BILINGUAL_FIELDS: [string, TranslationField][] = [
     ['description', 'DESCRIPTION'],
     ['spec', 'SPEC'],
     ['storage', 'STORAGE'],
+    ['sellingSpec', 'TECHNICAL'],
 ];
 const bilingual: Record<
     string,
@@ -65,7 +72,7 @@ function fitsDigits(raw: string | undefined, integer: number, fraction: number):
     return whole.length <= integer && (match[2] ?? '').length <= fraction;
 }
 
-// Thể tích lưu bằng cm³ (V67, cột volume_cm3 NUMERIC(14, 2)); làm tròn 2 số lẻ thay vì bắt staff tự cắt số.
+// Thể tích lưu bằng cm³ (V67, NUMERIC(14,2)); tự làm tròn 2 số lẻ.
 function roundVolume(raw: string | undefined): number {
     const value = Number((raw ?? '').trim());
     return Number.isFinite(value) ? Math.round(value * 100) / 100 : 0;
@@ -93,23 +100,29 @@ function requiredLabel(text: string): ReactNode {
     return parts.flatMap((part, i) =>
         i < parts.length - 1
             ? [
-                  part,
-                  <span key={i} className="text-red-600">
+                part,
+                <span key={i} className="text-red-600">
                       {' '}
-                      *
+                    *
                   </span>,
-              ]
+            ]
             : [part],
     );
 }
 
 type Props = {
     request?: ProductRequest;
+    product?: WarehouseProductDetail;
+    onEdit?: () => void;
+    onCreateMode?: () => void;
     onClose: () => void;
     onCreated?: (product: { id: string; sku: string }) => void;
 };
 
-export default function ProductCreateWizard({ request, onClose, onCreated }: Props) {
+export default function ProductCreateWizard({ request, product, onEdit, onCreateMode, onClose, onCreated }: Props) {
+    const editing = !!product;
+    const lockedCommercial = product?.status === 'PUBLISHED';
+    const queryClient = useQueryClient();
     const { tr, english } = useLogisticsText();
     const staffLang: Lang = english ? 'en' : 'vi';
     const steps = [
@@ -119,23 +132,37 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         tr('Xem lại'),
     ];
     const [step, setStep] = useState(0);
-    const [values, setValues] = useState<Record<string, string>>({
+    const [values, setValues] = useState<Record<string, string>>(() => product ? warehouseProductValues(product) : ({
         nameVi: request?.productName.replace(/^Yêu cầu quy cách mới:\s*/i, '').trim() || '',
+    }));
+    const { data: categories = [], isError: categoryError } = useQuery({
+        queryKey: ['ecom', 'categories'], queryFn: ({ signal }) => getHomeCategories(signal), staleTime: 60_000,
     });
-    const [categories, setCategories] = useState<HomeCategory[]>([]);
-    const [brands, setBrands] = useState<CatalogBrand[]>([]);
-    const [distributors, setDistributors] = useState<DistributorOption[]>([]);
-    const [countries, setCountries] = useState<CountryOption[]>([]);
-    const [countriesError, setCountriesError] = useState(false);
-    const [catalogError, setCatalogError] = useState(false);
+    const { data: brands = [], isError: brandError } = useQuery({
+        queryKey: ['ecom', 'brands'], queryFn: ({ signal }) => getCatalogBrands(signal), staleTime: 60_000,
+    });
+    const { data: distributors = [], isError: distributorError } = useQuery({
+        queryKey: ['logistics', 'product-distributors'], queryFn: ({ signal }) => getDistributors(signal), staleTime: 60_000,
+    });
+    const { data: countries = [], isError: countriesError } = useQuery({
+        queryKey: ['logistics', 'countries'], queryFn: ({ signal }) => getCountries(signal), staleTime: 60 * 60_000,
+    });
+    const catalogError = categoryError || brandError || distributorError;
     const [image, setImage] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState('');
-    const [tiers, setTiers] = useState<{ min: string; max: string; price: string }[]>([]);
+    const [imagePreview, setImagePreview] = useState(product?.imageUrl ?? '');
+    const [cropSource, setCropSource] = useState<{ url: string; name: string } | null>(null);
+    const cropUrl = cropSource?.url;
+    useEffect(() => {
+        if (cropUrl) return () => URL.revokeObjectURL(cropUrl);
+    }, [cropUrl]);
+    const [tiers, setTiers] = useState<
+        { min: string; max: string; price: string; unlimited: boolean }[]
+    >(() => product?.tiers.map(t => ({ min: String(t.min), max: t.max == null ? '' : String(t.max), price: String(t.price), unlimited: t.max == null })) ?? []);
     // Bảng dinh dưỡng (bắt buộc): lượng tham chiếu + các dòng VI/EN đồng bộ.
-    const [nutrition, setNutrition] = useState<{ basis: string; rows: NutritionRow[] }>({
-        basis: '100g',
-        rows: [{ vi: '', en: '', amount: '' }],
-    });
+    const [nutrition, setNutrition] = useState<{ basis: string; rows: NutritionRow[] }>(() => ({
+        basis: product ? product.nutritionBasis ?? '' : '100g',
+        rows: product?.nutritionFacts.length ? product.nutritionFacts.map(f => ({ vi: f.nutrient, en: f.nutrientEn ?? '', amount: f.amount })) : [{ vi: '', en: '', amount: '' }],
+    }));
     // Dịch tên thành phần dinh dưỡng sang ngôn ngữ còn lại bằng AI.
     const [nutritionTranslation, setNutritionTranslation] = useState<{
         target: Lang;
@@ -146,6 +173,33 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
     const [created, setCreated] = useState<{ id: string; sku: string } | null>(null);
+    const submitting = useRef(false);
+    const [initialForm] = useState(() => JSON.stringify({ values, tiers, nutrition }));
+    const [initialValues] = useState(() => ({ ...values }));
+    const [initialNutrition] = useState(() => JSON.stringify(nutrition));
+    const nutritionChanged = JSON.stringify(nutrition) !== initialNutrition;
+    const missing = (key: string) => !values[key]?.trim() && (!editing || !!initialValues[key]?.trim());
+    const hasValue = (key: string) => !!values[key]?.trim();
+    const allowExit = useRef(false);
+    const dirty = !created && (image !== null || JSON.stringify({ values, tiers, nutrition }) !== initialForm);
+    const blocker = useBlocker(() => (dirty || busy) && !allowExit.current);
+    const [exitAction, setExitAction] = useState<(() => void) | null>(null);
+    useBeforeUnload(event => {
+        if (dirty || busy) { event.preventDefault(); event.returnValue = ''; }
+    });
+    function askExit(action: () => void) {
+        if (busy || submitting.current) return;
+        if (dirty) setExitAction(() => action);
+        else action();
+    }
+    function confirmExit() {
+        if (blocker.state === 'blocked') { blocker.proceed(); return; }
+        const action = exitAction;
+        setExitAction(null);
+        allowExit.current = true;
+        action?.();
+        allowExit.current = false;
+    }
     const [suggestions, setSuggestions] = useState<Record<string, Suggestion>>({});
     const suggestionRequests = useRef<Record<string, AbortController>>({});
 
@@ -178,8 +232,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
     async function requestSuggestion(targetKey: string) {
         const info = bilingual[targetKey];
         const sourceText = values[info.counterpart]?.trim();
-        if (!sourceText) return;
-        suggestionRequests.current[targetKey]?.abort();
+        if (!sourceText || suggestionRequests.current[targetKey]) return;
         const controller = new AbortController();
         suggestionRequests.current[targetKey] = controller;
         setSuggestions((current) => ({
@@ -211,24 +264,12 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         }
     }
 
-    // Rời ô nguồn: tự gợi ý khi ô bên kia còn trống và chưa gợi ý cho đúng nội dung này.
-    function suggestAfterBlur(key: string) {
-        const info = bilingual[key];
-        if (!info) return;
-        const text = values[key]?.trim();
-        const target = info.counterpart;
-        if (!text || values[target]?.trim()) return;
-        const existing = suggestions[target];
-        if (existing && existing.sourceText === text && existing.status !== 'error') return;
-        void requestSuggestion(target);
-    }
-
     // Dịch tên các thành phần dinh dưỡng từ bảng kia sang `target` (một lần gọi cho cả bảng).
     async function translateNutrition(target: Lang) {
         const source: Lang = target === 'en' ? 'vi' : 'en';
         const names = nutrition.rows.map((row) => row[source].trim());
         if (!names.some(Boolean)) return;
-        nutritionTranslationRequest.current?.abort();
+        if (nutritionTranslationRequest.current) return;
         const controller = new AbortController();
         nutritionTranslationRequest.current = controller;
         setNutritionTranslation({ target, status: 'loading' });
@@ -239,7 +280,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 'TECHNICAL',
                 controller.signal,
             );
-            if (controller.signal.aborted) return;
+            if (controller.signal.aborted || nutritionTranslationRequest.current !== controller) return;
             const translated = text.split('|').map((name) => name.trim());
             if (translated.length !== names.length) {
                 setNutritionTranslation({
@@ -265,20 +306,13 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         }
     }
 
-    // "Quy cách bán" nhập một lần theo ngôn ngữ của staff; khi tạo sản phẩm, AI dịch sang ngôn ngữ còn lại.
-    async function sellingSpecTexts(): Promise<Record<Lang, string>> {
-        const value = values.sellingSpec.trim();
-        const other: Lang = staffLang === 'vi' ? 'en' : 'vi';
-        let translated = value;
-        try {
-            translated = (await suggestTranslation(value, staffLang, 'TECHNICAL')).trim() || value;
-        } catch {
-            // Không dịch được thì dùng nguyên văn để không chặn việc tạo sản phẩm.
-        }
-        const texts = { [staffLang]: value, [other]: translated } as Record<Lang, string>;
+    // Use the manually entered/explicitly translated selling spec; no AI request on Save.
+    function sellingSpecTexts(): Record<Lang, string | null> {
+        const vi = values.sellingSpecVi?.trim() || values.sellingSpecEn?.trim() || '';
+        const en = values.sellingSpecEn?.trim() || values.sellingSpecVi?.trim() || '';
         return {
-            vi: `${SELLING_SPEC_LABEL.vi}: ${texts.vi.replace(/\|/g, '/')}`,
-            en: `${SELLING_SPEC_LABEL.en}: ${texts.en.replace(/\|/g, '/')}`,
+            vi: editing && values.sellingSpecVi === initialValues.sellingSpecVi ? product.technicalVi : writeSellingSpec(product?.technicalVi, SELLING_SPEC_LABEL.vi, vi),
+            en: editing && values.sellingSpecEn === initialValues.sellingSpecEn ? product.technicalEn : writeSellingSpec(product?.technicalEn, SELLING_SPEC_LABEL.en, en),
         };
     }
 
@@ -291,20 +325,10 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
     }
 
     function validate(index: number): string {
-        if ((FREE_TEXT_FIELDS[index] ?? []).some((key) => countWords(values[key]) > MAX_TEXT_WORDS))
+        if ((FREE_TEXT_FIELDS[index] ?? []).some((key) => (!editing || values[key] !== initialValues[key]) && countWords(values[key]) > MAX_TEXT_WORDS))
             return tr('Mỗi ô mô tả, ghi chú hoặc bảo quản tối đa 150 chữ.');
         if (index === 0) {
-            if (
-                !values.nameVi?.trim() ||
-                !values.nameEn?.trim() ||
-                !values.sku?.trim() ||
-                !values.category ||
-                !values.origin ||
-                !values.distributor ||
-                !values.brand ||
-                !values.descriptionVi?.trim() ||
-                !values.descriptionEn?.trim()
-            )
+            if (['nameVi','nameEn','sku','category','origin','distributor','brand','descriptionVi','descriptionEn'].some(missing))
                 return tr(
                     'Vui lòng nhập tên, SKU, danh mục, thương hiệu, xuất xứ, nhà phân phối và mô tả (tiếng Việt và tiếng Anh).',
                 );
@@ -328,7 +352,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 'specEn',
                 'unit',
                 'minOrder',
-                'sellingSpec',
+                staffLang === 'vi' ? 'sellingSpecVi' : 'sellingSpecEn',
                 'netWeight',
                 'tareWeight',
                 'length',
@@ -339,10 +363,10 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 'storageEn',
                 'vat',
             ];
-            if (required.some((key) => !values[key]?.trim()))
+            if (required.some(missing))
                 return tr('Vui lòng nhập đủ mọi thông tin ở bước Chi tiết sản phẩm.');
             for (const key of ['netWeight', 'volume', 'length', 'width', 'height', 'minOrder']) {
-                if (!Number.isFinite(Number(values[key])) || Number(values[key]) <= 0)
+                if ((!editing || hasValue(key)) && (!Number.isFinite(Number(values[key])) || Number(values[key]) <= 0))
                     return tr(
                         'Khối lượng, kích thước, thể tích và số lượng tối thiểu phải lớn hơn 0.',
                     );
@@ -350,13 +374,12 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             if (!Number.isFinite(Number(values.tareWeight)) || Number(values.tareWeight) < 0)
                 return tr('Khối lượng bao bì không được âm.');
             // Cùng giới hạn @Digits của CreateWarehouseProductRequest để báo lỗi ngay trên form, không đợi BE trả 400.
-            // Thể tích (cm³) được tự làm tròn 2 số lẻ khi gửi; chỉ báo lỗi khi làm tròn còn 0 hoặc quá lớn.
             const volume = roundVolume(values.volume);
-            if (volume <= 0 || volume >= 1_000_000_000_000)
+            if ((!editing || hasValue('volume')) && (volume <= 0 || volume >= 1_000_000_000_000))
                 return tr('Thể tích tính bằng cm³ và phải lớn hơn 0. Ví dụ chai 500ml khoảng 500 cm³.');
-            if (!fitsDigits(values.netWeight, 9, 3) || !fitsDigits(values.tareWeight, 9, 3))
+            if (['netWeight','tareWeight'].some(key => (!editing || hasValue(key)) && !fitsDigits(values[key], 9, 3)))
                 return tr('Khối lượng tính bằng kg, tối đa 3 chữ số thập phân.');
-            if (['length', 'width', 'height'].some((key) => !fitsDigits(values[key], 8, 2)))
+            if (['length', 'width', 'height'].some((key) => (!editing || hasValue(key)) && !fitsDigits(values[key], 8, 2)))
                 return tr('Kích thước tính bằng cm, tối đa 2 chữ số thập phân.');
             if (!fitsDigits(values.minOrder, 9, 3))
                 return tr('Số lượng đặt tối thiểu tối đa 3 chữ số thập phân.');
@@ -366,6 +389,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 Number(values.vat) > 100
             )
                 return tr('Thuế suất VAT phải từ 0 đến 100%.');
+            if (editing && !nutritionChanged) return '';
             if (!nutrition.basis.trim())
                 return tr('Vui lòng nhập lượng tham chiếu cho bảng dinh dưỡng, ví dụ 100g.');
             if (nutrition.rows.length === 0)
@@ -381,28 +405,34 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             }
         }
         if (index === 2) {
-            if (!values.price?.trim()) return tr('Vui lòng nhập giá niêm yết.');
+            if (lockedCommercial) return '';
+            if (missing('price') || (tiers.length > 0 && !hasValue('price'))) return tr('Vui lòng nhập giá niêm yết.');
             const price = Number(values.price),
                 min = Number(values.minOrder);
             if (![price, min].every(Number.isFinite) || price < 0 || !Number.isInteger(price) || min <= 0)
                 return tr('Giá phải là số nguyên không âm và số lượng tối thiểu phải lớn hơn 0.');
             const sorted = [...tiers].sort((a, b) => Number(a.min) - Number(b.min));
+            if (tiers.some((tier, index) => tier.unlimited && index !== tiers.length - 1))
+                return tr('Chỉ bậc giá cuối cùng được phép không giới hạn.');
             for (let i = 0; i < sorted.length; i++) {
                 const tier = sorted[i],
                     low = Number(tier.min),
-                    high = tier.max.trim() ? Number(tier.max) : null,
+                    high = tier.unlimited ? null : Number(tier.max),
                     tierPrice = Number(tier.price);
                 if (
                     !tier.min.trim() ||
                     !tier.price.trim() ||
+                    (!tier.unlimited && !tier.max.trim()) ||
+                    (tier.unlimited && i !== sorted.length - 1) ||
                     !Number.isFinite(low) ||
+                    !/^\d{1,9}(?:\.\d{1,3})?$/.test(tier.min) ||
                     low <= 0 ||
                     !Number.isFinite(tierPrice) ||
                     !Number.isInteger(tierPrice) ||
                     tierPrice < 0 ||
                     tierPrice > price ||
-                    (high != null && (!Number.isFinite(high) || high < low)) ||
-                    (i > 0 && (!sorted[i - 1].max.trim() || Number(sorted[i - 1].max) >= low))
+                    (high != null && (!Number.isFinite(high) || !/^\d{1,9}(?:\.\d{1,3})?$/.test(tier.max) || high < low)) ||
+                    (i > 0 && (sorted[i - 1].unlimited || Number(sorted[i - 1].max) >= low))
                 )
                     return tr(
                         'Kiểm tra bậc giá: số lượng phải hợp lệ, không chồng lấn và đơn giá không vượt giá niêm yết.',
@@ -427,7 +457,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
     }
 
     async function createProduct() {
-        if (busy || created) return;
+        if (submitting.current || busy || created) return;
         for (let i = 0; i < 3; i++) {
             const problem = validate(i);
             if (problem) {
@@ -437,24 +467,25 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             }
         }
         const optionalNumber = (key: string) => (values[key]?.trim() ? Number(values[key]) : null);
-        const nutritionFacts = nutrition.rows.map((row) => ({
+        const nutritionFacts = editing && !nutritionChanged ? product.nutritionFacts : nutrition.rows.map((row) => ({
             nutrient: row.vi.trim(),
             nutrientEn: row.en.trim(),
             amount: row.amount.trim(),
         }));
+        submitting.current = true;
         setBusy(true);
         setError('');
-        const sellingSpec = await sellingSpecTexts();
+        const sellingSpec = sellingSpecTexts();
         const payload = {
             nameVi: values.nameVi.trim(),
             nameEn: values.nameEn.trim(),
-            sku: values.sku.trim(),
-            categoryId: values.category,
-            brandId: values.brand,
-            distributorId: values.distributor,
-            origin: values.origin,
-            descriptionVi: values.descriptionVi.trim(),
-            descriptionEn: values.descriptionEn.trim(),
+            sku: product?.sku ?? values.sku.trim(),
+            categoryId: values.category || null,
+            brandId: values.brand || null,
+            distributorId: values.distributor || null,
+            origin: values.origin || null,
+            descriptionVi: values.descriptionVi?.trim() || null,
+            descriptionEn: values.descriptionEn?.trim() || null,
             note: values.note || null,
             specVi: values.specVi || null,
             specEn: values.specEn || null,
@@ -469,67 +500,44 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             storageVi: values.storageVi || null,
             storageEn: values.storageEn || null,
             unit: values.unit,
-            price: Number(values.price),
-            vat: Number(values.vat),
+            price: optionalNumber('price'),
+            vat: optionalNumber('vat'),
             minOrder: Number(values.minOrder),
             tiers: tiers.map((tier) => ({
                 min: Number(tier.min),
-                max: tier.max.trim() ? Number(tier.max) : null,
+                max: tier.unlimited ? null : Number(tier.max),
                 price: Number(tier.price),
             })),
-            nutritionBasis: nutrition.basis.trim(),
+            nutritionBasis: nutrition.basis.trim() || null,
             nutritionFacts,
         };
         const body = new FormData();
         body.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
         if (image) body.append('image', image);
         try {
-            const result = await http.post<{ data: { id: string; sku: string } }>(
-                '/api/logistics/products',
-                body,
-            );
+            const result = await http.request<{ data: { id: string; sku: string } }>({
+                method: product ? 'put' : 'post',
+                url: product ? `/api/logistics/products/${product.id}` : '/api/logistics/products',
+                data: body,
+            });
             setCreated(result.data.data);
+            void queryClient.invalidateQueries({ queryKey: ['logistics', 'editable-products'] });
+            if (product) void invalidateChangedProduct(product.id);
         } catch (err) {
             setError(
                 axios.isAxiosError(err) && err.response?.status === 409
-                    ? tr('SKU đã tồn tại hoặc dữ liệu bị trùng. Vui lòng kiểm tra lại.')
-                    : tr('Không thể tạo sản phẩm. Kiểm tra thông tin và thử lại.'),
+                    ? tr(editing ? 'Dữ liệu đã thay đổi hoặc đang được sử dụng. Vui lòng kiểm tra lại.' : 'SKU đã tồn tại hoặc dữ liệu bị trùng. Vui lòng kiểm tra lại.')
+                    : tr(editing ? 'Không thể cập nhật sản phẩm. Kiểm tra thông tin và thử lại.' : 'Không thể tạo sản phẩm. Kiểm tra thông tin và thử lại.'),
             );
         } finally {
+            submitting.current = false;
             setBusy(false);
         }
     }
 
-    useEffect(() => {
-        const controller = new AbortController();
-        Promise.all([
-            getHomeCategories(controller.signal),
-            getCatalogBrands(controller.signal),
-            getDistributors(controller.signal),
-        ])
-            .then(([categoryData, brandData, distributorData]) => {
-                setCategories(categoryData);
-                setBrands(brandData);
-                setDistributors(distributorData);
-            })
-            .catch(() => {
-                if (!controller.signal.aborted) setCatalogError(true);
-            });
-        return () => controller.abort();
-    }, []);
-    // Danh sách quốc gia cho ô Xuất xứ (API bên ngoài, tải riêng để lỗi không chặn phần còn lại).
-    useEffect(() => {
-        const controller = new AbortController();
-        getCountries(controller.signal)
-            .then(setCountries)
-            .catch(() => {
-                if (!controller.signal.aborted) setCountriesError(true);
-            });
-        return () => controller.abort();
-    }, []);
     useEffect(
         () => () => {
-            if (imagePreview) URL.revokeObjectURL(imagePreview);
+            if (imagePreview.startsWith('blob:')) URL.revokeObjectURL(imagePreview);
         },
         [imagePreview],
     );
@@ -542,15 +550,16 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         const pair = bilingual[key];
         const props = {
             id: key,
+            readOnly: (editing && key === 'sku') || (lockedCommercial && ['price', 'vat'].includes(key)),
             value: values[key] || '',
             onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
                 const value = event.target.value;
                 setValues((current) => ({ ...current, [key]: value }));
                 // Nội dung nguồn đổi thì gợi ý cũ ở ô bên kia không còn đúng.
+                if (suggestions[key]) dropSuggestion(key);
                 const stale = pair && suggestions[pair.counterpart];
                 if (stale && stale.sourceText !== value.trim()) dropSuggestion(pair.counterpart);
             },
-            onBlur: pair ? () => suggestAfterBlur(key) : undefined,
             className: inputClass,
             placeholder: options?.placeholder,
         };
@@ -587,6 +596,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                         {...props}
                         type={options?.type || 'text'}
                         min={options?.type === 'number' ? '0' : undefined}
+                        maxLength={key.startsWith('sellingSpec') ? 200 : undefined}
                     />
                 )}
                 {suggestion && (
@@ -678,12 +688,14 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         CASE: tr('thùng'),
     };
     const cellInputClass =
-        'w-full rounded border border-black/40 bg-white px-3 py-2 text-sm font-normal text-black outline-none focus:border-black focus:ring-0';
+        'w-full rounded border border-black/40 bg-white px-3 py-2 text-sm font-normal text-black outline-none focus:border-black focus:ring-0 read-only:bg-store-cream disabled:bg-store-cream';
     const numberCell = (key: string, label: string, placeholder?: string) => (
         <input
             type="number"
             min="0"
+            step={key === 'volume' ? '0.01' : 'any'}
             aria-label={label}
+            readOnly={lockedCommercial && key === 'minOrder'}
             placeholder={placeholder}
             value={values[key] || ''}
             onChange={(e) => setValues((current) => ({ ...current, [key]: e.target.value }))}
@@ -713,6 +725,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             input: (
                 <select
                     aria-label={tr('Đơn vị bán')}
+                    disabled={editing}
                     value={values.unit || ''}
                     onChange={(e) => setValues((current) => ({ ...current, unit: e.target.value }))}
                     className={cellInputClass}
@@ -737,17 +750,14 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 'Cách đóng nhiều đơn vị thành thùng hoặc lốc khi bán sỉ và giao hàng. Nếu chỉ bán lẻ, ghi "Bán lẻ từng đơn vị".',
             ),
             input: (
-                <input
-                    aria-label={tr('Quy cách bán')}
-                    aria-describedby="spec-hint-sellingSpec"
-                    maxLength={200}
-                    placeholder={`${tr('Ví dụ:')} ${english ? sellingSpecExample.en : sellingSpecExample.vi}`}
-                    value={values.sellingSpec || ''}
-                    onChange={(e) =>
-                        setValues((current) => ({ ...current, sellingSpec: e.target.value }))
-                    }
-                    className={cellInputClass}
-                />
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {field('sellingSpecVi', tr('Tiếng Việt'), {
+                        placeholder: `${tr('Ví dụ:')} ${sellingSpecExample.vi}`,
+                    })}
+                    {field('sellingSpecEn', tr('Tiếng Anh'), {
+                        placeholder: `${tr('Ví dụ:')} ${sellingSpecExample.en}`,
+                    })}
+                </div>
             ),
         },
         {
@@ -795,28 +805,41 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             <PageNav
                 back={{
                     label: request ? tr('Quay lại yêu cầu') : tr('Quay lại sổ cái tồn kho'),
-                    onClick: onClose,
+                    onClick: () => askExit(onClose),
                     disabled: busy,
                 }}
             />
-            <LogisticsPageHeader number={request ? "04" : "03"} label={request ? tr("Yêu cầu khách hàng") : tr("Quản lý kho")} title={tr("Tạo sản phẩm mới")} />
+            <LogisticsPageHeader
+                number={request ? '04' : '03'}
+                label={request ? tr('Yêu cầu khách hàng') : tr('Quản lý kho')}
+                title={tr(editing ? 'Chỉnh sửa sản phẩm' : 'Tạo sản phẩm mới')}
+            >
+                {onEdit && <div className="flex shrink-0 flex-wrap justify-end gap-2">
+                    {onCreateMode && <button type="button" disabled={busy} onClick={() => askExit(onCreateMode)} className="rounded border border-black bg-white px-3 py-2 text-sm font-semibold disabled:opacity-50">{tr('Tạo sản phẩm mới')}</button>}
+                    <button type="button" disabled={busy} onClick={() => askExit(onEdit)} className="rounded border border-black bg-store-yellow px-3 py-2 text-sm font-semibold disabled:opacity-50">{tr('Chỉnh sửa sản phẩm')}</button>
+                </div>}
+            </LogisticsPageHeader>
+            {lockedCommercial && !created && <p className="rounded border border-store-line bg-store-cream p-3 text-sm">{tr('Sản phẩm đã đăng bán: SKU, đơn vị, MOQ, VAT và giá chỉ được xem trong chế độ này.')}</p>}
+            <ConfirmModal workspace open={!!exitAction || blocker.state === 'blocked'} busy={busy}
+                title={tr('Thay đổi chưa lưu')} message={tr('Bạn có muốn rời biểu mẫu mà không lưu thay đổi?')}
+                confirmLabel={tr('Xác nhận')} cancelLabel={tr('Hủy')}
+                onCancel={() => { setExitAction(null); if (blocker.state === 'blocked') blocker.reset(); }}
+                onConfirm={confirmExit} />
             {created ? (
                 <div className="rounded-xl border border-green-300 bg-green-50 p-6" role="status">
                     <p className="font-bold text-green-800">
-                        {tr('Đã tạo sản phẩm nháp') + ' '}
+                        {tr(editing ? 'Đã cập nhật sản phẩm' : 'Đã tạo sản phẩm nháp') + ' '}
                         {created.sku}.
                     </p>
-                    <p className="mt-2 text-sm text-green-800">
-                        {tr(
-                            'Sản phẩm chưa được đăng bán. Bạn có thể nhập tồn kho cho sản phẩm này.',
-                        ) + ' '}
-                    </p>
+                    {!editing && <p className="mt-2 text-sm text-green-800">
+                        {tr('Sản phẩm chưa được đăng bán. Bạn có thể nhập tồn kho cho sản phẩm này.')}
+                    </p>}
                     <button
                         type="button"
                         onClick={() => (onCreated ? onCreated(created) : onClose())}
                         className="mt-4 rounded bg-store-green px-4 py-2 font-bold text-white"
                     >
-                        {onCreated ? tr('Tiếp tục nhập hàng') : tr('Quay lại yêu cầu')}
+                        {onCreated ? tr('Tiếp tục nhập hàng') : tr(editing ? 'Tạo sản phẩm mới' : 'Quay lại sổ cái tồn kho')}
                     </button>
                 </div>
             ) : (
@@ -915,6 +938,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                                     ? tr('Chọn quốc gia')
                                                     : tr('Đang tải danh sách quốc gia…')}
                                             </option>
+                                            {editing && values.origin && !countries.some(country => country.value === values.origin) && <option value={values.origin}>{values.origin}</option>}
                                             {countries.map((country) => (
                                                 <option key={country.code} value={country.value}>
                                                     {english ? country.nameEn : country.nameVi}
@@ -986,10 +1010,15 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                         className="sr-only"
                                         onChange={(e) => {
                                             const selected = e.target.files?.[0] || null;
-                                            setImage(selected);
-                                            setImagePreview(
-                                                selected ? URL.createObjectURL(selected) : '',
-                                            );
+                                            e.target.value = '';
+                                            if (!selected) return;
+                                            if (selected.size > 5 * 1024 * 1024 ||
+                                                !['image/jpeg', 'image/png', 'image/webp'].includes(selected.type)) {
+                                                setError(tr('Chọn ảnh JPG, PNG hoặc WebP (tối đa 5 MB)'));
+                                                return;
+                                            }
+                                            setError('');
+                                            setCropSource({ url: URL.createObjectURL(selected), name: selected.name });
                                         }}
                                     />
                                 </label>
@@ -1022,44 +1051,44 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     <div className="overflow-hidden rounded border border-black/40">
                                         <table className="w-full table-fixed border-collapse text-sm">
                                             <thead className="bg-store-cream">
-                                                <tr>
-                                                    <th
-                                                        scope="col"
-                                                        className="w-[38%] px-3 py-2 text-left font-semibold"
-                                                    >
-                                                        {tr('Thông số')}
-                                                    </th>
-                                                    <th
-                                                        scope="col"
-                                                        className="px-3 py-2 text-left font-semibold"
-                                                    >
-                                                        {tr('Giá trị')}
-                                                    </th>
-                                                </tr>
+                                            <tr>
+                                                <th
+                                                    scope="col"
+                                                    className="w-[38%] px-3 py-2 text-left font-semibold"
+                                                >
+                                                    {tr('Thông số')}
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    className="px-3 py-2 text-left font-semibold"
+                                                >
+                                                    {tr('Giá trị')}
+                                                </th>
+                                            </tr>
                                             </thead>
                                             <tbody>
-                                                {specRows.map((row) => (
-                                                    <tr
-                                                        key={row.label}
-                                                        className="border-t border-black/10"
+                                            {specRows.map((row) => (
+                                                <tr
+                                                    key={row.label}
+                                                    className="border-t border-black/10"
+                                                >
+                                                    <th
+                                                        scope="row"
+                                                        className="px-3 py-2 text-left align-middle font-medium"
                                                     >
-                                                        <th
-                                                            scope="row"
-                                                            className="px-3 py-2 text-left align-middle font-medium"
-                                                        >
-                                                            {row.label}
-                                                            {row.hint && (
-                                                                <span
-                                                                    id={row.hintId}
-                                                                    className="mt-1 block text-xs font-normal leading-5 text-black/60"
-                                                                >
+                                                        {row.label}
+                                                        {row.hint && (
+                                                            <span
+                                                                id={row.hintId}
+                                                                className="mt-1 block text-xs font-normal leading-5 text-black/60"
+                                                            >
                                                                     {row.hint}
                                                                 </span>
-                                                            )}
-                                                        </th>
-                                                        <td className="px-2 py-2">{row.input}</td>
-                                                    </tr>
-                                                ))}
+                                                        )}
+                                                    </th>
+                                                    <td className="px-2 py-2">{row.input}</td>
+                                                </tr>
+                                            ))}
                                             </tbody>
                                         </table>
                                     </div>
@@ -1110,7 +1139,12 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     </label>
                                     <BilingualNutritionEditor
                                         rows={nutrition.rows}
-                                        onChange={(rows) => setNutrition({ ...nutrition, rows })}
+                                        onChange={(rows) => {
+                                            nutritionTranslationRequest.current?.abort();
+                                            nutritionTranslationRequest.current = null;
+                                            setNutritionTranslation(null);
+                                            setNutrition({ ...nutrition, rows });
+                                        }}
                                         labels={{
                                             heading: { vi: tr('Tiếng Việt'), en: tr('Tiếng Anh') },
                                             nutrient: {
@@ -1188,10 +1222,14 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     <h3 className="font-semibold">{tr('Bậc giá sỉ')}</h3>
                                     <button
                                         type="button"
-                                        onClick={() =>
-                                            setTiers([...tiers, { min: '', max: '', price: '' }])
+                                        disabled={
+                                            lockedCommercial || tiers.length >= 100 ||
+                                            tiers.some((tier) => tier.unlimited)
                                         }
-                                        className="rounded border border-black px-3 py-2 text-sm font-semibold"
+                                        onClick={() =>
+                                            setTiers((current) => [...current, { min: '', max: '', price: '', unlimited: false }])
+                                        }
+                                        className="rounded border border-black px-3 py-2 text-sm font-semibold disabled:opacity-50"
                                     >
                                         {tr('+ Thêm bậc giá') + ' '}
                                     </button>
@@ -1212,16 +1250,27 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                                 }
                                                 <input
                                                     type="number"
-                                                    min="0"
-                                                    value={tier[key]}
+                                                    min={key === 'price' ? '0' : '0.001'}
+                                                    step={key === 'price' ? '1' : '0.001'}
+                                                    disabled={lockedCommercial || (key === 'max' && tier.unlimited)}
+                                                    placeholder={
+                                                        key === 'max' && tier.unlimited
+                                                            ? tr('Không giới hạn')
+                                                            : undefined
+                                                    }
+                                                    value={
+                                                        key === 'max' && tier.unlimited
+                                                            ? ''
+                                                            : tier[key]
+                                                    }
                                                     onChange={(e) =>
                                                         setTiers(
                                                             tiers.map((item, i) =>
                                                                 i === index
                                                                     ? {
-                                                                          ...item,
-                                                                          [key]: e.target.value,
-                                                                      }
+                                                                        ...item,
+                                                                        [key]: e.target.value,
+                                                                    }
                                                                     : item,
                                                             ),
                                                         )
@@ -1230,15 +1279,38 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                                 />
                                             </label>
                                         ))}
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setTiers(tiers.filter((_, i) => i !== index))
-                                            }
-                                            className="mb-1 px-2 py-2 text-sm text-red-700"
-                                        >
-                                            {tr('Xóa') + ' '}
-                                        </button>
+                                        <div className="mb-1.5">
+                                            {!lockedCommercial && <LogisticsRemoveButton
+                                                label={`${tr('Xóa')} ${index + 1}`}
+                                                onClick={() =>
+                                                    setTiers(tiers.filter((_, i) => i !== index))
+                                                }
+                                            />}
+                                        </div>
+                                        {index === tiers.length - 1 && (
+                                            <label className="col-span-full flex items-center gap-2 text-sm font-medium">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={tier.unlimited}
+                                                    disabled={lockedCommercial}
+                                                    className="size-4 accent-store-green"
+                                                    onChange={(e) =>
+                                                        setTiers(
+                                                            tiers.map((item, i) =>
+                                                                i === index
+                                                                    ? {
+                                                                          ...item,
+                                                                          unlimited:
+                                                                              e.target.checked,
+                                                                      }
+                                                                    : item,
+                                                            ),
+                                                        )
+                                                    }
+                                                />
+                                                {tr('Không giới hạn số lượng tối đa')}
+                                            </label>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -1272,7 +1344,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     </p>
                                     <p className="mt-1 text-store-muted">
                                         {tr('Quy cách bán:') + ' '}
-                                        {values.sellingSpec || tr('Chưa nhập')}{' '}
+                                        {values[staffLang === 'vi' ? 'sellingSpecVi' : 'sellingSpecEn'] || tr('Chưa nhập')}{' '}
                                         {tr('· Nhà phân phối:')}{' '}
                                         {distributors.find((item) => item.id === values.distributor)
                                             ?.name || tr('Chưa chọn')}
@@ -1316,7 +1388,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                             <button
                                 type="button"
                                 disabled={busy}
-                                onClick={() => (step ? go(step - 1) : onClose())}
+                                onClick={() => (step ? go(step - 1) : askExit(onClose))}
                                 className="inline-flex items-center gap-2 rounded border border-black px-4 py-3 text-sm font-semibold"
                             >
                                 <ArrowLeft size={16} /> {step ? tr('Quay lại') : tr('Đóng')}
@@ -1338,12 +1410,21 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     className="inline-flex items-center gap-2 rounded border border-black bg-store-yellow px-5 py-3 text-sm font-bold disabled:opacity-50"
                                 >
                                     <PackagePlus size={16} />{' '}
-                                    {busy ? tr('Đang tạo...') : tr('Tạo sản phẩm nháp')}
+                                    {busy ? tr(editing ? 'Đang lưu...' : 'Đang tạo...') : tr(editing ? 'Lưu thay đổi' : 'Tạo sản phẩm nháp')}
                                 </button>
                             )}
                         </div>
                     </section>
                 </>
+            )}
+            {cropSource && (
+                <PromotionImageCropper src={cropSource.url} originalName={cropSource.name} kind="product"
+                                       onCancel={() => setCropSource(null)}
+                                       onApply={(file) => {
+                                           setImage(file);
+                                           setImagePreview(URL.createObjectURL(file));
+                                           setCropSource(null);
+                                       }} />
             )}
         </div>
     );

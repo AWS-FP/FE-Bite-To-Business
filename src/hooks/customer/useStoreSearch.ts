@@ -111,7 +111,9 @@ export function useStoreSearch() {
         if (searchMode === 'ai') {
             // Chế độ AI: AI ghép cả trang theo yêu cầu thay trang kết quả mặc định.
             setOpen(false);
+            setKeyword(searchText);
             navigate(aiPagePath(searchText));
+            void recordSearch(searchText);
             return;
         }
 
@@ -226,7 +228,8 @@ export function useStoreSearch() {
             open && searchMode === 'products' && canSuggest(term) && (!enabled || isFetching),
         suggestionError: enabled && isError,
         showSuggestionMenu: open && searchMode === 'products' && canSuggest(term),
-        showRecentSearches: open && searchMode === 'products' && !term && historyEntries.length > 0,
+        showRecentSearches: open && !term && historyEntries.length > 0,
+        historyPath: (value: string) => searchMode === 'ai' ? aiPagePath(value) : getCatalogSearchPath(value),
         keyword,
         changeKeyword,
         searchMode,

@@ -87,7 +87,7 @@ export default function EcommerceReviewsPage() {
                 ) : (
                     <div className="divide-y divide-[#edf1eb]">
                         {list.data.items.map((r) => (
-                            <article key={r.id} className="grid gap-4 p-5 lg:grid-cols-[1fr_170px]">
+                            <article key={r.id} className="grid items-start gap-4 p-5 sm:grid-cols-[minmax(0,1fr)_180px]">
                                 <div>
                                     <div className="flex flex-wrap items-center gap-3">
                                         <strong className="text-sm">
@@ -114,12 +114,12 @@ export default function EcommerceReviewsPage() {
                                         </p>
                                     )}
                                 </div>
-                                <div className="flex flex-wrap items-start justify-end gap-2">
+                                <div className="flex w-full flex-col items-stretch gap-2 self-start sm:w-[180px] sm:justify-self-end">
                                     {!r.deletedAt ? (
                                         <button
                                             type="button"
                                             disabled={busy}
-                                            className={executiveUi.secondary}
+                                            className={`${executiveUi.secondary} h-10 w-full !min-h-0 !py-0`}
                                             onClick={() => hide(r.id)}
                                         >
                                             {tr('Ẩn đánh giá', 'Hide review')}
@@ -128,7 +128,7 @@ export default function EcommerceReviewsPage() {
                                         <button
                                             type="button"
                                             disabled={busy}
-                                            className={executiveUi.secondary}
+                                            className={`${executiveUi.secondary} h-10 w-full !min-h-0 !py-0`}
                                             onClick={() => restore(r.id)}
                                         >
                                             {tr('Hiện lại', 'Restore')}
@@ -146,7 +146,7 @@ export default function EcommerceReviewsPage() {
                                         disabled={busy}
                                         onClick={() => remove(r.id)}
                                         aria-label={tr('Xóa vĩnh viễn đánh giá', 'Permanently delete review')}
-                                        className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700 transition hover:border-rose-400 hover:bg-rose-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                        className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700 transition hover:border-rose-400 hover:bg-rose-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600 disabled:cursor-not-allowed disabled:opacity-50"
                                     >
                                         <Trash2 size={15} aria-hidden="true" />
                                         {tr('Xóa đánh giá', 'Delete review')}

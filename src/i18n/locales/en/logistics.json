@@ -27,5 +27,19 @@
   "Không tải được danh sách sản phẩm.":"Could not load the product list.", "Đã lưu phản hồi. Email sẽ được gửi nếu khách đã chọn nhận thông báo.":"Response saved. An email will be sent if the customer opted in.", "Không thể lưu phản hồi. Hãy kiểm tra sản phẩm đã được đăng bán và thử lại.":"Could not save the response. Check that the product is published and try again.", "Yêu cầu khách hàng":"Customer requests", "Yêu cầu sản phẩm":"Product requests", "Tiếp nhận và phản hồi yêu cầu từ khách hàng.":"Review and respond to customer product requests.", "Phản hồi":"Respond", "Tạo sản phẩm":"Create product", "Phản hồi yêu cầu":"Respond to request", "Lý do từ chối":"Rejection reason", "Xác nhận sản phẩm":"Confirm product", "Từ chối":"Reject", "Xác nhận":"Confirm", "Lý do từ chối *":"Rejection reason *", "Xác nhận từ chối":"Confirm rejection", "Chọn sản phẩm đã đăng bán để gửi đúng đường dẫn cho khách hàng.":"Select a published product to send its link to the customer.", "Tìm sản phẩm theo tên hoặc SKU":"Search products by name or SKU", "Tìm tên hoặc mã SKU":"Search by name or SKU", "Đang tải sản phẩm...":"Loading products...", "Không tìm thấy sản phẩm.":"No products found.",
   "Đang tải dữ liệu...":"Loading data...", "Chưa có dữ liệu.":"No data available.", "Không tải được dữ liệu. Vui lòng thử lại.":"Could not load data. Please try again.", "Không nhận được phản hồi từ máy chủ. Vui lòng kiểm tra kết nối và tồn kho trước khi thử lại.":"No response from the server. Check your connection and inventory before retrying.", "Không thể xử lý yêu cầu. Vui lòng kiểm tra dữ liệu và thử lại.":"Could not process the request. Check the data and try again.", "Đóng menu":"Close menu", "Mở menu":"Open menu",
   "Dịch từ tiếng Việt":"Translate from Vietnamese", "Dịch từ tiếng Anh":"Translate from English", "AI đang gợi ý bản dịch…":"AI is suggesting a translation…", "Gợi ý từ AI":"AI suggestion", "Dùng gợi ý":"Use suggestion", "Thay bằng gợi ý":"Replace with suggestion", "Bỏ qua":"Dismiss", "Bạn đã dùng hết lượt gợi ý dịch trong giờ này. Vui lòng thử lại sau.":"You have used all translation suggestions for this hour. Please try again later.", "Tài khoản không có quyền dùng gợi ý dịch.":"This account cannot use translation suggestions.", "Chưa lấy được gợi ý dịch. Bạn có thể tự nhập hoặc thử lại.":"Could not get a translation suggestion. Enter it yourself or try again.",
-  "PENDING":"Pending", "REVIEWING":"Under review", "ADDED":"Added", "REJECTED":"Rejected"
+  "PENDING":"Pending", "REVIEWING":"Under review", "ADDED":"Added", "REJECTED":"Rejected",
+  "Không giới hạn": "Unlimited",
+  "Không giới hạn số lượng tối đa": "No maximum quantity",
+  "Chỉ bậc giá cuối cùng được phép không giới hạn.": "Only the final price tier may be unlimited.",
+  "Chọn sản phẩm cần chỉnh sửa": "Select a product to edit",
+  "Chỉnh sửa sản phẩm": "Edit product",
+  "Thay đổi chưa lưu": "Unsaved changes",
+  "Bạn có muốn rời biểu mẫu mà không lưu thay đổi?": "Leave the form without saving your changes?",
+  "Sản phẩm đã đăng bán: SKU, đơn vị, MOQ, VAT và giá chỉ được xem trong chế độ này.": "Published product: SKU, unit, MOQ, VAT and prices are read-only in this mode.",
+  "Đã cập nhật sản phẩm": "Product updated",
+  "Lưu thay đổi": "Save changes",
+  "Dữ liệu đã thay đổi hoặc đang được sử dụng. Vui lòng kiểm tra lại.": "The data has changed or is in use. Please check and try again.",
+  "Không thể cập nhật sản phẩm. Kiểm tra thông tin và thử lại.": "Could not update the product. Check the information and try again.",
+  "Bản nháp": "Draft",
+  "Đã đăng bán": "Published"
 }
