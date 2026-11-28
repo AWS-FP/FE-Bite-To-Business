@@ -65,18 +65,16 @@ function fitsDigits(raw: string | undefined, integer: number, fraction: number):
     return whole.length <= integer && (match[2] ?? '').length <= fraction;
 }
 
-// Cột volume chỉ giữ 6 số lẻ (@Digits fraction = 6), nên làm tròn thay vì bắt staff tự cắt số.
+// Thể tích lưu bằng cm³ (V67, cột volume_cm3 NUMERIC(14, 2)); làm tròn 2 số lẻ thay vì bắt staff tự cắt số.
 function roundVolume(raw: string | undefined): number {
     const value = Number((raw ?? '').trim());
-    return Number.isFinite(value) ? Math.round(value * 1_000_000) / 1_000_000 : 0;
+    return Number.isFinite(value) ? Math.round(value * 100) / 100 : 0;
 }
 
-// Thể tích (m³) gợi ý từ kích thước D × R × C (cm), làm tròn 6 chữ số như cột volume.
+// Thể tích (cm³) gợi ý từ kích thước D × R × C (cm).
 function volumeFromDimensions(length?: string, width?: string, height?: string): string {
-    const cm3 = Number(length) * Number(width) * Number(height);
-    if (!Number.isFinite(cm3) || cm3 <= 0) return '';
-    const m3 = Math.round(cm3) / 1_000_000;
-    return m3 > 0 ? m3.toFixed(6).replace(/0+$/, '').replace(/\.$/, '') : '';
+    const cm3 = Math.round(Number(length) * Number(width) * Number(height) * 100) / 100;
+    return Number.isFinite(cm3) && cm3 > 0 ? String(cm3) : '';
 }
 
 // Ô văn bản tự do tối đa 150 chữ (đếm theo khoảng trắng) để đoạn hiển thị không phá bố cục.
@@ -352,12 +350,10 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             if (!Number.isFinite(Number(values.tareWeight)) || Number(values.tareWeight) < 0)
                 return tr('Khối lượng bao bì không được âm.');
             // Cùng giới hạn @Digits của CreateWarehouseProductRequest để báo lỗi ngay trên form, không đợi BE trả 400.
-            // Thể tích nhiều hơn 6 số lẻ được tự làm tròn khi gửi; chỉ báo lỗi khi làm tròn còn 0 hoặc quá lớn.
+            // Thể tích (cm³) được tự làm tròn 2 số lẻ khi gửi; chỉ báo lỗi khi làm tròn còn 0 hoặc quá lớn.
             const volume = roundVolume(values.volume);
-            if (volume <= 0 || volume >= 1_000_000)
-                return tr(
-                    'Thể tích tính bằng m³ và phải từ 0.000001 đến dưới 1.000.000. Ví dụ chai 500ml khoảng 0.0005 m³.',
-                );
+            if (volume <= 0 || volume >= 1_000_000_000_000)
+                return tr('Thể tích tính bằng cm³ và phải lớn hơn 0. Ví dụ chai 500ml khoảng 500 cm³.');
             if (!fitsDigits(values.netWeight, 9, 3) || !fitsDigits(values.tareWeight, 9, 3))
                 return tr('Khối lượng tính bằng kg, tối đa 3 chữ số thập phân.');
             if (['length', 'width', 'height'].some((key) => !fitsDigits(values[key], 8, 2)))
@@ -773,12 +769,12 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             ),
         },
         {
-            label: tr('Thể tích (m³)'),
+            label: tr('Thể tích (cm³)'),
             hintId: 'spec-hint-volume',
-            hint: tr('Đơn vị m³, không phải ml hay lít. Nhập xong kích thước thì bấm "Tính từ kích thước".'),
+            hint: tr('Đơn vị cm³ (1 ml = 1 cm³). Nhập xong kích thước thì bấm "Tính từ kích thước".'),
             input: (
                 <div className="flex gap-2">
-                    {numberCell('volume', tr('Thể tích (m³)'), tr('Ví dụ: 0.0005'))}
+                    {numberCell('volume', tr('Thể tích (cm³)'), tr('Ví dụ: 500'))}
                     <button
                         type="button"
                         disabled={!suggestedVolume}
