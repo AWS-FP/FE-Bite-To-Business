@@ -1,3 +1,6 @@
+import Pagination from '@/components/common/Pagination';
+import { useLogPagination } from '@/hooks/admin/useLogPagination';
+import Skeleton from '@/components/common/Skeleton';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -6,7 +9,7 @@ import {
     Bar,
     CartesianGrid,
     ComposedChart,
-    Line,
+    Area,
     ResponsiveContainer,
     Tooltip,
     XAxis,
@@ -14,6 +17,8 @@ import {
 } from 'recharts';
 import AdminButton from './AdminButton';
 import ApiDiagnosticsPanel from './ApiDiagnosticsPanel';
+import SystemLogPanel from './SystemLogPanel';
+import FrontendLogPanel from './FrontendLogPanel';
 import { getSystemMonitoring } from '@/services/admin/systemService';
 import { useAuthStore } from '@/store/admin/authStore';
 import type { MonitoringPoint, SystemMonitoring } from '@/types/admin/system';
@@ -48,7 +53,7 @@ const sparseErrorMetrics = ['errors', 'clientErrors', 'alb4xx', 'alb5xx'];
 
 export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?: Mode }) {
     const { t, i18n } = useTranslation('admin');
-    const [hours, setHours] = useState(24);
+    const [hours, setHours] = useState(6);
     const [status, setStatus] = useState('all');
     const session = useAuthStore((state) => state.session);
     const sessionVersion = useAuthStore((state) => state.sessionVersion);
@@ -75,7 +80,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
         mode === 'logs'
             ? diagnosticsMetrics
             : mode === 'overview'
-              ? [...cloudMetrics, 'aiRequests', 'aiFailed']
+              ? cloudMetrics
               : aiMetrics;
     const logs =
         data?.recentAiLogs.filter(
@@ -84,8 +89,9 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                 (status === 'failed' ? row.status === 'FAILED' : row.status !== 'FAILED'),
         ) ?? [];
 
+    const logPager=useLogPagination(logs, `${hours}:${status}`);
     return (
-        <section className="system-monitoring" aria-label={t('system.monitoring.title')}>
+        <section className="grid min-w-0 gap-5" aria-label={t('system.monitoring.title')}>
             <div className="system-section-toolbar">
                 <div>
                     <h2>
@@ -97,15 +103,17 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                     </h2>
                 </div>
                 <div className="system-button-row">
-                    <label className="monitoring-range">
+                    <label className="flex items-center gap-2 text-xs">
                         {t('system.monitoring.range')}
                         <select
+                            className="rounded-[3px] border border-solid border-black bg-white p-2.5"
                             value={hours}
                             onChange={(event) => setHours(Number(event.target.value))}
                         >
+                            <option value={1}>{t('system.monitoring.hour')}</option>
+                            <option value={6}>{t('system.monitoring.sixHours')}</option>
                             <option value={24}>{t('system.monitoring.day')}</option>
                             <option value={168}>{t('system.monitoring.week')}</option>
-                            <option value={720}>{t('system.monitoring.month')}</option>
                         </select>
                     </label>
                     <AdminButton
@@ -123,8 +131,24 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                     {t('system.monitoring.error')}
                 </div>
             )}
-            {query.isPending && <p role="status">{t('system.loading')}</p>}
-            {mode === 'logs' && !data && <ApiDiagnosticsPanel hours={hours} />}
+            {query.isPending && (
+                <div aria-busy="true" className="system-metric-grid">
+                    {keys.map((id) => (
+                        <article key={id} className="system-metric-card">
+                            <Skeleton className="h-4 w-2/3" />
+                            <Skeleton className="mt-4 h-8 w-1/2" />
+                            <Skeleton className="mt-3 h-3 w-3/4" />
+                        </article>
+                    ))}
+                </div>
+            )}
+            {mode === 'logs' && !data && (
+                <>
+                    <ApiDiagnosticsPanel hours={hours} />
+                    <SystemLogPanel hours={hours} />
+                    <FrontendLogPanel key={hours} hours={hours} />
+                </>
+            )}
             {data && (
                 <>
                     <p className="system-muted">
@@ -143,7 +167,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                             )}
                         </div>
                     )}
-                    <div className="system-metric-grid">
+                    {mode !== 'logs' && <div className="grid grid-cols-1 gap-4 min-[701px]:grid-cols-2 min-[1201px]:grid-cols-4">
                         {keys.map((id) => {
                             const points = metricPoints(data, id);
                             const current = points.filter(
@@ -190,27 +214,26 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                                 </article>
                             );
                         })}
-                    </div>
-                    {mode === 'logs' && <ApiDiagnosticsPanel hours={hours} />}
-                    <div className="monitoring-chart-grid">
+                    </div>}
+                    {mode === 'logs' && <><ApiDiagnosticsPanel hours={hours} /><SystemLogPanel hours={hours} /><FrontendLogPanel key={hours} hours={hours} /></>}
+                    {mode !== 'logs' && <div className="grid grid-cols-1 gap-5 min-[701px]:grid-cols-2">
                         {(mode === 'ai'
                             ? aiMetrics
-                            : mode === 'logs'
-                              ? ['requests', 'errors', 'alb5xx', 'latency', 'pageLoad', 'lcp']
-                              : ['pageviews', 'requests', 'aiRequests', 'aiFailed']
+                            : ['pageviews', 'requests', 'latency', 'pageLoad', 'lcp', 'errors']
                         ).map((id) => (
                             <MetricChart key={id} id={id} data={data} date={date} />
                         ))}
-                    </div>
-                    <section className="system-panel">
+                    </div>}
+                    {mode === 'logs' && <section className="system-panel">
                         <header className="system-panel-heading">
                             <div>
                                 <h2>{t('system.monitoring.logsTitle')}</h2>
                                 <p>{t('system.monitoring.logsHint')}</p>
                             </div>
-                            <label className="monitoring-range">
+                            <label className="flex items-center gap-2 text-xs">
                                 {t('system.monitoring.status')}
                                 <select
+                                    className="rounded-[3px] border border-solid border-black bg-white p-2.5"
                                     value={status}
                                     onChange={(event) => setStatus(event.target.value)}
                                 >
@@ -221,7 +244,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                             </label>
                         </header>
                         <div className="system-table-scroll">
-                            <table className="system-log-table monitoring-log-table">
+                            <table className="system-log-table [&_td]:border-t [&_td]:[border-top-style:solid] [&_td]:border-store-line [&_td]:px-6 [&_td]:py-3.5 [&_td]:text-xs [&_td]:wrap-anywhere">
                                 <thead>
                                     <tr>
                                         {[
@@ -229,7 +252,8 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                                             'model',
                                             'status',
                                             'duration',
-                                            'tokens',
+                                            'input',
+                                            'output',
                                             'code',
                                         ].map((key) => (
                                             <th key={key}>{t(`system.monitoring.${key}`)}</th>
@@ -237,36 +261,33 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {logs.map((row, index) => (
-                                        <tr key={`${row.time}-${index}`}>
-                                            <td>{date(row.time)}</td>
-                                            <td>{row.model}</td>
-                                            <td>{row.status}</td>
+                                    {logPager.rows.map((row, index) => (
+                                        <tr key={row.id ?? `${row.time}-${index}`}>
+                                            <td>{new Date(row.time).toLocaleString(i18n.language, { timeZone: 'Asia/Ho_Chi_Minh' })}</td>
+                                            <td>{row.model}<span className="mt-1 block font-mono text-[10px] text-store-muted" title={row.id}>{row.id}</span></td>
+                                            <td><span className={`rounded-full px-2 py-1 font-semibold ${row.status === 'FAILED' ? 'bg-red-50 text-red-700' : row.status === 'SUCCEEDED' ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-800'}`}>{row.status}</span></td>
                                             <td>
                                                 {row.durationMs === null
                                                     ? '—'
                                                     : `${number.format(row.durationMs)} ms`}
                                             </td>
                                             <td>
-                                                {row.inputTokens === null ||
-                                                row.outputTokens === null
-                                                    ? '—'
-                                                    : number.format(
-                                                          row.inputTokens + row.outputTokens,
-                                                      )}
+                                                {row.inputTokens === null ? '—' : number.format(row.inputTokens)}
                                             </td>
+                                            <td>{row.outputTokens === null ? '—' : number.format(row.outputTokens)}</td>
                                             <td>{row.errorCode ?? '—'}</td>
                                         </tr>
                                     ))}
                                     {logs.length === 0 && (
                                         <tr>
-                                            <td colSpan={6}>{t('system.monitoring.emptyLogs')}</td>
+                                            <td colSpan={7}>{t('system.monitoring.emptyLogs')}</td>
                                         </tr>
                                     )}
                                 </tbody>
                             </table>
                         </div>
-                    </section>
+                        <Pagination {...logPager} loading={query.isFetching} />
+                    </section>}
                 </>
             )}
         </section>
@@ -333,12 +354,13 @@ function MetricChart({
         });
     }
     const gauge = gaugeMetrics.includes(id);
+    const bucketPager=useLogPagination(buckets, `${id}:${data.from}:${data.to}`);
     const unit = data.metrics.find((metric) => metric.id === id)?.unit;
     const suffix =
         unit === 'percent' ? '%' : unit === 'seconds' ? ' s' : unit === 'milliseconds' ? ' ms' : '';
     const number = new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 2 });
     return (
-        <section className="system-panel">
+        <section className="system-panel overflow-hidden rounded-xl border border-store-line bg-white shadow-sm">
             <header className="system-panel-heading">
                 <h2>{t(`system.monitoring.metrics.${id}`)}</h2>
             </header>
@@ -348,17 +370,17 @@ function MetricChart({
                 </div>
             ) : (
                 <>
-                    <div className="h-64 min-w-0 px-2 pt-4">
+                    <div className="h-72 min-w-0 px-4 pt-5">
                         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                             <ComposedChart
                                 data={buckets}
                                 accessibilityLayer
-                                margin={{ top: 8, right: 16, bottom: 8, left: 8 }}
+                                margin={{ top: 12, right: 16, bottom: 8, left: 4 }}
                             >
                                 <CartesianGrid
-                                    strokeDasharray="3 3"
+                                    strokeDasharray="3 5"
                                     vertical={false}
-                                    stroke="var(--color-store-line)"
+                                    stroke="#e4e9e6"
                                 />
                                 <XAxis
                                     dataKey="timestamp"
@@ -367,18 +389,22 @@ function MetricChart({
                                     tickFormatter={(value) =>
                                         date(new Date(Number(value)).toISOString())
                                     }
-                                    minTickGap={60}
+                                    minTickGap={75}
+                                    axisLine={false}
+                                    tickLine={false}
                                     tick={{ fontSize: 11, fill: 'var(--color-store-muted)' }}
                                 />
                                 <YAxis
-                                    width={60}
+                                    width={75}
                                     tickFormatter={(value) =>
                                         `${number.format(Number(value))}${suffix}`
                                     }
                                     allowDecimals={gauge}
+                                    axisLine={false}
+                                    tickLine={false}
                                     tick={{ fontSize: 11, fill: 'var(--color-store-muted)' }}
                                 />
-                                <Tooltip
+                                <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid #d8e2dc", boxShadow: "0 8px 25px rgba(10, 40, 29, .12)" }}
                                     labelFormatter={(value) =>
                                         date(new Date(Number(value)).toISOString())
                                     }
@@ -388,7 +414,9 @@ function MetricChart({
                                     ]}
                                 />
                                 {gauge ? (
-                                    <Line
+                                    <Area
+                                        type="monotone"
+                                        fill="rgba(18, 59, 46, 0.10)"
                                         dataKey="value"
                                         stroke="var(--color-store-green)"
                                         strokeWidth={2}
@@ -400,20 +428,21 @@ function MetricChart({
                                     <Bar
                                         dataKey="value"
                                         fill="var(--color-store-green)"
-                                        maxBarSize={24}
+                                        maxBarSize={18}
+                                        radius={[4, 4, 0, 0]}
                                         isAnimationActive={false}
                                     />
                                 )}
                             </ComposedChart>
                         </ResponsiveContainer>
                     </div>
-                    <div className="monitoring-chart-axis">
+                    <div className="flex justify-between px-6 pb-4 text-[11px] text-store-muted">
                         <span>{date(data.from)}</span>
                         <span>{date(data.to)}</span>
                     </div>
-                    <details className="monitoring-chart-data">
-                        <summary>{t('system.monitoring.viewData')}</summary>
-                        <table>
+                    <details className="border-t [border-top-style:solid] border-store-line px-6 py-3 text-xs">
+                        <summary className="cursor-pointer">{t('system.monitoring.viewData')}</summary>
+                        <table className="mt-3 w-full text-left">
                             <thead>
                                 <tr>
                                     <th>{t('system.monitoring.time')}</th>
@@ -421,7 +450,7 @@ function MetricChart({
                                 </tr>
                             </thead>
                             <tbody>
-                                {buckets.map((point) => (
+                                {bucketPager.rows.map((point) => (
                                     <tr key={point.time}>
                                         <td>{date(point.time)}</td>
                                         <td>
@@ -431,6 +460,7 @@ function MetricChart({
                                 ))}
                             </tbody>
                         </table>
+                        <Pagination {...bucketPager} />
                     </details>
                 </>
             )}

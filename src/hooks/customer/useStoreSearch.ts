@@ -14,14 +14,16 @@ import { aiPagePath } from '@/a2ui/runtime/useA2uiActions';
 
 export function useStoreSearch() {
     const [open, setOpen] = useState(false);
-    const { t, i18n } = useTranslation('storefront');
+    const [clearHistoryOpen, setClearHistoryOpen] = useState(false);
+    const { i18n } = useTranslation('storefront');
     const inputRef = useRef<HTMLInputElement>(null);
     const menuRef = useRef<HTMLElement>(null);
     const navigate = useNavigate();
     const location = useLocation();
-    const catalogKeyword = location.pathname === ROUTES.CATALOG
-        ? new URLSearchParams(location.search).get('q') ?? ''
-        : '';
+    const catalogKeyword =
+        location.pathname === ROUTES.CATALOG
+            ? (new URLSearchParams(location.search).get('q') ?? '')
+            : '';
     const [keyword, setKeyword] = useState(catalogKeyword);
     const [searchMode, setSearchMode] = useState<'products' | 'ai'>('products');
     const [showAINotice, setShowAINotice] = useState(false);
@@ -155,6 +157,17 @@ export function useStoreSearch() {
     function changeKeyword(value: string) {
         setKeyword(value);
         setOpen(true);
+        if (
+            !value.trim() &&
+            searchMode === 'products' &&
+            location.pathname === ROUTES.CATALOG &&
+            catalogKeyword
+        ) {
+            const params = new URLSearchParams(location.search);
+            params.delete('q');
+            params.delete('page');
+            navigate({ pathname: location.pathname, search: params.toString() }, { replace: true });
+        }
     }
 
     const suggestions = (enabled ? (data ?? []) : []).map((item) => {
@@ -199,7 +212,12 @@ export function useStoreSearch() {
     }
 
     function confirmClear() {
-        if (window.confirm(t('searchHistory.confirmClear'))) void clearHistory();
+        setOpen(false);
+        setClearHistoryOpen(true);
+    }
+
+    async function confirmClearHistory() {
+        if (await clearHistory()) setClearHistoryOpen(false);
     }
 
     return {
@@ -217,6 +235,9 @@ export function useStoreSearch() {
         historyEntries,
         deleteSearch,
         confirmClear,
+        clearHistoryOpen,
+        setClearHistoryOpen,
+        confirmClearHistory,
         deleting,
         deleteError,
         historyRef,

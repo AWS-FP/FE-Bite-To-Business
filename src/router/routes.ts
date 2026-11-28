@@ -11,6 +11,7 @@ export const ROUTES = {
     CATALOG: '/products',
     AI_PAGE: '/ai',
     CUSTOMER_COLLECTION: '/collections/:kind',
+    CUSTOMER_PROMOTION: '/promotions/:promotionId',
     PRODUCT_DETAIL: '/products/:productId',
 
     BRANDS: '/brands',
@@ -39,20 +40,21 @@ export const ROUTES = {
     ADMIN_PACKAGE_RETURNS: '/admin/package-returns',
     ADMIN_PAYMENT_REVIEWS: '/admin/payment-reviews',
     ADMIN_SYSTEM: '/admin/system',
+    ADMIN_REVENUE: '/admin/revenue',
 
     ECOMMERCE: '/e-commerce',
     ECOMMERCE_DASHBOARD: '/e-commerce/dashboard',
-    ECOMMERCE_QUOTES: '/e-commerce/quotes',
     ECOMMERCE_POSTER: '/e-commerce/poster',
     ECOMMERCE_PRODUCTS: '/e-commerce/products',
+    ECOMMERCE_COMBOS: '/e-commerce/combos',
     ECOMMERCE_PROMOTIONS: '/e-commerce/promotions',
     ECOMMERCE_COUPONS: '/e-commerce/coupons',
     ECOMMERCE_REQUESTS: '/e-commerce/product-requests',
     ECOMMERCE_REVIEWS: '/e-commerce/reviews',
-    ECOMMERCE_REFUNDS: '/e-commerce/cancellations',
 
     LOGISTICS: '/logistics',
     LOGISTICS_INVENTORY: '/logistics/inventory',
+    LOGISTICS_CREATE_PRODUCT: '/logistics/products/new',
     LOGISTICS_RECEIVE: '/logistics/receive',
     LOGISTICS_PRODUCT_REQUESTS: '/logistics/product-requests',
 
@@ -74,6 +76,16 @@ export function getRoleHome(role: UserRole) {
     return roleHome[role] ?? ROUTES.HOME;
 }
 
+const adminSections = [
+    ROUTES.ADMIN_REGISTRATIONS, ROUTES.ADMIN_STAFF, ROUTES.ADMIN_PACKAGE_RETURNS,
+    ROUTES.ADMIN_PAYMENT_REVIEWS, ROUTES.ADMIN_SYSTEM, ROUTES.ADMIN_REVENUE,
+];
+
+export function getAdminSectionNumber(pathname: string) {
+    const index = adminSections.findIndex(path => pathname === path || pathname.startsWith(path + '/'));
+    return String(Math.max(index, 0) + 1).padStart(2, '0');
+}
+
 export function getWorkspaceHome(role: UserRole) {
     if (
         role === 'ADMIN' ||
@@ -88,6 +100,7 @@ export function getWorkspaceHome(role: UserRole) {
 
 // Encode từng ID để ký tự /, ?, # không làm sai URL khi điều hướng.
 export const routePaths = {
+    promotionDetail: (promotionId: string) => `/promotions/${encodeURIComponent(promotionId)}`,
     productDetail: (productId: string) => `/products/${encodeURIComponent(productId)}`,
     quoteDetail: (quoteId: string) => `/quotes/${encodeURIComponent(quoteId)}`,
     orderDetail: (orderId: string) => `/orders/${encodeURIComponent(orderId)}`,

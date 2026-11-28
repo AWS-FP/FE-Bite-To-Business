@@ -1,3 +1,6 @@
+import BrandTileSkeleton from '@/components/brand/BrandTileSkeleton';
+import ProductCardSkeleton from '@/components/customer/home/ProductCardSkeleton';
+import Skeleton from '@/components/common/Skeleton';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
@@ -54,13 +57,8 @@ export default function BrandDetailPage() {
                 />
 
                 {brandsLoading && (
-                    <p
-                        role="status"
-                        className="rounded-[24px] bg-white p-10 text-sm text-store-muted"
-                    >
-                        {t('brandPage.loading')}
-                    </p>
-                )}
+<div aria-busy="true" className="rounded-[24px] bg-white p-10"><Skeleton className="h-24 w-24"/><Skeleton className="mt-4 h-8 w-1/2"/><Skeleton className="mt-3 h-4 w-3/4"/></div>
+)}
                 {!brandsLoading && (brandsError || !brand) && (
                     <div className="rounded-[24px] border border-[#e5e0d8] bg-white p-10">
                         <PackageSearch size={36} className="text-store-green" />
@@ -165,13 +163,8 @@ export default function BrandDetailPage() {
                                 />
                             </div>
                             {productsLoading && (
-                                <p
-                                    role="status"
-                                    className="py-12 text-center text-sm text-store-muted"
-                                >
-                                    {t('brandPage.loadingProducts')}
-                                </p>
-                            )}
+<div aria-busy="true" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{Array.from({ length: 8 }, (_, i) => <ProductCardSkeleton key={i}/>)}</div>
+)}
                             {productsError && (
                                 <p
                                     role="alert"
@@ -253,10 +246,8 @@ export default function BrandDetailPage() {
                                     </Link>
                                 </div>
                                 {relatedLoading && (
-                                    <p role="status" className="py-7 text-sm text-store-muted">
-                                        {t('brandPage.loading')}
-                                    </p>
-                                )}
+<div aria-busy="true" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">{Array.from({ length: 8 }, (_, i) => <BrandTileSkeleton key={i}/>)}</div>
+)}
                                 {!relatedLoading && matchedBrands.length > 0 && (
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                                         {matchedBrands.map((item) => (

@@ -1,13 +1,21 @@
 import { useTranslation } from 'react-i18next';
 import BtbImagePlaceholder from './BtbImagePlaceholder';
 /* Generated from the supplied HTML layout. Edit this section independently. */
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { landingSegments } from '@/constants/landing/landingSegments';
 
 export default function LandingSegments() {
     const { t } = useTranslation('storefront');
     const [activeSegment, setActiveSegment] = useState(0);
     const segment = landingSegments[activeSegment];
+    const tabListRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        const list = tabListRef.current;
+        const active = list?.querySelector<HTMLButtonElement>(`[data-seg-idx="${activeSegment}"]`);
+        if (!list || !active) return;
+        // Cuộn riêng hàng tab, không làm trang nhảy theo chiều dọc.
+        list.scrollTo({ left: active.offsetLeft - (list.clientWidth - active.offsetWidth) / 2 });
+    }, [activeSegment]);
     const photoBySegment = ['market', 'vegetables', 'kitchen', 'warehouse', 'produce'] as const;
     return (
         <section
@@ -21,10 +29,10 @@ export default function LandingSegments() {
                         {t('landing.segments.title')}
                     </h2>
                 </div>
-                <div className="mb-7 flex flex-wrap items-center justify-center gap-2.5">
+                <div className="mb-7 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5">
                     <button
                         type="button"
-                        className="inline-flex h-[38px] w-[38px] cursor-pointer items-center justify-center rounded-full border-[2.5px] border-solid border-store-ink bg-store-yellow text-base font-extrabold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] hover:bg-store-coral hover:text-white"
+                        className="inline-flex h-[38px] w-[38px] shrink-0 cursor-pointer items-center justify-center rounded-full border-[2.5px] border-solid border-store-ink bg-store-yellow text-base font-extrabold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] hover:bg-store-coral hover:text-white"
                         id="btnSegPrev"
                         aria-label={t('landing.segments.previous')}
                         onClick={() =>
@@ -40,64 +48,71 @@ export default function LandingSegments() {
                             aria-hidden="true"
                         />
                     </button>
+                    <div ref={tabListRef} role="group" aria-label={t('landing.segments.eyebrow')} className="relative flex min-w-0 flex-nowrap items-center gap-2.5 overflow-x-auto px-1 py-2 [scrollbar-width:thin] motion-safe:scroll-smooth">
+                        <button
+                            type="button"
+                            className={
+                                'shrink-0 whitespace-nowrap cursor-pointer rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-2.5 font-subheading text-sm font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors [&.active]:bg-store-coral [&.active]:font-extrabold [&.active]:text-white [&.active]:shadow-[4px_4px_0_var(--color-store-ink)]' +
+                                (activeSegment === 0 ? ' active' : '')
+                            }
+                            data-seg-idx="0"
+                            aria-pressed={activeSegment === 0}
+                            onClick={() => setActiveSegment(0)}
+                        >
+                            {t('landing.segments.businessTab')}
+                        </button>
+                        <button
+                            type="button"
+                            className={
+                                'shrink-0 whitespace-nowrap cursor-pointer rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-2.5 font-subheading text-sm font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors [&.active]:bg-store-coral [&.active]:font-extrabold [&.active]:text-white [&.active]:shadow-[4px_4px_0_var(--color-store-ink)]' +
+                                (activeSegment === 1 ? ' active' : '')
+                            }
+                            data-seg-idx="1"
+                            aria-pressed={activeSegment === 1}
+                            onClick={() => setActiveSegment(1)}
+                        >
+                            {t('landing.segments.shopTab')}
+                        </button>
+                        <button
+                            type="button"
+                            className={
+                                'shrink-0 whitespace-nowrap cursor-pointer rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-2.5 font-subheading text-sm font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors [&.active]:bg-store-coral [&.active]:font-extrabold [&.active]:text-white [&.active]:shadow-[4px_4px_0_var(--color-store-ink)]' +
+                                (activeSegment === 2 ? ' active' : '')
+                            }
+                            data-seg-idx="2"
+                            aria-pressed={activeSegment === 2}
+                            onClick={() => setActiveSegment(2)}
+                        >
+                            {t('landing.segments.restaurantTab')}
+                        </button>
+                        <button
+                            type="button"
+                            className={
+                                'shrink-0 whitespace-nowrap cursor-pointer rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-2.5 font-subheading text-sm font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors [&.active]:bg-store-coral [&.active]:font-extrabold [&.active]:text-white [&.active]:shadow-[4px_4px_0_var(--color-store-ink)]' +
+                                (activeSegment === 3 ? ' active' : '')
+                            }
+                            data-seg-idx="3"
+                            aria-pressed={activeSegment === 3}
+                            onClick={() => setActiveSegment(3)}
+                        >
+                            {t('landing.segments.distributionTab')}
+                        </button>
+                        <button
+                            type="button"
+                            className={
+                                'shrink-0 whitespace-nowrap cursor-pointer rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-2.5 font-subheading text-sm font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors [&.active]:bg-store-coral [&.active]:font-extrabold [&.active]:text-white [&.active]:shadow-[4px_4px_0_var(--color-store-ink)]' +
+                                (activeSegment === 4 ? ' active' : '')
+                            }
+                            data-seg-idx="4"
+                            aria-pressed={activeSegment === 4}
+                            onClick={() => setActiveSegment(4)}
+                        >
+                            {t('landing.segments.householdTab')}
+                        </button>
+                    </div>
                     <button
                         type="button"
-                        className={
-                            'cursor-pointer rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-2.5 font-subheading text-sm font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors [&.active]:bg-store-coral [&.active]:font-extrabold [&.active]:text-white [&.active]:shadow-[4px_4px_0_var(--color-store-ink)]' +
-                            (activeSegment === 0 ? ' active' : '')
-                        }
-                        data-seg-idx="0"
-                        onClick={() => setActiveSegment(0)}
-                    >
-                        {t('landing.segments.businessTab')}
-                    </button>
-                    <button
-                        type="button"
-                        className={
-                            'cursor-pointer rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-2.5 font-subheading text-sm font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors [&.active]:bg-store-coral [&.active]:font-extrabold [&.active]:text-white [&.active]:shadow-[4px_4px_0_var(--color-store-ink)]' +
-                            (activeSegment === 1 ? ' active' : '')
-                        }
-                        data-seg-idx="1"
-                        onClick={() => setActiveSegment(1)}
-                    >
-                        {t('landing.segments.shopTab')}
-                    </button>
-                    <button
-                        type="button"
-                        className={
-                            'cursor-pointer rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-2.5 font-subheading text-sm font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors [&.active]:bg-store-coral [&.active]:font-extrabold [&.active]:text-white [&.active]:shadow-[4px_4px_0_var(--color-store-ink)]' +
-                            (activeSegment === 2 ? ' active' : '')
-                        }
-                        data-seg-idx="2"
-                        onClick={() => setActiveSegment(2)}
-                    >
-                        {t('landing.segments.restaurantTab')}
-                    </button>
-                    <button
-                        type="button"
-                        className={
-                            'cursor-pointer rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-2.5 font-subheading text-sm font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors [&.active]:bg-store-coral [&.active]:font-extrabold [&.active]:text-white [&.active]:shadow-[4px_4px_0_var(--color-store-ink)]' +
-                            (activeSegment === 3 ? ' active' : '')
-                        }
-                        data-seg-idx="3"
-                        onClick={() => setActiveSegment(3)}
-                    >
-                        {t('landing.segments.distributionTab')}
-                    </button>
-                    <button
-                        type="button"
-                        className={
-                            'cursor-pointer rounded-full border-[2.5px] border-solid border-store-ink bg-store-cream px-5 py-2.5 font-subheading text-sm font-bold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] transition-colors [&.active]:bg-store-coral [&.active]:font-extrabold [&.active]:text-white [&.active]:shadow-[4px_4px_0_var(--color-store-ink)]' +
-                            (activeSegment === 4 ? ' active' : '')
-                        }
-                        data-seg-idx="4"
-                        onClick={() => setActiveSegment(4)}
-                    >
-                        {t('landing.segments.householdTab')}
-                    </button>
-                    <button
-                        type="button"
-                        className="inline-flex h-[38px] w-[38px] cursor-pointer items-center justify-center rounded-full border-[2.5px] border-solid border-store-ink bg-store-yellow text-base font-extrabold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] hover:bg-store-coral hover:text-white"
+                        className="inline-flex h-[38px] w-[38px] shrink-0 cursor-pointer items-center justify-center rounded-full border-[2.5px] border-solid border-store-ink bg-store-yellow text-base font-extrabold text-store-ink shadow-[3px_3px_0_var(--color-store-ink)] hover:bg-store-coral hover:text-white"
                         id="btnSegNext"
                         aria-label={t('landing.segments.next')}
                         onClick={() => setActiveSegment((v) => (v + 1) % landingSegments.length)}
@@ -110,7 +125,7 @@ export default function LandingSegments() {
                         />
                     </button>
                 </div>
-                <div className="grid grid-cols-2 items-center gap-8 rounded-[var(--radius-lg)] border-[2.5px] border-solid border-store-ink bg-store-cream p-9 shadow-[5px_5px_0_var(--color-store-ink)]">
+                <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2 rounded-[var(--radius-lg)] border-[2.5px] border-solid border-store-ink bg-store-cream p-5 sm:p-9 shadow-[5px_5px_0_var(--color-store-ink)]">
                     <div>
                         <h3
                             style={{

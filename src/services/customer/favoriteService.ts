@@ -2,8 +2,8 @@ import { http } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
 import { createBatchLoader } from '@/services/batchLoader';
 import type { FavoritePage, FavoriteStatus } from '@/types/customer/favorite';
-export async function getMyFavorites(page = 0, size = 20) {
-    const { data } = await http.get<ApiResponse<FavoritePage>>('/api/customer/favorites', { params: { page, size } });
+export async function getMyFavorites(page = 0, size = 20, signal?: AbortSignal) {
+    const { data } = await http.get<ApiResponse<FavoritePage>>('/api/customer/favorites', { params: { page, size }, signal });
     return data.data;
 }
 export async function getFavoriteStatus(productId: string) {

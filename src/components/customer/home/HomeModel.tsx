@@ -17,6 +17,8 @@ function useHomePageState() {
     const [combos, setCombos] = useState<HomeCombo[]>([]);
     const [categories, setCategories] = useState<HomeCategory[]>([]);
     const [loadingProducts, setLoadingProducts] = useState(true);
+    const [loadingCategories, setLoadingCategories] = useState(true);
+    const [categoryError, setCategoryError] = useState(false);
     const [productError, setProductError] = useState(false);
     const [flashPage, setFlashPage] = useState(1);
     const [standardPage, setStandardPage] = useState(1);
@@ -37,8 +39,15 @@ function useHomePageState() {
         const controller = new AbortController();
         // Categories are a separate Customer endpoint; failure should not hide products.
         getHomeCategories(controller.signal)
-            .then(setCategories)
-            .catch(() => {});
+            .then((items) => {
+                if (!controller.signal.aborted) setCategories(items);
+            })
+            .catch(() => {
+                if (!controller.signal.aborted) setCategoryError(true);
+            })
+            .finally(() => {
+                if (!controller.signal.aborted) setLoadingCategories(false);
+            });
         getHomeProducts(controller.signal)
             .then((data) => {
                 const convert = (items: HomeProduct[]) =>
@@ -84,6 +93,8 @@ function useHomePageState() {
         banners,
         combos,
         loadingProducts,
+        loadingCategories,
+        categoryError,
         productError,
     };
 }

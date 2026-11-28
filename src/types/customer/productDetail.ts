@@ -1,7 +1,7 @@
 export interface ProductTechnicalDetails {
     netWeightKg: number | null;
     tareWeightKg: number | null;
-    volumeM3: number | null;
+    volumeCm3: number | null;
     lengthCm: number | null;
     widthCm: number | null;
     heightCm: number | null;

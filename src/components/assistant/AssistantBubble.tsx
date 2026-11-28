@@ -4,15 +4,26 @@
  * của từng lượt bằng A2uiSurface; action trên surface được xử lý bởi useA2uiActions (RootLayout).
  * Có ô tích bật/tắt dùng thói quen duyệt web để cá nhân hóa.
  */
-import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from 'react';
+import {
+    useEffect,
+    useRef,
+    useState,
+    useSyncExternalStore,
+    type FormEvent,
+    type CSSProperties,
+    type PointerEvent,
+    type KeyboardEvent,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/router/routes';
-import { Loader2, RotateCcw, Send, Sparkles, X } from 'lucide-react';
+import { Loader2, MoveDiagonal2, RotateCcw, Send, Sparkles, X } from 'lucide-react';
 import { A2uiSurface } from '@a2ui/react/v0_9';
 import { useAuthStore } from '@/store/admin/authStore';
 import { useAssistantStore, type ChatEntry } from '@/a2ui/runtime/assistantStore';
 import { getSurface } from '@/a2ui/runtime/a2uiRuntime';
+import { aiPagePath } from '@/a2ui/runtime/useA2uiActions';
+import './AssistantBubble.css';
 import {
     personalizationEnabled,
     setPersonalizationEnabled,
@@ -26,14 +37,60 @@ export default function AssistantBubble() {
     const location = useLocation();
     const { i18n } = useTranslation();
     const locale = i18n.resolvedLanguage?.startsWith('en') ? 'en' : 'vi';
-    const { entries, busy, open, setOpen, send, reset } = useAssistantStore();
+    const { entries, busy, open, pendingPage, setOpen, send, reset } = useAssistantStore();
     const [text, setText] = useState('');
+    const [size, setSize] = useState({ width: 440, height: 680 });
+    const drag = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
     const personalize = useSyncExternalStore(subscribePersonalization, personalizationEnabled);
     const listRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
     }, [entries.length, busy]);
+
+    useEffect(() => {
+        if (!pendingPage) return;
+        useAssistantStore.setState({ pendingPage: null, open: false });
+        navigate(aiPagePath(pendingPage.prompt, pendingPage.subject, pendingPage.view));
+    }, [pendingPage, navigate]);
+
+    function resize(width: number, height: number) {
+        setSize({
+            width: Math.max(340, Math.min(width, window.innerWidth - 40)),
+            height: Math.max(320, Math.min(height, window.innerHeight - 40)),
+        });
+    }
+
+    function startResize(event: PointerEvent<HTMLButtonElement>) {
+        if (event.button !== 0) return;
+        const panel = event.currentTarget.parentElement?.getBoundingClientRect();
+        if (!panel) return;
+        event.preventDefault();
+        drag.current = {
+            x: event.clientX,
+            y: event.clientY,
+            width: panel.width,
+            height: panel.height,
+        };
+        event.currentTarget.setPointerCapture(event.pointerId);
+    }
+
+    function moveResize(event: PointerEvent<HTMLButtonElement>) {
+        if (!drag.current) return;
+        resize(
+            drag.current.width + drag.current.x - event.clientX,
+            drag.current.height + drag.current.y - event.clientY,
+        );
+    }
+
+    function resizeWithKeys(event: KeyboardEvent<HTMLButtonElement>) {
+        if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+        event.preventDefault();
+        resize(
+            size.width + (event.key === 'ArrowLeft' ? 32 : event.key === 'ArrowRight' ? -32 : 0),
+            size.height + (event.key === 'ArrowUp' ? 32 : event.key === 'ArrowDown' ? -32 : 0),
+        );
+    }
 
     if (role && role !== 'CUSTOMER') return null;
 
@@ -71,8 +128,37 @@ export default function AssistantBubble() {
     return (
         <section
             aria-label="Trợ lý mua hàng"
-            className="fixed inset-x-2 bottom-2 z-50 flex h-[min(680px,calc(100dvh-1rem))] flex-col overflow-hidden rounded-xl border border-store-line bg-white shadow-2xl sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-[440px]"
+            className="assistant-panel fixed inset-x-2 bottom-2 z-50 flex h-[min(680px,calc(100dvh-1rem))] flex-col overflow-hidden rounded-xl border border-store-line bg-white shadow-2xl sm:inset-x-auto sm:right-5 sm:bottom-5"
+            style={
+                {
+                    '--assistant-width': `${size.width}px`,
+                    '--assistant-height': `${size.height}px`,
+                } as CSSProperties
+            }
         >
+            <button
+                type="button"
+                className="absolute left-0 top-0 z-10 hidden size-6 touch-none cursor-nwse-resize rounded-br border-0 bg-white/15 text-white sm:block"
+                aria-label={
+                    locale === 'en'
+                        ? 'Resize chat using drag or arrow keys'
+                        : 'Kéo hoặc dùng phím mũi tên để đổi kích thước chat'
+                }
+                onPointerDown={startResize}
+                onPointerMove={moveResize}
+                onPointerUp={() => {
+                    drag.current = null;
+                }}
+                onPointerCancel={() => {
+                    drag.current = null;
+                }}
+                onLostPointerCapture={() => {
+                    drag.current = null;
+                }}
+                onKeyDown={resizeWithKeys}
+            >
+                <MoveDiagonal2 size={14} aria-hidden="true" />
+            </button>
             <header className="flex items-center justify-between gap-2 bg-store-green px-4 py-3 text-white">
                 <div>
                     <p className="flex items-center gap-2 text-sm font-bold">
@@ -84,7 +170,7 @@ export default function AssistantBubble() {
                         type="button"
                         onClick={reset}
                         title="Cuộc trò chuyện mới"
-                        className="rounded p-1.5 hover:bg-white/10"
+                        className="rounded border-0 bg-transparent p-1.5 text-white hover:bg-white/10"
                     >
                         <RotateCcw size={16} aria-hidden="true" />
                         <span className="sr-only">Cuộc trò chuyện mới</span>
@@ -92,7 +178,7 @@ export default function AssistantBubble() {
                     <button
                         type="button"
                         onClick={() => setOpen(false)}
-                        className="rounded p-1.5 hover:bg-white/10"
+                        className="rounded border-0 bg-transparent p-1.5 text-white hover:bg-white/10"
                     >
                         <X size={18} aria-hidden="true" />
                         <span className="sr-only">Đóng</span>
@@ -102,7 +188,7 @@ export default function AssistantBubble() {
 
             <div
                 ref={listRef}
-                className="flex-1 space-y-3 overflow-y-auto bg-store-cream/40 px-3 py-3"
+                className="min-h-0 min-w-0 flex-1 space-y-3 overflow-y-auto overflow-x-hidden bg-store-cream/40 px-3 py-3"
             >
                 {entries.length === 0 && (
                     <div className="space-y-2 text-sm text-store-muted">
@@ -131,8 +217,8 @@ export default function AssistantBubble() {
                         className="inline-flex items-center gap-2 text-xs text-store-muted"
                         role="status"
                     >
-                        <Loader2 size={14} className="animate-spin" aria-hidden="true" /> AI đang
-                        tạo giao diện…
+                        <Loader2 size={14} className="animate-spin" aria-hidden="true" /> Đang tìm
+                        kiếm…
                     </p>
                 )}
             </div>
@@ -193,7 +279,7 @@ function Entry({ entry }: { entry: ChatEntry }) {
                 </p>
             )}
             {surface && (
-                <div className="a2ui-surface rounded-lg bg-white p-2 text-store-ink shadow-sm [--a2ui-color-on-background:var(--color-store-ink)] [--a2ui-color-on-surface:var(--color-store-ink)] [--a2ui-text-caption-color:var(--color-store-ink)] [--a2ui-text-color-text:var(--color-store-ink)]">
+                <div className="a2ui-surface min-w-0 max-w-full overflow-x-auto rounded-lg bg-white p-2 text-store-ink shadow-sm [--a2ui-color-on-background:var(--color-store-ink)] [--a2ui-color-on-surface:var(--color-store-ink)] [--a2ui-text-caption-color:var(--color-store-ink)] [--a2ui-text-color-text:var(--color-store-ink)]">
                     <A2uiSurface surface={surface} />
                 </div>
             )}

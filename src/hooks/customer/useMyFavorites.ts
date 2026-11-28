@@ -1,52 +1,51 @@
 import { useEffect, useState } from 'react';
-import { getMyFavorites, removeFavorite } from '@/services/customer/favoriteService';
+import { getMyFavorites } from '@/services/customer/favoriteService';
 import type { FavoritePage } from '@/types/customer/favorite';
 
 const PAGE_SIZE = 12;
 
-/** Danh sách sản phẩm yêu thích theo trang, kèm bỏ yêu thích và tải lại. */
+/** Page of already-favorited products. Only refill after removal when more items exist. */
 export function useMyFavorites() {
     const [page, setPage] = useState(0);
     const [revision, setRevision] = useState(0);
     const [result, setResult] = useState<FavoritePage | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
-    const [removing, setRemoving] = useState<string | null>(null);
 
     useEffect(() => {
-        let alive = true;
-        getMyFavorites(page, PAGE_SIZE)
+        const controller = new AbortController();
+        let changingPage = false;
+        getMyFavorites(page, PAGE_SIZE, controller.signal)
             .then((data) => {
-                if (!alive) return;
-                // Bỏ sản phẩm cuối cùng ở một trang không phải trang đầu có thể làm trang đó trống.
+                if (controller.signal.aborted) return;
                 if (data.content.length === 0 && page > 0) {
-                    setPage(page - 1);
+                    changingPage = true;
+                    setPage(Math.max(0, data.totalPages - 1));
                 } else {
                     setResult(data);
                     setError(false);
                 }
             })
             .catch(() => {
-                if (alive) setError(true);
+                if (!controller.signal.aborted) setError(true);
             })
             .finally(() => {
-                if (alive) setLoading(false);
+                if (!controller.signal.aborted && !changingPage) setLoading(false);
             });
-        return () => {
-            alive = false;
-        };
+        return () => controller.abort();
     }, [page, revision]);
 
-    async function remove(productId: string) {
-        setRemoving(productId);
-        try {
-            await removeFavorite(productId);
+    function onRemoved(productId: string) {
+        if (result && page === 0 && result.totalPages <= 1) {
+            // With only one page, the remaining cards are already available; no extra GET.
+            setResult((current) => {
+                if (!current || !current.content.some((item) => item.productId === productId)) return current;
+                const totalElements = Math.max(0, current.totalElements - 1);
+                return { ...current, content: current.content.filter((item) => item.productId !== productId), totalElements, totalPages: Math.ceil(totalElements / PAGE_SIZE) };
+            });
+        } else {
             setLoading(true);
             setRevision((value) => value + 1);
-        } catch {
-            setError(true);
-        } finally {
-            setRemoving(null);
         }
     }
 
@@ -56,5 +55,5 @@ export function useMyFavorites() {
         setRevision((n) => n + 1);
     }
 
-    return { page, setPage, setLoading, result, loading, error, removing, remove, retry };
+    return { page, setPage, setLoading, result, loading, error, onRemoved, retry };
 }

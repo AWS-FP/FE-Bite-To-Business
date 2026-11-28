@@ -1,3 +1,5 @@
+import ExecutiveReviewImages from '@/components/e-commerce/ExecutiveReviewImages';
+import { ExecutiveArticleSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { MessageCircle, Star, Trash2 } from 'lucide-react';
 import { executiveUi } from '@/constants/e-commerce/executiveUi';
 import { useExecutiveReviews } from '@/hooks/e-commerce/useExecutiveReviews';
@@ -12,7 +14,6 @@ import {
     ExecutiveError,
     ExecutiveHeading,
     ExecutivePanel,
-    LoadingRows,
 } from '@/components/e-commerce/ExecutiveUI';
 
 export default function EcommerceReviewsPage() {
@@ -66,7 +67,7 @@ export default function EcommerceReviewsPage() {
                     </ExecutiveSelect>
                 </div>
                 {list.isLoading ? (
-                    <LoadingRows />
+                    <ExecutiveArticleSkeleton kind="reviews" />
                 ) : list.isError ? (
                     <div className="p-5">
                         <ExecutiveError
@@ -106,6 +107,7 @@ export default function EcommerceReviewsPage() {
                                     <p className="mt-2 break-all text-[11px] text-[#758778]">
                                         Product ID: {r.productId}
                                     </p>
+                                    <ExecutiveReviewImages key={JSON.stringify(r.imageUrls ?? [])} urls={r.imageUrls ?? []} />
                                     {r.deletionReason && (
                                         <p className="mt-2 text-xs text-rose-700">
                                             {tr('Lý do ẩn', 'Hidden reason')}: {r.deletionReason}

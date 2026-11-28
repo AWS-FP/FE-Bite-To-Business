@@ -43,6 +43,7 @@ export interface SystemMonitoring {
         outputTokens: number;
     }[];
     recentAiLogs: {
+        id: string;
         time: string;
         model: string;
         status: string;
@@ -52,3 +53,5 @@ export interface SystemMonitoring {
         errorCode: string | null;
     }[];
 }
+
+export interface ApplicationLogs { from: string; to: string; status: 'AVAILABLE' | 'LOADING' | 'UNCONFIGURED' | 'UNAVAILABLE'; entries: { time: string; message: string }[] }

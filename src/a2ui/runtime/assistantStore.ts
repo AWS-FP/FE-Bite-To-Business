@@ -9,6 +9,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { applyA2ui } from './a2uiRuntime';
 import { AgentHttpError, runAgent, type AgentEvent, type AgentState } from '../client/agentClient';
 import { trackEvent } from '../telemetry/interactionTracker';
+import { safeAssistantText } from './assistantText';
 
 export type ChatEntry = {
     id: string;
@@ -27,6 +28,7 @@ type AssistantState = {
     agentState: AgentState;
     busy: boolean;
     open: boolean;
+    pendingPage: { prompt: string; subject?: string; view?: 'table' } | null;
     setOpen: (open: boolean) => void;
     send: (text: string, locale: 'vi' | 'en') => Promise<void>;
     /** Ghi chú cục bộ (vd. đã thêm vào giỏ) — không gửi cho model như lời trợ lý. */
@@ -45,8 +47,16 @@ export const useAssistantStore = create<AssistantState>()(
             agentState: {},
             busy: false,
             open: false,
+            pendingPage: null,
             setOpen: (open) => set({ open }),
-            reset: () => set({ threadId: newId(), entries: [], agentState: {}, busy: false }),
+            reset: () =>
+                set({
+                    threadId: newId(),
+                    entries: [],
+                    agentState: {},
+                    busy: false,
+                    pendingPage: null,
+                }),
             note: (text) =>
                 set((state) => ({
                     entries: [...state.entries, { id: newId(), role: 'system', text }],
@@ -70,6 +80,7 @@ export const useAssistantStore = create<AssistantState>()(
                 const reply: ChatEntry = { id: newId(), role: 'assistant' };
                 const started = performance.now();
                 let firstSurfaceMs: number | null = null;
+                let rawResponseText = '';
                 const push = (patch: Partial<ChatEntry>) =>
                     set((state) => {
                         if (state.threadId !== threadId) return state;
@@ -86,8 +97,27 @@ export const useAssistantStore = create<AssistantState>()(
                     });
                 const onEvent = (event: AgentEvent) => {
                     if (get().threadId !== threadId) return;
-                    if (event.type === 'TEXT_MESSAGE_CONTENT') {
-                        push({ text: (reply.text ?? '') + event.delta });
+                    if (event.type === 'CUSTOM' && event.name === 'open_ai_page') {
+                        const value = event.value as {
+                            prompt?: unknown;
+                            subject?: unknown;
+                            view?: unknown;
+                        };
+                        if (typeof value?.prompt === 'string' && value.prompt.trim()) {
+                            set({
+                                pendingPage: {
+                                    prompt: value.prompt,
+                                    subject:
+                                        typeof value.subject === 'string'
+                                            ? value.subject
+                                            : undefined,
+                                    view: value.view === 'table' ? 'table' : undefined,
+                                },
+                            });
+                        }
+                    } else if (event.type === 'TEXT_MESSAGE_CONTENT') {
+                        rawResponseText += event.delta;
+                        push({ text: safeAssistantText(rawResponseText, locale) });
                     } else if (
                         event.type === 'CUSTOM' &&
                         event.name === 'a2ui' &&
@@ -127,10 +157,21 @@ export const useAssistantStore = create<AssistantState>()(
                         error: true,
                         text:
                             status === 429
-                                ? 'Bạn đã dùng hết lượt hỏi trợ lý trong giờ này. Vui lòng thử lại sau.'
-                                : status === 403
-                                  ? 'Trợ lý mua hàng chỉ dành cho khách hàng.'
-                                  : 'Trợ lý hiện chưa thể phản hồi. Bạn vẫn có thể tìm sản phẩm ở trang danh mục.',
+                                ? error instanceof AgentHttpError &&
+                                  error.code === 'AI_RATE_LIMIT_EXCEEDED'
+                                    ? 'Bạn đã dùng hết 50 lượt hỏi AI trong một giờ. Vui lòng thử lại sau.'
+                                    : 'Trợ lý đang nhận quá nhiều yêu cầu. Vui lòng thử lại sau ít phút.'
+                                : status === 401
+                                  ? 'Phiên đăng nhập có thể đã hết hạn. Bạn hãy đăng nhập lại rồi thử nhé.'
+                                  : status === 403
+                                    ? 'Trợ lý mua hàng chỉ dành cho khách hàng.'
+                                    : status === 400
+                                      ? 'Không thể xử lý nội dung hoặc trạng thái cuộc trò chuyện. Hãy tạo cuộc trò chuyện mới rồi thử lại.'
+                                      : status >= 500
+                                        ? `Máy chủ trợ lý đang gặp lỗi (${status}). Vui lòng thử lại sau.`
+                                        : status === 0
+                                          ? 'Không kết nối được đến trợ lý. Hãy kiểm tra kết nối hoặc máy chủ BE.'
+                                          : `Trợ lý chưa thể phản hồi (mã ${status}). Vui lòng thử lại.`,
                     });
                 } finally {
                     if (get().threadId === threadId) set({ busy: false });
@@ -148,7 +189,17 @@ export const useAssistantStore = create<AssistantState>()(
             }),
             // Dựng lại các surface hợp lệ gần nhất từ message đã lưu.
             onRehydrateStorage: () => (state) => {
-                state?.entries.forEach((entry) => entry.a2ui && applyA2ui(entry.a2ui));
+                state?.entries.forEach((entry) => {
+                    if (entry.role === 'assistant' && entry.text) {
+                        const safe = safeAssistantText(entry.text, state.agentState.locale);
+                        if (safe !== entry.text) {
+                            entry.text = safe;
+                            entry.a2ui = undefined;
+                            entry.surfaceId = undefined;
+                        }
+                    }
+                    if (entry.a2ui) applyA2ui(entry.a2ui);
+                });
             },
         },
     ),
@@ -159,7 +210,15 @@ function syncChatOwner(auth: ReturnType<typeof useAuthStore.getState>) {
     const owner = auth.session?.user.id ?? null;
     const chat = useAssistantStore.getState();
     if (owner !== chat.owner || (!owner && chat.entries.length > 0)) {
-        useAssistantStore.setState({ owner, threadId: newId(), entries: [], agentState: {}, busy: false, open: false });
+        useAssistantStore.setState({
+            owner,
+            threadId: newId(),
+            entries: [],
+            agentState: {},
+            busy: false,
+            open: false,
+            pendingPage: null,
+        });
     }
 }
 

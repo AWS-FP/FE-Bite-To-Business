@@ -25,6 +25,7 @@ import BrandDetailPage from '@/pages/BrandDetailPage';
 import ProfilePage from '@/pages/customer/ProfilePage';
 import CustomerCatalogPage from '@/pages/customer/CustomerCatalogPage';
 import CustomerCollectionPage from '@/pages/customer/CustomerCollectionPage';
+import CustomerPromotionPage from '@/pages/customer/CustomerPromotionPage';
 import CustomerProductDetailPage from '@/pages/customer/CustomerProductDetailPage';
 import CustomerFavoritesPage from '@/pages/customer/CustomerFavoritesPage';
 import CartPage from '@/pages/CartPage';
@@ -44,6 +45,7 @@ import DeliveryPackagePage from '@/pages/shipper/DeliveryPackagePage';
 import LogisticsLayout from '@/layouts/logistic/LogisticsLayout';
 import InventoryPage from '@/pages/logistic/InventoryPage';
 import ReceivePage from '@/pages/logistic/ReceivePage';
+import CreateProductPage from '@/pages/logistic/CreateProductPage';
 import PackageReturnsPage from '@/pages/admin/PackageReturnsPage';
 import PaymentReviewsPage from '@/pages/admin/PaymentReviewsPage';
 import ProductRequestsPage from '@/pages/logistic/ProductRequestsPage';
@@ -53,6 +55,7 @@ import RegistrationsPage from '@/pages/admin/RegistrationsPage';
 import RegistrationDetailPage from '@/pages/admin/RegistrationDetailPage';
 import StaffPage from '@/pages/admin/StaffPage';
 import SystemMetricsPage from '@/pages/admin/SystemMetricsPage';
+import RevenueReportPage from '@/pages/admin/RevenueReportPage';
 
 // Layouts & Shared Components
 import AdminLayout from '@/layouts/admin/AdminLayout';
@@ -64,12 +67,11 @@ import ProtectedRoute from './ProtectedRoute';
 import StorefrontRoleGuard from './StorefrontRoleGuard';
 import { ROUTES } from './routes';
 import EcommerceDashboardPage from '@/pages/e-commerce/EcommerceDashboardPage';
-import EcommerceQuotesPage from '@/pages/e-commerce/EcommerceQuotesPage';
 import EcommerceProductsPage from '@/pages/e-commerce/EcommerceProductsPage';
+import EcommerceCombosPage from '@/pages/e-commerce/EcommerceCombosPage';
 import EcommercePromotionsPage from '@/pages/e-commerce/EcommercePromotionsPage';
 import EcommerceCouponsPage from '@/pages/e-commerce/EcommerceCouponsPage';
 import EcommerceReviewsPage from '@/pages/e-commerce/EcommerceReviewsPage';
-import EcommerceRefundsPage from '@/pages/e-commerce/EcommerceRefundsPage';
 
 export const router = createBrowserRouter([
     {
@@ -104,7 +106,7 @@ export const router = createBrowserRouter([
 
             // ==========================================
             // 2. PUBLIC CUSTOMER PAGES
-            // Guests/Customers may browse; E-commerce staff stay in their workspace.
+            // Guests, customers and staff may browse; checkout is guest/customer-only.
             // ==========================================
             {
                 element: <StorefrontRoleGuard />,
@@ -144,6 +146,10 @@ export const router = createBrowserRouter([
                     {
                         path: ROUTES.CUSTOMER_COLLECTION,
                         Component: CustomerCollectionPage,
+                    },
+                    {
+                        path: ROUTES.CUSTOMER_PROMOTION,
+                        Component: CustomerPromotionPage,
                     },
                     {
                         path: ROUTES.PRODUCT_DETAIL,
@@ -254,6 +260,10 @@ export const router = createBrowserRouter([
                                 path: ROUTES.ADMIN_SYSTEM,
                                 Component: SystemMetricsPage,
                             },
+                            {
+                                path: ROUTES.ADMIN_REVENUE,
+                                Component: RevenueReportPage,
+                            },
                         ],
                     },
                 ],
@@ -279,8 +289,9 @@ export const router = createBrowserRouter([
                                 path: ROUTES.ECOMMERCE_DASHBOARD,
                                 Component: EcommerceDashboardPage,
                             },
-                            { path: ROUTES.ECOMMERCE_QUOTES, Component: EcommerceQuotesPage },
+                            { path: 'quotes', element: <Navigate to={ROUTES.ECOMMERCE_DASHBOARD} replace /> },
                             { path: ROUTES.ECOMMERCE_PRODUCTS, Component: EcommerceProductsPage },
+                            { path: ROUTES.ECOMMERCE_COMBOS, Component: EcommerceCombosPage },
                             {
                                 path: ROUTES.ECOMMERCE_PROMOTIONS,
                                 Component: EcommercePromotionsPage,
@@ -295,7 +306,7 @@ export const router = createBrowserRouter([
                                 element: <Navigate to={ROUTES.ECOMMERCE_DASHBOARD} replace />,
                             },
                             { path: ROUTES.ECOMMERCE_REVIEWS, Component: EcommerceReviewsPage },
-                            { path: ROUTES.ECOMMERCE_REFUNDS, Component: EcommerceRefundsPage },
+                            { path: 'cancellations', element: <Navigate to={ROUTES.ECOMMERCE_DASHBOARD} replace /> },
                         ],
                     },
                 ],
@@ -324,6 +335,9 @@ export const router = createBrowserRouter([
                             {
                                 path: ROUTES.LOGISTICS_RECEIVE,
                                 Component: ReceivePage,
+                            },
+                            {
+                                path: ROUTES.LOGISTICS_CREATE_PRODUCT, Component: CreateProductPage,
                             },
                             {
                                 path: ROUTES.LOGISTICS_PRODUCT_REQUESTS,

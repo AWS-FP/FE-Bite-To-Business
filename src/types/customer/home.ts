@@ -71,6 +71,7 @@ export interface HomeCombo {
     salePrice: number | null;
     availableQuantity: number;
     items: HomeComboItem[];
+    separateListPrice?: number | null;
     minOrderQuantity: number;
     quantityStep: number;
     vatRate: number | null;
@@ -97,4 +98,12 @@ export interface HomeResponse {
     combos: HomeCombo[];
     activePromotions: HomePromotion[];
     banners: HomeBanner[];
+}
+
+export interface HomePromotionProductsPage {
+    promotion: HomePromotion;
+    items: HomeProduct[];
+    page: number;
+    size: number;
+    hasNext: boolean;
 }

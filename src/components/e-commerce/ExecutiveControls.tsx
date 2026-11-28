@@ -159,7 +159,7 @@ export function ExecutiveSelect({
                         openMenu();
                     }
                 }}
-                className={`${executiveUi.input} flex !h-11 items-center justify-between gap-2 !rounded-xl !border-[#bdd5c4] !bg-[#f8fbf6] text-left !font-semibold shadow-sm transition hover:!border-[#4e9970] hover:!bg-white focus-visible:!ring-4 focus-visible:!ring-[#c5eacb] disabled:opacity-40`}
+                className={`${executiveUi.input} flex !h-11 items-center justify-between gap-2 !rounded-xl !border-[#bdd5c4] !bg-[#f8fbf6] text-left !font-semibold shadow-sm transition hover:!border-[#4e9970] hover:!bg-white focus:!border focus-visible:!border-[#276747] focus-visible:!ring-2 focus-visible:!ring-inset focus-visible:!ring-[#c5eacb] disabled:opacity-40`}
             >
                 <span className="min-w-0 truncate">{selected?.label || '—'}</span>
                 <ChevronDown

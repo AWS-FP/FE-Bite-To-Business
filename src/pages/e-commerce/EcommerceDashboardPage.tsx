@@ -1,8 +1,9 @@
+import Skeleton from '@/components/common/Skeleton';
+import { ExecutiveTableSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { useQuery } from '@tanstack/react-query';
 import {
     BarChart3,
     CalendarDays,
-    ClipboardCheck,
     Package,
     ShoppingBag,
     TrendingUp,
@@ -13,7 +14,6 @@ import {
     ExecutiveHeading,
     ExecutivePanel,
     ExecutiveStat,
-    LoadingRows,
 } from '@/components/e-commerce/ExecutiveUI';
 import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 import { formatVnd } from '@/services/e-commerce/executiveReadService';
@@ -33,10 +33,6 @@ export default function EcommerceDashboardPage() {
         queryKey: ['ecom', 'dashboard-products'],
         queryFn: () => executiveApi.products({ page: 0, size: 8 }),
     });
-    const quotes = useQuery({
-        queryKey: ['ecom', 'dashboard-quotes'],
-        queryFn: () => executiveApi.quotes('PENDING_APPROVAL', 0, 6),
-    });
     const m = metrics.data;
     return (
         <div className="space-y-6">
@@ -45,8 +41,8 @@ export default function EcommerceDashboardPage() {
                 eyebrow={tr('TỔNG QUAN VẬN HÀNH', 'COMMERCE OVERVIEW')}
                 title={tr('Tổng quan E-commerce', 'E-commerce overview')}
                 description={tr(
-                    'Chỉ số sản phẩm, báo giá và doanh thu hoàn tất trong tháng hiện tại.',
-                    'Product, quotation and completed-order performance for the current month.',
+                    'Chỉ số sản phẩm và doanh thu hoàn tất trong tháng hiện tại.',
+                    'Product and completed-order performance for the current month.',
                 )}
             />
             <section className="flex flex-wrap items-center justify-between gap-4 rounded-[22px] bg-[#133e2d] p-7 text-white sm:p-8">
@@ -72,7 +68,7 @@ export default function EcommerceDashboardPage() {
                     {dateParam(from)} — {dateParam(today)}
                 </span>
             </section>
-            {(metrics.isError || products.isError || quotes.isError) && (
+            {(metrics.isError || products.isError) && (
                 <ExecutiveFeedback
                     error
                     message={tr(
@@ -81,30 +77,23 @@ export default function EcommerceDashboardPage() {
                     )}
                 />
             )}
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <ExecutiveStat
                     title={tr('Sản phẩm đã đăng', 'Published products')}
-                    value={m?.publishedProducts ?? (metrics.isLoading ? '…' : '—')}
+                    value={metrics.isLoading ? <Skeleton className="h-[43.5px] w-24" /> : m?.publishedProducts ?? '—'}
                     icon={<Package size={20} />}
                     detail={tr('Đang bán trên gian hàng', 'Visible to customers')}
                 />
                 <ExecutiveStat
-                    title={tr('Báo giá chờ duyệt', 'Pending quotes')}
-                    value={m?.pendingQuotes ?? (metrics.isLoading ? '…' : '—')}
-                    icon={<ClipboardCheck size={20} />}
-                    tone="yellow"
-                    detail={tr('Cần xử lý', 'Awaiting review')}
-                />
-                <ExecutiveStat
                     title={tr('Đơn hoàn thành trong tháng', 'Completed orders this month')}
-                    value={m?.completedOrders ?? (metrics.isLoading ? '…' : '—')}
+                    value={metrics.isLoading ? <Skeleton className="h-[43.5px] w-24" /> : m?.completedOrders ?? '—'}
                     icon={<ShoppingBag size={20} />}
                     tone="blue"
                     detail={tr('Chỉ tính đơn COMPLETED', 'Completed orders only')}
                 />
                 <ExecutiveStat
                     title={tr('Doanh thu hoàn thành', 'Completed order revenue')}
-                    value={m ? formatVnd(m.revenue) : '—'}
+                    value={metrics.isLoading ? <Skeleton className="h-[43.5px] w-32" /> : m ? formatVnd(m.revenue) : '—'}
                     icon={<TrendingUp size={20} />}
                     tone="coral"
                     detail={tr('Tháng hiện tại', 'Current month')}
@@ -116,7 +105,7 @@ export default function EcommerceDashboardPage() {
                         {tr('Sản phẩm nháp', 'Draft products')}
                     </span>
                     <strong className="mt-3 block text-2xl font-black">
-                        {m?.draftProducts ?? '—'}
+                        {metrics.isLoading ? <Skeleton className="h-8 w-24" /> : m?.draftProducts ?? '—'}
                     </strong>
                 </div>
                 <div className="rounded-2xl border border-[#dce9dc] bg-white p-5">
@@ -124,7 +113,7 @@ export default function EcommerceDashboardPage() {
                         {tr('Khuyến mãi đang chạy', 'Active promotions')}
                     </span>
                     <strong className="mt-3 block text-2xl font-black">
-                        {m?.activePromotions ?? '—'}
+                        {metrics.isLoading ? <Skeleton className="h-8 w-24" /> : m?.activePromotions ?? '—'}
                     </strong>
                 </div>
                 <div className="rounded-2xl border border-[#dce9dc] bg-white p-5">
@@ -133,11 +122,11 @@ export default function EcommerceDashboardPage() {
                         {tr('Đơn có sử dụng coupon', 'Coupon orders')}
                     </span>
                     <strong className="mt-3 block text-2xl font-black">
-                        {m?.couponOrders ?? '—'}
+                        {metrics.isLoading ? <Skeleton className="h-8 w-24" /> : m?.couponOrders ?? '—'}
                     </strong>
                 </div>
             </div>
-            <div className="grid gap-5 xl:grid-cols-[1.4fr_1fr]">
+            <div className="grid gap-5">
                 <ExecutivePanel
                     title={tr('Sản phẩm cập nhật gần đây', 'Recently updated products')}
                     caption={tr(
@@ -146,7 +135,7 @@ export default function EcommerceDashboardPage() {
                     )}
                 >
                     {products.isLoading ? (
-                        <LoadingRows />
+                        <ExecutiveTableSkeleton cells={["product", "text", "text", "badge"]} count={8} tableClass="w-full min-w-[540px] text-left text-sm" cellClass="border-t border-[#edf1e9] px-5 py-3" />
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full min-w-[540px] text-left text-sm">
@@ -194,39 +183,6 @@ export default function EcommerceDashboardPage() {
                             {!products.data?.items.length && (
                                 <p className="p-6 text-sm text-[#6e8575]">
                                     {tr('Chưa có sản phẩm.', 'No products yet.')}
-                                </p>
-                            )}
-                        </div>
-                    )}
-                </ExecutivePanel>
-                <ExecutivePanel
-                    title={tr('Báo giá cần xử lý', 'Quotes awaiting review')}
-                    caption={tr('Phiên bản và tổng giá trị thực tế', 'Live revision and value')}
-                >
-                    {quotes.isLoading ? (
-                        <LoadingRows />
-                    ) : (
-                        <div className="divide-y divide-[#edf1e9]">
-                            {quotes.data?.items.map((q) => (
-                                <div
-                                    key={q.id}
-                                    className="flex items-center justify-between gap-3 px-5 py-4"
-                                >
-                                    <div>
-                                        <strong className="text-sm">{q.quoteNumber}</strong>
-                                        <p className="mt-1 text-xs text-[#6b8173]">
-                                            {q.companyName || q.contactName || q.customerId} · Rev{' '}
-                                            {q.revision}
-                                        </p>
-                                    </div>
-                                    <strong className="text-sm text-[#1e5e42]">
-                                        {formatVnd(q.totalAmount)}
-                                    </strong>
-                                </div>
-                            ))}
-                            {!quotes.data?.items.length && (
-                                <p className="p-6 text-sm text-[#6b8173]">
-                                    {tr('Không có báo giá chờ duyệt.', 'No pending quotes.')}
                                 </p>
                             )}
                         </div>

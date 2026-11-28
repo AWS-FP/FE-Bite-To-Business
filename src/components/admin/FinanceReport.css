@@ -145,9 +145,9 @@
     font-variant-numeric: tabular-nums;
 }
 .finance-chart {
-    height: 340px;
+    height: 360px;
     min-width: 0;
-    padding: 24px 16px 16px;
+    padding: 18px 8px 12px;
 }
 .finance-chart .recharts-legend-wrapper {
     font-size: 12px;

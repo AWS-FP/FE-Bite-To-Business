@@ -1,3 +1,4 @@
+import Skeleton from '@/components/common/Skeleton';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { CheckCircle2, Search, X } from 'lucide-react';
@@ -85,7 +86,7 @@ export default function CouponProductPicker({ selectedIds, onChange, disabled = 
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-[#edf1ed]">
-                        {products.isLoading && <tr><td className="px-3 py-5 text-[#6f8475]" colSpan={4}>{tr('Đang tải sản phẩm...', 'Loading products...')}</td></tr>}
+                        {products.isLoading && <>{Array.from({length:5},(_,i)=><tr key={i} aria-hidden="true"><td className="px-3 py-3"><Skeleton className="size-4"/></td><td className="px-3 py-3"><div className="flex items-center gap-2"><Skeleton className="size-9 shrink-0"/><Skeleton className="h-4 w-36"/></div></td><td className="px-3 py-3"><Skeleton className="h-3 w-28"/></td><td className="px-3 py-3"><Skeleton className="h-4 w-20"/></td></tr>)}</>}
                         {products.isError && <tr><td className="px-3 py-5 text-rose-700" colSpan={4}>{tr('Không tải được sản phẩm. Kiểm tra API và thử tìm lại.', 'Could not load products. Check the API and retry.')}</td></tr>}
                         {!products.isLoading && !products.isError && rows.length === 0 && <tr><td className="px-3 py-5 text-[#6f8475]" colSpan={4}>{tr('Không có sản phẩm phù hợp.', 'No matching products.')}</td></tr>}
                         {rows.map((product) => (

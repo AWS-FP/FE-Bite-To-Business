@@ -1,3 +1,5 @@
+import { useExecutiveConfirmation } from '@/hooks/e-commerce/useExecutiveConfirmation';
+import ListSkeleton from '@/components/common/ListSkeleton';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, ChevronLeft, ChevronRight, Filter, Package, Search, Tag, X } from 'lucide-react';
@@ -28,6 +30,7 @@ export default function PromotionProductManager({
     onClose: () => void;
     onSaved: () => void;
 }) {
+    const confirm = useExecutiveConfirmation();
     const tr = useExecutiveText();
     const qc = useQueryClient();
     const flash = campaign.promotionType === 'FLASH_SALE';
@@ -199,7 +202,7 @@ export default function PromotionProductManager({
     const bulkSelect = useMutation({
         mutationFn: (submitted: PromotionProductFilter) =>
             executiveApi.promotionMatchingProductIds(campaign.id, submitted),
-        onSuccess: (ids, submitted) => {
+        onSuccess: async (ids, submitted) => {
             // Ignore an in-flight bulk response after filters have changed.
             if (JSON.stringify(submitted) !== JSON.stringify(latestFilter.current)) return;
             const next = Array.from(new Set([...selected, ...ids]));
@@ -214,14 +217,15 @@ export default function PromotionProductManager({
             }
             if (
                 ids.length >= 20 &&
-                !window.confirm(
+                !(await confirm(
                     tr(
                         `Thêm ${ids.length} sản phẩm khớp bộ lọc vào danh sách?`,
                         `Add ${ids.length} matching products to the selection?`,
-                    ),
-                )
+                    ), () => undefined,
+                ))
             )
                 return;
+            if (JSON.stringify(submitted) !== JSON.stringify(latestFilter.current)) return;
             setSelection(next);
             setFeedback(
                 tr(
@@ -256,23 +260,23 @@ export default function PromotionProductManager({
         setSelection([...next]);
         setFeedback('');
     }
-    function closeSafely() {
+    async function closeSafely() {
         if (
             changed &&
-            !window.confirm(tr('Bỏ những thay đổi chưa lưu?', 'Discard unsaved changes?'))
+            !(await confirm(tr('Bỏ những thay đổi chưa lưu?', 'Discard unsaved changes?'), () => undefined, { danger: true }))
         )
             return;
         onClose();
     }
-    function clearSelected() {
+    async function clearSelected() {
         if (!selected.length) return;
         if (
-            !window.confirm(
+            !(await confirm(
                 tr(
                     `Bỏ chọn toàn bộ ${selected.length} sản phẩm?`,
                     `Unselect all ${selected.length} products?`,
-                ),
-            )
+                ), () => undefined,
+            ))
         )
             return;
         setSelection([]);
@@ -345,11 +349,11 @@ export default function PromotionProductManager({
         const replacingTierDiscounts = withListPrice.filter(
             (item) => item.saleDiscountPercent !== null,
         ).length;
-        const ok = window.confirm(
+        const ok = await confirm(
             tr(
                 `Áp dụng giảm ${bulkMode === 'PERCENT' ? `${amount}%` : money(amount)} cho ${withListPrice.length} sản phẩm đã chọn? Giá sale thay đổi trên TOÀN HỆ THỐNG sau khi lưu. ${replacingTierDiscounts} sản phẩm sẽ bị thay thế phần trăm giảm theo bậc.`,
                 `Apply a ${bulkMode === 'PERCENT' ? `${amount}%` : money(amount)} discount to ${withListPrice.length} selected products? Sale prices change SITE-WIDE when saved. ${replacingTierDiscounts} tier-percentage discounts will be replaced.`,
-            ),
+            ), () => undefined, { danger: true },
         );
         if (!ok) return;
         setPriceDrafts((previous) => {
@@ -680,12 +684,7 @@ export default function PromotionProductManager({
                     {tab === 'browse' ? (
                         <>
                             {(!searchIsSettled || products.isFetching) && (
-                                <p
-                                    role="status"
-                                    className="py-2 text-center text-xs text-[#597668]"
-                                >
-                                    {tr('Đang tải...', 'Loading...')}
-                                </p>
+                                <ListSkeleton image count={5} lines={3} className="space-y-2" rowClassName="flex flex-wrap items-center gap-3 rounded-xl border border-[#e1e8df] bg-white p-3 sm:flex-nowrap" />
                             )}
                             {searchIsSettled && products.isError && (
                                 <p role="alert" className="rounded-lg bg-red-50 p-4 text-red-700">
@@ -704,16 +703,8 @@ export default function PromotionProductManager({
                         </>
                     ) : (
                         <>
-                            {selectedDetails.isFetching && (
-                                <p
-                                    role="status"
-                                    className="py-3 text-center text-xs text-[#597668]"
-                                >
-                                    {tr(
-                                        'Đang tải toàn bộ sản phẩm đã chọn...',
-                                        'Loading all selected products...',
-                                    )}
-                                </p>
+                            {selectedDetails.isFetching && visibleDetails.length === 0 && (
+                                <ListSkeleton image count={5} lines={3} className="space-y-2" rowClassName="flex flex-wrap items-center gap-3 rounded-xl border border-[#e1e8df] bg-white p-3 sm:flex-nowrap" />
                             )}
                             {selectedDetails.isError && (
                                 <p role="alert" className="rounded-lg bg-red-50 p-4 text-red-700">
@@ -764,7 +755,7 @@ export default function PromotionProductManager({
                                         )}
                                     </p>
                                 )}
-                            {filteredDetails.length === 0 && selected.length > 0 && (
+                            {!selectedDetails.isFetching && filteredDetails.length === 0 && selected.length > 0 && (
                                 <p className="py-6 text-center text-sm text-[#597668]">
                                     {tr(
                                         'Không có sản phẩm đã chọn khớp tìm kiếm.',
@@ -919,17 +910,14 @@ export default function PromotionProductManager({
                                 type="button"
                                 disabled={!canSave || save.isPending || bulkSelect.isPending}
                                 onClick={() => {
-                                    if (
-                                        changes.length > 0 &&
-                                        !window.confirm(
-                                            tr(
-                                                `Lưu ${changes.length} giá sale cấp sản phẩm và danh sách áp dụng? Giá mới có thể ảnh hưởng chương trình khác và thay thế giảm theo bậc.`,
-                                                `Save ${changes.length} product-wide sale prices and campaign assignments? Other promotions and tier discounts may be affected.`,
-                                            ),
-                                        )
-                                    )
-                                        return;
-                                    save.mutate();
+                                    if (changes.length > 0) {
+                                        void confirm(tr(
+                                            `Lưu ${changes.length} giá sale cấp sản phẩm và danh sách áp dụng? Giá mới có thể ảnh hưởng chương trình khác và thay thế giảm theo bậc.`,
+                                            `Save ${changes.length} product-wide sale prices and campaign assignments? Other promotions and tier discounts may be affected.`,
+                                        ), () => save.mutateAsync(), { danger: true });
+                                    } else {
+                                        save.mutate();
+                                    }
                                 }}
                                 className={executiveUi.button}
                             >

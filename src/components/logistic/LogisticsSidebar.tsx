@@ -30,6 +30,7 @@ export default function LogisticsSidebar({ open, onClose, isCollapsed, onToggleC
                         items: [
                             { path: ROUTES.LOGISTICS_INVENTORY, label: vietnamese ? 'Sổ cái tồn kho' : 'Inventory ledger', icon: <Box size={18} /> },
                             { path: ROUTES.LOGISTICS_RECEIVE, label: vietnamese ? 'Nhập kho trực tiếp' : 'Receive stock', icon: <PackagePlus size={18} /> },
+                            { path: ROUTES.LOGISTICS_CREATE_PRODUCT, label: vietnamese ? 'Thêm sản phẩm' : 'Add product', icon: <PackagePlus size={18} /> },
                         ],
                     },
                     {

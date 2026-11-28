@@ -17,10 +17,13 @@
     },
     "navigation": {
         "products": "Products",
+        "combos": "Product combos",
         "promotions": "Promotions",
         "coupons": "Coupons",
         "inventory": "Inventory",
         "productRequests": "Product requests",
+        "quotes": "B2B quotes",
+        "cancellationRequests": "Cancellation requests",
         "trips": "Delivery trips"
     }
 }

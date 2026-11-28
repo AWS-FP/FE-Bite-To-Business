@@ -16,7 +16,7 @@ export function useCatalogBrowser() {
     const query = params.get('q') ?? '';
     const brandId = params.get('brand') || undefined;
     const page = catalogPage(params.get('page'));
-    const { data: categories = [], isError: categoryError } = useCatalogQuery({
+    const { data: categories = [], isError: categoryError, isPending: categoryLoading } = useCatalogQuery({
         queryKey: ['catalogCategories'],
         queryFn: ({ signal }) => getHomeCategories(signal),
     });
@@ -57,6 +57,7 @@ export function useCatalogBrowser() {
     return {
         categories,
         categoryError,
+        categoryLoading,
         pageData,
         loading,
         error,

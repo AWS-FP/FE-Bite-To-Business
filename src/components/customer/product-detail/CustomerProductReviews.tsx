@@ -1,3 +1,4 @@
+import ListSkeleton from '@/components/common/ListSkeleton';
 import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { MessageCircle, Star } from 'lucide-react';
@@ -250,9 +251,7 @@ export default function CustomerProductReviews({ productId }: { productId: strin
             </div>
 
             {loading && reviews.length === 0 && (
-                <p role="status" className="px-6 py-6 text-sm text-[#cad8cb]">
-                    {tr('loadingReviews')}
-                </p>
+                <ListSkeleton count={2} image lines={3} action={false} className="px-5 py-5 sm:px-6" />
             )}
             {error && (
                 <p role="alert" className="px-6 pt-4 text-sm text-[#ffd5bd]">

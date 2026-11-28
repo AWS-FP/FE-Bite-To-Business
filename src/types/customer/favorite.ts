@@ -1,10 +1,6 @@
-export interface FavoriteProduct {
-    productId: string;
-    sku: string;
-    nameVi: string;
-    nameEn: string;
-    imageUrl: string | null;
-    listPrice: number | null;
+import type { HomeProduct } from '@/types/customer/home';
+
+export interface FavoriteProduct extends HomeProduct {
     favoritedAt: string;
 }
 

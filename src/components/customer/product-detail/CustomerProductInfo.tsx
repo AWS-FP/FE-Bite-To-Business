@@ -63,7 +63,7 @@ export default function CustomerProductInfo({
                   { label: tr('height'), value: valueWithUnit(details?.heightCm, 'cm') },
               ]
             : []),
-        { label: tr('volume'), value: valueWithUnit(details?.volumeM3, 'm³') },
+        { label: tr('volume'), value: valueWithUnit(details?.volumeCm3, 'cm³') },
     ].filter((fact): fact is Fact => fact.value != null);
 
     // Prefer typed values returned by BE. Some imported technicalContent strings
@@ -188,7 +188,9 @@ export default function CustomerProductInfo({
         {
             key: 'origin',
             icon: Leaf,
-            text: originText,
+            text: product.unitCode === 'COMBO'
+                ? translatedText(details?.originContentEn, details?.originContentVi) || originText
+                : originText,
             facts: [],
         },
     ];

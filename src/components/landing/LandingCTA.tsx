@@ -1,99 +1,59 @@
-/* Generated from the supplied HTML layout. Edit this section independently. */
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuthStore } from '@/store/admin/authStore';
+import { getRoleHome, ROUTES } from '@/router/routes';
 
 export default function LandingCTA() {
-    const navigate = useNavigate();
     const { t } = useTranslation('storefront');
+    const session = useAuthStore((state) => state.session);
+    const restoring = useAuthStore((state) => state.restoring);
+    const guest = !session && !restoring;
+    const staff = Boolean(session && session.user.role !== 'CUSTOMER');
+    const shoppingPath = session && staff ? getRoleHome(session.user.role) : ROUTES.CATALOG;
+    const steps = guest ? [1, 2, 3].map((number) => ({
+        title: `introPages.cta.step${number}`,
+        text: `introPages.cta.step${number}Text`,
+    })) : [1, 2, 3].map((number) => ({
+        title: `landing.live.shoppingStep${number}`,
+        text: `landing.live.shoppingStep${number}Text`,
+    }));
+    const primaryClass = 'inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-store-yellow px-6 py-3 font-body text-sm font-bold text-store-ink no-underline transition-colors hover:bg-white';
+    const secondaryClass = 'inline-flex min-h-12 items-center justify-center rounded-full border border-white/40 px-6 py-3 font-body text-sm font-bold text-store-cream no-underline transition-colors hover:bg-white/10';
+
     return (
-        <section
-            className="mt-10 border-t-[3px] border-solid border-store-ink bg-store-green py-16 text-store-cream"
-            id="onboarding-cta"
-        >
-            <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-10 px-6 lg:grid-cols-[5fr_7fr]">
+        <section id="onboarding-cta" className="mt-10 border-t border-white/15 bg-store-green py-16 text-store-cream">
+            <div className="mx-auto grid max-w-[1240px] items-center gap-10 px-6 lg:grid-cols-[5fr_7fr]">
                 <div>
-                    <span className="showcase-badge">{t('introPages.cta.eyebrow')}</span>
-                    <h2 className="mb-3.5 font-subheading text-[clamp(2rem,4vw,3rem)] font-bold leading-[1.2] text-white">
-                        {t('introPages.cta.title')}
-                        <br />
-                        <span className="text-store-yellow">{t('introPages.cta.highlight')}</span> {t('introPages.cta.suffix')}
+                    <span className="font-body text-xs font-semibold uppercase tracking-wider text-store-yellow">{t('introPages.cta.eyebrow')}</span>
+                    <h2 className="mt-3 font-subheading text-[clamp(2rem,4vw,3rem)] font-bold leading-tight text-white">
+                        {t('introPages.cta.title')}{' '}
+                        <span className="text-store-yellow">{t('introPages.cta.highlight')}</span>{' '}{t('introPages.cta.suffix')}
                     </h2>
-                    <p className="mb-7 text-[15px] text-surface-green">
-                        {t('introPages.cta.description')}
-                    </p>
-                    <div className="flex flex-wrap gap-3.5">
-                        <button
-                            type="button"
-                            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-coral text-white"
-                            id="btnCreateAccountCta"
-                            onClick={() => navigate('/register')}
-                        >
-                            {t('header.register')}
-                            <span className="inline-flex h-[22px] w-[22px] items-center justify-center rounded-full bg-store-ink text-xs text-store-yellow">
-                                <img
-                                    src="/icons/arrow-right.svg"
-                                    className="btb-ui-icon"
-                                    alt=""
-                                    aria-hidden="true"
-                                />
-                            </span>
-                        </button>
-                        <button
-                            type="button"
-                            className="inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border-[2.5px] border-solid border-store-ink px-6 py-3 font-body text-[15px] font-bold no-underline shadow-[4px_4px_0_var(--color-store-ink)] transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-store-ink)] bg-store-cream text-store-ink hover:bg-store-yellow"
-                            id="btnSignInCta"
-                            style={{
-                                background: 'transparent',
-                                color: 'var(--color-white)',
-                                borderColor:
-                                    'color-mix(in srgb, var(--color-white) 40%, transparent)',
-                            }}
-                            onClick={() => navigate('/login')}
-                        >
-                            {t('header.login')}
-                        </button>
+                    <p className="mt-4 text-sm leading-relaxed text-surface-green">{t('introPages.cta.description')}</p>
+                    <div className="mt-7 flex flex-wrap gap-3">
+                        {guest ? (
+                            <>
+                                <Link to={ROUTES.REGISTER} className={primaryClass}>{t('header.register')}<img src="/icons/arrow-right.svg" alt="" className="size-4 object-contain" /></Link>
+                                <Link to={ROUTES.LOGIN} className={secondaryClass}>{t('header.login')}</Link>
+                            </>
+                        ) : (
+                            <>
+                                <Link to={shoppingPath} className={primaryClass}>{t(staff ? 'introPages.personal.workspace' : 'landing.live.browseCatalog')}<img src="/icons/arrow-right.svg" alt="" className="size-4 object-contain" /></Link>
+                                {session?.user.role === 'CUSTOMER' && <Link to={ROUTES.ORDERS} className={secondaryClass}>{t('landing.live.myOrders')}</Link>}
+                            </>
+                        )}
                     </div>
                 </div>
-                <div className="flex flex-col gap-5">
-                    <div className="flex items-start gap-[18px] rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-[18px] text-store-ink shadow-[6px_6px_0_var(--color-store-ink)]">
-                        <span className="min-w-12 rounded-xl border-2 border-solid border-store-ink bg-store-green px-3 py-1 text-center font-heading text-4xl font-bold leading-none text-store-yellow shadow-[3px_3px_0_var(--color-store-ink)]">
-                            1
-                        </span>
-                        <div>
-                            <strong className="mb-1 block font-subheading text-[19px] text-store-ink">
-                                {t('introPages.cta.step1')}
-                            </strong>
-                            <span className="text-[13.5px] text-store-green">
-                                {t('introPages.cta.step1Text')}
-                            </span>
-                        </div>
-                    </div>
-                    <div className="flex items-start gap-[18px] rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-[18px] text-store-ink shadow-[6px_6px_0_var(--color-store-ink)]">
-                        <span className="min-w-12 rounded-xl border-2 border-solid border-store-ink bg-store-green px-3 py-1 text-center font-heading text-4xl font-bold leading-none text-store-yellow shadow-[3px_3px_0_var(--color-store-ink)]">
-                            2
-                        </span>
-                        <div>
-                            <strong className="mb-1 block font-subheading text-[19px] text-store-ink">
-                                {t('introPages.cta.step2')}
-                            </strong>
-                            <span className="text-[13.5px] text-store-green">
-                                {t('introPages.cta.step2Text')}
-                            </span>
-                        </div>
-                    </div>
-                    <div className="flex items-start gap-[18px] rounded-[var(--radius-md)] border-[2.5px] border-solid border-store-ink bg-store-cream px-[22px] py-[18px] text-store-ink shadow-[6px_6px_0_var(--color-store-ink)]">
-                        <span className="min-w-12 rounded-xl border-2 border-solid border-store-ink bg-store-green px-3 py-1 text-center font-heading text-4xl font-bold leading-none text-store-yellow shadow-[3px_3px_0_var(--color-store-ink)]">
-                            3
-                        </span>
-                        <div>
-                            <strong className="mb-1 block font-subheading text-[19px] text-store-ink">
-                                {t('introPages.cta.step3')}
-                            </strong>
-                            <span className="text-[13.5px] text-store-green">
-                                {t('introPages.cta.step3Text')}
-                            </span>
-                        </div>
-                    </div>
+                <div className="grid gap-4">
+                    {steps.map((step, index) => (
+                        <article key={step.title} className="flex items-start gap-4 rounded-2xl border border-store-line bg-store-cream p-5 text-store-ink shadow-sm">
+                            <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-store-green font-body text-2xl font-bold text-store-yellow">{index + 1}</span>
+                            <div>
+                                <h3 className="font-subheading text-lg font-bold">{t(step.title)}</h3>
+                                <p className="mt-1 text-sm leading-relaxed text-store-green">{t(step.text)}</p>
+                            </div>
+                        </article>
+                    ))}
                 </div>
             </div>
         </section>

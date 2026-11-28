@@ -1,3 +1,5 @@
+import { useExecutiveConfirmation } from '@/hooks/e-commerce/useExecutiveConfirmation';
+import Skeleton from '@/components/common/Skeleton';
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CheckCircle2, ImagePlus, Pencil, UploadCloud } from 'lucide-react';
@@ -56,6 +58,7 @@ async function loadCampaigns(): Promise<Promotion[]> {
 }
 
 export default function EcommercePosterPage() {
+    const confirm = useExecutiveConfirmation();
     const tr = useExecutiveText();
     const qc = useQueryClient();
     const [promotionId, setPromotionId] = useState('');
@@ -235,9 +238,7 @@ export default function EcommercePosterPage() {
                                 ))}
                         </ExecutiveSelect>
                         {promos.isPending && (
-                            <p className="text-xs text-[#667d6b]">
-                                {tr('Đang tải danh sách chiến dịch...', 'Loading campaigns...')}
-                            </p>
+                            <Skeleton className="h-3 w-2/3" />
                         )}
                         {promos.isError && (
                             <ExecutiveError
@@ -298,15 +299,10 @@ export default function EcommercePosterPage() {
                         <button
                             type="button"
                             onClick={() => {
-                                if (
-                                    window.confirm(
-                                        tr(
+                                void confirm(tr(
                                             'Tải ảnh đã cắt và cập nhật chiến dịch?',
                                             'Upload cropped image and update campaign?',
-                                        ),
-                                    )
-                                )
-                                    upload.mutate();
+                                        ), () => upload.mutateAsync());
                             }}
                             disabled={!file || !promotion || upload.isPending || promos.isPending}
                             className={`${executiveUi.button} w-full`}

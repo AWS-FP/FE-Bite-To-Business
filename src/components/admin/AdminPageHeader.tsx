@@ -1,20 +1,21 @@
 import type { ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
+import { getAdminSectionNumber } from '@/router/routes';
 
 interface AdminPageHeaderProps {
-    sectionNumber: string;
     eyebrow: string;
     title: string;
-    description: string;
+    description?: string;
     children?: ReactNode;
 }
 
 export default function AdminPageHeader({
-    sectionNumber,
     eyebrow,
     title,
     description,
     children,
 }: AdminPageHeaderProps) {
+    const sectionNumber = getAdminSectionNumber(useLocation().pathname);
     return (
         <header className="admin-page-heading flex min-h-[106px] items-start justify-between gap-6">
             <div className="min-w-0">
@@ -27,7 +28,7 @@ export default function AdminPageHeader({
                 <h1 className="pt-2 font-heading text-[34px] leading-[44px] tracking-[-1px]">
                     {title}
                 </h1>
-                <p className="pt-2 text-[13px] leading-[21px] text-store-muted">{description}</p>
+                {description && <p className="pt-2 text-[13px] leading-[21px] text-store-muted">{description}</p>}
             </div>
             {children && <div className="flex shrink-0 items-center gap-3 pt-1">{children}</div>}
         </header>

@@ -4,11 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { PROMOTION_BANNER_ASPECT } from '@/constants/customer/promotionBanner';
 import { useHomeModelContext } from './home/HomeModel';
+import Skeleton from '@/components/common/Skeleton';
+import { routePaths } from '@/router/routes';
 
 /** All slides are published banner images returned by Customer Homepage API. */
 export default function CoverflowSlider() {
     const { t, i18n } = useTranslation('storefront');
-    const { banners } = useHomeModelContext();
+    const { banners, loadingProducts, productError } = useHomeModelContext();
     const slides = banners.filter((item) => Boolean(item.imageUrl?.trim()));
     const [active, setActive] = useState(0);
     const [paused, setPaused] = useState(false);
@@ -43,14 +45,39 @@ export default function CoverflowSlider() {
             }}
         >
             <div className="relative mx-auto max-w-[1320px] rounded-[28px] bg-store-dark/70 px-3 pb-16 pt-6 sm:px-14 sm:pt-9">
-                {slides.length === 0 ? (
+                {loadingProducts ? (
+                    <div aria-busy="true" className="relative overflow-hidden">
+                        <div
+                            className="absolute left-0 top-[9%] w-[44%] opacity-40"
+                            style={{ aspectRatio: PROMOTION_BANNER_ASPECT }}
+                        >
+                            <Skeleton className="h-full w-full rounded-2xl" />
+                        </div>
+                        <div
+                            className="absolute right-0 top-[9%] w-[44%] opacity-40"
+                            style={{ aspectRatio: PROMOTION_BANNER_ASPECT }}
+                        >
+                            <Skeleton className="h-full w-full rounded-2xl" />
+                        </div>
+                        <div
+                            className="relative mx-auto w-[75%] sm:w-[58%]"
+                            style={{ aspectRatio: PROMOTION_BANNER_ASPECT }}
+                        >
+                            <Skeleton className="h-full w-full rounded-2xl" />
+                        </div>
+                    </div>
+                ) : slides.length === 0 ? (
                     <div className="flex min-h-[290px] flex-col items-center justify-center rounded-2xl border border-dashed border-white/35 bg-white/5 px-6 text-center text-store-cream sm:min-h-[390px]">
                         <Megaphone size={34} className="mb-4 text-store-yellow" />
                         <h2 className="m-0 font-subheading text-xl font-bold">
                             {t('customerUI.bannerEmptyTitle')}
                         </h2>
                         <p className="mt-2 max-w-md text-sm text-white/70">
-                            {t('customerUI.bannerEmptyDescription')}
+                            {t(
+                                productError
+                                    ? 'homePage.productsError'
+                                    : 'customerUI.bannerEmptyDescription',
+                            )}
                         </p>
                     </div>
                 ) : (
@@ -75,7 +102,7 @@ export default function CoverflowSlider() {
                                     slide.targetUrl?.startsWith('/') &&
                                     !slide.targetUrl.startsWith('//')
                                         ? slide.targetUrl
-                                        : null;
+                                        : routePaths.promotionDetail(slide.id);
                                 const content = (
                                     <>
                                         <img

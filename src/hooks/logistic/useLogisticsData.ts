@@ -4,7 +4,7 @@ import { http } from '@/services/axiosClient';
 import type { ApiResponse } from '@/types/api';
 import { useLogisticsText } from './useLogisticsText';
 
-export interface Stock { productId: string; sku: string; name: string; unit: string; imageUrl: string | null; onHand: number; reserved: number; available: number }
+export interface Stock { productId: string; sku: string; name: string; unit: string; imageUrl: string | null; onHand: number; reserved: number; available: number; productStatus: string; active: boolean }
 export interface ProductRequest { id: string; productName: string; customerNote: string | null; status: string; createdAt: string }
 interface Page<T> { content: T[]; totalPages: number }
 
@@ -69,13 +69,13 @@ export function useLogisticsActions(refresh: () => Promise<void>) {
     const [error, setError] = useState('');
     const [errorCode, setErrorCode] = useState('');
     const [errorDetail, setErrorDetail] = useState('');
-    async function submit(path: string, body?: object) {
+    async function submit(path: string, body?: object, method: 'post' | 'delete' = 'post') {
         setBusy(true);
         setError('');
         setErrorCode('');
         setErrorDetail('');
         try {
-            await http.post(path, body);
+            await http.request({url:path,method,data:body});
             await refresh();
             return true;
         } catch (err) {

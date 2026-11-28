@@ -1,9 +1,10 @@
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 import { CommonSchemas } from '@a2ui/web_core/v0_9';
 import { createComponentImplementation } from '@a2ui/react/v0_9';
 import type { ComponentContext } from '@a2ui/web_core/v0_9';
 import { AlertCircle, CheckCircle2, Info, Search, Sparkles } from 'lucide-react';
-import { AddButton, Price, ProductTile, Stock, Tiers } from './productParts';
+import { AddButton, Price, ProductTile, Rating, Stock, Tiers } from './productParts';
 import {
     inStock,
     productList,
@@ -46,10 +47,10 @@ export const ProductGrid = createComponentImplementation(ProductGridApi, ({ prop
     const compact = props.density === 'compact';
     // Cột do model chọn chỉ là độ rộng thẻ mong muốn; lưới tự co theo chỗ đặt
     // (khung chat hẹp ~2 cột, trang rộng 4–5 cột) để không vỡ bố cục.
-    const minWidth = compact ? 140 : props.columns === 2 ? 260 : props.columns === 4 ? 170 : 200;
+    const minWidth = compact ? 180 : props.columns === 2 ? 320 : 250;
     return (
         <div
-            className="grid gap-3"
+            className="grid gap-5"
             style={{
                 gridTemplateColumns: `repeat(auto-fill, minmax(min(${minWidth}px, 100%), 1fr))`,
             }}
@@ -94,84 +95,109 @@ export const ProductTableApi = {
         emptyText: CommonSchemas.DynamicString.optional(),
     }),
 };
-export const ProductTable = createComponentImplementation(ProductTableApi, ({ props, context }) => {
-    const items = productList(props.items).slice(0, props.maxItems ?? 12);
-    if (!items.length)
+export const ProductTable = createComponentImplementation(
+    ProductTableApi,
+    function ProductTableView({ props, context }) {
+        const { i18n } = useTranslation();
+        const en = i18n.resolvedLanguage?.startsWith('en');
+        const labels: Record<Column, string> = en
+            ? {
+                  image: '',
+                  name: 'Product',
+                  spec: 'Pack',
+                  origin: 'Origin',
+                  price: 'Price',
+                  priceTiers: 'Quantity pricing',
+                  moq: 'Minimum order',
+                  stock: 'Stock',
+              }
+            : COLUMN_LABEL;
+        const items = productList(props.items).slice(0, props.maxItems ?? 12);
+        if (!items.length)
+            return (
+                <p className="text-sm text-store-muted">
+                    {props.emptyText ?? 'Không có sản phẩm.'}
+                </p>
+            );
+        const columns = props.columns as Column[];
+        // Renderer tự tính dòng nổi bật từ dữ liệu thật; model chỉ chọn tiêu chí.
+        const prices = items
+            .map((product) => unitPrice(product))
+            .filter((price): price is number => price != null);
+        const lowest = prices.length ? Math.min(...prices) : null;
+        const comparablePrices =
+            new Set(items.map((product) => product.unitCode + ':' + (product.spec ?? ''))).size ===
+            1;
+        const highlighted = (product: A2uiProduct) =>
+            props.highlight === 'lowestPrice'
+                ? comparablePrices && lowest != null && unitPrice(product) === lowest
+                : props.highlight === 'inStock' && inStock(product);
         return (
-            <p className="text-sm text-store-muted">{props.emptyText ?? 'Không có sản phẩm.'}</p>
-        );
-    const columns = props.columns as Column[];
-    // Renderer tự tính dòng nổi bật từ dữ liệu thật; model chỉ chọn tiêu chí.
-    const prices = items
-        .map((product) => unitPrice(product))
-        .filter((price): price is number => price != null);
-    const lowest = prices.length ? Math.min(...prices) : null;
-    const highlighted = (product: A2uiProduct) =>
-        props.highlight === 'lowestPrice'
-            ? lowest != null && unitPrice(product) === lowest
-            : props.highlight === 'inStock' && inStock(product);
-    return (
-        <div className="overflow-x-auto">
-            <table className="w-full min-w-[320px] text-left text-xs">
-                <thead>
-                    <tr className="border-b border-store-line text-store-muted">
-                        {columns.map((column) => (
-                            <th key={column} className="px-1 py-1 font-semibold">
-                                {COLUMN_LABEL[column]}
-                            </th>
-                        ))}
-                        {(props.showAddToCart ?? true) && <th className="px-1 py-1" />}
-                    </tr>
-                </thead>
-                <tbody>
-                    {items.map((product) => (
-                        <tr
-                            key={product.productId}
-                            className={`border-b border-store-line/70 align-top ${highlighted(product) ? 'bg-store-mint/40' : ''}`}
-                        >
+            <div className="overflow-x-auto rounded-2xl border border-store-line bg-white">
+                <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+                    <thead>
+                        <tr className="border-b border-store-line bg-store-green/5 text-store-muted">
                             {columns.map((column) => (
-                                <td key={column} className="px-1 py-1.5">
-                                    {column === 'image' &&
-                                        (product.imageUrl ? (
-                                            <img
-                                                src={product.imageUrl}
-                                                alt=""
-                                                className="size-10 rounded object-cover"
-                                            />
-                                        ) : (
-                                            <span className="block size-10 rounded bg-store-cream" />
-                                        ))}
-                                    {column === 'name' && (
-                                        <button
-                                            type="button"
-                                            onClick={() => viewProduct(context, product)}
-                                            className="border-0 bg-transparent p-0 text-left font-semibold hover:underline"
-                                        >
-                                            {product.name}
-                                        </button>
-                                    )}
-                                    {column === 'spec' && (product.spec ?? '—')}
-                                    {column === 'origin' &&
-                                        (product.facts?.origin ?? product.origin ?? '—')}
-                                    {column === 'price' && <Price product={product} />}
-                                    {column === 'priceTiers' && <Tiers product={product} />}
-                                    {column === 'moq' &&
-                                        `${product.minOrderQuantity} ${unitLabel(product.unitCode)}`}
-                                    {column === 'stock' && <Stock product={product} />}
-                                </td>
+                                <th key={column} className="px-4 py-4 font-semibold">
+                                    {labels[column]}
+                                </th>
                             ))}
-                            {(props.showAddToCart ?? true) && (
-                                <td className="px-1 py-1.5">
-                                    <AddButton context={context} product={product} />
-                                </td>
-                            )}
+                            {(props.showAddToCart ?? true) && <th className="px-1 py-1" />}
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
-});
+                    </thead>
+                    <tbody>
+                        {items.map((product) => (
+                            <tr
+                                key={product.productId}
+                                className={`border-b border-store-line/70 align-top ${highlighted(product) ? 'bg-store-mint/40' : ''}`}
+                            >
+                                {columns.map((column) => (
+                                    <td key={column} className="px-4 py-5">
+                                        {column === 'image' &&
+                                            (product.imageUrl ? (
+                                                <img
+                                                    src={product.imageUrl}
+                                                    alt=""
+                                                    className="size-10 rounded object-cover"
+                                                />
+                                            ) : (
+                                                <span className="block size-10 rounded bg-store-cream" />
+                                            ))}
+                                        {column === 'name' && (
+                                            <div className="space-y-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => viewProduct(context, product)}
+                                                    className="border-0 bg-transparent p-0 text-left font-semibold text-store-ink hover:underline"
+                                                >
+                                                    {product.name}
+                                                </button>
+                                                <Rating product={product} />
+                                            </div>
+                                        )}
+                                        {column === 'spec' && (product.spec ?? '—')}
+                                        {column === 'origin' &&
+                                            (product.facts?.origin ?? product.origin ?? '—')}
+                                        {column === 'price' && <Price product={product} />}
+                                        {column === 'priceTiers' && <Tiers product={product} />}
+                                        {column === 'moq' &&
+                                            `${product.minOrderQuantity} ${unitLabel(product.unitCode, en ? 'en' : 'vi')}`}
+                                        {column === 'stock' && <Stock product={product} />}
+                                    </td>
+                                ))}
+                                {(props.showAddToCart ?? true) && (
+                                    <td className="px-1 py-1.5">
+                                        <AddButton context={context} product={product} />
+                                    </td>
+                                )}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        );
+    },
+);
 
 export const ProductCardApi = {
     name: 'ProductCard',
@@ -247,11 +273,11 @@ export const Notice = createComponentImplementation(NoticeApi, ({ props }) => {
     const Icon = tone.icon;
     return (
         <div
-            className={`flex gap-2 rounded border px-3 py-2 text-xs ${tone.className}`}
+            className={`flex items-start gap-3 rounded-xl border px-4 py-4 text-sm leading-6 ${tone.className}`}
             role="status"
         >
             <Icon size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
-            <div>
+            <div className="min-w-0 space-y-1">
                 {props.title && <p className="font-bold">{props.title}</p>}
                 <p>{props.text}</p>
             </div>

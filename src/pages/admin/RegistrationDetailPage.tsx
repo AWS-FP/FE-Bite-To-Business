@@ -130,7 +130,7 @@ export default function RegistrationDetailPage() {
                 </header>
 
                 <div className="min-h-0 flex-1 overflow-y-auto px-[27px] pt-[25px] pb-[30px]">
-                    {registrationQuery.isPending && <RegistrationLoading />}
+                    {registrationQuery.isPending && <RegistrationLoading detail />}
 
                     {!registrationQuery.isPending && !registration && (
                         <RegistrationError

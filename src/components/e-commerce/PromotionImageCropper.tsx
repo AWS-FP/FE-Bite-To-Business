@@ -1,13 +1,15 @@
+import Skeleton from '@/components/common/Skeleton';
 import { useEffect, useRef, useState } from 'react';
 import type { PointerEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { Check, Move, RotateCcw, X, ZoomIn } from 'lucide-react';
+import ImageZoomSlider from '@/components/common/ImageZoomSlider';
 import { PROMOTION_BANNER_ASPECT, PROMOTION_BANNER_HEIGHT, PROMOTION_BANNER_SIZE, PROMOTION_BANNER_WIDTH } from '@/constants/customer/promotionBanner';
 import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 
 type Dimension = { width: number; height: number };
 type Point = { x: number; y: number };
-const STAGE_HEIGHT = 370;
+const INITIAL_STAGE: Dimension = { width: 720, height: 300 };
 const MAX_BYTES = 5 * 1024 * 1024;
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
@@ -17,17 +19,19 @@ export default function PromotionImageCropper({
     originalName,
     onApply,
     onCancel,
+    kind = 'promotion',
 }: {
     src: string;
     originalName: string;
     onApply: (result: File) => void;
     onCancel: () => void;
+    kind?: 'promotion' | 'combo';
 }) {
     const tr = useExecutiveText();
     const stageRef = useRef<HTMLDivElement>(null);
     const imageRef = useRef<HTMLImageElement | null>(null);
     const dragRef = useRef<{ pointerId: number; start: Point; offset: Point } | null>(null);
-    const [stageWidth, setStageWidth] = useState(720);
+    const [stageSize, setStageSize] = useState<Dimension>(INITIAL_STAGE);
     const [natural, setNatural] = useState<Dimension | null>(null);
     const [zoom, setZoom] = useState(1);
     const [offset, setOffset] = useState<Point>({ x: 0, y: 0 });
@@ -46,7 +50,11 @@ export default function PromotionImageCropper({
     useEffect(() => {
         const element = stageRef.current;
         if (!element) return;
-        const observer = new ResizeObserver(() => setStageWidth(element.clientWidth));
+        const observer = new ResizeObserver(() => {
+            const width = element.clientWidth;
+            const height = element.clientHeight;
+            if (width > 0 && height > 0) setStageSize({ width, height });
+        });
         observer.observe(element);
         return () => observer.disconnect();
     }, []);
@@ -67,7 +75,7 @@ export default function PromotionImageCropper({
     }, [src, imageLoadError]);
 
     const aspect = PROMOTION_BANNER_ASPECT;
-    const cropWidth = Math.max(80, Math.min(stageWidth - 32, (STAGE_HEIGHT - 48) * aspect));
+    const cropWidth = Math.max(1, Math.min(stageSize.width - 24, (stageSize.height - 24) * aspect));
     const cropHeight = cropWidth / aspect;
     const baseScale = natural ? Math.max(cropWidth / natural.width, cropHeight / natural.height) : 1;
     const scale = baseScale * zoom;
@@ -151,19 +159,19 @@ export default function PromotionImageCropper({
     }
 
     return createPortal(
-        <div className="fixed inset-0 z-[500] flex items-center justify-center bg-[#061f16]/80 px-3 py-4 backdrop-blur-sm sm:px-6" role="presentation" onPointerDown={(event) => { if (event.target === event.currentTarget && !busy) onCancel(); }}>
-            <section role="dialog" aria-modal="true" aria-label={tr('Cắt ảnh khuyến mãi', 'Crop promotion image')} className="flex max-h-[94vh] w-full max-w-[850px] flex-col overflow-y-auto rounded-2xl bg-[#fffaf0] shadow-2xl">
-                <div className="flex items-start justify-between border-b border-[#dbe6d9] px-5 py-4 sm:px-7">
+        <div className="fixed inset-0 z-[500] flex items-center justify-center bg-[#061f16]/80 px-2 py-2 backdrop-blur-sm sm:px-4" role="presentation" onPointerDown={(event) => { if (event.target === event.currentTarget && !busy) onCancel(); }}>
+            <section role="dialog" aria-modal="true" aria-label={kind === 'combo' ? tr('Cắt ảnh combo', 'Crop combo image') : tr('Cắt ảnh khuyến mãi', 'Crop promotion image')} className="flex max-h-[calc(100dvh-1rem)] w-full max-w-[850px] flex-col overflow-hidden rounded-2xl bg-[#fffaf0] shadow-2xl">
+                <div className="flex shrink-0 items-center justify-between gap-2 border-b border-[#dbe6d9] px-4 py-2 sm:px-5">
                     <div>
-                        <h2 className="text-xl font-bold text-[#14392b]">{tr('Chỉnh sửa vùng ảnh', 'Edit image crop')}</h2>
-                        <p className="mt-1 text-sm text-[#607465]">{tr('Kéo và phóng to ảnh trong khung cố định trước khi tải lên.', 'Drag and zoom within the fixed frame before uploading.')}</p>
+                        <h2 className="m-0 text-base font-bold text-[#14392b] sm:text-lg">{tr('Chỉnh sửa vùng ảnh', 'Edit image crop')}</h2>
+                        <p className="m-0 text-xs text-[#607465]">{tr('Kéo và phóng to ảnh trong khung cố định trước khi tải lên.', 'Drag and zoom within the fixed frame before uploading.')}</p>
                     </div>
-                    <button type="button" onClick={onCancel} disabled={busy} aria-label={tr('Đóng', 'Close')} className="rounded-lg p-2 text-[#14392b] hover:bg-[#e8efe6]"><X size={20} /></button>
+                    <button type="button" onClick={onCancel} disabled={busy} aria-label={tr('Đóng', 'Close')} className="shrink-0 rounded-lg !border-0 !bg-transparent p-2 text-[#14392b] hover:!bg-[#e8efe6]"><X size={20} /></button>
                 </div>
-                <div className="px-4 pt-4 sm:px-7">
-                    <div className="mb-3 rounded-xl border border-[#dbe6d9] bg-white px-4 py-3 text-sm text-[#24593d]">
-                        <p className="m-0 font-bold">{tr('Kích thước thiết kế banner', 'Banner design size')}: {PROMOTION_BANNER_SIZE} (16:9)</p>
-                        <p className="mb-0 mt-1 text-xs text-[#607465]">{tr('Khung này khớp với banner trang chủ. Chừa khoảng trống phía dưới cho tiêu đề chiến dịch.', 'This frame matches the homepage banner. Leave room at the bottom for the campaign title.')}</p>
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-2 sm:px-5">
+                    <div className="mb-2 rounded-lg border border-[#dbe6d9] bg-white px-3 py-1.5 text-xs text-[#24593d]">
+                        <p className="m-0 font-bold">{kind === 'combo' ? tr('Kích thước thiết kế ảnh combo', 'Combo image size') : tr('Kích thước thiết kế banner', 'Banner design size')}: {PROMOTION_BANNER_SIZE} (16:9)</p>
+                        <p className="m-0 text-xs text-[#607465]">{kind === 'combo' ? tr('Khung 16:9 khớp với thẻ combo trang chủ. Giữ các sản phẩm chính bên trong vùng cắt.', 'This 16:9 frame matches homepage combo cards. Keep the main products inside the crop area.') : tr('Khung này khớp với banner trang chủ. Chừa khoảng trống phía dưới cho tiêu đề chiến dịch.', 'This frame matches the homepage banner. Leave room at the bottom for the campaign title.')}</p>
                     </div>
                     <div ref={stageRef} role="img" aria-label={tr('Kéo ảnh trong khung sáng để chọn vùng cắt', 'Drag photo inside the crop guide to choose the area')} tabIndex={0}
                         onPointerDown={beginDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}
@@ -176,8 +184,8 @@ export default function PromotionImageCropper({
                             event.preventDefault();
                             setOffset((previous) => ({ x: clamp(previous.x + delta[event.key].x, -maxX, maxX), y: clamp(previous.y + delta[event.key].y, -maxY, maxY) }));
                         }}
-                        style={{ height: STAGE_HEIGHT, touchAction: 'none' }}
-                        className={`relative w-full select-none overflow-hidden rounded-xl bg-[#12261f] outline-none focus-visible:ring-4 focus-visible:ring-[#a0d8a9] ${dragging ? 'cursor-grabbing' : 'cursor-grab'}`}>
+                        style={{ touchAction: 'none' }}
+                        className={`relative h-[clamp(120px,39dvh,320px)] w-full select-none overflow-hidden rounded-xl bg-[#12261f] outline-none focus-visible:ring-4 focus-visible:ring-[#a0d8a9] ${dragging ? 'cursor-grabbing' : 'cursor-grab'}`}>
                         {natural && (
                             <img src={src} alt="" draggable={false} className="pointer-events-none absolute max-w-none select-none"
                                 style={{ width: photoWidth, height: photoHeight, left: `calc(50% + ${currentOffset.x}px)`, top: `calc(50% + ${currentOffset.y}px)`, transform: 'translate(-50%, -50%)' }} />
@@ -190,24 +198,24 @@ export default function PromotionImageCropper({
                             <div className="absolute top-1/3 left-0 w-full border-t border-dashed border-white/45" />
                             <div className="absolute top-2/3 left-0 w-full border-t border-dashed border-white/45" />
                         </div>
-                        {!natural && <div className="absolute inset-0 flex items-center justify-center text-sm text-white">{tr('Đang tải ảnh...', 'Loading image...')}</div>}
+                        {!natural && <Skeleton className="absolute! inset-0 h-full w-full" />}
                     </div>
-                    <div className="mt-4 flex flex-wrap items-center gap-3 text-[#315f42]">
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-[#315f42]">
                         <Move size={17} />
                         <span className="text-xs">{tr('Kéo hoặc dùng phím mũi tên để di chuyển', 'Drag or use arrow keys to move')}</span>
-                        <div className="flex flex-1 items-center gap-2 sm:ml-auto sm:max-w-[300px]">
-                            <ZoomIn size={17} />
-                            <input type="range" min="1" max="4" step="0.05" value={zoom} onChange={(event) => setZoom(Number(event.target.value))}
-                                aria-label={tr('Phóng to', 'Zoom')} className="w-full accent-[#24593d]" />
-                            <span className="min-w-[40px] text-xs font-bold">{Math.round(zoom * 100)}%</span>
+                        <div className="flex min-w-0 basis-full items-center gap-2 rounded-lg bg-white p-1.5 sm:ml-auto sm:max-w-[345px] sm:flex-1 sm:basis-auto">
+                            <ZoomIn size={17} className="shrink-0" />
+                            <ImageZoomSlider value={zoom} min={1} max={4} onChange={setZoom}
+                                label={tr('Thu phóng', 'Zoom')} decreaseLabel={tr('Thu nhỏ', 'Zoom out')} increaseLabel={tr('Phóng to', 'Zoom in')} />
+                            <span className="min-w-[44px] text-right text-xs font-bold tabular-nums">{Math.round(zoom * 100)}%</span>
                         </div>
                         <button type="button" onClick={() => { setOffset({ x: 0, y: 0 }); setZoom(1); }} className="flex items-center gap-1 rounded-lg border border-[#d1dfd1] bg-white px-3 py-2 text-xs font-semibold"><RotateCcw size={14} />{tr('Đặt lại', 'Reset')}</button>
                     </div>
                     {error && <p role="alert" className="mt-3 text-sm font-semibold text-rose-700">{error}</p>}
                 </div>
-                <div className="mt-4 flex flex-col-reverse gap-3 border-t border-[#dbe6d9] px-5 py-4 sm:flex-row sm:justify-end sm:px-7">
-                    <button type="button" disabled={busy} onClick={onCancel} className="rounded-xl border border-[#bed0bd] bg-white px-6 py-3 text-sm font-semibold text-[#315f42]">{tr('Hủy', 'Cancel')}</button>
-                    <button type="button" disabled={!natural || busy || Boolean(error)} onClick={() => void apply()} className="flex items-center justify-center gap-2 rounded-xl bg-[#174732] px-6 py-3 text-sm font-bold text-white disabled:opacity-50"><Check size={17} />{busy ? tr('Đang xử lý...', 'Processing...') : tr('Áp dụng vùng cắt', 'Apply crop')}</button>
+                <div className="flex shrink-0 flex-wrap justify-end gap-2 border-t border-[#dbe6d9] bg-[#fffaf0] px-3 py-2 sm:px-5">
+                    <button type="button" disabled={busy} onClick={onCancel} className="rounded-xl border border-[#bed0bd] bg-white px-4 py-2 text-sm font-semibold text-[#315f42]">{tr('Hủy', 'Cancel')}</button>
+                    <button type="button" disabled={!natural || busy || Boolean(error)} onClick={() => void apply()} className="flex items-center justify-center gap-2 rounded-xl bg-[#174732] px-4 py-2 text-sm font-bold text-white disabled:opacity-50"><Check size={17} />{busy ? tr('Đang xử lý...', 'Processing...') : tr('Áp dụng vùng cắt', 'Apply crop')}</button>
                 </div>
             </section>
         </div>, document.body,

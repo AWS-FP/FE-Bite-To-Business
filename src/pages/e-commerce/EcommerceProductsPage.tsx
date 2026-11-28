@@ -1,3 +1,5 @@
+import { useExecutiveConfirmation } from '@/hooks/e-commerce/useExecutiveConfirmation';
+import { ExecutiveTableSkeleton, ExecutivePricingSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ClipboardList, Package, RefreshCw, Search, X, Plus, Trash2, Save } from 'lucide-react';
@@ -14,7 +16,6 @@ import {
     ExecutiveError,
     ExecutiveHeading,
     ExecutivePanel,
-    LoadingRows,
 } from '@/components/e-commerce/ExecutiveUI';
 import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 import type { AdminProduct, PricingWrite } from '@/types/e-commerce/executiveAdmin';
@@ -38,6 +39,7 @@ function ProductDrawer({
     brand: string;
     onClose: () => void;
 }) {
+    const confirm = useExecutiveConfirmation();
     const tr = useExecutiveText(),
         qc = useQueryClient();
     const pricing = useQuery({
@@ -136,16 +138,13 @@ function ProductDrawer({
             };
         });
     const selectStatus = (status: string) => {
-        if (
-            status !== localStatus &&
-            window.confirm(
+        if (status !== localStatus && !statusSave.isPending)
+            void confirm(
                 tr(
                     `Chuyển trạng thái ${product.sku} thành ${status}?`,
                     `Change ${product.sku} to ${status}?`,
                 ),
-            )
-        )
-            statusSave.mutate(status);
+             () => statusSave.mutateAsync(status), { danger: status === 'ARCHIVED' });
     };
     return (
         <div
@@ -248,13 +247,14 @@ function ProductDrawer({
                             label={tr('Trạng thái sản phẩm', 'Publication status')}
                             value={localStatus}
                             onValueChange={selectStatus}
-                            disabled={statusSave.isPending}
+                            disabled={statusSave.isPending || product.unitCode === 'COMBO'}
                             className="mt-4"
                         >
                             <option value="DRAFT">DRAFT</option>
                             <option value="PUBLISHED">PUBLISHED</option>
                             <option value="ARCHIVED">ARCHIVED</option>
                         </ExecutiveSelect>
+                        {product.unitCode === 'COMBO' && <p className="mt-2 text-xs text-store-muted">{tr('Quản lý trạng thái tại trang Combo sản phẩm.', 'Manage publication on the Product combos page.')}</p>}
                     </section>
                     <section className="rounded-2xl border border-[#dde8dc] bg-white p-5">
                         <div className="mb-4 flex items-center justify-between gap-3">
@@ -272,7 +272,7 @@ function ProductDrawer({
                             )}
                         </div>
                         {pricing.isLoading ? (
-                            <LoadingRows />
+                            <ExecutivePricingSkeleton />
                         ) : pricing.isError ? (
                             <ExecutiveError
                                 message={tr(
@@ -549,13 +549,12 @@ function ProductDrawer({
                         className="rounded-2xl border border-[#dde8dc] bg-white p-5"
                         onSubmit={(e) => {
                             e.preventDefault();
-                            if (window.confirm(tr('Lưu thuế suất VAT mới?', 'Save new VAT rate?')))
-                                vatSave.mutate(Number(vatInput ?? vat.data?.vatRate));
+                            void confirm(tr('Lưu thuế suất VAT mới?', 'Save new VAT rate?'), () => vatSave.mutateAsync(Number(vatInput ?? vat.data?.vatRate)));
                         }}
                     >
                         <h3 className="mb-4 font-bold">{tr('Thuế VAT', 'VAT rate')}</h3>
                         {vat.isLoading ? (
-                            <LoadingRows />
+                            <ExecutivePricingSkeleton vat />
                         ) : (
                             <div className="flex flex-wrap items-end gap-3">
                                 <label className="flex-1 text-xs font-semibold">
@@ -689,7 +688,7 @@ export default function EcommerceProductsPage() {
                     </p>
                 )}
                 {products.isLoading ? (
-                    <LoadingRows />
+                    <ExecutiveTableSkeleton cells={["product", "text", "double", "double", "double", "text", "badge", "action"]} count={5} tableClass="w-full min-w-[1080px] border-collapse text-left text-sm" cellClass={executiveUi.td} />
                 ) : products.isError ? (
                     <div className="p-5">
                         <ExecutiveError

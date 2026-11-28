@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { Check, Grip, Minus, Plus, RotateCcw, ZoomIn } from 'lucide-react';
+import { Check, Grip, RotateCcw, ZoomIn } from 'lucide-react';
+import ImageZoomSlider from '@/components/common/ImageZoomSlider';
 
 import { useEffect, useId, useRef, useState } from 'react';
 
@@ -407,38 +408,8 @@ export default function AvatarCropper({ src, onApply, onBack }: AvatarCropperPro
                     </span>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <button
-                        type="button"
-                        aria-label={t('customerUI.avatarZoomOut')}
-                        disabled={zoom <= MIN_ZOOM}
-                        onClick={() => changeZoom(zoom - 0.1)}
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white disabled:opacity-35"
-                    >
-                        <Minus size={16} />
-                    </button>
-
-                    <input
-                        type="range"
-                        min={MIN_ZOOM}
-                        max={MAX_ZOOM}
-                        step={0.05}
-                        value={zoom}
-                        onChange={(event) => changeZoom(Number(event.target.value))}
-                        aria-label={t('customerUI.avatarZoom')}
-                        className="min-w-0 flex-1 cursor-pointer accent-store-yellow"
-                    />
-
-                    <button
-                        type="button"
-                        aria-label={t('customerUI.avatarZoomIn')}
-                        disabled={zoom >= MAX_ZOOM}
-                        onClick={() => changeZoom(zoom + 0.1)}
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white disabled:opacity-35"
-                    >
-                        <Plus size={16} />
-                    </button>
-                </div>
+                <ImageZoomSlider dark value={zoom} min={MIN_ZOOM} max={MAX_ZOOM} onChange={changeZoom}
+                    label={t('customerUI.avatarZoom')} decreaseLabel={t('customerUI.avatarZoomOut')} increaseLabel={t('customerUI.avatarZoomIn')} />
 
                 <p className="mb-0 mt-3 text-center text-[11px] text-white/55">
                     {t('customerUI.avatarCropHint')}

@@ -1,3 +1,4 @@
+import BrandTileSkeleton from '@/components/brand/BrandTileSkeleton';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -169,13 +170,8 @@ export default function BrandsPage() {
                         </Link>
                     </div>
                     {loading && (
-                        <p
-                            role="status"
-                            className="rounded-2xl bg-white p-8 text-sm text-store-muted"
-                        >
-                            {t('brandPage.loading')}
-                        </p>
-                    )}
+<div aria-busy="true" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">{Array.from({ length: 8 }, (_, i) => <BrandTileSkeleton key={i}/>)}</div>
+)}
                     {error && !loading && (
                         <div
                             role="alert"

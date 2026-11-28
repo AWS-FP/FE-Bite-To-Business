@@ -1,3 +1,4 @@
+import ListSkeleton from '@/components/common/ListSkeleton';
 import { useEffect, useState } from 'react';
 import AdminButton from '@/components/admin/AdminButton';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
@@ -109,10 +110,8 @@ export default function PackageReturnsPage() {
     return (
         <>
             <AdminPageHeader
-                sectionNumber="01"
                 eyebrow="PACKAGE RETURNS"
                 title="Yêu cầu trả hàng"
-                description="Khách trả kiện đã giao trong vòng 24 giờ. Mở yêu cầu để xem form và xác nhận hoàn tiền."
             >
                 <AdminButton icon="refresh" busy={r.list.isFetching} onClick={() => void r.list.refetch()}>Làm mới</AdminButton>
             </AdminPageHeader>
@@ -132,7 +131,7 @@ export default function PackageReturnsPage() {
                             <option value="">Tất cả</option>
                         </select>
                     </div>
-                    {r.list.isLoading && <p className="px-6 py-10 text-sm" role="status">Đang tải...</p>}
+                    {r.list.isLoading && <ListSkeleton className="mt-4 border-t border-black/10" rowClassName="flex items-start justify-between gap-3 border-b border-black/10 px-6 py-4" />}
                     {r.list.isError && <p className="px-6 py-10 text-sm text-red-700" role="alert">Không tải được danh sách yêu cầu trả hàng.</p>}
                     {r.list.data && r.list.data.content.length === 0 && <p className="px-6 py-10 text-sm text-store-muted">Không có yêu cầu nào.</p>}
                     {r.list.data && r.list.data.content.length > 0 && (

@@ -16,7 +16,12 @@ const PAGES: Record<string, string> = {
     brands: ROUTES.BRANDS,
 };
 
-export const aiPagePath = (prompt: string) => `/ai?q=${encodeURIComponent(prompt.trim())}`;
+export const aiPagePath = (prompt: string, subject?: string, view?: 'table') => {
+    const params = new URLSearchParams({ q: prompt.trim() });
+    if (subject?.trim()) params.set('subject', subject.trim().slice(0, 100));
+    if (view) params.set('view', view);
+    return `/ai?${params}`;
+};
 
 /**
  * Nối action A2UI (đã qua allowlist) vào luồng thật của web: router, giỏ hàng, trợ lý.
@@ -52,7 +57,7 @@ export function useA2uiActions() {
                         product.saleActive && product.salePrice != null
                             ? product.salePrice
                             : product.listPrice;
-                    useCartStore.getState().addItem(
+                    const limit = useCartStore.getState().addItem(
                         {
                             id: product.productId,
                             name: product.name,
@@ -65,7 +70,9 @@ export function useA2uiActions() {
                         },
                         Number(context.quantity) || product.minOrderQuantity,
                     );
-                    if (!onPage)
+                    if (limit) {
+                        note(i18n.t('storefront:productDetail.stockLimit', { ...limit, unit: product.unitCode }));
+                    } else if (!onPage)
                         note(`Đã thêm ${product.name} vào giỏ. Bạn chỉnh số lượng trong giỏ hàng.`);
                     break;
                 }
@@ -87,5 +94,5 @@ export function useA2uiActions() {
             }
         });
         return () => setA2uiActionHandler(null);
-    }, [navigate, locale]);
+    }, [navigate, locale, i18n]);
 }
