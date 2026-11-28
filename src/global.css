@@ -68,6 +68,11 @@ body::-webkit-scrollbar,
 
 /* Màu và font xài cho cả trang web */
 @theme static {
+    --animate-cart-added: cart-added 240ms ease-out;
+    @keyframes cart-added {
+        from { opacity: 0; transform: translateY(3px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
     /* Các tên cũ được giữ làm bí danh để không phải sửa hơn 500 chỗ đang dùng. */
     --font-body: 'Be Vietnam Pro', system-ui, sans-serif;
     --font-subtext: 'Be Vietnam Pro', system-ui, sans-serif;

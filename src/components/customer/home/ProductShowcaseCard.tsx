@@ -6,6 +6,7 @@ import type { HomeProductCardItem } from '@/types/customer/homeData';
 import { useFavoriteToggle } from '@/hooks/customer/useFavoriteToggle';
 import Skeleton from '@/components/common/Skeleton';
 import { useProductCardPurchase } from '@/hooks/customer/useProductCardPurchase';
+import CartPurchaseFeedback from '../CartPurchaseFeedback';
 
 /** Only the customer API supplies product, price and promotion values. */
 export default function ProductShowcaseCard({
@@ -42,7 +43,7 @@ export default function ProductShowcaseCard({
         setQuantity,
         minQuantity,
         step,
-        available,
+        feedback,
         inStock,
         validSale,
         unitPrice,
@@ -188,9 +189,7 @@ export default function ProductShowcaseCard({
                             <button
                                 type="button"
                                 onClick={() => setQuantity(quantity + step)}
-                                disabled={
-                                    !purchaseAllowed || !inStock || (available != null && quantity + step > available)
-                                }
+                                disabled={!purchaseAllowed || !inStock}
                                 aria-label={t('homePage.increaseQuantity')}
                                 className="grid h-7 w-6 cursor-pointer place-items-center rounded-md border-0 bg-transparent text-store-ink hover:bg-surface-soft disabled:cursor-not-allowed disabled:opacity-40"
                             >
@@ -202,8 +201,7 @@ export default function ProductShowcaseCard({
                             onClick={handleAddToOrder}
                             disabled={
                                 !purchaseAllowed || !inStock ||
-                                unitPrice == null ||
-                                (available != null && quantity > available)
+                                unitPrice == null
                             }
                             className="h-9 min-w-0 flex-1 cursor-pointer rounded-lg border-0 bg-store-green px-2 text-[11px] font-bold text-white transition hover:bg-store-dark disabled:cursor-not-allowed disabled:bg-[#91a59d]"
                         >
@@ -220,6 +218,7 @@ export default function ProductShowcaseCard({
                             )}
                         </button>
                     </div>
+                    <CartPurchaseFeedback feedback={feedback} unit={unit} />
                 </div>
             </div>
         </article>

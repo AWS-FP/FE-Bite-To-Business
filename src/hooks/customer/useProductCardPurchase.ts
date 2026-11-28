@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { HomeProductCardItem } from '@/types/customer/homeData';
-import { useCartStore } from '@/store/customer/cartStore';
+import { checkCartStock, useCartStore } from '@/store/customer/cartStore';
+import { useCartFeedback } from './useCartFeedback';
 import { useStorefrontPurchaseAccess } from './useStorefrontPurchaseAccess';
 
 /**
@@ -10,7 +11,8 @@ import { useStorefrontPurchaseAccess } from './useStorefrontPurchaseAccess';
 export function useProductCardPurchase(product: HomeProductCardItem, name: string) {
     const purchaseAllowed = useStorefrontPurchaseAccess();
     const addItemToCart = useCartStore((state) => state.addItem);
-    const [requestedQuantity, setQuantity] = useState(product.minOrderQuantity ?? 1);
+    const [requestedQuantity, setRequestedQuantity] = useState(product.minOrderQuantity ?? 1);
+    const { feedback, showFeedback, clearFeedback } = useCartFeedback();
 
     const minQuantity = product.minOrderQuantity ?? 1;
     const quantity = Math.max(minQuantity, requestedQuantity);
@@ -32,21 +34,30 @@ export function useProductCardPurchase(product: HomeProductCardItem, name: strin
         : 0;
     const totalPrice = unitPrice == null ? null : unitPrice * quantity;
 
+    const rules = { id: product.id, minOrderQuantity: minQuantity, quantityStep: step, maxQuantity: available };
+    function setQuantity(requested: number) {
+        const next = Number(requested.toFixed(3));
+        if (next > quantity) {
+            const limit = checkCartStock(rules, next);
+            if (limit) { showFeedback(limit); return; }
+        }
+        clearFeedback();
+        setRequestedQuantity(next);
+    }
+
     function handleAddToOrder() {
-        if (!purchaseAllowed || !inStock || unitPrice == null || (available != null && quantity > available)) return;
-        addItemToCart(
+        if (!purchaseAllowed || !inStock || unitPrice == null) return;
+        const limit = addItemToCart(
             {
-                id: product.id,
+                ...rules,
                 name,
                 spec: product.spec,
                 unitPrice,
                 imageUrl: product.imageUrl,
-                minOrderQuantity: minQuantity,
-                quantityStep: step,
-                maxQuantity: available ?? null,
             },
             quantity,
         );
+        showFeedback(limit);
     }
 
     return {
@@ -55,7 +66,7 @@ export function useProductCardPurchase(product: HomeProductCardItem, name: strin
         setQuantity,
         minQuantity,
         step,
-        available,
+        feedback,
         inStock,
         validSale,
         unitPrice,
