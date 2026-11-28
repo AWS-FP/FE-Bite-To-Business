@@ -60,6 +60,7 @@ export default function EcommerceCombosPage() {
     const tr = useExecutiveText(),
         qc = useQueryClient();
     const { search, setSearch, keyword, page, setPage, pending } = useExecutiveListSearch();
+    const [statusFilter, setStatusFilter] = useState('');
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<string | null>(null);
     const [translationSession, setTranslationSession] = useState(0);
@@ -75,9 +76,15 @@ export default function EcommerceCombosPage() {
         return () => URL.revokeObjectURL(cropUrl);
     }, [cropUrl]);
     const list = useQuery({
-        queryKey: ['ecom', 'combos', keyword, page],
+        queryKey: ['ecom', 'combos', keyword, statusFilter, page],
         enabled: !pending,
-        queryFn: ({ signal }) => executiveComboApi.list(page, signal, keyword || undefined),
+        queryFn: async ({ signal }) => {
+            const result = await executiveComboApi.list(page, signal, keyword || undefined, statusFilter || undefined);
+            if (statusFilter && result.items.some((item) => item.status !== statusFilter)) {
+                throw new Error('STATUS_FILTER_MISMATCH');
+            }
+            return result;
+        },
     });
     const categories = useQuery({
         queryKey: ['ecom', 'combo-categories'],
@@ -685,22 +692,39 @@ export default function EcommerceCombosPage() {
             )}
             <ExecutivePanel title={tr('Danh sách combo', 'Combo list')}
                 caption={!pending && list.data ? `${list.data.total} ${tr('combo', 'combos')}` : ''}>
-                <div className="flex gap-3 p-5">
+                <div className="flex flex-col gap-3 p-5 sm:flex-row">
                     <ExecutiveListSearch value={search} onChange={setSearch}
                         label={tr('Tìm combo', 'Search combos')}
                         placeholder={tr('Tìm theo tên combo (VI/EN) hoặc SKU...', 'Search combo name (VI/EN) or SKU...')} />
+                    <div className="w-full sm:w-[240px] sm:shrink-0">
+                        <ExecutiveSelect
+                            ariaLabel={tr('Trạng thái', 'Status')}
+                            value={statusFilter}
+                            onValueChange={(value) => {
+                                setStatusFilter(value);
+                                setPage(0);
+                            }}
+                        >
+                            <option value="">{tr('Tất cả trạng thái', 'All statuses')}</option>
+                            <option value="DRAFT">{statusLabel('DRAFT')}</option>
+                            <option value="PUBLISHED">{statusLabel('PUBLISHED')}</option>
+                            <option value="ARCHIVED">{statusLabel('ARCHIVED')}</option>
+                        </ExecutiveSelect>
+                    </div>
                 </div>
                 {pending || list.isPending ? (
                     <ExecutiveComboSkeleton />
                 ) : list.isError ? (
                     <ExecutiveError
-                        message={tr('Không tải được danh sách.', 'Unable to load combos.')}
+                        message={list.error instanceof Error && list.error.message === 'STATUS_FILTER_MISMATCH'
+                            ? tr('Máy chủ trả dữ liệu không đúng bộ lọc. Kiểm tra phiên bản Backend rồi thử lại.', 'The server returned data outside the selected filter. Check the backend version and retry.')
+                            : tr('Không tải được danh sách.', 'Unable to load combos.')}
                         retry={() => void list.refetch()}
                     />
                 ) : !list.data?.items.length ? (
                     <ExecutiveEmpty
-                        title={keyword ? tr('Không tìm thấy combo phù hợp', 'No matching combos') : tr('Chưa có combo', 'No combos')}
-                        description={keyword ? tr('Thử từ khóa khác.', 'Try another keyword.') : tr('Tạo combo mới để bắt đầu.', 'Create your first combo.')}
+                        title={keyword || statusFilter ? tr('Không tìm thấy combo phù hợp', 'No matching combos') : tr('Chưa có combo', 'No combos')}
+                        description={keyword || statusFilter ? tr('Thử từ khóa hoặc bộ lọc khác.', 'Try another keyword or filter.') : tr('Tạo combo mới để bắt đầu.', 'Create your first combo.')}
                         icon={<Boxes size={26} />}
                     />
                 ) : (

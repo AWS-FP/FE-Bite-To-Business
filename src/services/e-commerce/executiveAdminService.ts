@@ -34,15 +34,15 @@ export const executiveApi = {
         putData<AdminPricing>(`${api}/products/${id}/pricing`, payload),
     setProductStatus: (id: string, status: string) =>
         patchData<AdminProduct>(`${api}/products/${id}/status`, { status }),
-    coupons: (page = 0, size = 20, q?: string, signal?: AbortSignal) => getData<AdminPage<Coupon>>(`${api}/coupons`, { page, size, q }, signal),
+    coupons: (page = 0, size = 20, q?: string, signal?: AbortSignal, status?: string) => getData<AdminPage<Coupon>>(`${api}/coupons`, { page, size, q, status }, signal),
     coupon: (id: string) => getData<Coupon>(`${api}/coupons/${id}`),
     createCoupon: (payload: CouponWrite) => postData<Coupon>(`${api}/coupons`, payload),
     updateCoupon: (id: string, payload: CouponWrite) =>
         putData<Coupon>(`${api}/coupons/${id}`, payload),
     setCouponActive: (id: string, active: boolean) =>
         patchData<Coupon>(`${api}/coupons/${id}/active`, {}, { active }),
-    promotions: (status?: string, page = 0, size = 20, q?: string) =>
-        getData<AdminPage<Promotion>>(`${api}/promotions`, { status, page, size, q }),
+    promotions: (status?: string, page = 0, size = 20, q?: string, signal?: AbortSignal) =>
+        getData<AdminPage<Promotion>>(`${api}/promotions`, { status, page, size, q }, signal),
     promotion: (id: string) => getData<Promotion>(`${api}/promotions/${id}`),
     deletePromotion: async (id: string): Promise<void> => {
         await http.delete(`${api}/promotions/${encodeURIComponent(id)}`);

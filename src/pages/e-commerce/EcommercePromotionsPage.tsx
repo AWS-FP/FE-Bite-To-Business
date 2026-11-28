@@ -102,7 +102,13 @@ export default function EcommercePromotionsPage() {
     }, [cropUrl]);
     const list = useQuery({
         queryKey: ['ecom', 'promotions', status, page, debouncedSearch],
-        queryFn: () => executiveApi.promotions(status || undefined, page, 20, debouncedSearch),
+        queryFn: async ({ signal }) => {
+            const result = await executiveApi.promotions(status || undefined, page, 20, debouncedSearch, signal);
+            if (status && result.items.some((item) => promotionDisplayStatus(item) !== status)) {
+                throw new Error('STATUS_FILTER_MISMATCH');
+            }
+            return result;
+        },
         refetchInterval: 60_000,
     });
     function reset() {
@@ -510,9 +516,10 @@ export default function EcommercePromotionsPage() {
                             }}
                         >
                             <option value="">{tr('Tất cả', 'All statuses')}</option>
-                            {['DRAFT', 'PUBLISHED', 'DISABLED', 'ARCHIVED'].map((value) => (
-                                <option key={value}>{value}</option>
-                            ))}
+                            <option value="DRAFT">{tr('Bản nháp', 'DRAFT')}</option>
+                            <option value="PUBLISHED">{tr('Đã đăng', 'PUBLISHED')}</option>
+                            <option value="EXPIRED">{tr('Hết hạn', 'EXPIRED')}</option>
+                            <option value="ARCHIVED">{tr('Lưu trữ', 'ARCHIVED')}</option>
                         </ExecutiveSelect>
                     </div>
                 </div>
@@ -521,7 +528,9 @@ export default function EcommercePromotionsPage() {
                 ) : list.isError ? (
                     <div className="p-5">
                         <ExecutiveError
-                            message={tr('Không lấy được chiến dịch.', 'Could not load campaigns.')}
+                            message={list.error instanceof Error && list.error.message === 'STATUS_FILTER_MISMATCH'
+                                ? tr('Máy chủ trả dữ liệu không đúng bộ lọc. Kiểm tra phiên bản Backend rồi thử lại.', 'The server returned data outside the selected filter. Check the backend version and retry.')
+                                : tr('Không lấy được chiến dịch.', 'Could not load campaigns.')}
                             retry={() => void list.refetch()}
                         />
                     </div>
