@@ -195,7 +195,7 @@ export default function EcommercePosterPage() {
     return (
         <div className="space-y-6">
             <ExecutiveHeading
-                number="06"
+                number="07"
                 eyebrow="MARKETING / MEDIA"
                 title={tr('Ảnh khuyến mãi', 'Promotion images')}
                 description={tr(

@@ -5,6 +5,7 @@ import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 import { executiveErrorMessage } from '@/services/e-commerce/executiveError';
 import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 import { useAuthStore } from '@/store/admin/authStore';
+import { useDebouncedSearch } from '@/hooks/e-commerce/useDebouncedSearch';
 
 type ModerationInput = {
     id: string;
@@ -20,14 +21,23 @@ export function useExecutiveReviews() {
     const ownUserId = useAuthStore((state) => state.session?.user?.id);
     const [status, setStatus] = useState('');
     const [stars, setStars] = useState('');
-    const [page, setPage] = useState(0);
+    const [search, setSearchValue] = useState('');
+    const keyword = useDebouncedSearch(search.trim());
+    const [pagination, setPagination] = useState({ keyword: '', page: 0 });
+    const page = pagination.keyword === keyword ? pagination.page : 0;
+    function setPage(next: number) { setPagination({ keyword, page: next }); }
+    function setSearch(next: string) {
+        setSearchValue(next);
+        if (next.trim() !== search.trim()) setPagination({ keyword: next.trim(), page: 0 });
+    }
     const [feedback, setFeedback] = useState('');
     const [failed, setFailed] = useState(false);
 
     const list = useQuery({
-        queryKey: ['ecom', 'reviews', status, stars, page],
-        queryFn: () =>
-            executiveApi.reviews(status || undefined, stars ? Number(stars) : undefined, page, 20),
+        queryKey: ['ecom', 'reviews', status, stars, keyword, page],
+        enabled: search.trim() === keyword,
+        queryFn: ({ signal }) =>
+            executiveApi.reviews(status || undefined, stars ? Number(stars) : undefined, page, 20, keyword || undefined, signal),
     });
 
     function notify(message: string, isError = false) {
@@ -98,7 +108,7 @@ export function useExecutiveReviews() {
     }
 
     return {
-        tr, ownUserId, status, stars, page, setPage, feedback, failed, list, busy,
+        tr, ownUserId, status, stars, search, setSearch, keyword, page, setPage, feedback, failed, list, busy,
         changeStatus, changeStars, hide, restore, remove,
     };
 }

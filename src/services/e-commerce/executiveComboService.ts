@@ -11,10 +11,10 @@ import type {
 
 const api = '/api/ecommerce/combos';
 export const executiveComboApi = {
-    list: async (page: number, signal?: AbortSignal) =>
+    list: async (page: number, signal?: AbortSignal, q?: string, status?: string) =>
         (
             await http.get<ApiResponse<AdminPage<ExecutiveCombo>>>(api, {
-                params: { page, size: 12 },
+                params: { page, size: 12, q, status },
                 signal,
             })
         ).data.data,

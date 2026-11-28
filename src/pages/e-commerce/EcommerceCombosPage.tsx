@@ -1,3 +1,5 @@
+import ExecutiveListSearch from '@/components/e-commerce/ExecutiveListSearch';
+import { useExecutiveListSearch } from '@/hooks/e-commerce/useExecutiveListSearch';
 import { useExecutiveConfirmation } from '@/hooks/e-commerce/useExecutiveConfirmation';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import PromotionImageCropper from '@/components/e-commerce/PromotionImageCropper';
@@ -6,6 +8,7 @@ import { Boxes, ImagePlus, Plus, Save } from 'lucide-react';
 import { executiveUi } from '@/constants/e-commerce/executiveUi';
 import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 import {
+    ExecutiveBadge,
     ExecutiveFeedback,
     ExecutivePagination,
     ExecutiveSelect,
@@ -57,7 +60,8 @@ export default function EcommerceCombosPage() {
     const confirm = useExecutiveConfirmation();
     const tr = useExecutiveText(),
         qc = useQueryClient();
-    const [page, setPage] = useState(0);
+    const { search, setSearch, keyword, page, setPage, pending } = useExecutiveListSearch();
+    const [statusFilter, setStatusFilter] = useState('');
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<string | null>(null);
     const [translationSession, setTranslationSession] = useState(0);
@@ -73,8 +77,15 @@ export default function EcommerceCombosPage() {
         return () => URL.revokeObjectURL(cropUrl);
     }, [cropUrl]);
     const list = useQuery({
-        queryKey: ['ecom', 'combos', page],
-        queryFn: ({ signal }) => executiveComboApi.list(page, signal),
+        queryKey: ['ecom', 'combos', keyword, statusFilter, page],
+        enabled: !pending,
+        queryFn: async ({ signal }) => {
+            const result = await executiveComboApi.list(page, signal, keyword || undefined, statusFilter || undefined);
+            if (statusFilter && result.items.some((item) => item.status !== statusFilter)) {
+                throw new Error('STATUS_FILTER_MISMATCH');
+            }
+            return result;
+        },
     });
     const categories = useQuery({
         queryKey: ['ecom', 'combo-categories'],
@@ -351,7 +362,7 @@ export default function EcommerceCombosPage() {
                     onCancel={() => setCropSource(null)} onApply={(file) => { setCropSource(null); upload.mutate(file); }} />
             )}
             <ExecutiveHeading
-                number="09"
+                number="03"
                 eyebrow="CATALOG / COMBOS"
                 title={tr('Combo sản phẩm', 'Product combos')}
                 description={tr(
@@ -680,18 +691,41 @@ export default function EcommerceCombosPage() {
                     </ExecutivePanel>
                 </div>
             )}
-            <ExecutivePanel title={tr('Danh sách combo', 'Combo list')}>
-                {list.isPending ? (
+            <ExecutivePanel title={tr('Danh sách combo', 'Combo list')}
+                caption={!pending && list.data ? `${list.data.total} ${tr('combo', 'combos')}` : ''}>
+                <div className="flex flex-col gap-3 p-5 sm:flex-row">
+                    <ExecutiveListSearch value={search} onChange={setSearch}
+                        label={tr('Tìm combo', 'Search combos')}
+                        placeholder={tr('Tìm theo tên combo (VI/EN) hoặc SKU...', 'Search combo name (VI/EN) or SKU...')} />
+                    <div className="w-full sm:w-[240px] sm:shrink-0">
+                        <ExecutiveSelect
+                            ariaLabel={tr('Trạng thái', 'Status')}
+                            value={statusFilter}
+                            onValueChange={(value) => {
+                                setStatusFilter(value);
+                                setPage(0);
+                            }}
+                        >
+                            <option value="">{tr('Tất cả trạng thái', 'All statuses')}</option>
+                            <option value="DRAFT">{statusLabel('DRAFT')}</option>
+                            <option value="PUBLISHED">{statusLabel('PUBLISHED')}</option>
+                            <option value="ARCHIVED">{statusLabel('ARCHIVED')}</option>
+                        </ExecutiveSelect>
+                    </div>
+                </div>
+                {pending || list.isPending ? (
                     <ExecutiveComboSkeleton />
                 ) : list.isError ? (
                     <ExecutiveError
-                        message={tr('Không tải được danh sách.', 'Unable to load combos.')}
+                        message={list.error instanceof Error && list.error.message === 'STATUS_FILTER_MISMATCH'
+                            ? tr('Máy chủ trả dữ liệu không đúng bộ lọc. Kiểm tra phiên bản Backend rồi thử lại.', 'The server returned data outside the selected filter. Check the backend version and retry.')
+                            : tr('Không tải được danh sách.', 'Unable to load combos.')}
                         retry={() => void list.refetch()}
                     />
                 ) : !list.data?.items.length ? (
                     <ExecutiveEmpty
-                        title={tr('Chưa có combo', 'No combos')}
-                        description={tr('Tạo combo mới để bắt đầu.', 'Create your first combo.')}
+                        title={keyword || statusFilter ? tr('Không tìm thấy combo phù hợp', 'No matching combos') : tr('Chưa có combo', 'No combos')}
+                        description={keyword || statusFilter ? tr('Thử từ khóa hoặc bộ lọc khác.', 'Try another keyword or filter.') : tr('Tạo combo mới để bắt đầu.', 'Create your first combo.')}
                         icon={<Boxes size={26} />}
                     />
                 ) : (
@@ -714,9 +748,7 @@ export default function EcommerceCombosPage() {
                                     )}
                                 </div>
                                 <div className="flex flex-1 flex-col gap-2 p-4">
-                                    <span className="self-start rounded-full bg-[#e9f2e9] px-2 py-1 text-xs font-bold text-store-dark">
-                                        {statusLabel(combo.status)}
-                                    </span>
+                                    <ExecutiveBadge status={combo.status} label={statusLabel(combo.status)} />
                                     <h3
                                         className="line-clamp-2 min-h-12 break-words font-bold text-store-dark"
                                         title={tr(combo.nameVi, combo.nameEn)}
@@ -782,7 +814,7 @@ export default function EcommerceCombosPage() {
                         ))}
                     </div>
                 )}
-                {list.data && (
+                {!pending && list.data && (
                     <ExecutivePagination
                         page={page}
                         totalPages={list.data.totalPages}

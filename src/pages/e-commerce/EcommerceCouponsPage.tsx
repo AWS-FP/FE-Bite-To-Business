@@ -1,3 +1,5 @@
+import ExecutiveListSearch from '@/components/e-commerce/ExecutiveListSearch';
+import { useExecutiveListSearch } from '@/hooks/e-commerce/useExecutiveListSearch';
 import { useExecutiveConfirmation } from '@/hooks/e-commerce/useExecutiveConfirmation';
 import { ExecutiveTableSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { useState } from 'react';
@@ -32,8 +34,9 @@ export default function EcommerceCouponsPage() {
     const confirm = useExecutiveConfirmation();
     const tr = useExecutiveText(),
         qc = useQueryClient();
-    const [page, setPage] = useState(0),
-        [open, setOpen] = useState(false),
+    const { search, setSearch, keyword, page, setPage, pending } = useExecutiveListSearch();
+    const [statusFilter, setStatusFilter] = useState('');
+    const [open, setOpen] = useState(false),
         [editId, setEditId] = useState<string | null>(null),
         [code, setCode] = useState(''),
         [discountType, setDiscountType] = useState('PERCENTAGE'),
@@ -51,8 +54,15 @@ export default function EcommerceCouponsPage() {
         [feedback, setFeedback] = useState(''),
         [failed, setFailed] = useState(false);
     const list = useQuery({
-        queryKey: ['ecom', 'coupons', page],
-        queryFn: () => executiveApi.coupons(page, 20),
+        queryKey: ['ecom', 'coupons', keyword, statusFilter, page],
+        enabled: !pending,
+        queryFn: async ({ signal }) => {
+            const result = await executiveApi.coupons(page, 20, keyword || undefined, signal, statusFilter || undefined);
+            if (statusFilter && result.items.some((item) => item.isActive !== (statusFilter === 'ACTIVE'))) {
+                throw new Error('STATUS_FILTER_MISMATCH');
+            }
+            return result;
+        },
     });
     function reset() {
         setOpen(false);
@@ -424,22 +434,43 @@ export default function EcommerceCouponsPage() {
             )}
             <ExecutivePanel
                 title={tr('Danh sách coupon', 'Coupon inventory')}
-                caption={list.data ? `${list.data.total} coupon` : ''}
+                caption={!pending && list.data ? `${list.data.total} ${tr('coupon', 'coupons')}` : ''}
             >
-                {list.isLoading ? (
+                <div className="flex flex-col gap-3 p-5 sm:flex-row">
+                    <ExecutiveListSearch value={search} onChange={setSearch}
+                        label={tr('Tìm mã giảm giá', 'Search coupons')}
+                        placeholder={tr('Tìm theo mã hoặc tên coupon (VI/EN)...', 'Search coupon code or name (VI/EN)...')} />
+                    <div className="w-full sm:w-[240px] sm:shrink-0">
+                        <ExecutiveSelect
+                            ariaLabel={tr('Trạng thái', 'Status')}
+                            value={statusFilter}
+                            onValueChange={(value) => {
+                                setStatusFilter(value);
+                                setPage(0);
+                            }}
+                        >
+                            <option value="">{tr('Tất cả trạng thái', 'All statuses')}</option>
+                            <option value="ACTIVE">{tr('Đã bật', 'Enabled')}</option>
+                            <option value="INACTIVE">{tr('Đã tắt', 'Disabled')}</option>
+                        </ExecutiveSelect>
+                    </div>
+                </div>
+                {pending || list.isLoading ? (
                     <ExecutiveTableSkeleton cells={["text", "text", "text", "double", "text", "badge", "actions"]} count={5} tableClass="w-full min-w-[940px] text-left text-sm" cellClass={executiveUi.td} />
                 ) : list.isError ? (
                     <div className="p-5">
                         <ExecutiveError
-                            message={tr('Không tải được coupon.', 'Could not load coupons.')}
+                            message={list.error instanceof Error && list.error.message === 'STATUS_FILTER_MISMATCH'
+                            ? tr('Máy chủ trả dữ liệu không đúng bộ lọc. Kiểm tra phiên bản Backend rồi thử lại.', 'The server returned data outside the selected filter. Check the backend version and retry.')
+                            : tr('Không tải được coupon.', 'Could not load coupons.')}
                             retry={() => void list.refetch()}
                         />
                     </div>
                 ) : !list.data?.items.length ? (
                     <ExecutiveEmpty
                         icon={<TicketPercent />}
-                        title={tr('Chưa có coupon', 'No coupons yet')}
-                        description={tr('Tạo coupon mới để bắt đầu.', 'Create your first coupon.')}
+                        title={keyword || statusFilter ? tr('Không tìm thấy coupon phù hợp', 'No matching coupons') : tr('Chưa có coupon', 'No coupons yet')}
+                        description={keyword || statusFilter ? tr('Thử từ khóa hoặc bộ lọc khác.', 'Try another keyword or filter.') : tr('Tạo coupon mới để bắt đầu.', 'Create your first coupon.')}
                     />
                 ) : (
                     <div className="overflow-x-auto">
@@ -466,6 +497,7 @@ export default function EcommerceCouponsPage() {
                                     <tr key={c.id}>
                                         <td className={`${executiveUi.td} font-mono font-bold`}>
                                             {c.code}
+                                            {(c.nameVi || c.nameEn) && <span className="mt-1 block font-body text-xs font-normal text-store-muted">{tr(c.nameVi || c.nameEn || '', c.nameEn || c.nameVi || '')}</span>}
                                         </td>
                                         <td className={executiveUi.td}>
                                             {c.discountType === 'PERCENTAGE'
@@ -487,7 +519,8 @@ export default function EcommerceCouponsPage() {
                                         </td>
                                         <td className={executiveUi.td}>
                                             <ExecutiveBadge
-                                                status={c.isActive ? 'PUBLISHED' : 'DRAFT'}
+                                                status={c.isActive ? 'ACTIVE' : 'INACTIVE'}
+                                                label={c.isActive ? tr('Đã bật', 'Enabled') : tr('Đã tắt', 'Disabled')}
                                             />
                                         </td>
                                         <td className={executiveUi.td}>
@@ -525,7 +558,7 @@ export default function EcommerceCouponsPage() {
                         </table>
                     </div>
                 )}
-                {list.data && (
+                {!pending && list.data && (
                     <ExecutivePagination
                         page={page}
                         totalPages={list.data.totalPages}

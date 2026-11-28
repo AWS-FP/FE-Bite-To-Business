@@ -24,7 +24,7 @@ function CellShape({ kind }: { kind: Cell }) {
                 <Skeleton className="h-3 w-16" />
             </div>
         );
-    if (kind === "badge") return <Skeleton className="h-6 w-20 rounded-full" />;
+    if (kind === "badge") return <Skeleton className="h-6 w-20 rounded-[5px]" />;
     if (kind === "action" || kind === "actions")
         return (
             <div className="flex gap-2">
@@ -89,8 +89,8 @@ export function ExecutiveCampaignSkeleton() {
                     <div className="space-y-3 p-5">
                         <div className="flex items-center justify-between gap-2">
                             <div className="flex gap-2">
-                                <Skeleton className="h-5 w-20 rounded-full" />
-                                <Skeleton className="h-5 w-20 rounded-full" />
+                                <Skeleton className="h-5 w-20 rounded-[5px]" />
+                                <Skeleton className="h-5 w-20 rounded-[5px]" />
                             </div>
                             <Skeleton className="h-3 w-28" />
                         </div>
@@ -127,7 +127,7 @@ export function ExecutiveArticleSkeleton({
                     <div className={refund ? "space-y-1" : "space-y-3"}>
                         <div className="flex flex-wrap items-center gap-3">
                             <Skeleton className="h-5 w-48" />
-                            <Skeleton className="h-6 w-20 rounded-full" />
+                            <Skeleton className="h-6 w-20 rounded-[5px]" />
                         </div>
                         <Skeleton className="h-3 w-56 max-w-full" />
                         <Skeleton className="h-4 w-4/5" />
@@ -219,7 +219,7 @@ export function ExecutiveQuoteDetailSkeleton() {
             <div className="rounded-2xl border bg-white p-5">
                 <div className="flex justify-between gap-2">
                     <Skeleton className="h-7 w-40" />
-                    <Skeleton className="h-6 w-24 rounded-full" />
+                    <Skeleton className="h-6 w-24 rounded-[5px]" />
                 </div>
                 <Skeleton className="mt-2 h-5 w-2/3" />
                 <div className="mt-4 grid gap-3 border-t pt-4 sm:grid-cols-2">
@@ -257,7 +257,7 @@ export function ExecutiveComboSkeleton() {
                 >
                     <Skeleton className="aspect-video w-full rounded-none" />
                     <div className="flex flex-1 flex-col gap-2 p-4">
-                        <Skeleton className="h-6 w-20 rounded-full" />
+                        <Skeleton className="h-6 w-20 rounded-[5px]" />
                         <div className="h-12 space-y-2">
                             <Skeleton className="h-4 w-full" />
                             <Skeleton className="h-4 w-2/3" />

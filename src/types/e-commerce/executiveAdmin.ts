@@ -60,6 +60,8 @@ export type PricingWrite = {
 export type Coupon = {
     id: string;
     code: string;
+    nameVi?: string | null;
+    nameEn?: string | null;
     discountType: string;
     discountValue: number;
     minOrderAmount: number;
@@ -76,7 +78,7 @@ export type Coupon = {
     productIds?: string[];
 };
 
-export type CouponWrite = Omit<Coupon, 'id' | 'usedCount' | 'createdAt'>;
+export type CouponWrite = Omit<Coupon, 'id' | 'usedCount' | 'createdAt' | 'nameVi' | 'nameEn'>;
 
 export type Promotion = {
     id: string;

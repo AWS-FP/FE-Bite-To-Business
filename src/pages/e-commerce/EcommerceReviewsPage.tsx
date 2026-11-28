@@ -1,6 +1,6 @@
 import ExecutiveReviewImages from '@/components/e-commerce/ExecutiveReviewImages';
 import { ExecutiveArticleSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
-import { MessageCircle, Star, Trash2 } from 'lucide-react';
+import { MessageCircle, Search, Star, Trash2, X } from 'lucide-react';
 import { executiveUi } from '@/constants/e-commerce/executiveUi';
 import { useExecutiveReviews } from '@/hooks/e-commerce/useExecutiveReviews';
 import {
@@ -18,13 +18,13 @@ import {
 
 export default function EcommerceReviewsPage() {
     const {
-        tr, ownUserId, status, stars, page, setPage, feedback, failed, list, busy,
+        tr, ownUserId, status, stars, search, setSearch, keyword, page, setPage, feedback, failed, list, busy,
         changeStatus, changeStars, hide, restore, remove,
     } = useExecutiveReviews();
     return (
         <div className="space-y-6">
             <ExecutiveHeading
-                number="08"
+                number="06"
                 eyebrow="CUSTOMER FEEDBACK"
                 title={tr('Kiểm duyệt đánh giá', 'Review moderation')}
                 description={tr(
@@ -40,7 +40,18 @@ export default function EcommerceReviewsPage() {
                 title={tr('Đánh giá khách hàng', 'Customer reviews')}
                 caption={list.data ? `${list.data.total} ${tr('đánh giá', 'reviews')}` : ''}
             >
-                <div className="grid gap-3 p-5 sm:max-w-[590px] sm:grid-cols-2">
+                <div className="grid gap-3 p-5 sm:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(150px,220px)_minmax(150px,220px)]">
+                    <div className={`${executiveUi.selectSearch} h-11 min-w-0 sm:col-span-2 xl:col-span-1`}>
+                        <Search size={18} className="shrink-0 text-store-sage" aria-hidden="true" />
+                        <input type="search" value={search} maxLength={120}
+                            onChange={(event) => setSearch(event.target.value)}
+                            aria-label={tr('Tìm đánh giá', 'Search reviews')}
+                            placeholder={tr('Tìm theo sản phẩm, SKU, nội dung hoặc ID...', 'Search product, SKU, comment or ID...')}
+                            className={`${executiveUi.selectSearchInput} store-search-input`} />
+                        {search && <button type="button" onClick={() => setSearch('')}
+                            aria-label={tr('Xóa tìm kiếm', 'Clear search')}
+                            className="grid size-7 shrink-0 place-items-center rounded-md border-0 bg-transparent text-store-muted hover:bg-surface-green focus-visible:bg-surface-green"><X size={15} /></button>}
+                    </div>
                     <ExecutiveSelect
                         value={status}
                         onValueChange={changeStatus}
@@ -66,7 +77,7 @@ export default function EcommerceReviewsPage() {
                         ))}
                     </ExecutiveSelect>
                 </div>
-                {list.isLoading ? (
+                {list.isLoading || search.trim() !== keyword ? (
                     <ExecutiveArticleSkeleton kind="reviews" />
                 ) : list.isError ? (
                     <div className="p-5">
@@ -78,11 +89,8 @@ export default function EcommerceReviewsPage() {
                 ) : !list.data?.items.length ? (
                     <ExecutiveEmpty
                         icon={<MessageCircle />}
-                        title={tr('Chưa có đánh giá', 'No reviews')}
-                        description={tr(
-                            'Đánh giá sẽ xuất hiện khi khách gửi lên.',
-                            'Reviews appear when customers submit feedback.',
-                        )}
+                        title={keyword || status || stars ? tr('Không tìm thấy đánh giá phù hợp', 'No matching reviews') : tr('Chưa có đánh giá', 'No reviews')}
+                        description={keyword || status || stars ? tr('Thử đổi từ khóa hoặc bộ lọc.', 'Try another keyword or filter.') : tr('Đánh giá sẽ xuất hiện khi khách gửi lên.', 'Reviews appear when customers submit feedback.')}
                     />
                 ) : (
                     <div className="divide-y divide-[#edf1eb]">
@@ -156,7 +164,7 @@ export default function EcommerceReviewsPage() {
                         ))}
                     </div>
                 )}
-                {list.data && (
+                {list.data && search.trim() === keyword && (
                     <ExecutivePagination
                         page={page}
                         totalPages={list.data.totalPages}
