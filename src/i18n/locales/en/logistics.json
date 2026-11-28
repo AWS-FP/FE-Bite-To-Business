@@ -30,5 +30,16 @@
   "PENDING":"Pending", "REVIEWING":"Under review", "ADDED":"Added", "REJECTED":"Rejected",
   "Không giới hạn": "Unlimited",
   "Không giới hạn số lượng tối đa": "No maximum quantity",
-  "Chỉ bậc giá cuối cùng được phép không giới hạn.": "Only the final price tier may be unlimited."
+  "Chỉ bậc giá cuối cùng được phép không giới hạn.": "Only the final price tier may be unlimited.",
+  "Chọn sản phẩm cần chỉnh sửa": "Select a product to edit",
+  "Chỉnh sửa sản phẩm": "Edit product",
+  "Thay đổi chưa lưu": "Unsaved changes",
+  "Bạn có muốn rời biểu mẫu mà không lưu thay đổi?": "Leave the form without saving your changes?",
+  "Sản phẩm đã đăng bán: SKU, đơn vị, MOQ, VAT và giá chỉ được xem trong chế độ này.": "Published product: SKU, unit, MOQ, VAT and prices are read-only in this mode.",
+  "Đã cập nhật sản phẩm": "Product updated",
+  "Lưu thay đổi": "Save changes",
+  "Dữ liệu đã thay đổi hoặc đang được sử dụng. Vui lòng kiểm tra lại.": "The data has changed or is in use. Please check and try again.",
+  "Không thể cập nhật sản phẩm. Kiểm tra thông tin và thử lại.": "Could not update the product. Check the information and try again.",
+  "Bản nháp": "Draft",
+  "Đã đăng bán": "Published"
 }

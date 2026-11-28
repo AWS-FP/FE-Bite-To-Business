@@ -21,6 +21,7 @@ export default function StoreSearch() {
         changeMode,
         showAINotice,
         historyEntries,
+        historyPath,
         deleteSearch,
         confirmClear,
         clearHistoryOpen,
@@ -134,7 +135,7 @@ export default function StoreSearch() {
                                     className="flex items-center gap-2 rounded-xl hover:bg-store-cream"
                                 >
                                     <Link
-                                        to={getCatalogSearchPath(entry.keyword)}
+                                        to={historyPath(entry.keyword)}
                                         onClick={(event) =>
                                             void handleHistoryClick(event, entry.keyword)
                                         }

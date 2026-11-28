@@ -21,7 +21,10 @@
 .lg-workspace .language-switcher button{font:800 14px/21px var(--font-body)}
 .lg-workspace button{cursor:pointer}
 .lg-workspace button:disabled{opacity:.5;cursor:not-allowed}
-.lg-workspace button:focus-visible,.lg-workspace a:focus-visible,.lg-workspace input:focus-visible,.lg-workspace textarea:focus-visible,.lg-workspace select:focus-visible{outline:2px solid var(--color-store-ink);outline-offset:2px}
+:is(.lg-workspace,[data-workspace-dialog]) :is(button,a,input,textarea,select,summary,[role="button"],[role="tab"]):focus{outline:none;--tw-ring-shadow:0 0 #0000;--tw-ring-offset-shadow:0 0 #0000}
+:is(.lg-workspace,[data-workspace-dialog]) :is(button,a,summary,[role="button"],[role="tab"]):focus-visible{background-color:var(--color-store-cream);text-decoration:underline;text-underline-offset:3px}
+:is(.lg-workspace,[data-workspace-dialog]) :is(input,textarea,select):focus-visible{border-color:var(--color-store-green);background-color:var(--color-store-cream)}
+:is(.lg-workspace,[data-workspace-dialog]) input:is([type="checkbox"],[type="radio"]):focus-visible{outline:1px solid var(--color-store-green);outline-offset:2px}
 .lg-workspace h1,.lg-workspace h2,.lg-workspace p{margin:0}
 .lg-workspace h1{font-family:var(--font-heading);font-synthesis:none;font-weight: 700}
 .lg-workspace h2{font-family:var(--font-subheading);font-synthesis:none}

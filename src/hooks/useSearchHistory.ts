@@ -8,6 +8,17 @@ import {
 } from '@/services/searchHistoryService';
 import type { SearchHistoryResponse } from '@/types/searchHistory';
 
+const pendingMutations = new Map<string, Promise<SearchHistoryResponse[]>>();
+
+function enqueueHistoryMutation(key: string, operation: () => Promise<SearchHistoryResponse[]>) {
+    const pending = pendingMutations.get(key);
+    const next = (pending ? pending.catch(() => undefined) : Promise.resolve()).then(operation);
+    pendingMutations.set(key, next);
+    const clean = () => { if (pendingMutations.get(key) === next) pendingMutations.delete(key); };
+    void next.then(clean, clean);
+    return next;
+}
+
 const guestHistoryKey = 'bitetobusiness.search-history';
 export interface SearchHistoryEntry {
     id: string;
@@ -43,13 +54,15 @@ export default function useSearchHistory() {
     const [deleting, setDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState(false);
     const loadControllerRef = useRef<AbortController | null>(null);
-    const saveControllerRef = useRef<AbortController | null>(null);
+    const sessionKey = `${userId ?? "guest"}:${sessionVersion}`;
 
     useEffect(() => {
         const controller = new AbortController();
         loadControllerRef.current = controller;
         if (userId) {
-            getSearchHistory(controller.signal)
+            // A remounted header can reuse the result of a still-pending submitted search.
+            const pending = pendingMutations.get(sessionKey);
+            (pending ?? getSearchHistory(controller.signal))
                 .then((rows) => {
                     if (!controller.signal.aborted)
                         setAccountHistory({ userId, sessionVersion, rows, unavailable: false });
@@ -61,9 +74,9 @@ export default function useSearchHistory() {
         }
         return () => {
             controller.abort();
-            saveControllerRef.current?.abort();
+            // A submitted search must finish even if navigation unmounts the header.
         };
-    }, [userId, sessionVersion]);
+    }, [userId, sessionVersion, sessionKey]);
 
     const accountReady =
         accountHistory?.userId === userId && accountHistory?.sessionVersion === sessionVersion;
@@ -93,7 +106,7 @@ export default function useSearchHistory() {
             storeGuestKeywords(
                 [
                     keyword,
-                    ...guestHistory.filter(
+                    ...readGuestHistory().filter(
                         (value) => value.toLowerCase() !== keyword.toLowerCase(),
                     ),
                 ].slice(0, 5),
@@ -101,20 +114,19 @@ export default function useSearchHistory() {
             return true;
         }
         loadControllerRef.current?.abort();
-        saveControllerRef.current?.abort();
-        const controller = new AbortController();
-        saveControllerRef.current = controller;
         try {
-            const rows = await saveSearchHistory(keyword, controller.signal);
-            if (!controller.signal.aborted && isSameSession()) {
-                setAccountHistory({ userId, sessionVersion, rows, unavailable: false });
-            }
+            const rows = await enqueueHistoryMutation(sessionKey, () => {
+                if (!isSameSession()) return Promise.reject(new Error('Search history session changed'));
+                return saveSearchHistory(keyword);
+            });
+            if (isSameSession()) setAccountHistory({ userId, sessionVersion, rows, unavailable: false });
+            return isSameSession();
         } catch {
-            if (!controller.signal.aborted && isSameSession()) {
-                setAccountHistory({ userId, sessionVersion, rows: [], unavailable: true });
-            }
+            // A history write failure must not discard an already loaded history.
+            if (isSameSession()) setAccountHistory(current => current?.userId === userId && current.sessionVersion === sessionVersion
+                ? current : { userId, sessionVersion, rows: [], unavailable: true });
+            return false;
         }
-        return !controller.signal.aborted && isSameSession();
     }
     async function changeHistory(id?: string): Promise<boolean> {
         if (deleting) return false;
@@ -126,9 +138,11 @@ export default function useSearchHistory() {
             return true;
         }
         loadControllerRef.current?.abort();
-        saveControllerRef.current?.abort();
         try {
-            const rows = id ? await deleteSearchHistoryEntry(id) : await clearSearchHistory();
+            const rows = await enqueueHistoryMutation(sessionKey, () => {
+                if (!isSameSession()) return Promise.reject(new Error('Search history session changed'));
+                return id ? deleteSearchHistoryEntry(id) : clearSearchHistory();
+            });
             if (isSameSession()) {
                 setAccountHistory({ userId, sessionVersion, rows, unavailable: false });
             }

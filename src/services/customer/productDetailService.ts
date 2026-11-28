@@ -73,6 +73,10 @@ const pricingCache = new Map<
     { at: number; value?: CustomerProductPricing; pending?: Promise<CustomerProductPricing> }
 >();
 
+export function invalidateProductPricing(id: string) {
+    pricingCache.delete(id);
+}
+
 export function getCachedProductPricing(id: string) {
     const entry = pricingCache.get(id);
     return entry?.value && Date.now() - entry.at < PRICING_CACHE_MS ? entry.value : undefined;
@@ -86,11 +90,11 @@ export function loadProductPricing(id: string) {
     // Not abortable: several cards and revisits may share the same request.
     const request = requestPricing(id).then(
         (value) => {
-            pricingCache.set(id, { at: Date.now(), value });
+            if (pricingCache.get(id)?.pending === request) pricingCache.set(id, { at: Date.now(), value });
             return value;
         },
         (error: unknown) => {
-            pricingCache.delete(id);
+            if (pricingCache.get(id)?.pending === request) pricingCache.delete(id);
             throw error;
         },
     );
