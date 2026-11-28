@@ -1,8 +1,8 @@
 /*
- * Chỉ 3 font cho cả website (đủ dấu tiếng Việt, đọc tốt tiếng Anh):
- * - Be Vietnam Pro: mọi chữ (body, tiêu đề, label, chữ phụ).
- * - Inter: số và giá tiền (số đều độ rộng, "1" không lẫn với "l").
- * - Kavoon: chỉ cho logo "Bite to Business".
+ * Chỉ 3 font cho cả website:
+ * - Be Vietnam Pro: body, tiêu đề, label và chữ phụ.
+ * - Inter: số và giá tiền.
+ * - Kavoon: logo Bite to Business.
  */
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Inter:wght@400..900&family=Kavoon&display=swap');
 
@@ -10,7 +10,7 @@
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 
-/* A2UI injects a light/dark default theme when its first surface mounts. */
+/* A2UI theme */
 :root {
     color-scheme: light;
 }
@@ -23,7 +23,7 @@
 .a2ui-surface,
 .a2ui-page {
     color-scheme: light;
-    font-family: var(--font-body);
+    font-family: var(--font-body), sans-serif;
     --a2ui-color-primary: var(--color-store-green);
     --a2ui-color-on-primary: #ffffff;
     --a2ui-color-on-background: var(--color-store-ink);
@@ -35,24 +35,29 @@
 .a2ui-page-header {
     position: static;
 }
+
 .a2ui-page {
     --a2ui-column-gap: 2rem;
     --a2ui-row-gap: 1.25rem;
 }
+
 .a2ui-surface {
     --a2ui-column-gap: 1rem;
     --a2ui-row-gap: 0.75rem;
 }
+
 .a2ui-page h1,
 .a2ui-page h2,
 .a2ui-page h3 {
     overflow-wrap: anywhere;
 }
+
 .a2ui-surface button,
 .a2ui-page button {
     line-height: 1.5;
 }
 
+/* Scrollbar */
 html,
 body,
 * {
@@ -66,9 +71,23 @@ body::-webkit-scrollbar,
     display: none;
 }
 
-/* Màu và font xài cho cả trang web */
+/* Design tokens */
 @theme static {
-    /* Các tên cũ được giữ làm bí danh để không phải sửa hơn 500 chỗ đang dùng. */
+    --animate-cart-added: cart-added 240ms ease-out;
+
+    @keyframes cart-added {
+        from {
+            opacity: 0;
+            transform: translateY(3px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Typography */
     --font-body: 'Be Vietnam Pro', system-ui, sans-serif;
     --font-subtext: 'Be Vietnam Pro', system-ui, sans-serif;
     --font-heading: 'Be Vietnam Pro', system-ui, sans-serif;
@@ -78,16 +97,21 @@ body::-webkit-scrollbar,
     --font-price: 'Inter', system-ui, sans-serif;
     --font-brand: 'Kavoon', Georgia, serif;
     --font-mono: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+
+    /* Store colors */
     --color-store-green: #12372a;
     --color-store-dark: #0b241b;
     --color-store-yellow: #fce043;
     --color-store-cream: #fbf3e4;
     --color-store-ink: #14132b;
+
+    /* Authentication colors */
     --color-auth-green: #123b2e;
     --color-auth-ink: #17133a;
     --color-auth-cream: #fff1e0;
     --color-auth-muted: #787386;
 
+    /* Additional store colors */
     --color-store-coral: #ff5a4e;
     --color-store-pink: #ff9bd2;
     --color-store-mint: #d9eea3;
@@ -98,6 +122,7 @@ body::-webkit-scrollbar,
     --color-store-line: #d3dbd5;
     --color-store-line-strong: #73756e;
 
+    /* Surface colors */
     --color-surface-soft: #f8f7f3;
     --color-surface-muted: #f1eff8;
     --color-surface-green: #eaf3ec;
@@ -105,6 +130,7 @@ body::-webkit-scrollbar,
     --color-surface-pink: #fff0f4;
     --color-surface-blue: #e8eaff;
 
+    /* Semantic colors */
     --color-success: #15803d;
     --color-warning: #a16207;
     --color-warning-soft: #fff5db;
@@ -114,33 +140,34 @@ body::-webkit-scrollbar,
     --color-danger-line: #f5c2bc;
     --color-info: #1e2699;
 
+    /* Role colors */
     --color-role-delivery: #2563eb;
     --color-role-ecommerce: #9333ea;
     --color-role-logistics: #0f766e;
     --color-status-active: #22c55e;
 }
 
+/* Custom Tailwind utilities */
 @utility brand-name {
-    font-family: var(--font-brand);
+    font-family: var(--font-brand), serif;
     font-weight: 400;
     font-style: normal;
     font-synthesis: none;
 }
 
 @utility font-heading {
-    font-family: var(--font-heading);
-    /* Prata cũ đậm sẵn ở 400; Be Vietnam Pro cần 700 để tiêu đề không bị mảnh. */
+    font-family: var(--font-heading), sans-serif;
     font-weight: 700;
     font-style: normal;
     font-synthesis: none;
 }
 
-/* Giá tiền dùng chữ số có cùng độ rộng để dễ nhìn */
 @utility font-price {
-    font-family: var(--font-price);
+    font-family: var(--font-price), sans-serif;
     font-variant-numeric: lining-nums tabular-nums;
 }
 
+/* Base styles */
 @layer base {
     * {
         box-sizing: border-box;
@@ -148,12 +175,12 @@ body::-webkit-scrollbar,
 
     body {
         margin: 0;
-        font-family: var(--font-body);
+        font-family: var(--font-body), sans-serif;
         -webkit-font-smoothing: antialiased;
     }
 
     h1 {
-        font-family: var(--font-heading);
+        font-family: var(--font-heading), sans-serif;
         font-weight: 700;
         font-synthesis: none;
     }
@@ -161,16 +188,16 @@ body::-webkit-scrollbar,
     h2,
     h3,
     h4 {
-        font-family: var(--font-subheading);
+        font-family: var(--font-subheading), sans-serif;
     }
 
     label,
     legend {
-        font-family: var(--font-label);
+        font-family: var(--font-label), sans-serif;
     }
 
     small {
-        font-family: var(--font-subtext);
+        font-family: var(--font-subtext), sans-serif;
     }
 
     button,
@@ -180,25 +207,24 @@ body::-webkit-scrollbar,
         font: inherit;
     }
 
-    /* Mọi phần tử bấm được hiện con trỏ tay; nút bị vô hiệu hiện not-allowed. */
+    /* Interactive elements */
     button,
     [role='button'],
     [role='tab'],
     summary,
     label[for],
     select,
-    input:is(
-        [type='button'],
-        [type='submit'],
-        [type='reset'],
-        [type='checkbox'],
-        [type='radio'],
-        [type='file']
-    ),
+    input[type='button'],
+    input[type='submit'],
+    input[type='reset'],
+    input[type='checkbox'],
+    input[type='radio'],
+    input[type='file'],
     a[href] {
         cursor: pointer;
     }
 
+    /* Disabled elements */
     button:disabled,
     [role='button'][aria-disabled='true'],
     input:disabled,
@@ -207,68 +233,84 @@ body::-webkit-scrollbar,
     }
 
     /*
-     * Hover dự phòng cho nút chưa có kiểu hover riêng (không có class `hover:` nào),
-     * để không nút nào đứng yên khi rê chuột. Nút đã có hover riêng giữ nguyên thiết kế.
+     * Hover dự phòng cho button chưa có hover riêng.
+     * Không ghi đè hover của component.
      */
     :is(button, [role='button']):not(:disabled):not([aria-disabled='true']):not([class*='hover:']) {
         transition: filter 150ms ease;
     }
 
-    :is(button, [role='button']):not(:disabled):not([aria-disabled='true']):not(
-            [class*='hover:']
-        ):hover {
+    :is(button, [role='button']):not(:disabled):not([aria-disabled='true']):not([class*='hover:']):hover {
         filter: brightness(0.93);
     }
 }
 
-/* Kiểu focus dùng chung cho chuột và bàn phím. */
-:root
-    body
-    :is(
-        a[href],
-        button,
-        input,
-        select,
-        textarea,
-        summary,
-        [role='button'],
-        [role='tab'],
-        [role='combobox'],
-        :where([tabindex]:not([tabindex='-1']))
-    ):focus {
-    border-width: 2px;
-    border-style: solid;
-    border-color: currentColor;
+/*
+ * Focus management
+ *
+ * Không thay đổi border-width khi focus.
+ * Không tạo viền đen quanh label hoặc container.
+ * Giữ border mặc định của component.
+ */
+
+/* Mouse focus */
+:root body a[href]:focus:not(:focus-visible),
+:root body button:focus:not(:focus-visible),
+:root body input:focus:not(:focus-visible),
+:root body select:focus:not(:focus-visible),
+:root body textarea:focus:not(:focus-visible),
+:root body summary:focus:not(:focus-visible),
+:root body [role='button']:focus:not(:focus-visible),
+:root body [role='tab']:focus:not(:focus-visible),
+:root body [role='combobox']:focus:not(:focus-visible),
+:root body [tabindex]:focus:not(:focus-visible) {
     outline: none;
     box-shadow: none;
 }
 
-:root
-    body
-    :is(
-        .focus-border-group,
-        .staff-control,
-        label:has(> input:is([type='radio'], [type='checkbox']))
-    ):focus-within {
-    border-width: 2px;
-    border-style: solid;
-    border-color: currentColor;
-    outline: none;
+/*
+ * Keyboard focus
+ * Viền mỏng, không ảnh hưởng kích thước hoặc layout.
+ */
+:root body a[href]:focus-visible,
+:root body button:focus-visible,
+:root body summary:focus-visible,
+:root body [role='button']:focus-visible,
+:root body [role='tab']:focus-visible,
+:root body [role='combobox']:focus-visible,
+:root body [tabindex]:focus-visible {
+    outline: 1px solid var(--color-store-sage);
+    outline-offset: 2px;
     box-shadow: none;
 }
 
-:root body :is(.focus-border-group, .staff-control) :is(input, select, textarea):focus {
-    border: 0;
-    outline: none;
+/* Form controls */
+:root body input:focus-visible,
+:root body select:focus-visible,
+:root body textarea:focus-visible {
+    border-color: var(--color-store-sage);
+    outline: 1px solid var(--color-store-sage);
+    outline-offset: 0;
     box-shadow: none;
 }
 
-:root body :is(input, select, textarea)[aria-invalid='true']:focus {
+/* Checkbox and radio keyboard focus */
+:root body input[type='checkbox']:focus-visible,
+:root body input[type='radio']:focus-visible {
+    outline: 1px solid var(--color-store-sage);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+/* Invalid form controls */
+:root body input[aria-invalid='true']:focus,
+:root body select[aria-invalid='true']:focus,
+:root body textarea[aria-invalid='true']:focus {
     border-color: var(--color-danger);
 }
 
-:root body .about-business-trigger:focus {
-    border: 0;
-    outline: none;
-    box-shadow: none;
+:root body input[aria-invalid='true']:focus-visible,
+:root body select[aria-invalid='true']:focus-visible,
+:root body textarea[aria-invalid='true']:focus-visible {
+    outline-color: var(--color-danger);
 }

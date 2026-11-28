@@ -1,8 +1,10 @@
-import { CheckCircle2, Minus, Plus, ShoppingCart, Truck } from 'lucide-react';
+import { Minus, Plus, ShoppingCart, Truck } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
-import { useCartStore } from '@/store/customer/cartStore';
+import { checkCartStock, useCartStore } from '@/store/customer/cartStore';
+import { useCartFeedback } from '@/hooks/customer/useCartFeedback';
+import CartPurchaseFeedback from '../CartPurchaseFeedback';
 import { useStorefrontPurchaseAccess } from '@/hooks/customer/useStorefrontPurchaseAccess';
 import type {
     CustomerProductDetail,
@@ -26,7 +28,8 @@ export default function CustomerProductPurchase({ product, pricing, name, spec }
     const [quantity, setQuantity] = useState(() =>
         Math.max(1, Number(pricing?.minOrderQuantity ?? product.minOrderQuantity) || 1),
     );
-    const [added, setAdded] = useState(false);
+    const { feedback, showFeedback, clearFeedback } = useCartFeedback();
+    const added = feedback !== null && !feedback.limit;
 
     const min = Math.max(1, Number(pricing?.minOrderQuantity ?? product.minOrderQuantity) || 1);
     const step = Math.max(0.001, Number(pricing?.quantityStep ?? product.quantityStep) || 1);
@@ -55,12 +58,18 @@ export default function CustomerProductPurchase({ product, pricing, name, spec }
         salePrice != null && listPrice != null ? Math.round((1 - salePrice / listPrice) * 100) : 0;
     const stockOk = pricing?.inventoryAvailable === true && availableQuantity >= min;
     const canAdd =
-        purchaseAllowed && priceAvailable && unitPrice != null && stockOk && selectedQuantity <= availableQuantity;
+        purchaseAllowed && priceAvailable && unitPrice != null && stockOk;
+    const rules = { id: product.id, minOrderQuantity: min, quantityStep: step, maxQuantity: availableQuantity };
 
     const setValidQuantity = (requested: number) => {
-        setAdded(false);
         const steps = Math.max(0, Math.round((requested - min) / step));
-        setQuantity(Number((min + steps * step).toFixed(3)));
+        const next = Number((min + steps * step).toFixed(3));
+        if (next > selectedQuantity && stockOk) {
+            const limit = checkCartStock(rules, next);
+            if (limit) { showFeedback(limit); return; }
+        }
+        clearFeedback();
+        setQuantity(next);
     };
     const goToTier = (tierMinimum: number) => {
         const steps = Math.max(0, Math.ceil((tierMinimum - min) / step));
@@ -68,9 +77,9 @@ export default function CustomerProductPurchase({ product, pricing, name, spec }
     };
     const submit = () => {
         if (!canAdd || unitPrice == null) return;
-        addItem(
+        const limit = addItem(
             {
-                id: product.id,
+                ...rules,
                 name,
                 nameVi: product.nameVi,
                 nameEn: product.nameEn,
@@ -79,13 +88,10 @@ export default function CustomerProductPurchase({ product, pricing, name, spec }
                 specEn: product.packageSpecEn,
                 unitPrice,
                 imageUrl: product.imageUrl ?? undefined,
-                minOrderQuantity: min,
-                quantityStep: step,
-                maxQuantity: availableQuantity,
             },
             selectedQuantity,
         );
-        setAdded(true);
+        showFeedback(limit);
     };
 
     return (
@@ -201,7 +207,7 @@ export default function CustomerProductPurchase({ product, pricing, name, spec }
                                 type="button"
                                 aria-label={tr('increase')}
                                 onClick={() => setValidQuantity(selectedQuantity + step)}
-                                disabled={!stockOk || selectedQuantity + step > availableQuantity}
+                                disabled={!stockOk}
                                 className="grid h-8 w-8 place-items-center border-0 bg-transparent text-[#1b4e36] hover:bg-[#edf5ea] disabled:opacity-40"
                             >
                                 <Plus size={14} />
@@ -233,14 +239,7 @@ export default function CustomerProductPurchase({ product, pricing, name, spec }
                     <ShoppingCart size={17} />
                     {!purchaseAllowed ? t('customerUI.comboPreviewOnly') : added ? tr('added') : canAdd ? tr('addToOrder') : tr('unavailableToOrder')}
                 </button>
-                {added && (
-                    <p
-                        role="status"
-                        className="m-0 flex items-center gap-2 text-xs font-bold text-[#21704c]"
-                    >
-                        <CheckCircle2 size={15} /> {tr('added')}
-                    </p>
-                )}
+                <CartPurchaseFeedback feedback={feedback} unit={product.unitCode} />
                 <div className="flex items-center gap-1.5 border-t border-[#e2ebe0] pt-1.5 text-[10px] font-medium text-[#407056]">
                     <Truck size={14} aria-hidden="true" /> {tr('delivery')}
                 </div>

@@ -58,6 +58,27 @@ type Lang = TranslationLanguage;
 // Nhãn "Quy cách bán" trong chuỗi technical_content; trang sản phẩm tách chuỗi này thành một dòng của bảng.
 const SELLING_SPEC_LABEL: Record<Lang, string> = { vi: 'Quy cách bán', en: 'Selling spec' };
 
+// Kiểm tra số thập phân theo @Digits(integer, fraction) của BE. Number() có thể trả dạng 1e-7 nên đọc chuỗi staff nhập.
+function fitsDigits(raw: string | undefined, integer: number, fraction: number): boolean {
+    const value = (raw ?? '').trim();
+    const match = /^(\d+)(?:\.(\d*))?$/.exec(value);
+    if (!match) return false;
+    const whole = match[1].replace(/^0+(?=\d)/, '');
+    return whole.length <= integer && (match[2] ?? '').length <= fraction;
+}
+
+// Thể tích lưu bằng cm³ (V67, cột volume_cm3 NUMERIC(14, 2)); làm tròn 2 số lẻ thay vì bắt staff tự cắt số.
+function roundVolume(raw: string | undefined): number {
+    const value = Number((raw ?? '').trim());
+    return Number.isFinite(value) ? Math.round(value * 100) / 100 : 0;
+}
+
+// Thể tích (cm³) gợi ý từ kích thước D × R × C (cm).
+function volumeFromDimensions(length?: string, width?: string, height?: string): string {
+    const cm3 = Math.round(Number(length) * Number(width) * Number(height) * 100) / 100;
+    return Number.isFinite(cm3) && cm3 > 0 ? String(cm3) : '';
+}
+
 // Ô văn bản tự do tối đa 150 chữ (đếm theo khoảng trắng) để đoạn hiển thị không phá bố cục.
 const MAX_TEXT_WORDS = 150;
 const FREE_TEXT_FIELDS: Record<number, string[]> = {
@@ -74,12 +95,12 @@ function requiredLabel(text: string): ReactNode {
     return parts.flatMap((part, i) =>
         i < parts.length - 1
             ? [
-                  part,
-                  <span key={i} className="text-red-600">
+                part,
+                <span key={i} className="text-red-600">
                       {' '}
-                      *
+                    *
                   </span>,
-              ]
+            ]
             : [part],
     );
 }
@@ -322,6 +343,17 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             }
             if (!Number.isFinite(Number(values.tareWeight)) || Number(values.tareWeight) < 0)
                 return tr('Khối lượng bao bì không được âm.');
+            // Cùng giới hạn @Digits của CreateWarehouseProductRequest để báo lỗi ngay trên form, không đợi BE trả 400.
+            // Thể tích (cm³) được tự làm tròn 2 số lẻ khi gửi; chỉ báo lỗi khi làm tròn còn 0 hoặc quá lớn.
+            const volume = roundVolume(values.volume);
+            if (volume <= 0 || volume >= 1_000_000_000_000)
+                return tr('Thể tích tính bằng cm³ và phải lớn hơn 0. Ví dụ chai 500ml khoảng 500 cm³.');
+            if (!fitsDigits(values.netWeight, 9, 3) || !fitsDigits(values.tareWeight, 9, 3))
+                return tr('Khối lượng tính bằng kg, tối đa 3 chữ số thập phân.');
+            if (['length', 'width', 'height'].some((key) => !fitsDigits(values[key], 8, 2)))
+                return tr('Kích thước tính bằng cm, tối đa 2 chữ số thập phân.');
+            if (!fitsDigits(values.minOrder, 9, 3))
+                return tr('Số lượng đặt tối thiểu tối đa 3 chữ số thập phân.');
             if (
                 !Number.isFinite(Number(values.vat)) ||
                 Number(values.vat) < 0 ||
@@ -427,7 +459,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             specEn: values.specEn || null,
             netWeight: optionalNumber('netWeight'),
             tareWeight: optionalNumber('tareWeight'),
-            volume: optionalNumber('volume'),
+            volume: values.volume?.trim() ? roundVolume(values.volume) : null,
             length: optionalNumber('length'),
             width: optionalNumber('width'),
             height: optionalNumber('height'),
@@ -631,8 +663,24 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             className={cellInputClass}
         />
     );
+    // Ví dụ "Quy cách bán" theo đơn vị bán đang chọn, để staff thấy đây là cách đóng thùng/lốc khi bán sỉ.
+    const sellingSpecExamples: Record<string, { vi: string; en: string }> = {
+        KG: { vi: 'Thùng 10 kg', en: 'Case of 10 kg' },
+        BOTTLE: { vi: 'Thùng 12 chai', en: 'Case of 12 bottles' },
+        PIECE: { vi: 'Hộp 20 cái', en: 'Box of 20 pieces' },
+        PACK: { vi: 'Thùng 30 gói', en: 'Case of 30 packs' },
+        TRAY: { vi: 'Thùng 10 khay', en: 'Case of 10 trays' },
+        BOX: { vi: 'Thùng 12 hộp', en: 'Case of 12 boxes' },
+        BAG: { vi: 'Bao 10 túi', en: 'Sack of 10 bags' },
+        CAN: { vi: 'Thùng 24 lon', en: 'Case of 24 cans' },
+        TIN: { vi: 'Thùng 12 hộp thiếc', en: 'Case of 12 tins' },
+        TUB: { vi: 'Thùng 6 hộp nhựa', en: 'Case of 6 tubs' },
+        CASE: { vi: 'Bán nguyên thùng, không tách lẻ', en: 'Sold by the case only' },
+    };
+    const sellingSpecExample = sellingSpecExamples[values.unit || ''] ?? sellingSpecExamples.CAN;
+    const suggestedVolume = volumeFromDimensions(values.length, values.width, values.height);
     // 7 thông số kỹ thuật cố định; nhãn theo ngôn ngữ staff đang chọn ở language switcher.
-    const specRows: { label: string; input: ReactNode }[] = [
+    const specRows: { label: string; hint?: string; hintId?: string; input: ReactNode }[] = [
         {
             label: tr('Đơn vị bán'),
             input: (
@@ -657,10 +705,18 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         },
         {
             label: tr('Quy cách bán'),
+            hintId: 'spec-hint-sellingSpec',
+            hint: tr(
+                'Cách đóng nhiều đơn vị thành thùng hoặc lốc khi bán sỉ và giao hàng. Nếu chỉ bán lẻ, ghi "Bán lẻ từng đơn vị".',
+            ),
             input: (
-                <div className="grid grid-cols-2 gap-2">
-                    {field('sellingSpecVi', tr('Tiếng Việt'), { placeholder: tr('Ví dụ: Thùng 24 lon') })}
-                    {field('sellingSpecEn', tr('Tiếng Anh'), { placeholder: tr('Ví dụ: Thùng 24 lon') })}
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {field('sellingSpecVi', tr('Tiếng Việt'), {
+                        placeholder: `${tr('Ví dụ:')} ${sellingSpecExample.vi}`,
+                    })}
+                    {field('sellingSpecEn', tr('Tiếng Anh'), {
+                        placeholder: `${tr('Ví dụ:')} ${sellingSpecExample.en}`,
+                    })}
                 </div>
             ),
         },
@@ -682,7 +738,26 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 </div>
             ),
         },
-        { label: tr('Thể tích (m³)'), input: numberCell('volume', tr('Thể tích (m³)')) },
+        {
+            label: tr('Thể tích (cm³)'),
+            hintId: 'spec-hint-volume',
+            hint: tr('Đơn vị cm³ (1 ml = 1 cm³). Nhập xong kích thước thì bấm "Tính từ kích thước".'),
+            input: (
+                <div className="flex gap-2">
+                    {numberCell('volume', tr('Thể tích (cm³)'), tr('Ví dụ: 500'))}
+                    <button
+                        type="button"
+                        disabled={!suggestedVolume}
+                        onClick={() =>
+                            setValues((current) => ({ ...current, volume: suggestedVolume }))
+                        }
+                        className="shrink-0 rounded border border-black/40 px-3 py-2 text-xs font-semibold disabled:opacity-40"
+                    >
+                        {tr('Tính từ kích thước')}
+                    </button>
+                </div>
+            ),
+        },
     ];
 
     return (
@@ -922,36 +997,44 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     <div className="overflow-hidden rounded border border-black/40">
                                         <table className="w-full table-fixed border-collapse text-sm">
                                             <thead className="bg-store-cream">
-                                                <tr>
-                                                    <th
-                                                        scope="col"
-                                                        className="w-[38%] px-3 py-2 text-left font-semibold"
-                                                    >
-                                                        {tr('Thông số')}
-                                                    </th>
-                                                    <th
-                                                        scope="col"
-                                                        className="px-3 py-2 text-left font-semibold"
-                                                    >
-                                                        {tr('Giá trị')}
-                                                    </th>
-                                                </tr>
+                                            <tr>
+                                                <th
+                                                    scope="col"
+                                                    className="w-[38%] px-3 py-2 text-left font-semibold"
+                                                >
+                                                    {tr('Thông số')}
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    className="px-3 py-2 text-left font-semibold"
+                                                >
+                                                    {tr('Giá trị')}
+                                                </th>
+                                            </tr>
                                             </thead>
                                             <tbody>
-                                                {specRows.map((row) => (
-                                                    <tr
-                                                        key={row.label}
-                                                        className="border-t border-black/10"
+                                            {specRows.map((row) => (
+                                                <tr
+                                                    key={row.label}
+                                                    className="border-t border-black/10"
+                                                >
+                                                    <th
+                                                        scope="row"
+                                                        className="px-3 py-2 text-left align-middle font-medium"
                                                     >
-                                                        <th
-                                                            scope="row"
-                                                            className="px-3 py-2 text-left align-middle font-medium"
-                                                        >
-                                                            {row.label}
-                                                        </th>
-                                                        <td className="px-2 py-2">{row.input}</td>
-                                                    </tr>
-                                                ))}
+                                                        {row.label}
+                                                        {row.hint && (
+                                                            <span
+                                                                id={row.hintId}
+                                                                className="mt-1 block text-xs font-normal leading-5 text-black/60"
+                                                            >
+                                                                    {row.hint}
+                                                                </span>
+                                                        )}
+                                                    </th>
+                                                    <td className="px-2 py-2">{row.input}</td>
+                                                </tr>
+                                            ))}
                                             </tbody>
                                         </table>
                                     </div>
@@ -1120,9 +1203,9 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                                             tiers.map((item, i) =>
                                                                 i === index
                                                                     ? {
-                                                                          ...item,
-                                                                          [key]: e.target.value,
-                                                                      }
+                                                                        ...item,
+                                                                        [key]: e.target.value,
+                                                                    }
                                                                     : item,
                                                             ),
                                                         )
@@ -1133,14 +1216,14 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                         ))}
                                         <div className="mb-1.5">
                                             <LogisticsRemoveButton label={`${tr('Xóa')} ${index + 1}`}
-                                                onClick={() => setTiers(tiers.filter((_, i) => i !== index))} />
+                                                                   onClick={() => setTiers(tiers.filter((_, i) => i !== index))} />
                                         </div>
                                         {index === tiers.length - 1 && (
                                             <label className="col-span-full flex items-center gap-2 text-sm font-medium">
                                                 <input type="checkbox" checked={tier.unlimited}
-                                                    className="size-4 accent-store-green"
-                                                    onChange={(e) => setTiers(tiers.map((item, i) =>
-                                                        i === index ? { ...item, unlimited: e.target.checked } : item))} />
+                                                       className="size-4 accent-store-green"
+                                                       onChange={(e) => setTiers(tiers.map((item, i) =>
+                                                           i === index ? { ...item, unlimited: e.target.checked } : item))} />
                                                 {tr('Không giới hạn số lượng tối đa')}
                                             </label>
                                         )}
@@ -1252,12 +1335,12 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             )}
             {cropSource && (
                 <PromotionImageCropper src={cropSource.url} originalName={cropSource.name} kind="product"
-                    onCancel={() => setCropSource(null)}
-                    onApply={(file) => {
-                        setImage(file);
-                        setImagePreview(URL.createObjectURL(file));
-                        setCropSource(null);
-                    }} />
+                                       onCancel={() => setCropSource(null)}
+                                       onApply={(file) => {
+                                           setImage(file);
+                                           setImagePreview(URL.createObjectURL(file));
+                                           setCropSource(null);
+                                       }} />
             )}
         </div>
     );

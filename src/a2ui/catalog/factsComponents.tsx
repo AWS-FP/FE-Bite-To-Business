@@ -19,7 +19,7 @@ const SECTION_LABEL: Record<Section, { label: string; icon: typeof Info }> = {
     storage: { label: 'Bảo quản & sơ chế', icon: Snowflake },
     origin: { label: 'Xuất xứ & nguồn gốc', icon: Globe2 },
     nutrition: { label: 'Thông tin dinh dưỡng', icon: Leaf },
-    technical: { label: 'Thông số', icon: Ruler },
+    technical: { label: 'Cách nhận diện sản phẩm', icon: Ruler },
     compliance: { label: 'An toàn thực phẩm & hóa đơn', icon: FileCheck2 },
     description: { label: 'Mô tả', icon: Info },
 };

@@ -42,7 +42,7 @@ const emptyForm = {
     cloudinaryPublicId: '',
     netWeightKg: '',
     tareWeightKg: '',
-    volumeM3: '',
+    volumeCm3: '',
     lengthCm: '',
     widthCm: '',
     heightCm: '',
@@ -137,7 +137,7 @@ export default function EcommerceCombosPage() {
                 cloudinaryPublicId: combo.cloudinaryPublicId ?? '',
                 netWeightKg: combo.details?.netWeightKg == null ? '' : String(combo.details.netWeightKg),
                 tareWeightKg: combo.details?.tareWeightKg == null ? '' : String(combo.details.tareWeightKg),
-                volumeM3: combo.details?.volumeM3 == null ? '' : String(combo.details.volumeM3),
+                volumeCm3: combo.details?.volumeCm3 == null ? '' : String(combo.details.volumeCm3),
                 lengthCm: combo.details?.lengthCm == null ? '' : String(combo.details.lengthCm),
                 widthCm: combo.details?.widthCm == null ? '' : String(combo.details.widthCm),
                 heightCm: combo.details?.heightCm == null ? '' : String(combo.details.heightCm),
@@ -298,7 +298,7 @@ export default function EcommerceCombosPage() {
             details: {
                 netWeightKg: form.netWeightKg.trim() === '' ? null : Number(form.netWeightKg),
                 tareWeightKg: form.tareWeightKg.trim() === '' ? null : Number(form.tareWeightKg),
-                volumeM3: form.volumeM3.trim() === '' ? null : Number(form.volumeM3),
+                volumeCm3: form.volumeCm3.trim() === '' ? null : Number(form.volumeCm3),
                 lengthCm: form.lengthCm.trim() === '' ? null : Number(form.lengthCm),
                 widthCm: form.widthCm.trim() === '' ? null : Number(form.widthCm),
                 heightCm: form.heightCm.trim() === '' ? null : Number(form.heightCm),
@@ -488,7 +488,7 @@ export default function EcommerceCombosPage() {
                                             ['lengthCm', 'Chiều dài (cm)', 'Length (cm)', '0.01', '0.01', '99999999.99'],
                                             ['widthCm', 'Chiều rộng (cm)', 'Width (cm)', '0.01', '0.01', '99999999.99'],
                                             ['heightCm', 'Chiều cao (cm)', 'Height (cm)', '0.01', '0.01', '99999999.99'],
-                                            ['volumeM3', 'Thể tích (m³)', 'Volume (m³)', '0.000001', '0.000001', '999999.999999'],
+                                            ['volumeCm3', 'Thể tích (cm³)', 'Volume (cm³)', '0.01', '0.01', '999999999999.99'],
                                         ] as const).map(([key, vi, en, min, step, max]) => (
                                             <label key={key} className="text-xs font-bold">
                                                 {tr(vi, en)}
