@@ -1,3 +1,5 @@
+import ExecutiveListSearch from '@/components/e-commerce/ExecutiveListSearch';
+import { useExecutiveListSearch } from '@/hooks/e-commerce/useExecutiveListSearch';
 import { useExecutiveConfirmation } from '@/hooks/e-commerce/useExecutiveConfirmation';
 import { ExecutiveTableSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { useState } from 'react';
@@ -32,8 +34,8 @@ export default function EcommerceCouponsPage() {
     const confirm = useExecutiveConfirmation();
     const tr = useExecutiveText(),
         qc = useQueryClient();
-    const [page, setPage] = useState(0),
-        [open, setOpen] = useState(false),
+    const { search, setSearch, keyword, page, setPage, pending } = useExecutiveListSearch();
+    const [open, setOpen] = useState(false),
         [editId, setEditId] = useState<string | null>(null),
         [code, setCode] = useState(''),
         [discountType, setDiscountType] = useState('PERCENTAGE'),
@@ -51,8 +53,9 @@ export default function EcommerceCouponsPage() {
         [feedback, setFeedback] = useState(''),
         [failed, setFailed] = useState(false);
     const list = useQuery({
-        queryKey: ['ecom', 'coupons', page],
-        queryFn: () => executiveApi.coupons(page, 20),
+        queryKey: ['ecom', 'coupons', keyword, page],
+        enabled: !pending,
+        queryFn: ({ signal }) => executiveApi.coupons(page, 20, keyword || undefined, signal),
     });
     function reset() {
         setOpen(false);
@@ -424,9 +427,14 @@ export default function EcommerceCouponsPage() {
             )}
             <ExecutivePanel
                 title={tr('Danh sách coupon', 'Coupon inventory')}
-                caption={list.data ? `${list.data.total} coupon` : ''}
+                caption={!pending && list.data ? `${list.data.total} ${tr('coupon', 'coupons')}` : ''}
             >
-                {list.isLoading ? (
+                <div className="flex gap-3 p-5">
+                    <ExecutiveListSearch value={search} onChange={setSearch}
+                        label={tr('Tìm mã giảm giá', 'Search coupons')}
+                        placeholder={tr('Tìm theo mã hoặc tên coupon (VI/EN)...', 'Search coupon code or name (VI/EN)...')} />
+                </div>
+                {pending || list.isLoading ? (
                     <ExecutiveTableSkeleton cells={["text", "text", "text", "double", "text", "badge", "actions"]} count={5} tableClass="w-full min-w-[940px] text-left text-sm" cellClass={executiveUi.td} />
                 ) : list.isError ? (
                     <div className="p-5">
@@ -438,8 +446,8 @@ export default function EcommerceCouponsPage() {
                 ) : !list.data?.items.length ? (
                     <ExecutiveEmpty
                         icon={<TicketPercent />}
-                        title={tr('Chưa có coupon', 'No coupons yet')}
-                        description={tr('Tạo coupon mới để bắt đầu.', 'Create your first coupon.')}
+                        title={keyword ? tr('Không tìm thấy coupon phù hợp', 'No matching coupons') : tr('Chưa có coupon', 'No coupons yet')}
+                        description={keyword ? tr('Thử từ khóa khác.', 'Try another keyword.') : tr('Tạo coupon mới để bắt đầu.', 'Create your first coupon.')}
                     />
                 ) : (
                     <div className="overflow-x-auto">
@@ -466,6 +474,7 @@ export default function EcommerceCouponsPage() {
                                     <tr key={c.id}>
                                         <td className={`${executiveUi.td} font-mono font-bold`}>
                                             {c.code}
+                                            {(c.nameVi || c.nameEn) && <span className="mt-1 block font-body text-xs font-normal text-store-muted">{tr(c.nameVi || c.nameEn || '', c.nameEn || c.nameVi || '')}</span>}
                                         </td>
                                         <td className={executiveUi.td}>
                                             {c.discountType === 'PERCENTAGE'
@@ -525,7 +534,7 @@ export default function EcommerceCouponsPage() {
                         </table>
                     </div>
                 )}
-                {list.data && (
+                {!pending && list.data && (
                     <ExecutivePagination
                         page={page}
                         totalPages={list.data.totalPages}

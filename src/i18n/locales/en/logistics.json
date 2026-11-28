@@ -33,6 +33,7 @@
   "Chỉ bậc giá cuối cùng được phép không giới hạn.": "Only the final price tier may be unlimited.",
   "Chọn sản phẩm cần chỉnh sửa": "Select a product to edit",
   "Chỉnh sửa sản phẩm": "Edit product",
+  "Sản phẩm sẽ giữ nguyên trạng thái hiện tại.": "The product will keep its current publication status.",
   "Thay đổi chưa lưu": "Unsaved changes",
   "Bạn có muốn rời biểu mẫu mà không lưu thay đổi?": "Leave the form without saving your changes?",
   "Sản phẩm đã đăng bán: SKU, đơn vị, MOQ, VAT và giá chỉ được xem trong chế độ này.": "Published product: SKU, unit, MOQ, VAT and prices are read-only in this mode.",

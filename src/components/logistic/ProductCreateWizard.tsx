@@ -1317,7 +1317,21 @@ export default function ProductCreateWizard({ request, product, onEdit, onCreate
                         )}
                         {step === 3 && (
                             <div className="mt-5 space-y-4 text-sm">
-                                <div className="rounded-lg bg-store-cream p-4">
+                                <div className="rounded-lg border border-store-line bg-white p-4 sm:flex sm:items-start sm:gap-5">
+                                    <div className="mb-4 w-full shrink-0 sm:mb-0 sm:w-36">
+                                        <p className="mb-2 text-xs font-semibold text-store-muted">{tr('Ảnh sản phẩm')}</p>
+                                        <div className="grid aspect-square w-full place-items-center overflow-hidden rounded-lg border border-store-line bg-store-cream">
+                                            {imagePreview ? (
+                                                <img src={imagePreview} alt={tr('Ảnh sản phẩm')} className="h-full w-full object-contain" />
+                                            ) : (
+                                                <div className="flex flex-col items-center gap-2 p-3 text-center text-xs text-store-muted">
+                                                    <ImagePlus size={24} aria-hidden="true" />
+                                                    {tr('Chưa có ảnh sản phẩm')}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="min-w-0 flex-1 break-words">
                                     <p className="font-semibold">{tr('Thông tin cơ bản')}</p>
                                     <p className="mt-2">
                                         {values.nameVi || tr('Chưa nhập tên')} ·{' '}
@@ -1330,6 +1344,7 @@ export default function ProductCreateWizard({ request, product, onEdit, onCreate
                                         {brands.find((brand) => brand.id === values.brand)?.name ||
                                             tr('Chưa chọn')}
                                     </p>
+                                    </div>
                                 </div>
                                 <div className="rounded-lg bg-store-cream p-4">
                                     <p className="font-semibold">{tr('Chi tiết sản phẩm')}</p>
@@ -1371,7 +1386,7 @@ export default function ProductCreateWizard({ request, product, onEdit, onCreate
                                 </div>
                                 <p className="rounded-lg border border-store-line p-4 text-store-muted">
                                     {tr(
-                                        'Sản phẩm sẽ được tạo ở trạng thái nháp và chưa đăng bán.',
+                                        editing ? 'Sản phẩm sẽ giữ nguyên trạng thái hiện tại.' : 'Sản phẩm sẽ được tạo ở trạng thái nháp và chưa đăng bán.',
                                     ) + ' '}
                                 </p>
                             </div>

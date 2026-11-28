@@ -55,6 +55,7 @@ function ProductDrawer({
     const [vatInput, setVatInput] = useState<string | null>(null);
     const [feedback, setFeedback] = useState('');
     const [failed, setFailed] = useState(false);
+    const currentVat = vat.data?.vatRate ?? product.vatRate;
     const tiers = editing?.tiers ?? pricing.data?.priceTiers ?? [];
     const makeDraft = (): PricingWrite => ({
         listPrice: pricing.data?.listPrice ?? 0,
@@ -157,24 +158,24 @@ function ProductDrawer({
                 role="dialog"
                 aria-modal="true"
                 aria-label={tr('Chi tiết quản trị sản phẩm', 'Product management details')}
-                className="flex h-dvh w-full max-w-[650px] flex-col bg-[#faf7ec] shadow-2xl"
+                className="flex h-dvh w-full max-w-[680px] flex-col bg-store-cream shadow-2xl"
             >
-                <div className="flex items-start justify-between gap-4 border-b bg-white px-6 py-5">
-                    <div className="flex items-center gap-4">
+                <div className="flex items-start justify-between gap-4 border-0 border-b border-solid border-store-line bg-white px-5 py-5 sm:px-6">
+                    <div className="flex min-w-0 items-center gap-4">
                         {product.imageUrl ? (
                             <img
                                 alt=""
                                 src={product.imageUrl}
-                                className="size-16 rounded-xl border object-contain"
+                                className="size-16 shrink-0 rounded-lg border border-solid border-store-line bg-white object-contain"
                             />
                         ) : (
                             <Package size={32} />
                         )}
-                        <div>
-                            <span className="text-xs font-bold uppercase text-[#648772]">
+                        <div className="min-w-0">
+                            <span className="break-all text-xs font-semibold text-store-muted">
                                 {product.sku}
                             </span>
-                            <h2 className="mt-1 max-w-[420px] text-lg font-black">
+                            <h2 className="m-0 mt-1 break-words text-lg font-bold text-store-ink">
                                 {tr(product.nameVi, product.nameEn)}
                             </h2>
                             <p className="mt-1 text-xs text-[#6d7f71]">
@@ -185,7 +186,7 @@ function ProductDrawer({
                     <button
                         type="button"
                         aria-label={tr('Đóng', 'Close')}
-                        className="rounded-xl border bg-white p-2"
+                        className="grid size-9 shrink-0 place-items-center rounded-lg border border-solid border-store-line bg-white text-store-green hover:bg-surface-green"
                         onClick={onClose}
                     >
                         <X size={20} />
@@ -193,56 +194,48 @@ function ProductDrawer({
                 </div>
                 <div className="flex-1 space-y-5 overflow-y-auto p-5 sm:p-6">
                     <ExecutiveFeedback message={feedback} error={failed} />
-                    <section className="rounded-2xl border border-[#dde8dc] bg-white p-5">
-                        <h3 className="mb-3 font-bold">
-                            {tr('Thông tin hàng hóa', 'Product information')}
-                        </h3>
-                        <dl className="grid gap-3 text-sm sm:grid-cols-2">
-                            <div>
-                                <dt className="text-xs text-[#748577]">
-                                    {tr('Quy cách', 'Packaging')}
-                                </dt>
-                                <dd className="font-semibold">
-                                    {tr(product.packageSpecVi ?? '—', product.packageSpecEn ?? '—')}
-                                </dd>
-                            </div>
-                            <div>
-                                <dt className="text-xs text-[#748577]">
-                                    {tr('Xuất xứ', 'Origin')}
-                                </dt>
-                                <dd className="font-semibold">{product.origin || '—'}</dd>
-                            </div>
+                    <section className="rounded-xl border border-solid border-store-line bg-white p-5">
+                        <h3 className="m-0 text-base font-bold text-store-ink">{tr('Thông tin sản phẩm', 'Product information')}</h3>
+                        <dl className="m-0 mt-4 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+                            {[
+                                [tr('Mã SKU', 'SKU'), product.sku],
+                                [tr('Thương hiệu', 'Brand'), brand],
+                                [tr('Danh mục', 'Category'), category],
+                                [tr('Xuất xứ', 'Origin'), product.origin],
+                                [tr('Quy cách đóng gói', 'Packaging'), tr(product.packageSpecVi || product.packageSpecEn || '', product.packageSpecEn || product.packageSpecVi || '')],
+                                [tr('Đơn vị bán', 'Selling unit'), product.unitCode],
+                            ].map(([label, value]) => (
+                                <div key={label} className="min-w-0 border-0 border-b border-solid border-store-line pb-3">
+                                    <dt className="text-xs font-medium text-store-muted">{label}</dt>
+                                    <dd className="m-0 mt-1 break-words text-sm font-semibold text-store-ink">{value || '—'}</dd>
+                                </div>
+                            ))}
                         </dl>
-                        <p className="mt-4 whitespace-pre-line text-sm leading-6 text-[#536958]">
-                            {tr(product.descriptionVi ?? '', product.descriptionEn ?? '') || '—'}
-                        </p>
-                    </section>
-                    <section className="rounded-2xl border border-[#dde8dc] bg-white p-5">
-                        <h3 className="mb-4 font-bold">
-                            {tr('Trạng thái & thông số', 'Status and specifications')}
-                        </h3>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <span className="text-xs text-[#728576]">MOQ</span>
-                                <strong className="block">
-                                    {product.minOrderQuantity} {product.unitCode}
-                                </strong>
-                            </div>
-                            <div>
-                                <span className="text-xs text-[#728576]">
-                                    {tr('Ngày cập nhật', 'Updated')}
-                                </span>
-                                <strong className="block">
-                                    {new Date(product.updatedAt).toLocaleDateString('vi-VN')}
-                                </strong>
-                            </div>
-                            <div>
-                                <span className="text-xs text-[#728576]">
-                                    {tr('VAT (%)', 'VAT (%)')}
-                                </span>
-                                <strong className="block">{product.vatRate ?? '—'}</strong>
-                            </div>
+                        <div className="mt-4">
+                            <h4 className="m-0 text-xs font-semibold text-store-muted">{tr('Mô tả sản phẩm', 'Product description')}</h4>
+                            <p className="m-0 mt-2 max-h-48 overflow-y-auto whitespace-pre-wrap break-words rounded-lg bg-[#f8faf7] p-3 text-sm leading-6 text-store-ink">
+                                {tr(product.descriptionVi || product.descriptionEn || '', product.descriptionEn || product.descriptionVi || '') || tr('Chưa có mô tả.', 'No description provided.')}
+                            </p>
                         </div>
+                    </section>
+                    <section className="rounded-xl border border-solid border-store-line bg-white p-5">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                            <h3 className="m-0 text-base font-bold text-store-ink">{tr('Trạng thái & thông số bán hàng', 'Status and selling specifications')}</h3>
+                            <ExecutiveBadge status={localStatus} />
+                        </div>
+                        <dl className="m-0 mt-4 grid grid-cols-2 gap-4 text-sm">
+                            {[
+                                [tr('Số lượng đặt tối thiểu (MOQ)', 'Minimum order quantity (MOQ)'), `${product.minOrderQuantity} ${product.unitCode}`],
+                                [tr('Bước số lượng', 'Quantity step'), String(product.quantityStep)],
+                                [tr('Thuế VAT', 'VAT rate'), currentVat == null ? '—' : `${currentVat}%`],
+                                [tr('Ngày cập nhật', 'Updated'), new Date(product.updatedAt).toLocaleDateString(tr('vi-VN', 'en-GB'))],
+                            ].map(([label, value]) => (
+                                <div key={label} className="min-w-0 rounded-lg bg-[#f8faf7] p-3">
+                                    <dt className="text-xs text-store-muted">{label}</dt>
+                                    <dd className="m-0 mt-1 break-words font-semibold text-store-ink">{value}</dd>
+                                </div>
+                            ))}
+                        </dl>
                         <ExecutiveSelect
                             label={tr('Trạng thái sản phẩm', 'Publication status')}
                             value={localStatus}

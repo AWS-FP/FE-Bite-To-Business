@@ -1,30 +1,37 @@
 import Skeleton from '@/components/common/Skeleton';
 import { ExecutiveTableSkeleton } from '@/components/e-commerce/ExecutiveSkeletons';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
+import { ROUTES } from '@/router/routes';
 import {
+    ArrowRight,
     BarChart3,
-    CalendarDays,
+    FileText,
     Package,
     ShoppingBag,
+    Tag,
     TrendingUp,
 } from 'lucide-react';
 import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
 import { ExecutiveBadge, ExecutiveFeedback } from '@/components/e-commerce/ExecutiveControls';
-import {
-    ExecutiveHeading,
-    ExecutivePanel,
-    ExecutiveStat,
-} from '@/components/e-commerce/ExecutiveUI';
+import { ExecutiveHeading, ExecutivePanel } from '@/components/e-commerce/ExecutiveUI';
 import { executiveApi } from '@/services/e-commerce/executiveAdminService';
 import { formatVnd } from '@/services/e-commerce/executiveReadService';
 
 function dateParam(value: Date) {
-    return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
+    return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(
+        value.getDate(),
+    ).padStart(2, '0')}`;
 }
+
 export default function EcommerceDashboardPage() {
     const tr = useExecutiveText();
     const today = new Date();
     const from = new Date(today.getFullYear(), today.getMonth(), 1);
+    const monthLabel = new Intl.DateTimeFormat(tr('vi-VN', 'en-US'), {
+        month: 'long',
+        year: 'numeric',
+    }).format(today);
     const metrics = useQuery({
         queryKey: ['ecom', 'metrics', dateParam(from), dateParam(today)],
         queryFn: () => executiveApi.metrics(dateParam(from), dateParam(today)),
@@ -34,6 +41,7 @@ export default function EcommerceDashboardPage() {
         queryFn: () => executiveApi.products({ page: 0, size: 8 }),
     });
     const m = metrics.data;
+
     return (
         <div className="space-y-6">
             <ExecutiveHeading
@@ -45,29 +53,7 @@ export default function EcommerceDashboardPage() {
                     'Product and completed-order performance for the current month.',
                 )}
             />
-            <section className="flex flex-wrap items-center justify-between gap-4 rounded-[22px] bg-[#133e2d] p-7 text-white sm:p-8">
-                <div>
-                    <span className="text-[11px] font-bold uppercase tracking-[.18em] text-[#f9dc70]">
-                        BITE TO BUSINESS · EXECUTIVE
-                    </span>
-                    <h2 className="mt-3 max-w-xl text-2xl font-black sm:text-[31px]">
-                        {tr(
-                            'Tổng quan kinh doanh trong một màn hình',
-                            'Your commerce performance at a glance',
-                        )}
-                    </h2>
-                    <p className="mt-2 text-sm text-[#d9e7db]">
-                        {tr(
-                            'Được cập nhật từ hệ thống quản trị',
-                            'Live from the executive management APIs',
-                        )}
-                    </p>
-                </div>
-                <span className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm">
-                    <CalendarDays size={18} />
-                    {dateParam(from)} — {dateParam(today)}
-                </span>
-            </section>
+
             {(metrics.isError || products.isError) && (
                 <ExecutiveFeedback
                     error
@@ -77,65 +63,148 @@ export default function EcommerceDashboardPage() {
                     )}
                 />
             )}
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                <ExecutiveStat
-                    title={tr('Sản phẩm đã đăng', 'Published products')}
-                    value={metrics.isLoading ? <Skeleton className="h-[43.5px] w-24" /> : m?.publishedProducts ?? '—'}
-                    icon={<Package size={20} />}
-                    detail={tr('Đang bán trên gian hàng', 'Visible to customers')}
-                />
-                <ExecutiveStat
-                    title={tr('Đơn hoàn thành trong tháng', 'Completed orders this month')}
-                    value={metrics.isLoading ? <Skeleton className="h-[43.5px] w-24" /> : m?.completedOrders ?? '—'}
-                    icon={<ShoppingBag size={20} />}
-                    tone="blue"
-                    detail={tr('Chỉ tính đơn COMPLETED', 'Completed orders only')}
-                />
-                <ExecutiveStat
-                    title={tr('Doanh thu hoàn thành', 'Completed order revenue')}
-                    value={metrics.isLoading ? <Skeleton className="h-[43.5px] w-32" /> : m ? formatVnd(m.revenue) : '—'}
-                    icon={<TrendingUp size={20} />}
-                    tone="coral"
-                    detail={tr('Tháng hiện tại', 'Current month')}
-                />
-            </div>
-            <div className="grid gap-4 sm:grid-cols-3">
-                <div className="rounded-2xl border border-[#dce9dc] bg-white p-5">
-                    <span className="text-xs font-semibold text-[#63796a]">
-                        {tr('Sản phẩm nháp', 'Draft products')}
-                    </span>
-                    <strong className="mt-3 block text-2xl font-black">
-                        {metrics.isLoading ? <Skeleton className="h-8 w-24" /> : m?.draftProducts ?? '—'}
-                    </strong>
+
+            <section aria-label={tr('Kết quả kinh doanh', 'Sales performance')} className="relative overflow-hidden rounded-[32px] border-[2.5px] border-store-ink bg-store-green px-5 py-5 text-white shadow-[0_7px_0_0_var(--color-store-ink)] sm:px-7 sm:py-7">
+                <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                    <div className="absolute -left-8 top-10 size-24 rounded-full border border-white/10 bg-white/5" />
+                    <div className="absolute left-1/3 top-6 size-16 rounded-full border border-white/10 bg-store-yellow/10" />
+                    <div className="absolute bottom-4 right-8 size-28 rounded-full border border-white/10 bg-white/5" />
+                    <div className="absolute -right-4 top-1/2 h-24 w-24 -translate-y-1/2 rounded-[28px] border border-white/10 bg-white/5" />
                 </div>
-                <div className="rounded-2xl border border-[#dce9dc] bg-white p-5">
-                    <span className="text-xs font-semibold text-[#63796a]">
-                        {tr('Khuyến mãi đang chạy', 'Active promotions')}
-                    </span>
-                    <strong className="mt-3 block text-2xl font-black">
-                        {metrics.isLoading ? <Skeleton className="h-8 w-24" /> : m?.activePromotions ?? '—'}
-                    </strong>
+                <div className="relative flex flex-wrap items-center justify-between gap-5">
+                    <div className="min-w-0">
+                        <span className="mb-3 inline-flex -rotate-[2deg] rounded-md border-2 border-store-ink bg-store-yellow px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.16em] text-store-ink shadow-[3px_3px_0_0_var(--color-store-ink)]">
+                            {tr('Bảng điều hành', 'Control board')}
+                        </span>
+                        <h2 className="m-0 font-heading text-2xl font-extrabold leading-tight text-white sm:text-3xl">
+                            {tr('Hoạt động kinh doanh', 'Commerce operations')}
+                        </h2>
+                    </div>
+                    <div className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-semibold text-white">
+                        {monthLabel}
+                    </div>
                 </div>
-                <div className="rounded-2xl border border-[#dce9dc] bg-white p-5">
-                    <span className="flex items-center gap-2 text-xs font-semibold text-[#63796a]">
-                        <BarChart3 size={15} />
-                        {tr('Đơn có sử dụng coupon', 'Coupon orders')}
-                    </span>
-                    <strong className="mt-3 block text-2xl font-black">
-                        {metrics.isLoading ? <Skeleton className="h-8 w-24" /> : m?.couponOrders ?? '—'}
-                    </strong>
+                <div className="relative mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-[1.4fr_1fr_1fr]">
+                    {[
+                        {
+                            label: tr('Doanh thu hoàn thành', 'Completed order revenue'),
+                            value: m ? formatVnd(m.revenue) : '—',
+                            detail: tr('Chỉ tính đơn đã hoàn thành', 'Completed orders only'),
+                            icon: TrendingUp,
+                            featured: true,
+                        },
+                        {
+                            label: tr('Đơn hàng hoàn thành', 'Completed orders'),
+                            value: m?.completedOrders ?? '—',
+                            detail: tr('Trong tháng hiện tại', 'Current month'),
+                            icon: ShoppingBag,
+                            featured: false,
+                        },
+                        {
+                            label: tr('Đơn có sử dụng coupon', 'Coupon orders'),
+                            value: m?.couponOrders ?? '—',
+                            detail: tr('Trong kỳ báo cáo', 'Reporting period'),
+                            icon: BarChart3,
+                            featured: false,
+                        },
+                    ].map(({ label, value, detail, icon: Icon, featured }) => (
+                        <div key={label} className={`min-w-0 rounded-2xl border border-solid border-white/20 bg-white/10 p-4 sm:p-5 ${featured ? 'sm:col-span-2 xl:col-span-1' : ''}`}>
+                            <div className="flex items-start justify-between gap-3">
+                                <p className="m-0 text-xs font-bold uppercase tracking-wide text-white/85">{label}</p>
+                                <Icon size={20} className="shrink-0 text-store-yellow" aria-hidden="true" />
+                            </div>
+                            <div className="mt-3 break-words font-price text-3xl font-extrabold tabular-nums text-store-yellow">
+                                {metrics.isLoading ? <Skeleton className="h-9 w-24 max-w-full" /> : value}
+                            </div>
+                            <p className="mb-0 mt-2 text-xs leading-5 text-white/75">{detail}</p>
+                        </div>
+                    ))}
                 </div>
-            </div>
+            </section>
+
+            <section className="space-y-3" aria-label={tr('Sản phẩm và khuyến mãi', 'Catalog and promotions')}>
+                <h2 className="m-0 text-base font-bold text-store-ink">
+                    {tr('Sản phẩm và khuyến mãi', 'Catalog and promotions')}
+                </h2>
+                <div className="grid gap-4 sm:grid-cols-3">
+                    {[
+                        {
+                            label: tr('Sản phẩm đã đăng', 'Published products'),
+                            value: m?.publishedProducts,
+                            icon: Package,
+                            tone: 'bg-[#eef7ef] border-[#c5ddcc] text-[#20603c] shadow-[0_4px_0_0_rgba(32,96,60,0.12)]',
+                            chip: 'bg-[#d8eddd] text-[#1b6340]',
+                            to: ROUTES.ECOMMERCE_PRODUCTS,
+                        },
+                        {
+                            label: tr('Sản phẩm nháp', 'Draft products'),
+                            value: m?.draftProducts,
+                            icon: FileText,
+                            tone: 'bg-[#eef5fb] border-[#cbddeb] text-[#285e88] shadow-[0_4px_0_0_rgba(40,94,136,0.12)]',
+                            chip: 'bg-[#dcecf8] text-[#285e88]',
+                            to: ROUTES.ECOMMERCE_PRODUCTS,
+                        },
+                        {
+                            label: tr('Khuyến mãi đang chạy', 'Active promotions'),
+                            value: m?.activePromotions,
+                            icon: Tag,
+                            tone: 'bg-[#fff9df] border-[#ecdba0] text-[#795b14] shadow-[0_4px_0_0_rgba(121,91,20,0.12)]',
+                            chip: 'bg-[#ffedab] text-[#795b14]',
+                            to: ROUTES.ECOMMERCE_PROMOTIONS,
+                        },
+                    ].map(({ label, value, icon: Icon, tone, chip, to }) => (
+                        <Link
+                            key={label}
+                            to={to}
+                            className={`group flex min-h-[158px] flex-col justify-between rounded-[22px] border-2 border-solid p-5 text-store-ink no-underline transition hover:-translate-y-0.5 ${tone}`}
+                        >
+                            <div className="flex items-start justify-between gap-3">
+                                <span className={`grid size-11 shrink-0 place-items-center rounded-2xl ${chip}`}>
+                                    <Icon size={20} />
+                                </span>
+                                <ArrowRight
+                                    size={18}
+                                    className="shrink-0 text-current transition-transform group-hover:translate-x-1"
+                                    aria-hidden="true"
+                                />
+                            </div>
+                            <div>
+                                <p className="m-0 text-xs font-bold uppercase tracking-[0.16em] text-current/75">
+                                    {label}
+                                </p>
+                                <strong className="mt-2 block font-price text-[38px] font-black leading-none tabular-nums text-current">
+                                    {metrics.isLoading ? (
+                                        <Skeleton className="h-10 w-16" />
+                                    ) : (
+                                        value ?? '—'
+                                    )}
+                                </strong>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+            </section>
+
             <div className="grid gap-5">
                 <ExecutivePanel
                     title={tr('Sản phẩm cập nhật gần đây', 'Recently updated products')}
-                    caption={tr(
-                        'Bao gồm sản phẩm nháp và đã lưu trữ',
-                        'Includes draft and archived records',
-                    )}
+                    caption={tr('Danh sách theo lần cập nhật gần nhất', 'Products ordered by latest update')}
+                    action={
+                        <Link
+                            to={ROUTES.ECOMMERCE_PRODUCTS}
+                            className="inline-flex items-center gap-2 text-sm font-semibold text-store-green no-underline hover:underline"
+                        >
+                            {tr('Xem tất cả', 'View all')} <ArrowRight size={15} aria-hidden="true" />
+                        </Link>
+                    }
                 >
                     {products.isLoading ? (
-                        <ExecutiveTableSkeleton cells={["product", "text", "text", "badge"]} count={8} tableClass="w-full min-w-[540px] text-left text-sm" cellClass="border-t border-[#edf1e9] px-5 py-3" />
+                        <ExecutiveTableSkeleton
+                            cells={['product', 'text', 'text', 'badge']}
+                            count={8}
+                            tableClass="w-full min-w-[540px] text-left text-sm"
+                            cellClass="border-t border-[#edf1e9] px-5 py-3"
+                        />
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full min-w-[540px] text-left text-sm">
@@ -170,9 +239,7 @@ export default function EcommerceDashboardPage() {
                                                 </div>
                                             </td>
                                             <td className="px-5 py-3 font-mono text-xs">{p.sku}</td>
-                                            <td className="px-5 py-3 font-bold">
-                                                {formatVnd(p.listPrice)}
-                                            </td>
+                                            <td className="px-5 py-3 font-bold">{formatVnd(p.listPrice)}</td>
                                             <td className="px-5 py-3">
                                                 <ExecutiveBadge status={p.status} />
                                             </td>

@@ -1,3 +1,5 @@
+import ExecutiveListSearch from '@/components/e-commerce/ExecutiveListSearch';
+import { useExecutiveListSearch } from '@/hooks/e-commerce/useExecutiveListSearch';
 import { useExecutiveConfirmation } from '@/hooks/e-commerce/useExecutiveConfirmation';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import PromotionImageCropper from '@/components/e-commerce/PromotionImageCropper';
@@ -57,7 +59,7 @@ export default function EcommerceCombosPage() {
     const confirm = useExecutiveConfirmation();
     const tr = useExecutiveText(),
         qc = useQueryClient();
-    const [page, setPage] = useState(0);
+    const { search, setSearch, keyword, page, setPage, pending } = useExecutiveListSearch();
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<string | null>(null);
     const [translationSession, setTranslationSession] = useState(0);
@@ -73,8 +75,9 @@ export default function EcommerceCombosPage() {
         return () => URL.revokeObjectURL(cropUrl);
     }, [cropUrl]);
     const list = useQuery({
-        queryKey: ['ecom', 'combos', page],
-        queryFn: ({ signal }) => executiveComboApi.list(page, signal),
+        queryKey: ['ecom', 'combos', keyword, page],
+        enabled: !pending,
+        queryFn: ({ signal }) => executiveComboApi.list(page, signal, keyword || undefined),
     });
     const categories = useQuery({
         queryKey: ['ecom', 'combo-categories'],
@@ -351,7 +354,7 @@ export default function EcommerceCombosPage() {
                     onCancel={() => setCropSource(null)} onApply={(file) => { setCropSource(null); upload.mutate(file); }} />
             )}
             <ExecutiveHeading
-                number="09"
+                number="03"
                 eyebrow="CATALOG / COMBOS"
                 title={tr('Combo sản phẩm', 'Product combos')}
                 description={tr(
@@ -680,8 +683,14 @@ export default function EcommerceCombosPage() {
                     </ExecutivePanel>
                 </div>
             )}
-            <ExecutivePanel title={tr('Danh sách combo', 'Combo list')}>
-                {list.isPending ? (
+            <ExecutivePanel title={tr('Danh sách combo', 'Combo list')}
+                caption={!pending && list.data ? `${list.data.total} ${tr('combo', 'combos')}` : ''}>
+                <div className="flex gap-3 p-5">
+                    <ExecutiveListSearch value={search} onChange={setSearch}
+                        label={tr('Tìm combo', 'Search combos')}
+                        placeholder={tr('Tìm theo tên combo (VI/EN) hoặc SKU...', 'Search combo name (VI/EN) or SKU...')} />
+                </div>
+                {pending || list.isPending ? (
                     <ExecutiveComboSkeleton />
                 ) : list.isError ? (
                     <ExecutiveError
@@ -690,8 +699,8 @@ export default function EcommerceCombosPage() {
                     />
                 ) : !list.data?.items.length ? (
                     <ExecutiveEmpty
-                        title={tr('Chưa có combo', 'No combos')}
-                        description={tr('Tạo combo mới để bắt đầu.', 'Create your first combo.')}
+                        title={keyword ? tr('Không tìm thấy combo phù hợp', 'No matching combos') : tr('Chưa có combo', 'No combos')}
+                        description={keyword ? tr('Thử từ khóa khác.', 'Try another keyword.') : tr('Tạo combo mới để bắt đầu.', 'Create your first combo.')}
                         icon={<Boxes size={26} />}
                     />
                 ) : (
@@ -782,7 +791,7 @@ export default function EcommerceCombosPage() {
                         ))}
                     </div>
                 )}
-                {list.data && (
+                {!pending && list.data && (
                     <ExecutivePagination
                         page={page}
                         totalPages={list.data.totalPages}

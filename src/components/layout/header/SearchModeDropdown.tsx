@@ -97,7 +97,7 @@ export default function SearchModeDropdown({ value, onChange, onOpen }: SearchMo
                     if (!isOpen) onOpen?.();
                     setIsOpen(!isOpen);
                 }}
-                className="relative flex h-8 w-full cursor-pointer items-center justify-center rounded-full border-2 border-solid border-transparent bg-store-cream px-5 text-[11px] leading-4 font-bold text-store-green transition-colors hover:bg-surface-yellow aria-expanded:bg-store-yellow"
+                className="relative flex h-8 w-full cursor-pointer items-center justify-center rounded-full border-0 bg-store-cream !outline-none !shadow-none focus-visible:!bg-surface-green px-5 text-[11px] leading-4 font-bold text-store-green transition-colors hover:bg-surface-yellow aria-expanded:bg-store-yellow"
             >
                 <span className="truncate">
                     {t(value === 'ai' ? 'search.askAI' : 'search.products')}
@@ -115,7 +115,7 @@ export default function SearchModeDropdown({ value, onChange, onOpen }: SearchMo
                     id={menuId}
                     role="menu"
                     aria-label={t('search.mode')}
-                    className="absolute top-[calc(100%+12px)] left-0 z-[130] w-[224px] overflow-hidden rounded-2xl border-2 border-solid border-store-ink bg-store-cream p-1.5 text-store-green"
+                    className="absolute top-[calc(100%+12px)] left-0 z-[130] w-[224px] overflow-hidden rounded-xl border border-solid border-store-line bg-white p-1.5 shadow-[0_12px_30px_rgba(18,55,42,0.12)] text-store-green"
                 >
                     <p className="m-0 border-0 border-b border-solid border-store-green/15 px-3 pt-1.5 pb-2.5 font-label text-[10px] leading-4 font-semibold tracking-[1px] uppercase">
                         {t('search.mode')}
@@ -126,7 +126,7 @@ export default function SearchModeDropdown({ value, onChange, onOpen }: SearchMo
                         tabIndex={-1}
                         aria-checked={value === 'products'}
                         onClick={() => selectMode('products')}
-                        className="mt-1 flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl border-2 border-solid border-transparent bg-transparent px-3 text-left text-[12px] leading-5 font-semibold text-store-green hover:bg-surface-green focus:bg-surface-green aria-checked:bg-store-yellow"
+                        className="mt-1 flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-lg border-0 bg-transparent !outline-none !shadow-none px-3 text-left text-[12px] leading-5 font-semibold text-store-green hover:bg-surface-green focus:bg-surface-green aria-checked:bg-store-yellow"
                     >
                         <Search size={16} className="shrink-0" aria-hidden="true" />
                         <span className="flex-1">{t('search.products')}</span>
@@ -138,7 +138,7 @@ export default function SearchModeDropdown({ value, onChange, onOpen }: SearchMo
                         tabIndex={-1}
                         aria-checked={value === 'ai'}
                         onClick={() => selectMode('ai')}
-                        className="mt-1 flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl border-2 border-solid border-transparent bg-transparent px-3 text-left text-[12px] leading-5 font-semibold text-store-green hover:bg-surface-green focus:bg-surface-green aria-checked:bg-store-yellow"
+                        className="mt-1 flex h-11 w-full cursor-pointer items-center gap-2.5 rounded-lg border-0 bg-transparent !outline-none !shadow-none px-3 text-left text-[12px] leading-5 font-semibold text-store-green hover:bg-surface-green focus:bg-surface-green aria-checked:bg-store-yellow"
                     >
                         <Sparkles size={16} className="shrink-0" aria-hidden="true" />
                         <span className="flex-1">{t('search.askAI')}</span>

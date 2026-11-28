@@ -91,7 +91,7 @@ export default function StoreSearch() {
                 )}
 
                 <button
-                    className="flex h-full shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-r-full border-0 border-l-2 border-solid border-store-ink bg-store-yellow px-3.5 text-[12px] font-extrabold text-store-ink transition-colors hover:bg-[#ffe97b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white disabled:cursor-wait disabled:opacity-70"
+                    className="flex h-full shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-r-full border-0 border-l-2 border-solid border-store-ink bg-store-yellow px-3.5 text-[12px] font-extrabold text-store-ink transition-colors hover:bg-[#ffe97b] focus-visible:!outline-none focus-visible:!bg-surface-yellow disabled:cursor-wait disabled:opacity-70"
                     type="submit"
                     aria-label={t(searchMode === 'ai' ? 'search.askAI' : 'search.submit')}
                 >
@@ -139,7 +139,7 @@ export default function StoreSearch() {
                                         onClick={(event) =>
                                             void handleHistoryClick(event, entry.keyword)
                                         }
-                                        className="flex min-w-0 flex-1 items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold text-store-ink no-underline focus-visible:outline-2 focus-visible:outline-store-green"
+                                        className="flex min-w-0 flex-1 items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold text-store-ink no-underline focus-visible:!outline-none focus-visible:bg-surface-green"
                                     >
                                         <Clock3 size={15} className="shrink-0 text-store-muted" />
                                         <span className="truncate">{entry.keyword}</span>
@@ -175,7 +175,7 @@ export default function StoreSearch() {
                                         onClick={(event) =>
                                             void handleHistoryClick(event, item.keyword, item.path)
                                         }
-                                        className="group flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 text-store-ink no-underline transition-colors hover:bg-store-cream focus-visible:bg-store-cream focus-visible:outline-2 focus-visible:outline-store-green"
+                                        className="group flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 text-store-ink no-underline transition-colors hover:bg-store-cream focus-visible:bg-store-cream focus-visible:!outline-none focus-visible:bg-surface-green"
                                     >
                                         {item.kind === 'product' ? (
                                             item.imageUrl ? (
@@ -213,7 +213,7 @@ export default function StoreSearch() {
                             <Link
                                 to={getCatalogSearchPath(keyword.trim())}
                                 onClick={(event) => void handleHistoryClick(event, keyword.trim())}
-                                className="mt-2 flex items-center justify-between gap-2 rounded-xl border border-solid border-store-line bg-store-cream px-3 py-3 text-xs font-bold text-store-green no-underline hover:bg-surface-yellow focus-visible:outline-2 focus-visible:outline-store-green"
+                                className="mt-2 flex items-center justify-between gap-2 rounded-xl border border-solid border-store-line bg-store-cream px-3 py-3 text-xs font-bold text-store-green no-underline hover:bg-surface-yellow focus-visible:!outline-none focus-visible:bg-surface-green"
                             >
                                 <span className="min-w-0 truncate">
                                     {t('search.viewAll', { query: keyword.trim() })}

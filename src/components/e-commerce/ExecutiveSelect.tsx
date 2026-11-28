@@ -1,7 +1,9 @@
 import { Check, ChevronDown } from 'lucide-react';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { createPortal } from 'react-dom';
+import { executiveUi } from '@/constants/e-commerce/executiveUi';
+import { dropdownPosition } from '@/utils/e-commerce/dropdownPosition';
 
 export type ExecutiveSelectOption = { value: string; label: string };
 
@@ -29,33 +31,19 @@ export default function ExecutiveSelect({
     const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
     const [open, setOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
-    const [geometry, setGeometry] = useState({ left: 0, top: 0, width: 200, maxHeight: 270 });
+    const [geometry, setGeometry] = useState<ReturnType<typeof dropdownPosition> | null>(null);
     const selectedIndex = Math.max(
         0,
         options.findIndex((option) => option.value === value),
     );
     const selectedOption = options[selectedIndex];
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!open) return;
         function reposition() {
             const rect = triggerRef.current?.getBoundingClientRect();
             if (!rect) return;
-            const availableBelow = window.innerHeight - rect.bottom - 14;
-            const availableAbove = rect.top - 14;
-            const upwards = availableBelow < 200 && availableAbove > availableBelow;
-            const maxHeight = Math.max(
-                100,
-                Math.min(280, upwards ? availableAbove : availableBelow),
-            );
-            setGeometry({
-                left: Math.min(rect.left, Math.max(8, window.innerWidth - rect.width - 8)),
-                top: upwards
-                    ? Math.max(8, rect.top - Math.min(280, maxHeight) - 6)
-                    : rect.bottom + 6,
-                width: rect.width,
-                maxHeight,
-            });
+            setGeometry(dropdownPosition(rect, 0, Math.min(280, Math.max(64, options.length * 48 + 14))));
         }
         function closeOutside(event: PointerEvent) {
             if (
@@ -74,11 +62,11 @@ export default function ExecutiveSelect({
             window.removeEventListener('scroll', reposition, true);
             document.removeEventListener('pointerdown', closeOutside);
         };
-    }, [open]);
+    }, [open, options.length]);
 
     useEffect(() => {
         if (!open) return;
-        const raf = window.requestAnimationFrame(() => optionRefs.current[selectedIndex]?.focus());
+        const raf = window.requestAnimationFrame(() => optionRefs.current[selectedIndex]?.focus({ preventScroll: true }));
         return () => window.cancelAnimationFrame(raf);
     }, [open, selectedIndex]);
 
@@ -134,7 +122,7 @@ export default function ExecutiveSelect({
                     setActiveIndex(selectedIndex);
                     setOpen((previous) => !previous);
                 }}
-                className={`flex h-11 w-full min-w-0 items-center justify-between gap-3 rounded-xl border border-[#c7d8ca] bg-white px-3.5 text-left text-sm font-medium text-[#173f30] shadow-sm transition hover:border-[#74a88a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#81c5a0] disabled:opacity-50 ${className}`}
+                className={`${executiveUi.selectTrigger} ${className}`}
             >
                 <span className="min-w-0 truncate">{selectedOption?.label ?? ariaLabel}</span>
                 <ChevronDown
@@ -142,7 +130,7 @@ export default function ExecutiveSelect({
                     className={`shrink-0 text-[#527360] transition-transform ${open ? 'rotate-180' : ''}`}
                 />
             </button>
-            {open &&
+            {open && geometry &&
                 createPortal(
                     <div
                         id={id}
@@ -150,13 +138,8 @@ export default function ExecutiveSelect({
                         role="listbox"
                         aria-label={ariaLabel}
                         onKeyDown={keydown}
-                        className="fixed z-[260] overflow-y-auto rounded-xl border border-[#b8cec0] bg-white p-1.5 shadow-[0_18px_40px_rgba(15,45,32,0.2)]"
-                        style={{
-                            left: geometry.left,
-                            top: geometry.top,
-                            width: geometry.width,
-                            maxHeight: geometry.maxHeight,
-                        }}
+                        className={`${executiveUi.selectPanel} fixed z-[260] overflow-y-auto`}
+                        style={geometry}
                     >
                         {options.map((option, index) => (
                             <button
@@ -169,7 +152,7 @@ export default function ExecutiveSelect({
                                 aria-selected={option.value === value}
                                 onMouseEnter={() => setActiveIndex(index)}
                                 onClick={() => select(index)}
-                                className={`flex w-full items-start justify-between gap-2 rounded-lg px-3 py-2.5 text-left text-sm transition ${option.value === value ? 'bg-[#e6f2e8] font-bold text-[#135438]' : 'text-[#264a37] hover:bg-[#f1f6ef]'} focus-visible:bg-[#e6f2e8] focus-visible:outline-none`}
+                                className={executiveUi.selectOption}
                             >
                                 <span className="min-w-0 break-words">{option.label}</span>
                                 {option.value === value && (

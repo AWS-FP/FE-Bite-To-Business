@@ -34,11 +34,16 @@ export function ExecutivePanel({ title, caption, action, children }: {
 export function ExecutiveStat({ title, value, icon, detail, tone = 'green' }: {
     title: string; value: ReactNode; icon: ReactNode; detail?: string; tone?: 'green' | 'yellow' | 'blue' | 'coral';
 }) {
-    const bg = { green: 'bg-[#e7f4e8]', yellow: 'bg-[#fff3bf]', blue: 'bg-[#e7f2f8]', coral: 'bg-[#fff0e7]' }[tone];
-    return <div className={`${executiveUi.card} p-5`}>
-        <div className="flex items-center justify-between gap-2"><p className="text-xs font-semibold text-[#63766b]">{title}</p><span className={`grid size-10 place-items-center rounded-xl text-[#124b35] ${bg}`}>{icon}</span></div>
-        <strong className="mt-3 block font-display text-[29px] font-extrabold tabular-nums text-[#143d2e]">{value}</strong>
-        <p className="mt-1 min-h-5 text-xs text-[#7d8982]">{detail ?? ' '}</p>
+    const colors = {
+        green: { card: '!bg-[#eef7ef] !border-[#c5ddcc]', icon: 'bg-[#d8eddd] text-[#1b6340]', value: 'text-[#143d2e]' },
+        yellow: { card: '!bg-[#fff9df] !border-[#ecdba0]', icon: 'bg-[#ffedab] text-[#795b14]', value: 'text-[#664b12]' },
+        blue: { card: '!bg-[#eef5fb] !border-[#cbddeb]', icon: 'bg-[#dcecf8] text-[#285e88]', value: 'text-[#214d72]' },
+        coral: { card: '!bg-[#fff4ed] !border-[#efd8cb]', icon: 'bg-[#fce4d6] text-[#994b2e]', value: 'text-[#803c28]' },
+    }[tone];
+    return <div className={`${executiveUi.card} ${colors.card} border-solid p-5`}>
+        <div className="flex items-center justify-between gap-2"><p className="text-xs font-semibold text-store-muted">{title}</p><span className={`grid size-10 shrink-0 place-items-center rounded-xl ${colors.icon}`}>{icon}</span></div>
+        <strong className={`mt-3 block break-words font-price text-[29px] font-extrabold tabular-nums ${colors.value}`}>{value}</strong>
+        <p className="mt-1 min-h-5 text-xs text-store-muted">{detail ?? ' '}</p>
     </div>;
 }
 

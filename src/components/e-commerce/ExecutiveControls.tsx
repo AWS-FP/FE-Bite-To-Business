@@ -3,6 +3,8 @@ import type { ReactElement, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Check, ChevronDown, Search, X } from 'lucide-react';
 import { executiveUi } from '@/constants/e-commerce/executiveUi';
+import { useExecutiveText } from '@/hooks/e-commerce/useExecutiveText';
+import { dropdownPosition } from '@/utils/e-commerce/dropdownPosition';
 
 type OptionProps = {
     value?: string;
@@ -46,6 +48,7 @@ export function ExecutiveSelect({
     searchPlaceholder = 'Search...',
     emptyMessage = 'No matches found',
 }: SelectProps) {
+    const tr = useExecutiveText();
     const options = Children.toArray(children)
         .filter(
             (node): node is ReactElement<OptionProps> =>
@@ -60,7 +63,7 @@ export function ExecutiveSelect({
 
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState('');
-    const [position, setPosition] = useState({ top: 0, left: 0, width: 220 });
+    const [position, setPosition] = useState<ReturnType<typeof dropdownPosition> | null>(null);
     const trigger = useRef<HTMLButtonElement>(null);
     const menu = useRef<HTMLDivElement>(null);
     const searchInput = useRef<HTMLInputElement>(null);
@@ -93,15 +96,9 @@ export function ExecutiveSelect({
             return;
         }
         const rect = trigger.current?.getBoundingClientRect();
-        if (rect) {
-            const width = Math.max(rect.width, 220);
-            const maxTop = Math.max(12, window.innerHeight - 335);
-            setPosition({
-                top: Math.min(rect.bottom + 7, maxTop),
-                left: Math.max(8, Math.min(rect.left, window.innerWidth - width - 8)),
-                width,
-            });
-        }
+        if (!rect) return;
+        const preferredHeight = Math.min(256, Math.max(64, options.length * 48)) + (searchable ? 64 : 14);
+        setPosition(dropdownPosition(rect, 220, preferredHeight));
         setSearch('');
         setOpen(true);
     }
@@ -114,8 +111,8 @@ export function ExecutiveSelect({
 
     useEffect(() => {
         if (!open) return;
-        if (searchable) searchInput.current?.focus();
-        else optionRefs.current[selectedIndex]?.focus();
+        if (searchable) searchInput.current?.focus({ preventScroll: true });
+        else optionRefs.current[selectedIndex]?.focus({ preventScroll: true });
         const outside = (event: globalThis.PointerEvent) => {
             const node = event.target as Node;
             if (!trigger.current?.contains(node) && !menu.current?.contains(node)) closeMenu();
@@ -133,10 +130,13 @@ export function ExecutiveSelect({
         document.addEventListener('pointerdown', outside);
         document.addEventListener('keydown', keyboard);
         window.addEventListener('scroll', closeOnScroll, true);
+        const closeOnResize = () => closeMenu();
+        window.addEventListener('resize', closeOnResize);
         return () => {
             document.removeEventListener('pointerdown', outside);
             document.removeEventListener('keydown', keyboard);
             window.removeEventListener('scroll', closeOnScroll, true);
+            window.removeEventListener('resize', closeOnResize);
         };
     }, [open, searchable, selectedIndex]);
 
@@ -159,7 +159,7 @@ export function ExecutiveSelect({
                         openMenu();
                     }
                 }}
-                className={`${executiveUi.input} flex !h-11 items-center justify-between gap-2 !rounded-xl !border-[#bdd5c4] !bg-[#f8fbf6] text-left !font-semibold shadow-sm transition hover:!border-[#4e9970] hover:!bg-white focus:!border focus-visible:!border-[#276747] focus-visible:!ring-2 focus-visible:!ring-inset focus-visible:!ring-[#c5eacb] disabled:opacity-40`}
+                className={executiveUi.selectTrigger}
             >
                 <span className="min-w-0 truncate">{selected?.label || '—'}</span>
                 <ChevronDown
@@ -167,21 +167,19 @@ export function ExecutiveSelect({
                     className={`shrink-0 text-[#276747] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
                 />
             </button>
-            {open &&
+            {open && position &&
                 createPortal(
                     <div
                         ref={menu}
                         style={{
                             position: 'fixed',
-                            top: position.top,
-                            left: position.left,
-                            width: position.width,
+                            ...position,
                             zIndex: 250,
                         }}
-                        className="rounded-2xl border border-[#d3e4d6] bg-white p-1.5 shadow-[0_20px_55px_rgba(16,55,35,.22)]"
+                        className={`${executiveUi.selectPanel} flex flex-col overflow-hidden`}
                     >
                         {searchable && (
-                            <div className="relative mb-1.5 flex items-center gap-2 rounded-xl border border-[#cddfd1] bg-[#f8fbf6] px-2.5 focus-within:border-[#29895d]">
+                            <div className={`${executiveUi.selectSearch} mb-1.5 shrink-0`}>
                                 <Search size={16} className="shrink-0 text-[#47745b]" />
                                 <input
                                     ref={searchInput}
@@ -203,12 +201,13 @@ export function ExecutiveSelect({
                                             choose(visibleOptions[0].value);
                                         }
                                     }}
-                                    className="h-10 min-w-0 flex-1 border-0 bg-transparent text-sm text-[#14392b] outline-none placeholder:text-[#84978b]"
+                                    className={executiveUi.selectSearchInput}
                                 />
                                 {search && (
                                     <button
                                         type="button"
-                                        aria-label="Clear search"
+                                        aria-label={tr('Xóa tìm kiếm', 'Clear search')}
+                                        className="grid size-7 shrink-0 place-items-center rounded-md !border-0 bg-transparent text-store-muted !outline-none !shadow-none hover:bg-surface-green focus-visible:!bg-surface-green"
                                         onClick={() => {
                                             setSearch('');
                                             searchInput.current?.focus();
@@ -222,7 +221,7 @@ export function ExecutiveSelect({
                         <div
                             role="listbox"
                             aria-label={ariaLabel ?? label ?? 'Options'}
-                            className="max-h-64 overflow-y-auto overscroll-contain [scrollbar-width:thin]"
+                            className="min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:thin]"
                         >
                             {visibleOptions.map((option, index) => (
                                 <button
@@ -257,7 +256,7 @@ export function ExecutiveSelect({
                                             choose(option.value);
                                         }
                                     }}
-                                    className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-[#29895d] ${option.value === value ? 'bg-[#fff0ac] text-[#14392b]' : 'text-[#2c5340] hover:bg-[#edf7ec]'}`}
+                                    className={executiveUi.selectOption}
                                 >
                                     <span className="min-w-0 break-words">{option.label}</span>
                                     {option.value === value && (

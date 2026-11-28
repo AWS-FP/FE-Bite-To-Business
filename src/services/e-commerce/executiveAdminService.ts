@@ -34,7 +34,7 @@ export const executiveApi = {
         putData<AdminPricing>(`${api}/products/${id}/pricing`, payload),
     setProductStatus: (id: string, status: string) =>
         patchData<AdminProduct>(`${api}/products/${id}/status`, { status }),
-    coupons: (page = 0, size = 20) => getData<AdminPage<Coupon>>(`${api}/coupons`, { page, size }),
+    coupons: (page = 0, size = 20, q?: string, signal?: AbortSignal) => getData<AdminPage<Coupon>>(`${api}/coupons`, { page, size, q }, signal),
     coupon: (id: string) => getData<Coupon>(`${api}/coupons/${id}`),
     createCoupon: (payload: CouponWrite) => postData<Coupon>(`${api}/coupons`, payload),
     updateCoupon: (id: string, payload: CouponWrite) =>
@@ -113,8 +113,8 @@ export const executiveApi = {
             expectedRevision,
             reason,
         }),
-    reviews: (status?: string, stars?: number, page = 0, size = 20) =>
-        getData<AdminPage<ExecutiveReview>>(`${api}/reviews`, { status, stars, page, size }),
+    reviews: (status?: string, stars?: number, page = 0, size = 20, q?: string, signal?: AbortSignal) =>
+        getData<AdminPage<ExecutiveReview>>(`${api}/reviews`, { status, stars, page, size, q }, signal),
     moderateReview: (id: string, action: 'HIDE' | 'RESTORE', reason?: string) =>
         patchData<ExecutiveReview>(`${api}/reviews/${id}/moderation`, { action, reason }),
     deleteReview: async (id: string): Promise<void> => {
