@@ -10,7 +10,6 @@ import {
     Cpu,
     Download,
     FileText,
-    Info,
     RefreshCw,
     Server,
     Users,
@@ -270,28 +269,8 @@ function SystemMetricsContent({ tab }: { tab: string }) {
                                     </span>
                                 </li>
                             </ul>
-                            <p className="system-source-note">
-                                <Info size={16} />
-                                {t('system.sources.note')}
-                            </p>
                         </section>
                     </div>
-
-                    <p className="system-updated" role="status">
-                        <Clock3 size={14} />
-                        {health.data
-                            ? t('system.updated', {
-                                  time: new Intl.DateTimeFormat(
-                                      i18n.resolvedLanguage === 'en' ? 'en-GB' : 'vi-VN',
-                                      {
-                                          dateStyle: 'short',
-                                          timeStyle: 'medium',
-                                          timeZone: 'Asia/Ho_Chi_Minh',
-                                      },
-                                  ).format(new Date(health.data.checkedAt)),
-                              })
-                            : t('system.noUpdate')}
-                    </p>
                 </>
             )}
             {tab === 'ai' && <SystemMonitoringDashboard mode="ai" />}

@@ -1,3 +1,5 @@
+import Pagination from '@/components/common/Pagination';
+import { useLogPagination } from '@/hooks/admin/useLogPagination';
 import Skeleton from '@/components/common/Skeleton';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -78,7 +80,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
         mode === 'logs'
             ? diagnosticsMetrics
             : mode === 'overview'
-              ? [...cloudMetrics, 'aiRequests', 'aiFailed']
+              ? cloudMetrics
               : aiMetrics;
     const logs =
         data?.recentAiLogs.filter(
@@ -87,6 +89,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                 (status === 'failed' ? row.status === 'FAILED' : row.status !== 'FAILED'),
         ) ?? [];
 
+    const logPager=useLogPagination(logs, `${hours}:${status}`);
     return (
         <section className="grid min-w-0 gap-5" aria-label={t('system.monitoring.title')}>
             <div className="system-section-toolbar">
@@ -164,7 +167,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                             )}
                         </div>
                     )}
-                    <div className="grid grid-cols-1 gap-4 min-[701px]:grid-cols-2 min-[1201px]:grid-cols-4">
+                    {mode !== 'logs' && <div className="grid grid-cols-1 gap-4 min-[701px]:grid-cols-2 min-[1201px]:grid-cols-4">
                         {keys.map((id) => {
                             const points = metricPoints(data, id);
                             const current = points.filter(
@@ -211,19 +214,17 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                                 </article>
                             );
                         })}
-                    </div>
+                    </div>}
                     {mode === 'logs' && <><ApiDiagnosticsPanel hours={hours} /><SystemLogPanel hours={hours} /><FrontendLogPanel key={hours} hours={hours} /></>}
-                    <div className="grid grid-cols-1 gap-5 min-[701px]:grid-cols-2">
+                    {mode !== 'logs' && <div className="grid grid-cols-1 gap-5 min-[701px]:grid-cols-2">
                         {(mode === 'ai'
                             ? aiMetrics
-                            : mode === 'logs'
-                              ? ['requests', 'errors', 'alb5xx', 'latency', 'pageLoad', 'lcp']
-                              : ['pageviews', 'requests', 'aiRequests', 'aiFailed']
+                            : ['pageviews', 'requests', 'latency', 'pageLoad', 'lcp', 'errors']
                         ).map((id) => (
                             <MetricChart key={id} id={id} data={data} date={date} />
                         ))}
-                    </div>
-                    <section className="system-panel">
+                    </div>}
+                    {mode === 'logs' && <section className="system-panel">
                         <header className="system-panel-heading">
                             <div>
                                 <h2>{t('system.monitoring.logsTitle')}</h2>
@@ -260,7 +261,7 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {logs.map((row, index) => (
+                                    {logPager.rows.map((row, index) => (
                                         <tr key={row.id ?? `${row.time}-${index}`}>
                                             <td>{new Date(row.time).toLocaleString(i18n.language, { timeZone: 'Asia/Ho_Chi_Minh' })}</td>
                                             <td>{row.model}<span className="mt-1 block font-mono text-[10px] text-store-muted" title={row.id}>{row.id}</span></td>
@@ -285,7 +286,8 @@ export default function SystemMonitoringDashboard({ mode = 'overview' }: { mode?
                                 </tbody>
                             </table>
                         </div>
-                    </section>
+                        <Pagination {...logPager} loading={query.isFetching} />
+                    </section>}
                 </>
             )}
         </section>
@@ -352,6 +354,7 @@ function MetricChart({
         });
     }
     const gauge = gaugeMetrics.includes(id);
+    const bucketPager=useLogPagination(buckets, `${id}:${data.from}:${data.to}`);
     const unit = data.metrics.find((metric) => metric.id === id)?.unit;
     const suffix =
         unit === 'percent' ? '%' : unit === 'seconds' ? ' s' : unit === 'milliseconds' ? ' ms' : '';
@@ -447,7 +450,7 @@ function MetricChart({
                                 </tr>
                             </thead>
                             <tbody>
-                                {buckets.map((point) => (
+                                {bucketPager.rows.map((point) => (
                                     <tr key={point.time}>
                                         <td>{date(point.time)}</td>
                                         <td>
@@ -457,6 +460,7 @@ function MetricChart({
                                 ))}
                             </tbody>
                         </table>
+                        <Pagination {...bucketPager} />
                     </details>
                 </>
             )}

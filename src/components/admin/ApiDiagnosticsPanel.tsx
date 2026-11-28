@@ -1,3 +1,5 @@
+import Pagination from '@/components/common/Pagination';
+import { useLogPagination } from '@/hooks/admin/useLogPagination';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -32,6 +34,8 @@ export default function ApiDiagnosticsPanel({ hours }: { hours: number }) {
     const errors = report?.errors.filter(
         (row) => family === 'all' || String(row.httpStatus).startsWith(family),
     );
+    const errorPager=useLogPagination(errors ?? [], `${hours}:${family}`);
+    const slowPager=useLogPagination(report?.slowest ?? [], String(hours));
     return (
         <section className="system-panel">
             <header className="system-panel-heading">
@@ -85,7 +89,7 @@ export default function ApiDiagnosticsPanel({ hours }: { hours: number }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {errors?.map((row) => (
+                                {errorPager.rows.map((row) => (
                                     <tr
                                         key={[
                                             row.method,
@@ -116,6 +120,7 @@ export default function ApiDiagnosticsPanel({ hours }: { hours: number }) {
                             </tbody>
                         </table>
                     </div>
+                    <Pagination {...errorPager} loading={query.isFetching} />
                     <header className="system-panel-heading">
                         <h3>{label('slowest')}</h3>
                     </header>
@@ -129,7 +134,7 @@ export default function ApiDiagnosticsPanel({ hours }: { hours: number }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {report.slowest.map((row) => (
+                                {slowPager.rows.map((row) => (
                                     <tr key={row.method + row.route}>
                                         <td>
                                             {row.method} {row.route}
@@ -147,6 +152,7 @@ export default function ApiDiagnosticsPanel({ hours }: { hours: number }) {
                             </tbody>
                         </table>
                     </div>
+                    <Pagination {...slowPager} loading={query.isFetching} />
                 </>
             )}
         </section>

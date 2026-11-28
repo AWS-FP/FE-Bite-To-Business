@@ -29,7 +29,7 @@ export default function LogisticsTopbar({ onOpenMenu }: { onOpenMenu: () => void
                 <LogisticsMenuButton onClick={onOpenMenu} />
                 <div className="lg-topbar-stamp">
                     <small>BTB</small>
-                    <strong>01</strong>
+                    <strong>03</strong>
                 </div>
                 <div>
                     <div className="lg-topbar-eyebrow">

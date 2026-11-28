@@ -5,7 +5,6 @@ import {
     Package,
     TicketPercent,
     Truck,
-    Undo2,
     Warehouse,
     LayoutDashboard,
 } from 'lucide-react';
@@ -43,8 +42,6 @@ export const STAFF_WORKSPACES: Record<StaffRole, StaffWorkspace> = {
         roleLabel: 'logistics.role',
         items: [
             { path: ROUTES.LOGISTICS_INVENTORY, label: 'navigation.inventory', icon: Warehouse },
-            { path: ROUTES.LOGISTICS_QUOTES, label: 'navigation.quotes', icon: ClipboardList },
-            { path: ROUTES.LOGISTICS_CANCELLATIONS, label: 'navigation.cancellationRequests', icon: Undo2 },
             {
                 path: ROUTES.LOGISTICS_PRODUCT_REQUESTS,
                 label: 'navigation.productRequests',

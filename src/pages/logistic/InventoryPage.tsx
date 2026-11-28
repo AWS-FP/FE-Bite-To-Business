@@ -45,7 +45,7 @@ export default function InventoryPage() {
 
     async function clearAvailable() {
         if (!clearing) return;
-        const saved = await action.submit(`/api/logistics/inventory/${clearing.productId}/clear-available`, { movementId });
+        const saved = await action.submit(`/api/logistics/products/${clearing.productId}`, undefined, 'delete');
         if (saved) setClearing(null);
     }
 
@@ -80,13 +80,13 @@ export default function InventoryPage() {
                                 {data.items.map((item) => (
                                     <tr key={item.productId} className="border-t border-store-line/70 hover:bg-store-cream/50">
                                         <td className="px-6 py-4 font-semibold">{item.name}</td>
-                                        <td className="whitespace-nowrap px-4 py-4 font-mono text-xs text-store-muted">{item.sku}</td>
+                                        <td className="whitespace-nowrap px-4 py-4 font-body text-sm text-black">{item.sku}</td>
                                         <td className="px-4 py-4 text-store-muted">{item.unit}</td>
                                         <td className="px-4 py-4 text-center font-price font-semibold tabular-nums">{item.onHand.toLocaleString('vi-VN')}</td>
                                         <td className="px-4 py-4 text-center font-price tabular-nums text-store-muted">{item.reserved.toLocaleString('vi-VN')}</td>
                                         <td className="px-4 py-4 text-center font-price font-bold tabular-nums text-store-green">{item.available.toLocaleString('vi-VN')}</td>
-                                        <td className="px-6 py-4"><span className={`inline-flex items-center whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold ${item.available > 0 ? 'bg-surface-green text-store-green' : 'bg-danger-soft text-danger-strong'}`}>{item.available > 0 ? tr("Còn hàng") : tr("Không còn hàng bán")}</span></td>
-                                        <td className="px-6 py-4"><div className="flex justify-center gap-2 whitespace-nowrap"><button type="button" onClick={() => openAdjustment(item)} className="rounded border border-black px-3 py-2 font-semibold hover:bg-store-cream">{tr("Điều chỉnh")}</button><button type="button" disabled={item.available <= 0} onClick={() => { setClearing(item); setMovementId(crypto.randomUUID()); }} className="rounded border border-red-700 px-3 py-2 font-semibold text-red-700 hover:bg-red-50 disabled:opacity-40">{tr("Xóa tồn")}</button></div></td>
+                                        <td className="px-6 py-4"><span className={`inline-flex items-center whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold ${item.available > 0 ? 'bg-surface-green text-store-green' : 'bg-danger-soft text-danger-strong'}`}>{item.productStatus === 'ARCHIVED' ? tr('Đã ẩn') : item.productStatus === 'DRAFT' ? tr('Chưa đăng bán') : item.available > 0 ? tr("Còn hàng") : tr("Không còn hàng bán")}</span></td>
+                                        <td className="px-6 py-4"><div className="flex justify-center gap-2 whitespace-nowrap"><button type="button" onClick={() => openAdjustment(item)} className="rounded border border-black px-3 py-2 font-semibold hover:bg-store-cream">{tr("Điều chỉnh")}</button><button type="button" disabled={item.productStatus === 'ARCHIVED'} onClick={() => { setClearing(item); setMovementId(crypto.randomUUID()); }} className="rounded border border-red-700 px-3 py-2 font-semibold text-red-700 hover:bg-red-50 disabled:opacity-40">{tr("Xóa")}</button></div></td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -108,7 +108,7 @@ export default function InventoryPage() {
                     <div className="flex justify-end gap-3"><button type="button" disabled={action.busy} onClick={() => setSelected(null)} className="rounded border border-black px-4 py-2">{tr("Hủy")}</button><button type="submit" disabled={action.busy} className="rounded border border-black bg-store-yellow px-4 py-2 font-semibold disabled:opacity-50">{action.busy ? tr("Đang lưu...") : tr("Lưu điều chỉnh")}</button></div>
                 </form>
             </div>}
-            <ConfirmModal open={Boolean(clearing)} title={tr("Xóa tồn khả dụng")} message={<>{tr("Xác nhận xóa hàng tồn kho khả dụng") + ' '}<strong>{clearing?.name}</strong>?</>} confirmLabel={tr("Xác nhận xóa")} cancelLabel={tr('Hủy')} danger busy={action.busy} error={action.error} onCancel={() => setClearing(null)} onConfirm={() => void clearAvailable()} />
+            <ConfirmModal open={Boolean(clearing)} title={tr("Xóa sản phẩm")} message={<>{tr("Xác nhận xóa sản phẩm") + ' '}<strong>{clearing?.name}</strong>?</>} confirmLabel={tr("Xác nhận xóa")} cancelLabel={tr('Hủy')} danger busy={action.busy} error={action.error} onCancel={() => setClearing(null)} onConfirm={() => void clearAvailable()} />
         </div>
     );
 }

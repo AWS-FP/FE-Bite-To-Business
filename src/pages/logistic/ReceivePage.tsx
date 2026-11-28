@@ -5,7 +5,6 @@ import { ImageOff, Package } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import LogisticsPageShell, { ListStatus } from '@/components/logistic/LogisticsPageShell';
 import Pagination from '@/components/common/Pagination';
-import ProductCreateWizard from '@/components/logistic/ProductCreateWizard';
 import {
     useLogisticsActions,
     useLogisticsList,
@@ -22,8 +21,6 @@ export default function ReceivePage() {
     const [quantity, setQuantity] = useState('');
     const [reason, setReason] = useState('');
     const [success, setSuccess] = useState(false);
-    const [creatingProduct, setCreatingProduct] = useState(false);
-    const [createdSku, setCreatedSku] = useState('');
     const product = data.items.find((item) => item.productId === productId);
     const unitNames: Record<string, string> =
         i18n.resolvedLanguage === 'en'
@@ -73,28 +70,11 @@ export default function ReceivePage() {
         movementId.current = null;
         setSuccess(false);
     }
-    if (creatingProduct)
-        return (
-            <ProductCreateWizard
-                onClose={() => setCreatingProduct(false)}
-                onCreated={(created) => {
-                    setCreatingProduct(false);
-                    setSearch(created.sku);
-                    data.setPage(0);
-                    setKeyword(created.sku);
-                    setProductId(created.id);
-                    setCreatedSku(created.sku);
-                    changed();
-                    if (keyword === created.sku) void data.refresh();
-                }}
-            />
-        );
     return (
         <LogisticsPageShell
             number="02"
             label={tr("Quản lý kho")}
             title={tr("Nhập hàng")}
-            description={tr("Ghi nhận số lượng sản phẩm nhận vào kho.")}
         >
             <div className="grid grid-cols-[minmax(0,1.2fr)_minmax(300px,1fr)] items-start gap-6">
                 <div>
@@ -102,20 +82,6 @@ export default function ReceivePage() {
                     onSubmit={save}
                     className="space-y-4 rounded-xl border-2 border-black bg-white p-6"
                 >
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                        <p className="m-0 text-sm text-store-muted">
-                            {tr("Chọn sản phẩm có sẵn hoặc thêm sản phẩm mới.") + ' '}</p>
-                        <button
-                            type="button"
-                            onClick={() => setCreatingProduct(true)}
-                            className="rounded border border-black bg-store-yellow px-4 py-2 text-sm font-bold hover:opacity-90"
-                        >
-                            {tr("+ Thêm sản phẩm mới") + ' '}</button>
-                    </div>
-                    {createdSku && (
-                        <p role="status" className="rounded bg-green-50 p-3 text-sm text-green-800">
-                            {tr("Đã tạo sản phẩm nháp") + ' '}{createdSku}{tr(". Nhập số lượng và chọn “Nhập hàng” để ghi nhận tồn kho.") + ' '}</p>
-                    )}
                     <label className="block font-bold">
                         {tr("Tìm sản phẩm") + ' '}<input
                             value={search}
@@ -124,7 +90,6 @@ export default function ReceivePage() {
                                 data.setPage(0);
                                 setSearch(e.target.value);
                                 setProductId('');
-                                setCreatedSku('');
                                 changed();
                             }}
                             placeholder={tr("Nhập tên sản phẩm hoặc mã SKU")}
