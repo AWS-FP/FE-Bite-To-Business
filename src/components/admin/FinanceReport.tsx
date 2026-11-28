@@ -1,3 +1,4 @@
+import axios from 'axios';
 import TableSkeleton from '@/components/common/TableSkeleton';
 import Skeleton from '@/components/common/Skeleton';
 import { useState, type FormEvent } from 'react';
@@ -114,6 +115,15 @@ export default function FinanceReport() {
     }
 
     const summary = report.data?.summary;
+    const chartRows=(report.data?.periods ?? []).map(row=>({...row,timestamp:Date.parse(row.date+'T00:00:00Z')}));
+    const chartValues=chartRows.flatMap(row=>basis==='payments'?[row.collected,row.refunded,row.netCollected]:[row.completedAmount]);
+    const peak=Math.max(0,...chartValues),low=Math.min(0,...chartValues);
+    const axisStep=peak>=1_000_000?Math.max(3_000_000,Math.ceil(peak/18_000_000)*3_000_000):peak>=100_000?100_000:peak>=10_000?10_000:1_000;
+    const axisMin=Math.floor(low/axisStep)*axisStep,axisMax=Math.max(axisStep,Math.ceil(peak/axisStep)*axisStep);
+    const moneyTicks=Array.from({length:Math.round((axisMax-axisMin)/axisStep)+1},(_,i)=>axisMin+i*axisStep);
+    const formatMoneyTick=(value:number)=>value===0?'0':Math.abs(value)>=1_000_000?new Intl.NumberFormat(i18n.language,{maximumFractionDigits:1}).format(value/1_000_000)+(i18n.language.startsWith('vi')?' tr':'M'):new Intl.NumberFormat(i18n.language,{notation:'compact'}).format(value);
+    const reportError=axios.isAxiosError(report.error)?report.error.response:null;
+
     const cards = [
         ['collected', summary?.collected, ArrowDownLeft],
         ['refunded', summary?.refunded, ArrowUpRight],
@@ -249,7 +259,7 @@ export default function FinanceReport() {
             </form>
             {report.isError && (
                 <p role="alert" className="system-notice system-notice-warning">
-                    {label('loadError')}
+                    {label('loadError')} {reportError && <span>(HTTP {reportError.status})</span>}
                     {report.data && <> {label('stale')}</>}
                 </p>
             )}
@@ -303,28 +313,23 @@ export default function FinanceReport() {
                     <div className="finance-chart">
                         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                             <ComposedChart
-                                data={report.data.periods}
+                                data={chartRows}
                                 accessibilityLayer
-                                margin={{ left: 20, right: 12 }}
+                                margin={{ top: 12, left: 0, right: 14, bottom: 4 }}
                             >
                                 <CartesianGrid
-                                    strokeDasharray="3 3"
+                                    strokeDasharray="3 5"
                                     vertical={false}
                                     stroke="var(--color-store-line)"
                                 />
-                                <XAxis dataKey="date" minTickGap={35} tick={{ fontSize: 11 }} />
-                                <YAxis
-                                    width={85}
-                                    tickFormatter={(value) =>
-                                        new Intl.NumberFormat(i18n.language, {
-                                            notation: 'compact',
-                                        }).format(Number(value))
-                                    }
-                                />
+                                <XAxis dataKey="timestamp" type="number" scale="time" domain={['dataMin','dataMax']} padding={{left:12,right:12}} minTickGap={48} axisLine={false} tickLine={false} tick={{fontSize:11}} tickFormatter={value=>new Date(Number(value)).toLocaleDateString(i18n.language,{day:'2-digit',month:'2-digit',timeZone:'UTC'})}/>
+                                <YAxis width={70} domain={[axisMin,axisMax]} ticks={moneyTicks} axisLine={false} tickLine={false} tick={{fontSize:12}} tickFormatter={value=>formatMoneyTick(Number(value))}/>
                                 <Tooltip
+                                    labelFormatter={value=>new Date(Number(value)).toLocaleDateString(i18n.language,{timeZone:"UTC"})}
                                     formatter={(value) => money(Number(value))}
                                     contentStyle={{
                                         border: '1px solid var(--color-store-line)',
+                                        borderRadius:12, boxShadow:'0 8px 24px rgba(0,0,0,.09)',
                                         background: 'var(--color-surface-soft)',
                                         color: 'var(--color-store-ink)',
                                     }}
@@ -336,14 +341,16 @@ export default function FinanceReport() {
                                             dataKey="collected"
                                             name={label('collected')}
                                             fill="var(--color-store-green)"
-                                            maxBarSize={26}
+                                            maxBarSize={22}
+                                            radius={[4,4,0,0]}
                                             isAnimationActive={false}
                                         />
                                         <Bar
                                             dataKey="refunded"
                                             name={label('refunded')}
                                             fill="var(--color-danger)"
-                                            maxBarSize={26}
+                                            maxBarSize={22}
+                                            radius={[4,4,0,0]}
                                             isAnimationActive={false}
                                         />
                                         <Line
@@ -351,6 +358,7 @@ export default function FinanceReport() {
                                             name={label('netCollected')}
                                             stroke="var(--color-warning)"
                                             dot={false}
+                                            strokeWidth={2.5}
                                             isAnimationActive={false}
                                         />
                                     </>
@@ -359,7 +367,8 @@ export default function FinanceReport() {
                                         dataKey="completedAmount"
                                         name={label('completedAmount')}
                                         fill="var(--color-store-green)"
-                                        maxBarSize={26}
+                                        maxBarSize={22}
+                                            radius={[4,4,0,0]}
                                         isAnimationActive={false}
                                     />
                                 )}

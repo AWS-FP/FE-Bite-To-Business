@@ -74,7 +74,7 @@ export default function ProductRequestsPage() {
     }
 
     if (creating) return <ProductCreateWizard request={creating} onClose={() => setCreating(null)} />;
-    return <LogisticsPageShell number="04" label={tr("Yêu cầu khách hàng")} title={tr("Yêu cầu sản phẩm")} description={tr("Tiếp nhận và phản hồi yêu cầu từ khách hàng.")}>
+    return <LogisticsPageShell number="04" label={tr("Yêu cầu khách hàng")} title={tr("Yêu cầu sản phẩm")}>
         <section className="rounded-xl border border-store-line bg-white p-5">
             {message && <p role="status" className="mb-4 rounded-lg bg-green-50 p-3 text-green-800">{message}</p>}
             <ListStatus loading={data.loading} error={data.error} empty={data.items.length === 0} />

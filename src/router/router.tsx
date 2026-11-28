@@ -45,6 +45,7 @@ import DeliveryPackagePage from '@/pages/shipper/DeliveryPackagePage';
 import LogisticsLayout from '@/layouts/logistic/LogisticsLayout';
 import InventoryPage from '@/pages/logistic/InventoryPage';
 import ReceivePage from '@/pages/logistic/ReceivePage';
+import CreateProductPage from '@/pages/logistic/CreateProductPage';
 import PackageReturnsPage from '@/pages/admin/PackageReturnsPage';
 import PaymentReviewsPage from '@/pages/admin/PaymentReviewsPage';
 import ProductRequestsPage from '@/pages/logistic/ProductRequestsPage';
@@ -66,13 +67,11 @@ import ProtectedRoute from './ProtectedRoute';
 import StorefrontRoleGuard from './StorefrontRoleGuard';
 import { ROUTES } from './routes';
 import EcommerceDashboardPage from '@/pages/e-commerce/EcommerceDashboardPage';
-import LogisticsQuotesPage from '@/pages/logistic/LogisticsQuotesPage';
 import EcommerceProductsPage from '@/pages/e-commerce/EcommerceProductsPage';
 import EcommerceCombosPage from '@/pages/e-commerce/EcommerceCombosPage';
 import EcommercePromotionsPage from '@/pages/e-commerce/EcommercePromotionsPage';
 import EcommerceCouponsPage from '@/pages/e-commerce/EcommerceCouponsPage';
 import EcommerceReviewsPage from '@/pages/e-commerce/EcommerceReviewsPage';
-import LogisticsCancellationsPage from '@/pages/logistic/LogisticsCancellationsPage';
 
 export const router = createBrowserRouter([
     {
@@ -338,11 +337,12 @@ export const router = createBrowserRouter([
                                 Component: ReceivePage,
                             },
                             {
+                                path: ROUTES.LOGISTICS_CREATE_PRODUCT, Component: CreateProductPage,
+                            },
+                            {
                                 path: ROUTES.LOGISTICS_PRODUCT_REQUESTS,
                                 Component: ProductRequestsPage,
                             },
-                            { path: ROUTES.LOGISTICS_QUOTES, Component: LogisticsQuotesPage },
-                            { path: ROUTES.LOGISTICS_CANCELLATIONS, Component: LogisticsCancellationsPage },
                         ],
                     },
                 ],

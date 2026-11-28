@@ -29,7 +29,7 @@ export default function DeliveryTopbar({ onOpenMenu }: { onOpenMenu: () => void 
                 <DeliveryMenuButton onClick={onOpenMenu} />
                 <div className="dl-stamp">
                     <small>BTB</small>
-                    <strong>01</strong>
+                    <strong>04</strong>
                 </div>
                 <div className="dl-topbar-titles">
                     <p className="dl-eyebrow">

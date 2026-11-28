@@ -15,7 +15,7 @@ export function LogisticsPageHeader({ number, label, title, description, childre
     </header>;
 }
 
-export default function LogisticsPageShell({ number, label, title, description, children }: { number: string; label: string; title: string; description: string; children: ReactNode }) {
+export default function LogisticsPageShell({ number, label, title, description, children }: { number: string; label: string; title: string; description?: string; children: ReactNode }) {
     return <div className="mx-auto max-w-[1200px] space-y-6 text-black"><LogisticsPageHeader number={number} label={label} title={title} description={description} />{children}</div>;
 }
 export function ListStatus({ loading, error, empty }: { loading: boolean; error: string; empty: boolean }) {

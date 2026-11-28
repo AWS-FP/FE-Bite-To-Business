@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/admin/authStore';
 import {
@@ -23,21 +24,24 @@ export function useFinanceReports(
         queryFn: ({ signal }) => getFinanceReport(filters, signal),
         enabled: role === 'ADMIN',
         staleTime: 30_000,
-        retry: false,
+        retry: (attempt,error) => attempt < 1 && axios.isAxiosError(error) && (!error.response || error.response.status>=500),
+        retryDelay: 1000,
     });
     const transactions = useQuery({
         queryKey: [...key, 'transactions', page, kind, status],
         queryFn: ({ signal }) => getFinanceTransactions(filters, page, kind, status, signal),
         enabled: role === 'ADMIN',
         staleTime: 30_000,
-        retry: false,
+        retry: (attempt,error) => attempt < 1 && axios.isAxiosError(error) && (!error.response || error.response.status>=500),
+        retryDelay: 1000,
     });
     const customers = useQuery({
         queryKey: [...key, 'customers', customerPage],
         queryFn: ({ signal }) => getFinanceCustomers(filters, customerPage, signal),
         enabled: role === 'ADMIN',
         staleTime: 30_000,
-        retry: false,
+        retry: (attempt,error) => attempt < 1 && axios.isAxiosError(error) && (!error.response || error.response.status>=500),
+        retryDelay: 1000,
     });
     return { report, transactions, customers };
 }

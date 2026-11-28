@@ -54,8 +54,7 @@ export const ROUTES = {
 
     LOGISTICS: '/logistics',
     LOGISTICS_INVENTORY: '/logistics/inventory',
-    LOGISTICS_QUOTES: '/logistics/quotes',
-    LOGISTICS_CANCELLATIONS: '/logistics/cancellations',
+    LOGISTICS_CREATE_PRODUCT: '/logistics/products/new',
     LOGISTICS_RECEIVE: '/logistics/receive',
     LOGISTICS_PRODUCT_REQUESTS: '/logistics/product-requests',
 

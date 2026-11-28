@@ -1,3 +1,4 @@
+import { LogisticsPageHeader } from '@/components/logistic/LogisticsPageShell';
 import { useLogisticsText } from '@/hooks/logistic/useLogisticsText';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
@@ -721,24 +722,12 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         <div className="mx-auto max-w-[1200px] space-y-6 text-black">
             <PageNav
                 back={{
-                    label: request ? tr('Quay lại yêu cầu') : tr('Quay lại nhập hàng'),
+                    label: request ? tr('Quay lại yêu cầu') : tr('Quay lại sổ cái tồn kho'),
                     onClick: onClose,
                     disabled: busy,
                 }}
             />
-            <div className="flex items-start justify-between gap-6">
-                <div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-store-green">
-                        {request
-                            ? tr('Yêu cầu khách hàng / Tạo sản phẩm')
-                            : tr('Quản lý kho / Tạo sản phẩm')}
-                    </p>
-                    <h1 className="mt-2 font-heading text-[34px]">{tr('Tạo sản phẩm mới')}</h1>
-                    <p className="mt-2 text-sm text-store-muted">
-                        {tr('Điền thông tin sản phẩm theo từng bước.') + ' '}
-                    </p>
-                </div>
-            </div>
+            <LogisticsPageHeader number={request ? "04" : "03"} label={request ? tr("Yêu cầu khách hàng") : tr("Quản lý kho")} title={tr("Tạo sản phẩm mới")} />
             {created ? (
                 <div className="rounded-xl border border-green-300 bg-green-50 p-6" role="status">
                     <p className="font-bold text-green-800">
