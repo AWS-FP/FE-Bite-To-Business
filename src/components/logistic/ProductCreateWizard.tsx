@@ -1,6 +1,7 @@
 import { LogisticsPageHeader } from '@/components/logistic/LogisticsPageShell';
 import { useLogisticsText } from '@/hooks/logistic/useLogisticsText';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
     ArrowLeft,
     ArrowRight,
@@ -15,14 +16,14 @@ import type { TranslationField, TranslationLanguage } from '@/types/logistic/tra
 import { getHomeCategories } from '@/services/customer/homeService';
 import type { HomeCategory } from '@/types/customer/home';
 import { getCatalogBrands } from '@/services/customer/catalogReadService';
-import type { CatalogBrand } from '@/types/customer/catalog';
 import type { ProductRequest } from '@/hooks/logistic/useLogisticsData';
 import { http } from '@/services/axiosClient';
 import axios from 'axios';
 import PageNav from '@/components/common/PageNav';
+import PromotionImageCropper from '@/components/e-commerce/PromotionImageCropper';
+import LogisticsRemoveButton from './LogisticsRemoveButton';
 import BilingualNutritionEditor, { type NutritionRow } from './BilingualNutritionEditor';
 import { getCountries, getDistributors } from '@/services/logistic/productSourceService';
-import type { CountryOption, DistributorOption } from '@/types/logistic/productSource';
 
 const inputClass =
     'mt-2 w-full rounded border border-black/40 bg-white px-3 py-3 text-sm font-normal text-black outline-none focus:border-black focus:ring-0';
@@ -33,6 +34,7 @@ const BILINGUAL_FIELDS: [string, TranslationField][] = [
     ['description', 'DESCRIPTION'],
     ['spec', 'SPEC'],
     ['storage', 'STORAGE'],
+    ['sellingSpec', 'TECHNICAL'],
 ];
 const bilingual: Record<
     string,
@@ -101,15 +103,27 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
     const [values, setValues] = useState<Record<string, string>>({
         nameVi: request?.productName.replace(/^Yêu cầu quy cách mới:\s*/i, '').trim() || '',
     });
-    const [categories, setCategories] = useState<HomeCategory[]>([]);
-    const [brands, setBrands] = useState<CatalogBrand[]>([]);
-    const [distributors, setDistributors] = useState<DistributorOption[]>([]);
-    const [countries, setCountries] = useState<CountryOption[]>([]);
-    const [countriesError, setCountriesError] = useState(false);
-    const [catalogError, setCatalogError] = useState(false);
+    const { data: categories = [], isError: categoryError } = useQuery({
+        queryKey: ['ecom', 'categories'], queryFn: ({ signal }) => getHomeCategories(signal), staleTime: 60_000,
+    });
+    const { data: brands = [], isError: brandError } = useQuery({
+        queryKey: ['ecom', 'brands'], queryFn: ({ signal }) => getCatalogBrands(signal), staleTime: 60_000,
+    });
+    const { data: distributors = [], isError: distributorError } = useQuery({
+        queryKey: ['logistics', 'product-distributors'], queryFn: ({ signal }) => getDistributors(signal), staleTime: 60_000,
+    });
+    const { data: countries = [], isError: countriesError } = useQuery({
+        queryKey: ['logistics', 'countries'], queryFn: ({ signal }) => getCountries(signal), staleTime: 60 * 60_000,
+    });
+    const catalogError = categoryError || brandError || distributorError;
     const [image, setImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState('');
-    const [tiers, setTiers] = useState<{ min: string; max: string; price: string }[]>([]);
+    const [cropSource, setCropSource] = useState<{ url: string; name: string } | null>(null);
+    const cropUrl = cropSource?.url;
+    useEffect(() => {
+        if (cropUrl) return () => URL.revokeObjectURL(cropUrl);
+    }, [cropUrl]);
+    const [tiers, setTiers] = useState<{ min: string; max: string; price: string; unlimited: boolean }[]>([]);
     // Bảng dinh dưỡng (bắt buộc): lượng tham chiếu + các dòng VI/EN đồng bộ.
     const [nutrition, setNutrition] = useState<{ basis: string; rows: NutritionRow[] }>({
         basis: '100g',
@@ -157,8 +171,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
     async function requestSuggestion(targetKey: string) {
         const info = bilingual[targetKey];
         const sourceText = values[info.counterpart]?.trim();
-        if (!sourceText) return;
-        suggestionRequests.current[targetKey]?.abort();
+        if (!sourceText || suggestionRequests.current[targetKey]) return;
         const controller = new AbortController();
         suggestionRequests.current[targetKey] = controller;
         setSuggestions((current) => ({
@@ -190,24 +203,12 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         }
     }
 
-    // Rời ô nguồn: tự gợi ý khi ô bên kia còn trống và chưa gợi ý cho đúng nội dung này.
-    function suggestAfterBlur(key: string) {
-        const info = bilingual[key];
-        if (!info) return;
-        const text = values[key]?.trim();
-        const target = info.counterpart;
-        if (!text || values[target]?.trim()) return;
-        const existing = suggestions[target];
-        if (existing && existing.sourceText === text && existing.status !== 'error') return;
-        void requestSuggestion(target);
-    }
-
     // Dịch tên các thành phần dinh dưỡng từ bảng kia sang `target` (một lần gọi cho cả bảng).
     async function translateNutrition(target: Lang) {
         const source: Lang = target === 'en' ? 'vi' : 'en';
         const names = nutrition.rows.map((row) => row[source].trim());
         if (!names.some(Boolean)) return;
-        nutritionTranslationRequest.current?.abort();
+        if (nutritionTranslationRequest.current) return;
         const controller = new AbortController();
         nutritionTranslationRequest.current = controller;
         setNutritionTranslation({ target, status: 'loading' });
@@ -218,7 +219,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 'TECHNICAL',
                 controller.signal,
             );
-            if (controller.signal.aborted) return;
+            if (controller.signal.aborted || nutritionTranslationRequest.current !== controller) return;
             const translated = text.split('|').map((name) => name.trim());
             if (translated.length !== names.length) {
                 setNutritionTranslation({
@@ -244,20 +245,13 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         }
     }
 
-    // "Quy cách bán" nhập một lần theo ngôn ngữ của staff; khi tạo sản phẩm, AI dịch sang ngôn ngữ còn lại.
-    async function sellingSpecTexts(): Promise<Record<Lang, string>> {
-        const value = values.sellingSpec.trim();
-        const other: Lang = staffLang === 'vi' ? 'en' : 'vi';
-        let translated = value;
-        try {
-            translated = (await suggestTranslation(value, staffLang, 'TECHNICAL')).trim() || value;
-        } catch {
-            // Không dịch được thì dùng nguyên văn để không chặn việc tạo sản phẩm.
-        }
-        const texts = { [staffLang]: value, [other]: translated } as Record<Lang, string>;
+    // Use the manually entered/explicitly translated selling spec; no AI request on Save.
+    function sellingSpecTexts(): Record<Lang, string> {
+        const vi = values.sellingSpecVi?.trim() || values.sellingSpecEn?.trim() || '';
+        const en = values.sellingSpecEn?.trim() || values.sellingSpecVi?.trim() || '';
         return {
-            vi: `${SELLING_SPEC_LABEL.vi}: ${texts.vi.replace(/\|/g, '/')}`,
-            en: `${SELLING_SPEC_LABEL.en}: ${texts.en.replace(/\|/g, '/')}`,
+            vi: `${SELLING_SPEC_LABEL.vi}: ${vi.replace(/\|/g, '/')}`,
+            en: `${SELLING_SPEC_LABEL.en}: ${en.replace(/\|/g, '/')}`,
         };
     }
 
@@ -307,7 +301,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 'specEn',
                 'unit',
                 'minOrder',
-                'sellingSpec',
+                staffLang === 'vi' ? 'sellingSpecVi' : 'sellingSpecEn',
                 'netWeight',
                 'tareWeight',
                 'length',
@@ -355,22 +349,27 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             if (![price, min].every(Number.isFinite) || price < 0 || !Number.isInteger(price) || min <= 0)
                 return tr('Giá phải là số nguyên không âm và số lượng tối thiểu phải lớn hơn 0.');
             const sorted = [...tiers].sort((a, b) => Number(a.min) - Number(b.min));
+            if (tiers.some((tier, index) => tier.unlimited && index !== tiers.length - 1))
+                return tr('Chỉ bậc giá cuối cùng được phép không giới hạn.');
             for (let i = 0; i < sorted.length; i++) {
                 const tier = sorted[i],
                     low = Number(tier.min),
-                    high = tier.max.trim() ? Number(tier.max) : null,
+                    high = tier.unlimited ? null : Number(tier.max),
                     tierPrice = Number(tier.price);
                 if (
                     !tier.min.trim() ||
                     !tier.price.trim() ||
+                    (!tier.unlimited && !tier.max.trim()) ||
+                    (tier.unlimited && i !== sorted.length - 1) ||
                     !Number.isFinite(low) ||
+                    !/^\d{1,9}(?:\.\d{1,3})?$/.test(tier.min) ||
                     low <= 0 ||
                     !Number.isFinite(tierPrice) ||
                     !Number.isInteger(tierPrice) ||
                     tierPrice < 0 ||
                     tierPrice > price ||
-                    (high != null && (!Number.isFinite(high) || high < low)) ||
-                    (i > 0 && (!sorted[i - 1].max.trim() || Number(sorted[i - 1].max) >= low))
+                    (high != null && (!Number.isFinite(high) || !/^\d{1,9}(?:\.\d{1,3})?$/.test(tier.max) || high < low)) ||
+                    (i > 0 && (sorted[i - 1].unlimited || Number(sorted[i - 1].max) >= low))
                 )
                     return tr(
                         'Kiểm tra bậc giá: số lượng phải hợp lệ, không chồng lấn và đơn giá không vượt giá niêm yết.',
@@ -412,7 +411,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         }));
         setBusy(true);
         setError('');
-        const sellingSpec = await sellingSpecTexts();
+        const sellingSpec = sellingSpecTexts();
         const payload = {
             nameVi: values.nameVi.trim(),
             nameEn: values.nameEn.trim(),
@@ -442,7 +441,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             minOrder: Number(values.minOrder),
             tiers: tiers.map((tier) => ({
                 min: Number(tier.min),
-                max: tier.max.trim() ? Number(tier.max) : null,
+                max: tier.unlimited ? null : Number(tier.max),
                 price: Number(tier.price),
             })),
             nutritionBasis: nutrition.basis.trim(),
@@ -468,33 +467,6 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         }
     }
 
-    useEffect(() => {
-        const controller = new AbortController();
-        Promise.all([
-            getHomeCategories(controller.signal),
-            getCatalogBrands(controller.signal),
-            getDistributors(controller.signal),
-        ])
-            .then(([categoryData, brandData, distributorData]) => {
-                setCategories(categoryData);
-                setBrands(brandData);
-                setDistributors(distributorData);
-            })
-            .catch(() => {
-                if (!controller.signal.aborted) setCatalogError(true);
-            });
-        return () => controller.abort();
-    }, []);
-    // Danh sách quốc gia cho ô Xuất xứ (API bên ngoài, tải riêng để lỗi không chặn phần còn lại).
-    useEffect(() => {
-        const controller = new AbortController();
-        getCountries(controller.signal)
-            .then(setCountries)
-            .catch(() => {
-                if (!controller.signal.aborted) setCountriesError(true);
-            });
-        return () => controller.abort();
-    }, []);
     useEffect(
         () => () => {
             if (imagePreview) URL.revokeObjectURL(imagePreview);
@@ -515,10 +487,10 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 const value = event.target.value;
                 setValues((current) => ({ ...current, [key]: value }));
                 // Nội dung nguồn đổi thì gợi ý cũ ở ô bên kia không còn đúng.
+                if (suggestions[key]) dropSuggestion(key);
                 const stale = pair && suggestions[pair.counterpart];
                 if (stale && stale.sourceText !== value.trim()) dropSuggestion(pair.counterpart);
             },
-            onBlur: pair ? () => suggestAfterBlur(key) : undefined,
             className: inputClass,
             placeholder: options?.placeholder,
         };
@@ -555,6 +527,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                         {...props}
                         type={options?.type || 'text'}
                         min={options?.type === 'number' ? '0' : undefined}
+                        maxLength={key.startsWith('sellingSpec') ? 200 : undefined}
                     />
                 )}
                 {suggestion && (
@@ -685,16 +658,10 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         {
             label: tr('Quy cách bán'),
             input: (
-                <input
-                    aria-label={tr('Quy cách bán')}
-                    maxLength={200}
-                    placeholder={tr('Ví dụ: Thùng 24 lon')}
-                    value={values.sellingSpec || ''}
-                    onChange={(e) =>
-                        setValues((current) => ({ ...current, sellingSpec: e.target.value }))
-                    }
-                    className={cellInputClass}
-                />
+                <div className="grid grid-cols-2 gap-2">
+                    {field('sellingSpecVi', tr('Tiếng Việt'), { placeholder: tr('Ví dụ: Thùng 24 lon') })}
+                    {field('sellingSpecEn', tr('Tiếng Anh'), { placeholder: tr('Ví dụ: Thùng 24 lon') })}
+                </div>
             ),
         },
         {
@@ -914,10 +881,15 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                         className="sr-only"
                                         onChange={(e) => {
                                             const selected = e.target.files?.[0] || null;
-                                            setImage(selected);
-                                            setImagePreview(
-                                                selected ? URL.createObjectURL(selected) : '',
-                                            );
+                                            e.target.value = '';
+                                            if (!selected) return;
+                                            if (selected.size > 5 * 1024 * 1024 ||
+                                                !['image/jpeg', 'image/png', 'image/webp'].includes(selected.type)) {
+                                                setError(tr('Chọn ảnh JPG, PNG hoặc WebP (tối đa 5 MB)'));
+                                                return;
+                                            }
+                                            setError('');
+                                            setCropSource({ url: URL.createObjectURL(selected), name: selected.name });
                                         }}
                                     />
                                 </label>
@@ -1030,7 +1002,12 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     </label>
                                     <BilingualNutritionEditor
                                         rows={nutrition.rows}
-                                        onChange={(rows) => setNutrition({ ...nutrition, rows })}
+                                        onChange={(rows) => {
+                                            nutritionTranslationRequest.current?.abort();
+                                            nutritionTranslationRequest.current = null;
+                                            setNutritionTranslation(null);
+                                            setNutrition({ ...nutrition, rows });
+                                        }}
                                         labels={{
                                             heading: { vi: tr('Tiếng Việt'), en: tr('Tiếng Anh') },
                                             nutrient: {
@@ -1108,10 +1085,11 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     <h3 className="font-semibold">{tr('Bậc giá sỉ')}</h3>
                                     <button
                                         type="button"
+                                        disabled={tiers.length >= 100 || tiers.some((tier) => tier.unlimited)}
                                         onClick={() =>
-                                            setTiers([...tiers, { min: '', max: '', price: '' }])
+                                            setTiers((current) => [...current, { min: '', max: '', price: '', unlimited: false }])
                                         }
-                                        className="rounded border border-black px-3 py-2 text-sm font-semibold"
+                                        className="rounded border border-black px-3 py-2 text-sm font-semibold disabled:opacity-50"
                                     >
                                         {tr('+ Thêm bậc giá') + ' '}
                                     </button>
@@ -1132,8 +1110,11 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                                 }
                                                 <input
                                                     type="number"
-                                                    min="0"
-                                                    value={tier[key]}
+                                                    min={key === 'price' ? '0' : '0.001'}
+                                                    step={key === 'price' ? '1' : '0.001'}
+                                                    disabled={key === 'max' && tier.unlimited}
+                                                    placeholder={key === 'max' && tier.unlimited ? tr('Không giới hạn') : undefined}
+                                                    value={key === 'max' && tier.unlimited ? '' : tier[key]}
                                                     onChange={(e) =>
                                                         setTiers(
                                                             tiers.map((item, i) =>
@@ -1150,15 +1131,19 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                                 />
                                             </label>
                                         ))}
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setTiers(tiers.filter((_, i) => i !== index))
-                                            }
-                                            className="mb-1 px-2 py-2 text-sm text-red-700"
-                                        >
-                                            {tr('Xóa') + ' '}
-                                        </button>
+                                        <div className="mb-1.5">
+                                            <LogisticsRemoveButton label={`${tr('Xóa')} ${index + 1}`}
+                                                onClick={() => setTiers(tiers.filter((_, i) => i !== index))} />
+                                        </div>
+                                        {index === tiers.length - 1 && (
+                                            <label className="col-span-full flex items-center gap-2 text-sm font-medium">
+                                                <input type="checkbox" checked={tier.unlimited}
+                                                    className="size-4 accent-store-green"
+                                                    onChange={(e) => setTiers(tiers.map((item, i) =>
+                                                        i === index ? { ...item, unlimited: e.target.checked } : item))} />
+                                                {tr('Không giới hạn số lượng tối đa')}
+                                            </label>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -1192,7 +1177,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                     </p>
                                     <p className="mt-1 text-store-muted">
                                         {tr('Quy cách bán:') + ' '}
-                                        {values.sellingSpec || tr('Chưa nhập')}{' '}
+                                        {values[staffLang === 'vi' ? 'sellingSpecVi' : 'sellingSpecEn'] || tr('Chưa nhập')}{' '}
                                         {tr('· Nhà phân phối:')}{' '}
                                         {distributors.find((item) => item.id === values.distributor)
                                             ?.name || tr('Chưa chọn')}
@@ -1264,6 +1249,15 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                         </div>
                     </section>
                 </>
+            )}
+            {cropSource && (
+                <PromotionImageCropper src={cropSource.url} originalName={cropSource.name} kind="product"
+                    onCancel={() => setCropSource(null)}
+                    onApply={(file) => {
+                        setImage(file);
+                        setImagePreview(URL.createObjectURL(file));
+                        setCropSource(null);
+                    }} />
             )}
         </div>
     );

@@ -25,7 +25,7 @@ export default function PromotionImageCropper({
     originalName: string;
     onApply: (result: File) => void;
     onCancel: () => void;
-    kind?: 'promotion' | 'combo';
+    kind?: 'promotion' | 'combo' | 'product';
 }) {
     const tr = useExecutiveText();
     const stageRef = useRef<HTMLDivElement>(null);
@@ -74,7 +74,7 @@ export default function PromotionImageCropper({
         return () => { active = false; imageRef.current = null; };
     }, [src, imageLoadError]);
 
-    const aspect = PROMOTION_BANNER_ASPECT;
+    const aspect = kind === 'product' ? 1 : PROMOTION_BANNER_ASPECT;
     const cropWidth = Math.max(1, Math.min(stageSize.width - 24, (stageSize.height - 24) * aspect));
     const cropHeight = cropWidth / aspect;
     const baseScale = natural ? Math.max(cropWidth / natural.width, cropHeight / natural.height) : 1;
@@ -131,8 +131,8 @@ export default function PromotionImageCropper({
         setBusy(true);
         setError('');
         try {
-            const outputWidth = PROMOTION_BANNER_WIDTH;
-            const outputHeight = PROMOTION_BANNER_HEIGHT;
+            const outputWidth = kind === 'product' ? 800 : PROMOTION_BANNER_WIDTH;
+            const outputHeight = kind === 'product' ? 800 : PROMOTION_BANNER_HEIGHT;
             const canvas = document.createElement('canvas');
             canvas.width = outputWidth;
             canvas.height = outputHeight;
@@ -160,7 +160,7 @@ export default function PromotionImageCropper({
 
     return createPortal(
         <div className="fixed inset-0 z-[500] flex items-center justify-center bg-[#061f16]/80 px-2 py-2 backdrop-blur-sm sm:px-4" role="presentation" onPointerDown={(event) => { if (event.target === event.currentTarget && !busy) onCancel(); }}>
-            <section role="dialog" aria-modal="true" aria-label={kind === 'combo' ? tr('Cắt ảnh combo', 'Crop combo image') : tr('Cắt ảnh khuyến mãi', 'Crop promotion image')} className="flex max-h-[calc(100dvh-1rem)] w-full max-w-[850px] flex-col overflow-hidden rounded-2xl bg-[#fffaf0] shadow-2xl">
+            <section role="dialog" aria-modal="true" aria-label={kind === 'product' ? tr('Cắt ảnh sản phẩm', 'Crop product image') : kind === 'combo' ? tr('Cắt ảnh combo', 'Crop combo image') : tr('Cắt ảnh khuyến mãi', 'Crop promotion image')} className="flex max-h-[calc(100dvh-1rem)] w-full max-w-[850px] flex-col overflow-hidden rounded-2xl bg-[#fffaf0] shadow-2xl">
                 <div className="flex shrink-0 items-center justify-between gap-2 border-b border-[#dbe6d9] px-4 py-2 sm:px-5">
                     <div>
                         <h2 className="m-0 text-base font-bold text-[#14392b] sm:text-lg">{tr('Chỉnh sửa vùng ảnh', 'Edit image crop')}</h2>
@@ -170,8 +170,8 @@ export default function PromotionImageCropper({
                 </div>
                 <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-2 sm:px-5">
                     <div className="mb-2 rounded-lg border border-[#dbe6d9] bg-white px-3 py-1.5 text-xs text-[#24593d]">
-                        <p className="m-0 font-bold">{kind === 'combo' ? tr('Kích thước thiết kế ảnh combo', 'Combo image size') : tr('Kích thước thiết kế banner', 'Banner design size')}: {PROMOTION_BANNER_SIZE} (16:9)</p>
-                        <p className="m-0 text-xs text-[#607465]">{kind === 'combo' ? tr('Khung 16:9 khớp với thẻ combo trang chủ. Giữ các sản phẩm chính bên trong vùng cắt.', 'This 16:9 frame matches homepage combo cards. Keep the main products inside the crop area.') : tr('Khung này khớp với banner trang chủ. Chừa khoảng trống phía dưới cho tiêu đề chiến dịch.', 'This frame matches the homepage banner. Leave room at the bottom for the campaign title.')}</p>
+                        <p className="m-0 font-bold">{kind === 'product' ? tr('Kích thước ảnh sản phẩm', 'Product image size') : kind === 'combo' ? tr('Kích thước thiết kế ảnh combo', 'Combo image size') : tr('Kích thước thiết kế banner', 'Banner design size')}: {kind === 'product' ? '800 × 800 (1:1)' : `${PROMOTION_BANNER_SIZE} (16:9)`}</p>
+                        <p className="m-0 text-xs text-[#607465]">{kind === 'product' ? tr('Giữ sản phẩm bên trong khung vuông.', 'Keep the product inside the square frame.') : kind === 'combo' ? tr('Khung 16:9 khớp với thẻ combo trang chủ. Giữ các sản phẩm chính bên trong vùng cắt.', 'This 16:9 frame matches homepage combo cards. Keep the main products inside the crop area.') : tr('Khung này khớp với banner trang chủ. Chừa khoảng trống phía dưới cho tiêu đề chiến dịch.', 'This frame matches the homepage banner. Leave room at the bottom for the campaign title.')}</p>
                     </div>
                     <div ref={stageRef} role="img" aria-label={tr('Kéo ảnh trong khung sáng để chọn vùng cắt', 'Drag photo inside the crop guide to choose the area')} tabIndex={0}
                         onPointerDown={beginDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}

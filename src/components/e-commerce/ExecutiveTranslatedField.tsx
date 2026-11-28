@@ -11,9 +11,9 @@ export default function ExecutiveTranslatedField({ label, value, source, sourceL
         <div className="flex flex-wrap items-start justify-between gap-1">
             <label htmlFor={id} className="text-xs font-bold leading-7">{label}</label>
             <div className="min-w-0 max-w-full">
-                <ExecutiveTranslationSuggestion key={JSON.stringify([session, source, value, sourceLanguage, field])} source={source} language={sourceLanguage} field={field} limit={limit} disabled={disabled} onAccept={onChange} />
+                <ExecutiveTranslationSuggestion key={JSON.stringify([session, source, value, sourceLanguage, field, disabled])} source={source} target={value} language={sourceLanguage} field={field} limit={limit} disabled={disabled} onAccept={onChange} />
             </div>
         </div>
-        {multiline ? <textarea id={id} rows={3} className={`${executiveUi.input} !h-auto py-3`} value={value} onChange={e => onChange(e.target.value)} required={required} /> : <input id={id} className={executiveUi.input} value={value} maxLength={limit} required={required} onChange={e => onChange(e.target.value)} />}
+        {multiline ? <textarea id={id} rows={3} maxLength={limit} className={`${executiveUi.input} !h-auto py-3`} value={value} onChange={e => onChange(e.target.value)} required={required} /> : <input id={id} className={executiveUi.input} value={value} maxLength={limit} required={required} onChange={e => onChange(e.target.value)} />}
     </div>;
 }

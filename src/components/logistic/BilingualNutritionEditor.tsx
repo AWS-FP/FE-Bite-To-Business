@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import LogisticsRemoveButton from './LogisticsRemoveButton';
 
 // Một dòng dinh dưỡng: tên tiếng Việt, tên tiếng Anh, hàm lượng dùng chung.
 export type NutritionRow = { vi: string; en: string; amount: string };
@@ -81,13 +82,10 @@ export default function BilingualNutritionEditor({ rows, onChange, labels, heade
                                                 />
                                             </td>
                                             <td className="px-1 text-center">
-                                                <button
-                                                    type="button"
+                                                <LogisticsRemoveButton
+                                                    label={`${labels.remove} ${index + 1}`}
                                                     onClick={() => onChange(rows.filter((_, i) => i !== index))}
-                                                    className="text-sm text-red-700"
-                                                >
-                                                    {labels.remove}
-                                                </button>
+                                                />
                                             </td>
                                         </tr>
                                     ))}

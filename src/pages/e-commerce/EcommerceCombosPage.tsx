@@ -26,8 +26,7 @@ import { ExecutiveComboSkeleton } from '@/components/e-commerce/ExecutiveSkeleto
 import { formatCurrencyVnd } from '@/constants/customer/homeData';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '@/router/routes';
-import type { TranslationField } from '@/types/logistic/translation';
-import ExecutiveTranslationSuggestion from '@/components/e-commerce/ExecutiveTranslationSuggestion';
+import ExecutiveTranslatedField from '@/components/e-commerce/ExecutiveTranslatedField';
 import { invalidatePublicCatalog } from '@/hooks/customer/useCatalogQuery';
 
 const emptyForm = {
@@ -54,10 +53,6 @@ const emptyForm = {
     originContentVi: '',
     originContentEn: '',
 };
-function ComboTranslation({ source, field, disabled, onAccept }: { source: string; field: TranslationField; disabled: boolean; onAccept: (text: string) => void }) {
-    return <ExecutiveTranslationSuggestion key={JSON.stringify([source, field])} source={source} language="vi" field={field} limit={field === 'NAME' ? 200 : 2000} disabled={disabled} onAccept={onAccept} />;
-}
-
 export default function EcommerceCombosPage() {
     const confirm = useExecutiveConfirmation();
     const tr = useExecutiveText(),
@@ -65,6 +60,7 @@ export default function EcommerceCombosPage() {
     const [page, setPage] = useState(0);
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<string | null>(null);
+    const [translationSession, setTranslationSession] = useState(0);
     const [form, setForm] = useState(emptyForm);
     const [items, setItems] = useState<SelectedIngredient[]>([]);
     const [feedback, setFeedback] = useState({ message: '', error: false });
@@ -102,6 +98,7 @@ export default function EcommerceCombosPage() {
         );
     }
     function reset() {
+        setTranslationSession((value) => value + 1);
         setEditId(null);
         setForm({ ...emptyForm });
         setItems([]);
@@ -125,6 +122,7 @@ export default function EcommerceCombosPage() {
                 );
                 return;
             }
+            setTranslationSession((value) => value + 1);
             setEditId(combo.id);
             setForm({
                 nameVi: combo.nameVi,
@@ -393,28 +391,11 @@ export default function EcommerceCombosPage() {
                             <fieldset disabled={busy} className="min-w-0 space-y-5 border-0 p-0">
                                 <div className="grid min-w-0 gap-4 md:grid-cols-2">
                                     {(['nameVi', 'nameEn'] as const).map((key) => (
-                                        <div key={key} className="min-w-0">
-                                            <label className="block text-xs font-bold">
-                                                {key === 'nameVi'
-                                                    ? tr('Tên tiếng Việt', 'Vietnamese name')
-                                                    : tr('Tên tiếng Anh', 'English name')}
-                                                <input
-                                                    required
-                                                    maxLength={200}
-                                                    value={form[key]}
-                                                    onChange={(e) => update(key, e.target.value)}
-                                                    className={`${executiveUi.input} mt-2`}
-                                                />
-                                            </label>
-                                            {key === 'nameEn' && (
-                                                <ComboTranslation
-                                                    source={form.nameVi}
-                                                    field="NAME"
-                                                    disabled={busy}
-                                                    onAccept={(text) => update('nameEn', text)}
-                                                />
-                                            )}
-                                        </div>
+                                        <ExecutiveTranslatedField key={key}
+                                            label={key === 'nameVi' ? tr('Tên tiếng Việt', 'Vietnamese name') : tr('Tên tiếng Anh', 'English name')}
+                                            value={form[key]} source={form[key === 'nameVi' ? 'nameEn' : 'nameVi']}
+                                            sourceLanguage={key === 'nameVi' ? 'en' : 'vi'} field="NAME" limit={200}
+                                            session={`${editId ?? 'new'}:${translationSession}:name`} required disabled={busy} onChange={(value) => update(key, value)} />
                                     ))}
                                     <ExecutiveSelect
                                         label={tr('Danh mục', 'Category')}
@@ -490,33 +471,11 @@ export default function EcommerceCombosPage() {
                                         )}
                                     </div>
                                     {(['descriptionVi', 'descriptionEn'] as const).map((key) => (
-                                        <div key={key} className="min-w-0">
-                                            <label className="block text-xs font-bold">
-                                                {key === 'descriptionVi'
-                                                    ? tr(
-                                                          'Mô tả tiếng Việt',
-                                                          'Vietnamese description',
-                                                      )
-                                                    : tr('Mô tả tiếng Anh', 'English description')}
-                                                <textarea
-                                                    maxLength={5000}
-                                                    rows={3}
-                                                    value={form[key]}
-                                                    onChange={(e) => update(key, e.target.value)}
-                                                    className={`${executiveUi.input} mt-2 !h-auto py-3`}
-                                                />
-                                            </label>
-                                            {key === 'descriptionEn' && (
-                                                <ComboTranslation
-                                                    source={form.descriptionVi}
-                                                    field="DESCRIPTION"
-                                                    disabled={busy}
-                                                    onAccept={(text) =>
-                                                        update('descriptionEn', text)
-                                                    }
-                                                />
-                                            )}
-                                        </div>
+                                        <ExecutiveTranslatedField key={key}
+                                            label={key === 'descriptionVi' ? tr('Mô tả tiếng Việt', 'Vietnamese description') : tr('Mô tả tiếng Anh', 'English description')}
+                                            value={form[key]} source={form[key === 'descriptionVi' ? 'descriptionEn' : 'descriptionVi']}
+                                            sourceLanguage={key === 'descriptionVi' ? 'en' : 'vi'} field="DESCRIPTION" limit={5000}
+                                            session={`${editId ?? 'new'}:${translationSession}:description`} multiline disabled={busy} onChange={(value) => update(key, value)} />
                                     ))}
                                 </div>
                                 <section className="space-y-4 rounded-xl border border-store-green/20 p-4">
@@ -545,17 +504,12 @@ export default function EcommerceCombosPage() {
                                             ['originContentVi', 'originContentEn', 'Xuất xứ thành phần', 'Ingredient origins', 'ORIGIN_DETAIL'],
                                         ] as const).map(([viKey, enKey, vi, en, field]) => (
                                             <div key={viKey} className="grid min-w-0 items-start gap-4 md:col-span-2 md:grid-cols-2">
-                                                <label className="text-xs font-bold">
-                                                    {tr(vi, en)} (VI)
-                                                    <textarea rows={3} maxLength={2000} value={form[viKey]} onChange={(e) => update(viKey, e.target.value)} className={`${executiveUi.input} mt-2 !h-auto py-3`} />
-                                                </label>
-                                                <div className="min-w-0">
-                                                    <label className="block text-xs font-bold">
-                                                        {tr(vi, en)} (EN)
-                                                        <textarea rows={3} maxLength={2000} value={form[enKey]} onChange={(e) => update(enKey, e.target.value)} className={`${executiveUi.input} mt-2 !h-auto py-3`} />
-                                                    </label>
-                                                    <ComboTranslation source={form[viKey]} field={field} disabled={busy} onAccept={(text) => update(enKey, text)} />
-                                                </div>
+                                                <ExecutiveTranslatedField label={`${tr(vi, en)} (VI)`} value={form[viKey]}
+                                                    source={form[enKey]} sourceLanguage="en" field={field} limit={2000}
+                                                    session={`${editId ?? 'new'}:${translationSession}:${viKey}`} multiline disabled={busy} onChange={(value) => update(viKey, value)} />
+                                                <ExecutiveTranslatedField label={`${tr(vi, en)} (EN)`} value={form[enKey]}
+                                                    source={form[viKey]} sourceLanguage="vi" field={field} limit={2000}
+                                                    session={`${editId ?? 'new'}:${translationSession}:${enKey}`} multiline disabled={busy} onChange={(value) => update(enKey, value)} />
                                             </div>
                                         ))}
                                     </div>
