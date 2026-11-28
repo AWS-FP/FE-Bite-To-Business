@@ -23,7 +23,7 @@ export interface CartItem {
 
 interface CartStoreState {
     items: CartItem[]
-    addItem: (item: Omit<CartItem, 'quantity'>, quantity: number) => void
+    addItem: (item: Omit<CartItem, 'quantity'>, quantity: number) => StockLimit | null
     /**
      * Moves the quantity by `steps` order steps (+1 / -1 from the cart buttons).
      * Going below the MOQ removes the item; going above available stock is ignored.
@@ -46,6 +46,19 @@ interface CartStoreState {
 
 const guestKey = 'bitetobusiness.guest-cart'
 const round = (value: number) => Number(value.toFixed(3))
+
+export interface StockLimit { stock: number; inCart: number }
+
+/** Validate the whole addition, including units of this SKU already in the cart. */
+export function checkCartStock(item: Pick<CartItem, 'id' | 'minOrderQuantity' | 'quantityStep' | 'maxQuantity'>, quantity: number): StockLimit | null {
+    const existing = useCartStore.getState().items.find(line => line.id === item.id)
+    const rules = cartRules({ ...existing, ...item, maxQuantity: item.maxQuantity ?? existing?.maxQuantity })
+    const inCart = existing?.quantity ?? 0
+    if (rules.cap !== null && rules.max !== null && round(inCart + quantity) > rules.cap) {
+        return { stock: rules.max, inCart }
+    }
+    return null
+}
 
 export function cartRules(item: Pick<CartItem, 'minOrderQuantity' | 'quantityStep' | 'maxQuantity'>) {
     const min = Math.max(0.001, Number(item.minOrderQuantity) || 1)
@@ -78,15 +91,18 @@ function stepFrom(quantity: number, rules: ReturnType<typeof cartRules>, directi
 
 export const useCartStore = create<CartStoreState>()(persist((set) => ({
     items: [],
-    addItem: (newItem, quantity) =>
+    addItem: (newItem, quantity) => {
+        const limit = checkCartStock(newItem, quantity)
+        if (limit) return limit
         set((state) => {
             const existing = state.items.find((i) => i.id === newItem.id)
-            const rules = cartRules({ ...existing, ...newItem })
+            const item = { ...existing, ...newItem, maxQuantity: newItem.maxQuantity ?? existing?.maxQuantity }
+            const rules = cartRules(item)
             if (existing) {
                 return {
                     items: state.items.map((i) =>
                         i.id === newItem.id
-                            ? { ...i, ...newItem, quantity: snap(i.quantity + quantity, rules) }
+                            ? { ...item, quantity: snap(i.quantity + quantity, rules) }
                             : i
                     ),
                 }
@@ -94,7 +110,9 @@ export const useCartStore = create<CartStoreState>()(persist((set) => ({
             return {
                 items: [{ ...newItem, quantity: snap(quantity, rules) }, ...state.items],
             }
-        }),
+        })
+        return null
+    },
     updateQuantity: (id, steps) =>
         set((state) => ({
             items: state.items

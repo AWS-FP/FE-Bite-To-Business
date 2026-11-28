@@ -57,7 +57,7 @@ export function useA2uiActions() {
                         product.saleActive && product.salePrice != null
                             ? product.salePrice
                             : product.listPrice;
-                    useCartStore.getState().addItem(
+                    const limit = useCartStore.getState().addItem(
                         {
                             id: product.productId,
                             name: product.name,
@@ -70,7 +70,9 @@ export function useA2uiActions() {
                         },
                         Number(context.quantity) || product.minOrderQuantity,
                     );
-                    if (!onPage)
+                    if (limit) {
+                        note(i18n.t('storefront:productDetail.stockLimit', { ...limit, unit: product.unitCode }));
+                    } else if (!onPage)
                         note(`Đã thêm ${product.name} vào giỏ. Bạn chỉnh số lượng trong giỏ hàng.`);
                     break;
                 }
@@ -92,5 +94,5 @@ export function useA2uiActions() {
             }
         });
         return () => setA2uiActionHandler(null);
-    }, [navigate, locale]);
+    }, [navigate, locale, i18n]);
 }

@@ -147,7 +147,7 @@ export function AddButton({
             type="button"
             disabled={disabled}
             onClick={() => addToCart(context, product)}
-            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border-0 bg-store-green px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-store-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-store-green disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border-0 bg-store-green px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-store-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-store-green disabled:cursor-not-allowed disabled:opacity-40"
         >
             <Plus size={14} aria-hidden="true" /> {en ? 'Add to cart' : 'Thêm vào giỏ'}
         </button>
@@ -256,14 +256,26 @@ export function ProductPresentation({
                     {product.spec && <p className="text-sm text-store-muted">{product.spec}</p>}
                     <Price product={product} />
                     <Rating product={product} />
-                    <div className="flex flex-wrap items-center gap-3">
-                        <Stock product={product} />
+                    <div className="flex flex-wrap items-center gap-2">
+                        <span className={`inline-flex min-h-7 items-center rounded-full px-2.5 py-1 ${
+                            product.availableQuantity == null
+                                ? 'bg-slate-100'
+                                : inStock(product)
+                                  ? 'bg-[#eaf4eb]'
+                                  : 'bg-red-50'
+                        }`}>
+                            <Stock product={product} />
+                        </span>
                         <span className="text-xs text-store-muted">
                             MOQ: {product.minOrderQuantity} {unitLabel(product.unitCode)}
                         </span>
                     </div>
                     {showTiers && <Tiers product={product} />}
-                    {showAdd && <AddButton context={context} product={product} />}
+                    {showAdd && (
+                        <div className="mt-3 border-t border-store-line/70 pt-3">
+                            <AddButton context={context} product={product} />
+                        </div>
+                    )}
                 </div>
             </div>
         </article>
