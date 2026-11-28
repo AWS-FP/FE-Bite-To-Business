@@ -56,6 +56,29 @@ type Lang = TranslationLanguage;
 // Nhãn "Quy cách bán" trong chuỗi technical_content; trang sản phẩm tách chuỗi này thành một dòng của bảng.
 const SELLING_SPEC_LABEL: Record<Lang, string> = { vi: 'Quy cách bán', en: 'Selling spec' };
 
+// Kiểm tra số thập phân theo @Digits(integer, fraction) của BE. Number() có thể trả dạng 1e-7 nên đọc chuỗi staff nhập.
+function fitsDigits(raw: string | undefined, integer: number, fraction: number): boolean {
+    const value = (raw ?? '').trim();
+    const match = /^(\d+)(?:\.(\d*))?$/.exec(value);
+    if (!match) return false;
+    const whole = match[1].replace(/^0+(?=\d)/, '');
+    return whole.length <= integer && (match[2] ?? '').length <= fraction;
+}
+
+// Cột volume chỉ giữ 6 số lẻ (@Digits fraction = 6), nên làm tròn thay vì bắt staff tự cắt số.
+function roundVolume(raw: string | undefined): number {
+    const value = Number((raw ?? '').trim());
+    return Number.isFinite(value) ? Math.round(value * 1_000_000) / 1_000_000 : 0;
+}
+
+// Thể tích (m³) gợi ý từ kích thước D × R × C (cm), làm tròn 6 chữ số như cột volume.
+function volumeFromDimensions(length?: string, width?: string, height?: string): string {
+    const cm3 = Number(length) * Number(width) * Number(height);
+    if (!Number.isFinite(cm3) || cm3 <= 0) return '';
+    const m3 = Math.round(cm3) / 1_000_000;
+    return m3 > 0 ? m3.toFixed(6).replace(/0+$/, '').replace(/\.$/, '') : '';
+}
+
 // Ô văn bản tự do tối đa 150 chữ (đếm theo khoảng trắng) để đoạn hiển thị không phá bố cục.
 const MAX_TEXT_WORDS = 150;
 const FREE_TEXT_FIELDS: Record<number, string[]> = {
@@ -328,6 +351,19 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             }
             if (!Number.isFinite(Number(values.tareWeight)) || Number(values.tareWeight) < 0)
                 return tr('Khối lượng bao bì không được âm.');
+            // Cùng giới hạn @Digits của CreateWarehouseProductRequest để báo lỗi ngay trên form, không đợi BE trả 400.
+            // Thể tích nhiều hơn 6 số lẻ được tự làm tròn khi gửi; chỉ báo lỗi khi làm tròn còn 0 hoặc quá lớn.
+            const volume = roundVolume(values.volume);
+            if (volume <= 0 || volume >= 1_000_000)
+                return tr(
+                    'Thể tích tính bằng m³ và phải từ 0.000001 đến dưới 1.000.000. Ví dụ chai 500ml khoảng 0.0005 m³.',
+                );
+            if (!fitsDigits(values.netWeight, 9, 3) || !fitsDigits(values.tareWeight, 9, 3))
+                return tr('Khối lượng tính bằng kg, tối đa 3 chữ số thập phân.');
+            if (['length', 'width', 'height'].some((key) => !fitsDigits(values[key], 8, 2)))
+                return tr('Kích thước tính bằng cm, tối đa 2 chữ số thập phân.');
+            if (!fitsDigits(values.minOrder, 9, 3))
+                return tr('Số lượng đặt tối thiểu tối đa 3 chữ số thập phân.');
             if (
                 !Number.isFinite(Number(values.vat)) ||
                 Number(values.vat) < 0 ||
@@ -428,7 +464,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             specEn: values.specEn || null,
             netWeight: optionalNumber('netWeight'),
             tareWeight: optionalNumber('tareWeight'),
-            volume: optionalNumber('volume'),
+            volume: values.volume?.trim() ? roundVolume(values.volume) : null,
             length: optionalNumber('length'),
             width: optionalNumber('width'),
             height: optionalNumber('height'),
@@ -673,8 +709,9 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         CASE: { vi: 'Bán nguyên thùng, không tách lẻ', en: 'Sold by the case only' },
     };
     const sellingSpecExample = sellingSpecExamples[values.unit || ''] ?? sellingSpecExamples.CAN;
+    const suggestedVolume = volumeFromDimensions(values.length, values.width, values.height);
     // 7 thông số kỹ thuật cố định; nhãn theo ngôn ngữ staff đang chọn ở language switcher.
-    const specRows: { label: string; hint?: string; input: ReactNode }[] = [
+    const specRows: { label: string; hint?: string; hintId?: string; input: ReactNode }[] = [
         {
             label: tr('Đơn vị bán'),
             input: (
@@ -699,13 +736,14 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         },
         {
             label: tr('Quy cách bán'),
+            hintId: 'spec-hint-sellingSpec',
             hint: tr(
                 'Cách đóng nhiều đơn vị thành thùng hoặc lốc khi bán sỉ và giao hàng. Nếu chỉ bán lẻ, ghi "Bán lẻ từng đơn vị".',
             ),
             input: (
                 <input
                     aria-label={tr('Quy cách bán')}
-                    aria-describedby="selling-spec-hint"
+                    aria-describedby="spec-hint-sellingSpec"
                     maxLength={200}
                     placeholder={`${tr('Ví dụ:')} ${english ? sellingSpecExample.en : sellingSpecExample.vi}`}
                     value={values.sellingSpec || ''}
@@ -734,7 +772,26 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                 </div>
             ),
         },
-        { label: tr('Thể tích (m³)'), input: numberCell('volume', tr('Thể tích (m³)')) },
+        {
+            label: tr('Thể tích (m³)'),
+            hintId: 'spec-hint-volume',
+            hint: tr('Đơn vị m³, không phải ml hay lít. Nhập xong kích thước thì bấm "Tính từ kích thước".'),
+            input: (
+                <div className="flex gap-2">
+                    {numberCell('volume', tr('Thể tích (m³)'), tr('Ví dụ: 0.0005'))}
+                    <button
+                        type="button"
+                        disabled={!suggestedVolume}
+                        onClick={() =>
+                            setValues((current) => ({ ...current, volume: suggestedVolume }))
+                        }
+                        className="shrink-0 rounded border border-black/40 px-3 py-2 text-xs font-semibold disabled:opacity-40"
+                    >
+                        {tr('Tính từ kích thước')}
+                    </button>
+                </div>
+            ),
+        },
     ];
 
     return (
@@ -997,7 +1054,7 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                                             {row.label}
                                                             {row.hint && (
                                                                 <span
-                                                                    id="selling-spec-hint"
+                                                                    id={row.hintId}
                                                                     className="mt-1 block text-xs font-normal leading-5 text-black/60"
                                                                 >
                                                                     {row.hint}
