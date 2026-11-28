@@ -658,8 +658,23 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
             className={cellInputClass}
         />
     );
+    // Ví dụ "Quy cách bán" theo đơn vị bán đang chọn, để staff thấy đây là cách đóng thùng/lốc khi bán sỉ.
+    const sellingSpecExamples: Record<string, { vi: string; en: string }> = {
+        KG: { vi: 'Thùng 10 kg', en: 'Case of 10 kg' },
+        BOTTLE: { vi: 'Thùng 12 chai', en: 'Case of 12 bottles' },
+        PIECE: { vi: 'Hộp 20 cái', en: 'Box of 20 pieces' },
+        PACK: { vi: 'Thùng 30 gói', en: 'Case of 30 packs' },
+        TRAY: { vi: 'Thùng 10 khay', en: 'Case of 10 trays' },
+        BOX: { vi: 'Thùng 12 hộp', en: 'Case of 12 boxes' },
+        BAG: { vi: 'Bao 10 túi', en: 'Sack of 10 bags' },
+        CAN: { vi: 'Thùng 24 lon', en: 'Case of 24 cans' },
+        TIN: { vi: 'Thùng 12 hộp thiếc', en: 'Case of 12 tins' },
+        TUB: { vi: 'Thùng 6 hộp nhựa', en: 'Case of 6 tubs' },
+        CASE: { vi: 'Bán nguyên thùng, không tách lẻ', en: 'Sold by the case only' },
+    };
+    const sellingSpecExample = sellingSpecExamples[values.unit || ''] ?? sellingSpecExamples.CAN;
     // 7 thông số kỹ thuật cố định; nhãn theo ngôn ngữ staff đang chọn ở language switcher.
-    const specRows: { label: string; input: ReactNode }[] = [
+    const specRows: { label: string; hint?: string; input: ReactNode }[] = [
         {
             label: tr('Đơn vị bán'),
             input: (
@@ -684,11 +699,15 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
         },
         {
             label: tr('Quy cách bán'),
+            hint: tr(
+                'Cách đóng nhiều đơn vị thành thùng hoặc lốc khi bán sỉ và giao hàng. Nếu chỉ bán lẻ, ghi "Bán lẻ từng đơn vị".',
+            ),
             input: (
                 <input
                     aria-label={tr('Quy cách bán')}
+                    aria-describedby="selling-spec-hint"
                     maxLength={200}
-                    placeholder={tr('Ví dụ: Thùng 24 lon')}
+                    placeholder={`${tr('Ví dụ:')} ${english ? sellingSpecExample.en : sellingSpecExample.vi}`}
                     value={values.sellingSpec || ''}
                     onChange={(e) =>
                         setValues((current) => ({ ...current, sellingSpec: e.target.value }))
@@ -976,6 +995,14 @@ export default function ProductCreateWizard({ request, onClose, onCreated }: Pro
                                                             className="px-3 py-2 text-left align-middle font-medium"
                                                         >
                                                             {row.label}
+                                                            {row.hint && (
+                                                                <span
+                                                                    id="selling-spec-hint"
+                                                                    className="mt-1 block text-xs font-normal leading-5 text-black/60"
+                                                                >
+                                                                    {row.hint}
+                                                                </span>
+                                                            )}
                                                         </th>
                                                         <td className="px-2 py-2">{row.input}</td>
                                                     </tr>
